@@ -1,129 +1,79 @@
 workflows:
-  ios:
-    name: iOS — MisAutónomos
-    instance_type: mac_mini_m2
-    max_build_duration: 60
-    environment:
-      vars:
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-        BUNDLE_ID: "es.misautonomos.app"
-        # Define en Codemagic UI los secrets de App Store Connect y firma:
-        #   APP_STORE_CONNECT_PRIVATE_KEY, APP_STORE_CONNECT_KEY_IDENTIFIER,
-        #   APP_STORE_CONNECT_ISSUER_ID, CERTIFICATE_PRIVATE_KEY
-        # y un grupo `app_store_credentials`.
-      node: 20.18.0
-      xcode: latest
-      cocoapods: default
-      groups:
-        - app_store_credentials   # opcional: define en Codemagic
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
-    scripts:
-      - name: Instalar dependencias web
-        script: |
-          npm ci
-      - name: Build web (Vite)
-        script: |
-          npm run build
-      - name: Sync Capacitor iOS
-        script: |
-          npx cap sync ios
-      - name: Pod install
-        script: |
-          cd ios/App
-          pod install --repo-update
-      - name: Set up code signing
-        script: |
-          if [ -n "$APP_STORE_CONNECT_PRIVATE_KEY" ]; then
-            keychain initialize
-            app-store-connect fetch-signing-files "$BUNDLE_ID" \
-              --type IOS_APP_STORE \
-              --create
-            keychain add-certificates
-            xcode-project use-profiles
-          else
-            echo "Sin firma configurada — build sin firmar (solo para verificación)."
-          fi
-      - name: Build .ipa
-        script: |
-          if [ -n "$APP_STORE_CONNECT_PRIVATE_KEY" ]; then
-            xcode-project build-ipa \
-              --workspace "$XCODE_WORKSPACE" \
-              --scheme "$XCODE_SCHEME"
-          else
-            xcodebuild -workspace "$XCODE_WORKSPACE" -scheme "$XCODE_SCHEME" \
-              -configuration Release -sdk iphonesimulator \
-              -derivedDataPath build/ios/derivedData \
-              CODE_SIGNING_ALLOWED=NO clean build
-          fi
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Logs/**/*.log
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-        beta_groups:
-          - "Internal"
-
+  # ===== ANDROID: genera un APK instalable para PROBAR que todo compila =====
   android:
-    name: Android — MisAutónomos
-    instance_type: mac_mini_m2
+    name: MisAutonomos Android
+    instance_type: linux_x2
     max_build_duration: 60
     environment:
-      vars:
-        PACKAGE_NAME: "es.misautonomos.app"
       node: 20.18.0
-      java: 17
-      groups:
-        - google_play_credentials  # opcional: define en Codemagic
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
     scripts:
-      - name: Instalar dependencias web
-        script: |
-          npm ci
-      - name: Build web (Vite)
-        script: |
-          npm run build
-      - name: Sync Capacitor Android
-        script: |
-          npx cap sync android
-      - name: Set up keystore (si está configurado)
-        script: |
-          if [ -n "$CM_KEYSTORE" ]; then
-            echo "$CM_KEYSTORE" | base64 --decode > /tmp/keystore.jks
-            cat <<EOF > android/key.properties
-          storeFile=/tmp/keystore.jks
-          storePassword=$CM_KEYSTORE_PASSWORD
-          keyAlias=$CM_KEY_ALIAS
-          keyPassword=$CM_KEY_PASSWORD
-          EOF
-          else
-            echo "Sin keystore — build sin firmar."
-          fi
-      - name: Build .aab (release)
+      - name: Instalar dependencias
+        script: npm install
+      - name: Compilar la web
+        script: npm run build
+      - name: Capacitor sync Android
+        script: npx cap sync android
+      - name: Build APK (debug)
         script: |
           cd android
           chmod +x ./gradlew
-          ./gradlew bundleRelease
+          ./gradlew assembleDebug
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+
+  # ===== ANDROID RELEASE (.aab para Play): actívalo cuando tengas el keystore =====
+  android-release:
+    name: MisAutonomos Android Release (.aab)
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      node: 20.18.0
+      groups:
+        - keystore_credentials   # crea este grupo en Codemagic: CM_KEYSTORE, CM_KEYSTORE_PASSWORD, CM_KEY_ALIAS, CM_KEY_PASSWORD
+    scripts:
+      - name: Instalar dependencias
+        script: npm install
+      - name: Compilar la web
+        script: npm run build
+      - name: Capacitor sync Android
+        script: npx cap sync android
+      - name: Preparar keystore
+        script: echo $CM_KEYSTORE | base64 --decode > $CM_BUILD_DIR/android/app/release.keystore
+      - name: Build AAB firmado
+        script: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file=$CM_BUILD_DIR/android/app/release.keystore \
+            -Pandroid.injected.signing.store.password=$CM_KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$CM_KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$CM_KEY_PASSWORD
     artifacts:
       - android/app/build/outputs/**/*.aab
-      - android/app/build/outputs/**/*.apk
-    publishing:
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
-        submit_as_draft: true
+
+  # ===== iOS: compila la app (sin firmar). El .ipa firmado vendra con tu cuenta Apple =====
+  ios:
+    name: MisAutonomos iOS (compilacion)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      node: 20.18.0
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Instalar dependencias
+        script: npm install
+      - name: Compilar la web
+        script: npm run build
+      - name: Capacitor sync iOS
+        script: npx cap sync ios
+      - name: Instalar pods
+        script: cd ios/App && pod install
+      - name: Compilar (sin firma)
+        script: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release \
+            -sdk iphoneos -archivePath $CM_BUILD_DIR/build/App.xcarchive archive \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - build/*.xcarchive
