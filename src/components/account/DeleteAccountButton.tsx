@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Trash2, Loader2, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/api/supabaseClient';
-import { base44 } from '@/api/base44Client';
 
 const NAVY = '#00255C';
 
@@ -34,30 +33,21 @@ export default function DeleteAccountButton({
     }
     setBusy(true);
     try {
-      let userId: string | null = null;
-      try {
-        const me = await base44.auth.me();
-        userId = me?.id || null;
-      } catch {
-        const { data } = await supabase.auth.getUser();
-        userId = data?.user?.id || null;
-      }
-      if (!userId) {
-        toast.error('No has iniciado sesión.');
+      const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' });
+      if (error) {
+        console.error('[DeleteAccount] edge function error:', error);
+        toast.error(error.message || 'No se ha podido eliminar la cuenta.');
         return;
       }
-      await base44.functions.invoke('deleteUser', { userId });
       try {
         await supabase.auth.signOut();
       } catch {
         /* noop */
       }
       toast.success('Cuenta eliminada.');
-      setTimeout(() => {
-        window.location.href = redirectTo;
-      }, 800);
+      window.location.href = redirectTo;
     } catch (e: any) {
-      console.error('[DeleteAccount] error:', e);
+      console.error('[DeleteAccount] exception:', e);
       toast.error(e?.message || 'No se ha podido eliminar la cuenta.');
     } finally {
       setBusy(false);
