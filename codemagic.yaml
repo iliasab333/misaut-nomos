@@ -57,6 +57,10 @@ workflows:
       - android/app/build/outputs/**/*.aab
 
   # ===== iOS: .ipa firmado y subido a App Store Connect =====
+  # Capacitor 8+ usa Swift Package Manager (ios/App/CapApp-SPM/Package.swift)
+  # en lugar de CocoaPods, por eso NO existe Podfile ni App.xcworkspace y no
+  # ejecutamos pod install. xcodebuild resuelve los plugins SPM directamente
+  # desde el .xcodeproj.
   ios:
     name: MisAutonomos iOS (.ipa)
     instance_type: mac_mini_m2
@@ -66,7 +70,6 @@ workflows:
     environment:
       node: 22.14.0
       xcode: latest
-      cocoapods: default
       vars:
         BUNDLE_ID: "com.base690076ad86e673c796768de5.app"
         APP_STORE_APPLE_ID: 6759524805
@@ -77,12 +80,14 @@ workflows:
         script: npm run build
       - name: Capacitor sync iOS
         script: npx cap sync ios
-      - name: Instalar pods
-        script: cd ios/App && pod install
+      - name: Resolver dependencias Swift Package Manager
+        script: |
+          cd ios/App
+          xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App
       - name: Configurar firma (crea certificado y perfil si faltan)
         script: |
           keychain initialize
-          app-store-connect fetch-signing-files "com.base690076ad86e673c796768de5.app" \
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create
           keychain add-certificates
@@ -91,7 +96,7 @@ workflows:
         script: |
           cd ios/App
           xcode-project build-ipa \
-            --workspace App.xcworkspace \
+            --project App.xcodeproj \
             --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
