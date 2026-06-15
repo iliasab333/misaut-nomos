@@ -30,3 +30,7 @@ dist-ssr
 .env
 .vercel
 .env*
+
+# Android signing — NEVER commit keystore o credenciales
+android/app/*.keystore
+android/key.properties
