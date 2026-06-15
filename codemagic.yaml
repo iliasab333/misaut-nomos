@@ -9,9 +9,16 @@ workflows:
     scripts:
       - name: Usar Java 21
         script: |
-          export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+          JH=$(/usr/libexec/java_home -v 21 2>/dev/null || true)
+          if [ -z "$JH" ]; then
+            echo "JDK 21 no encontrado; instalando con Homebrew..."
+            brew install openjdk@21
+            JH="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home"
+          fi
+          export JAVA_HOME="$JH"
           echo "JAVA_HOME=$JAVA_HOME" >> $CM_ENV
-          java -version
+          echo "Usando JAVA_HOME=$JAVA_HOME"
+          "$JAVA_HOME/bin/java" -version
       - name: Instalar dependencias
         script: npm install
       - name: Compilar la web
@@ -38,9 +45,15 @@ workflows:
     scripts:
       - name: Usar Java 21
         script: |
-          export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+          JH=$(/usr/libexec/java_home -v 21 2>/dev/null || true)
+          if [ -z "$JH" ]; then
+            echo "JDK 21 no encontrado; instalando con Homebrew..."
+            brew install openjdk@21
+            JH="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home"
+          fi
+          export JAVA_HOME="$JH"
           echo "JAVA_HOME=$JAVA_HOME" >> $CM_ENV
-          java -version
+          "$JAVA_HOME/bin/java" -version
       - name: Instalar dependencias
         script: npm install
       - name: Compilar la web
