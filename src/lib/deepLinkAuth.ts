@@ -3,7 +3,7 @@
 // Flujo de login en nativo:
 //  1. La app abre el navegador del sistema con el flujo OAuth/email.
 //  2. Supabase devuelve al usuario a una URL custom-scheme (ej.
-//     `es.misautonomos.app://login-callback#access_token=...`).
+//     `com.base690076ad86e673c796768de5.app://login-callback#access_token=...`).
 //  3. Capacitor App.addListener('appUrlOpen') captura esa URL y la pasamos a
 //     `supabase.auth.exchangeCodeForSession` o `setSession` según el formato.
 //

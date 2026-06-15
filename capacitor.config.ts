@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'es.misautonomos.app',
+  appId: 'com.base690076ad86e673c796768de5.app',
   appName: 'MisAutónomos',
   // Vite -> 'dist'. Si tu web es Next.js con export estático -> 'out'
   webDir: 'dist',
