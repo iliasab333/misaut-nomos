@@ -87,9 +87,8 @@ workflows:
       - name: Configurar firma (crea certificado y perfil si faltan)
         script: |
           keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
+          app-store-connect create-certificate --type IOS_DISTRIBUTION --save
+          app-store-connect fetch-signing-files "com.base690076ad86e673c796768de5.app" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
       - name: Build IPA firmado
