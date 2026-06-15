@@ -7,6 +7,11 @@ workflows:
     environment:
       node: 22.14.0
     scripts:
+      - name: Usar Java 21
+        script: |
+          export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+          echo "JAVA_HOME=$JAVA_HOME" >> $CM_ENV
+          java -version
       - name: Instalar dependencias
         script: npm install
       - name: Compilar la web
@@ -31,6 +36,11 @@ workflows:
       groups:
         - keystore_credentials   # crea este grupo en Codemagic: CM_KEYSTORE, CM_KEYSTORE_PASSWORD, CM_KEY_ALIAS, CM_KEY_PASSWORD
     scripts:
+      - name: Usar Java 21
+        script: |
+          export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+          echo "JAVA_HOME=$JAVA_HOME" >> $CM_ENV
+          java -version
       - name: Instalar dependencias
         script: npm install
       - name: Compilar la web
