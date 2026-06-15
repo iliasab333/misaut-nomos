@@ -2,7 +2,7 @@ workflows:
   # ===== ANDROID: genera un APK instalable para PROBAR que todo compila =====
   android:
     name: MisAutonomos Android
-    instance_type: linux_x2
+    instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
       node: 20.18.0
@@ -24,7 +24,7 @@ workflows:
   # ===== ANDROID RELEASE (.aab para Play): actívalo cuando tengas el keystore =====
   android-release:
     name: MisAutonomos Android Release (.aab)
-    instance_type: linux_x2
+    instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
       node: 20.18.0
