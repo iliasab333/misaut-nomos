@@ -7,18 +7,6 @@ workflows:
     environment:
       node: 22.14.0
     scripts:
-      - name: Usar Java 21
-        script: |
-          JH=$(/usr/libexec/java_home -v 21 2>/dev/null || true)
-          if [ -z "$JH" ]; then
-            echo "JDK 21 no encontrado; instalando con Homebrew..."
-            brew install openjdk@21
-            JH="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home"
-          fi
-          export JAVA_HOME="$JH"
-          echo "JAVA_HOME=$JAVA_HOME" >> $CM_ENV
-          echo "Usando JAVA_HOME=$JAVA_HOME"
-          "$JAVA_HOME/bin/java" -version
       - name: Instalar dependencias
         script: npm install
       - name: Compilar la web
@@ -27,9 +15,12 @@ workflows:
         script: npx cap sync android
       - name: Build APK (debug)
         script: |
+          # Fijar Java 21 EN ESTE MISMO paso (no se hereda entre pasos)
+          export JAVA_HOME=$(/usr/libexec/java_home -v 21 2>/dev/null || echo "$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home")
+          echo "Compilando con:"; "$JAVA_HOME/bin/java" -version
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug -Dorg.gradle.java.home="$JAVA_HOME"
     artifacts:
       - android/app/build/outputs/**/*.apk
 
@@ -43,17 +34,6 @@ workflows:
       groups:
         - keystore_credentials   # crea este grupo en Codemagic: CM_KEYSTORE, CM_KEYSTORE_PASSWORD, CM_KEY_ALIAS, CM_KEY_PASSWORD
     scripts:
-      - name: Usar Java 21
-        script: |
-          JH=$(/usr/libexec/java_home -v 21 2>/dev/null || true)
-          if [ -z "$JH" ]; then
-            echo "JDK 21 no encontrado; instalando con Homebrew..."
-            brew install openjdk@21
-            JH="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home"
-          fi
-          export JAVA_HOME="$JH"
-          echo "JAVA_HOME=$JAVA_HOME" >> $CM_ENV
-          "$JAVA_HOME/bin/java" -version
       - name: Instalar dependencias
         script: npm install
       - name: Compilar la web
@@ -64,9 +44,12 @@ workflows:
         script: echo $CM_KEYSTORE | base64 --decode > $CM_BUILD_DIR/android/app/release.keystore
       - name: Build AAB firmado
         script: |
+          export JAVA_HOME=$(/usr/libexec/java_home -v 21 2>/dev/null || echo "$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home")
+          echo "Compilando con:"; "$JAVA_HOME/bin/java" -version
           cd android
           chmod +x ./gradlew
           ./gradlew bundleRelease \
+            -Dorg.gradle.java.home="$JAVA_HOME" \
             -Pandroid.injected.signing.store.file=$CM_BUILD_DIR/android/app/release.keystore \
             -Pandroid.injected.signing.store.password=$CM_KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$CM_KEY_ALIAS \
