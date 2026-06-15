@@ -1,5 +1,5 @@
 workflows:
-  # ===== ANDROID: genera un APK instalable para PROBAR que todo compila =====
+  # ===== ANDROID: APK de prueba (no firmado para tiendas) =====
   android:
     name: MisAutonomos Android
     instance_type: mac_mini_m2
@@ -15,7 +15,6 @@ workflows:
         script: npx cap sync android
       - name: Build APK (debug)
         script: |
-          # Fijar Java 21 EN ESTE MISMO paso (no se hereda entre pasos)
           export JAVA_HOME=$(/usr/libexec/java_home -v 21 2>/dev/null || echo "$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home")
           echo "Compilando con:"; "$JAVA_HOME/bin/java" -version
           cd android
@@ -24,7 +23,7 @@ workflows:
     artifacts:
       - android/app/build/outputs/**/*.apk
 
-  # ===== ANDROID RELEASE (.aab para Play): actívalo cuando tengas el keystore =====
+  # ===== ANDROID RELEASE (.aab firmado para Google Play) =====
   android-release:
     name: MisAutonomos Android Release (.aab)
     instance_type: mac_mini_m2
@@ -32,7 +31,7 @@ workflows:
     environment:
       node: 22.14.0
       groups:
-        - keystore_credentials   # crea este grupo en Codemagic: CM_KEYSTORE, CM_KEYSTORE_PASSWORD, CM_KEY_ALIAS, CM_KEY_PASSWORD
+        - keystore_credentials
     scripts:
       - name: Instalar dependencias
         script: npm install
@@ -57,15 +56,23 @@ workflows:
     artifacts:
       - android/app/build/outputs/**/*.aab
 
-  # ===== iOS: compila la app (sin firmar). El .ipa firmado vendra con tu cuenta Apple =====
+  # ===== iOS: .ipa firmado y subido a App Store Connect =====
   ios:
-    name: MisAutonomos iOS (compilacion)
+    name: MisAutonomos iOS (.ipa)
     instance_type: mac_mini_m2
-    max_build_duration: 60
+    max_build_duration: 90
+    integrations:
+      app_store_connect: codemagic_asc_api_key
     environment:
       node: 22.14.0
       xcode: latest
       cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.base690076ad86e673c796768de5.app
+      vars:
+        BUNDLE_ID: "com.base690076ad86e673c796768de5.app"
+        APP_STORE_APPLE_ID: 6759524805
     scripts:
       - name: Instalar dependencias
         script: npm install
@@ -75,11 +82,19 @@ workflows:
         script: npx cap sync ios
       - name: Instalar pods
         script: cd ios/App && pod install
-      - name: Compilar (sin firma)
+      - name: Registrar dispositivos y perfiles de firma
+        script: |
+          xcode-project use-profiles
+      - name: Build IPA firmado
         script: |
           cd ios/App
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release \
-            -sdk iphoneos -archivePath $CM_BUILD_DIR/build/App.xcarchive archive \
-            CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          xcode-project build-ipa \
+            --workspace App.xcworkspace \
+            --scheme App
     artifacts:
-      - build/*.xcarchive
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
