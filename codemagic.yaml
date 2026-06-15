@@ -67,9 +67,6 @@ workflows:
       node: 22.14.0
       xcode: latest
       cocoapods: default
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.base690076ad86e673c796768de5.app
       vars:
         BUNDLE_ID: "com.base690076ad86e673c796768de5.app"
         APP_STORE_APPLE_ID: 6759524805
