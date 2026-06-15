@@ -2,176 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
-
-/* :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-} */
-
-
+/* ─────────────────────────────────────────────────────────────────────────
+   Tokens de marca MisAutónomos
+   - Navy primario:  #00255C  → HSL 216 100% 18%
+   - Gold de acento: #F5C13D  → HSL  43  90% 60%
+   - Neutros slate (Tailwind).
+   Las HSL se exponen como componentes (h s% l%) para que Tailwind las consuma
+   vía `hsl(var(--...) / <alpha-value>)`.
+   ───────────────────────────────────────────────────────────────────────── */
 
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 222 47% 11%;            /* slate-900 */
+
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primario = navy de marca */
+    --primary: 216 100% 18%;              /* #00255C */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secundario = neutro suave */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    /* Acento = dorado de marca */
+    --accent: 43 90% 60%;                 /* #F5C13D */
+    --accent-foreground: 216 100% 18%;    /* texto navy sobre dorado */
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;      /* slate-500 */
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;                /* slate-200 */
+    --input: 214 32% 91%;
+    --ring: 216 100% 18%;                 /* foco navy */
+
+    --radius: 0.75rem;                    /* 12px base */
+
+    /* Tokens propios de marca (para uso directo) */
+    --brand-navy: 216 100% 18%;
+    --brand-navy-deep: 216 100% 12%;
+    --brand-gold: 43 90% 60%;
+    --brand-gold-deep: 38 80% 50%;
+    --brand-cream: 44 50% 96%;
+    --brand-ink: 222 47% 11%;
+    --brand-surface: 220 20% 98%;         /* gris muy suave para bandas */
+
+    /* Sidebar reusa los mismos tokens */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222.2 47.4% 11.2%;
-    --sidebar-primary: 221.2 83.2% 53.3%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 210 40% 96.1%;
-    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
-    --sidebar-border: 214.3 31.8% 91.4%;
-    --sidebar-ring: 221.2 83.2% 53.3%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 216 100% 18%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 216 100% 18%;
   }
-  
-  /* Force light theme always — override .dark class if it exists */
+
+  /* Forzar light theme siempre. */
   .dark {
     --background: 0 0% 100% !important;
-    --foreground: 222.2 84% 4.9% !important;
+    --foreground: 222 47% 11% !important;
     --card: 0 0% 100% !important;
-    --card-foreground: 222.2 84% 4.9% !important;
+    --card-foreground: 222 47% 11% !important;
     --popover: 0 0% 100% !important;
-    --popover-foreground: 222.2 84% 4.9% !important;
-    --primary: 221.2 83.2% 53.3% !important;
-    --primary-foreground: 210 40% 98% !important;
-    --secondary: 210 40% 96.1% !important;
-    --secondary-foreground: 222.2 47.4% 11.2% !important;
-    --muted: 210 40% 96.1% !important;
-    --muted-foreground: 215.4 16.3% 46.9% !important;
-    --accent: 210 40% 96.1% !important;
-    --accent-foreground: 222.2 47.4% 11.2% !important;
-    --destructive: 0 84.2% 60.2% !important;
-    --destructive-foreground: 210 40% 98% !important;
-    --border: 214.3 31.8% 91.4% !important;
-    --input: 214.3 31.8% 91.4% !important;
-    --ring: 221.2 83.2% 53.3% !important;
-    --sidebar-background: 0 0% 100% !important;
-    --sidebar-foreground: 222.2 47.4% 11.2% !important;
-    --sidebar-primary: 221.2 83.2% 53.3% !important;
-    --sidebar-primary-foreground: 210 40% 98% !important;
-    --sidebar-accent: 210 40% 96.1% !important;
-    --sidebar-accent-foreground: 222.2 47.4% 11.2% !important;
-    --sidebar-border: 214.3 31.8% 91.4% !important;
-    --sidebar-ring: 221.2 83.2% 53.3% !important;
+    --popover-foreground: 222 47% 11% !important;
+    --primary: 216 100% 18% !important;
+    --primary-foreground: 0 0% 100% !important;
+    --secondary: 210 40% 96% !important;
+    --secondary-foreground: 222 47% 11% !important;
+    --muted: 210 40% 96% !important;
+    --muted-foreground: 215 16% 47% !important;
+    --accent: 43 90% 60% !important;
+    --accent-foreground: 216 100% 18% !important;
+    --destructive: 0 84% 60% !important;
+    --destructive-foreground: 0 0% 100% !important;
+    --border: 214 32% 91% !important;
+    --input: 214 32% 91% !important;
+    --ring: 216 100% 18% !important;
   }
 }
-
-
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
   body {
     @apply bg-background text-foreground;
   }
+  /* Cinturón anti-CLS: cualquier <img> sin altura explícita conserva su ratio
+     real en cuanto se conoce el natural-size, y no salta. Los <img> con
+     width/height/aspect-ratio explícitos no se ven afectados. */
+  img:not([width]):not([height]) {
+    height: auto;
+    max-width: 100%;
+    aspect-ratio: attr(width number, auto);
+  }
 }
 
-/* =============================================
-   MICRO-INTERACCIONES GLOBALES
-   ============================================= */
-
-/* Cards con hover suave (complementa globals.css) */
+/* ─────────────────────────────────────────────────────────────────────────
+   Microinteracciones globales
+   ───────────────────────────────────────────────────────────────────────── */
 .profile-card {
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .profile-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 50px -16px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px -16px hsl(var(--brand-navy) / 0.18);
 }
 @media (max-width: 768px) {
-  .profile-card:hover {
-    transform: none;
-    box-shadow: none;
-  }
-  .profile-card:active {
-    transform: scale(0.98);
-  }
+  .profile-card:hover { transform: none; box-shadow: none; }
+  .profile-card:active { transform: scale(0.99); }
+}
+
+/* Focus visible accesible por defecto (negociado con tokens) */
+:focus-visible {
+  outline: 2px solid hsl(var(--brand-navy));
+  outline-offset: 2px;
+  border-radius: 4px;
 }

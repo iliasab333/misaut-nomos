@@ -1,270 +1,344 @@
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
-import { useParams, useNavigate } from "react-router-dom";
-import { Star, CheckCircle, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { toast } from "sonner";
-import SEOHead from "../components/seo/SEOHead";
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Star, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import SEOHead from '@/components/seo/SEOHead';
+import InitialsAvatar from '@/components/ui/InitialsAvatar';
+import { optimizeSupabaseImage } from '@/lib/supabaseImage';
+import { getReviewRequest, submitReview } from '@/lib/reviewRpc';
+import { toast } from 'sonner';
 
-/**
- * Página pública para dejar una reseña desde un link directo.
- * URL: /valorar/:professionalId
- * No requiere login para ver el formulario; al enviar, si no está logueado, redirige al login.
- */
+const NAVY = '#00255C';
+const GOLD = '#F5C13D';
+
+// /valorar/:token — página móvil-first de una sola pantalla.
+// 1) Resuelve el token con get_review_request (RPC).
+// 2) Si valid, muestra foto + business_name + formulario con rating
+//    obligatorio (1–5) y subratings opcionales.
+// 3) Envía con submit_review(token, ...). Maneja errores conocidos.
 export default function LeaveReviewPage() {
-  const { professionalId } = useParams();
+  const { token: paramToken } = useParams();
   const navigate = useNavigate();
 
-  const [profile, setProfile] = useState(null);
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [info, setInfo] = useState(null);
+  const [reason, setReason] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const [existingReview, setExistingReview] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const [ratings, setRatings] = useState({
-    rapidez: 0,
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [sub, setSub] = useState({
     comunicacion: 0,
     calidad: 0,
+    rapidez: 0,
     precio_satisfaccion: 0,
   });
-  const [comment, setComment] = useState("");
 
   useEffect(() => {
-    const init = async () => {
+    let cancelled = false;
+    (async () => {
+      if (!paramToken) {
+        setReason('no_existe');
+        setLoading(false);
+        return;
+      }
       try {
-        // Cargar perfil profesional
-        const profiles = await base44.entities.ProfessionalProfile.filter({ user_id: professionalId });
-        setProfile(profiles[0] || null);
-
-        // Intentar cargar usuario (puede fallar si no está logueado)
-        try {
-          const u = await base44.auth.me();
-          setUser(u);
-
-          // Verificar si ya existe review
-          if (u) {
-            const existing = await base44.entities.Review.filter({
-              professional_id: professionalId,
-              client_id: u.id
-            });
-            setExistingReview(existing[0] || null);
-          }
-        } catch {}
-      } catch {}
-      setLoading(false);
+        const data = await getReviewRequest(paramToken);
+        if (cancelled) return;
+        if (!data || data.valid === false) {
+          setReason(data?.reason || 'no_existe');
+          setInfo(null);
+        } else {
+          setInfo(data);
+        }
+      } catch (e) {
+        if (!cancelled) setReason(e?.message || 'no_existe');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
     };
-    if (professionalId) init();
-  }, [professionalId]);
+  }, [paramToken]);
 
-  const avgRating = Math.round(
-    (ratings.rapidez + ratings.comunicacion + ratings.calidad + ratings.precio_satisfaccion) / 4
-  );
-
-  const handleSubmit = async () => {
-    if (!user) {
-      sessionStorage.setItem('review_pending', JSON.stringify({ professionalId, ratings, comment }));
-      base44.auth.redirectToLogin(window.location.href);
+  const onSubmit = async (e) => {
+    e?.preventDefault?.();
+    if (!rating) {
+      toast.error('Pon una nota global');
       return;
     }
-    if (Object.values(ratings).some(r => r === 0)) {
-      toast.error("Valora todos los aspectos");
-      return;
-    }
-    if (existingReview) {
-      toast.error("Ya has dejado una valoración a este profesional");
-      return;
-    }
-
     setSubmitting(true);
     try {
-      await base44.entities.Review.create({
-        professional_id: professionalId,
-        client_id: user.id,
-        client_name: user.full_name || user.email?.split("@")[0] || "Cliente",
-        rating: avgRating,
-        rapidez: ratings.rapidez,
-        comunicacion: ratings.comunicacion,
-        calidad: ratings.calidad,
-        precio_satisfaccion: ratings.precio_satisfaccion,
-        comment: comment.trim(),
-        is_verified: true,
-        client_verified: false,
+      const res = await submitReview({
+        token: paramToken,
+        rating,
+        comment: comment.trim() || null,
+        comunicacion: sub.comunicacion || null,
+        calidad: sub.calidad || null,
+        rapidez: sub.rapidez || null,
+        precio_satisfaccion: sub.precio_satisfaccion || null,
+        client_name: clientName.trim() || null,
       });
-
-      // Recalcular media (fire-and-forget)
-      base44.functions.invoke('recalcProfessionalRating', {
-        event: { type: 'create' },
-        data: { professional_id: professionalId, rating: avgRating, client_name: user.full_name, comment }
-      }).catch(() => {});
-
+      if (res?.ok === false) {
+        const r = res?.reason || 'error';
+        if (r === 'ya_valorado' || r === 'token_caducado' || r === 'no_existe') {
+          setReason(r);
+        } else {
+          toast.error('No se ha podido enviar la valoración.');
+        }
+        return;
+      }
       setSubmitted(true);
-    } catch (err) {
-      toast.error("Error al enviar la valoración. Inténtalo de nuevo.");
+    } catch (e) {
+      const m = (e?.message || '').toLowerCase();
+      if (m.includes('ya_valorado')) setReason('ya_valorado');
+      else if (m.includes('caducado') || m.includes('expir')) setReason('token_caducado');
+      else if (m.includes('no_existe') || m.includes('invalid')) setReason('no_existe');
+      else toast.error(e?.message || 'Error al enviar');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const StarInput = ({ field, label }) => (
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-gray-700 w-44 flex-shrink-0">{label}</span>
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map(s => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setRatings(r => ({ ...r, [field]: s }))}
-            className="focus:outline-none"
-          >
-            <Star className={`w-7 h-7 transition-colors ${s <= ratings[field] ? "fill-amber-400 text-amber-400" : "text-gray-200 hover:text-amber-300"}`} />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <p className="text-gray-600 mb-4">Profesional no encontrado.</p>
-          <Button onClick={() => navigate("/buscar")}>Volver a búsqueda</Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">¡Gracias por tu valoración!</h2>
-          <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-            Tu opinión ayuda a otros clientes a elegir mejor y al profesional a mejorar.
-          </p>
-          <div className="flex gap-3">
-            <Button onClick={() => navigate(`/autonomo/${profile.slug_publico || professionalId}`)} variant="outline" className="flex-1">
-              Ver perfil
-            </Button>
-            <Button onClick={() => navigate("/buscar")} className="flex-1 bg-blue-600 hover:bg-blue-700">
-              Buscar más
-            </Button>
-          </div>
-          {!user && (
-            <p className="text-xs text-gray-500 mt-4">
-              ¿Eres autónomo?{" "}
-              <button onClick={() => navigate("/precios")} className="text-blue-600 underline">
-                Regístrate gratis
-              </button>
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  }
+  const photo = info?.photo
+    ? optimizeSupabaseImage(info.photo, { width: 200, height: 200 })
+    : null;
+  const businessName = info?.business_name || 'el profesional';
 
   return (
     <>
-      <SEOHead
-        title={`Valorar a ${profile.business_name} - MisAutónomos`}
-        description={`Deja tu valoración sobre ${profile.business_name}`}
-        noindex
-      />
-
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6">
-          {/* Header del profesional */}
-          <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
-            <Avatar className="w-14 h-14 flex-shrink-0">
-              {profile.imagen_principal ? (
-                <AvatarImage src={profile.imagen_principal} alt={profile.business_name} className="object-cover" />
-              ) : (
-                <AvatarFallback className="bg-blue-600 text-white text-xl font-bold">
-                  {profile.business_name?.charAt(0)}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            <div>
-              <h1 className="font-bold text-gray-900 text-base">{profile.business_name}</h1>
-              <p className="text-sm text-gray-500">{profile.categories?.[0]} · {profile.ciudad}</p>
+      <SEOHead title="Dejar una reseña — MisAutónomos" noindex />
+      <div className="min-h-screen bg-slate-50">
+        <div className="max-w-md mx-auto px-4 sm:px-6 py-6 pb-24">
+          {loading ? (
+            <div className="flex items-center justify-center py-24">
+              <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
             </div>
-          </div>
-
-          {existingReview ? (
-            <div className="text-center py-6">
-              <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-              <p className="font-semibold text-gray-900">Ya has valorado a este profesional</p>
-              <p className="text-sm text-gray-500 mt-1">Puedes editar tu valoración desde tu perfil</p>
-              <Button onClick={() => navigate("/mi-perfil")} className="mt-4">Ver mis reseñas</Button>
-            </div>
+          ) : reason ? (
+            <InvalidTokenView
+              reason={reason}
+              onHome={() => navigate('/')}
+            />
+          ) : submitted ? (
+            <SubmittedView
+              businessName={businessName}
+              onHome={() => navigate('/')}
+            />
           ) : (
             <>
-              <h2 className="font-bold text-gray-900 mb-5 text-lg">¿Cómo fue tu experiencia?</h2>
-
-              <div className="space-y-4 mb-5">
-                <StarInput field="rapidez" label="Rapidez" />
-                <StarInput field="comunicacion" label="Comunicación" />
-                <StarInput field="calidad" label="Calidad del trabajo" />
-                <StarInput field="precio_satisfaccion" label="Precio / satisfacción" />
-              </div>
-
-              <div className="mb-5">
-                <Textarea
-                  placeholder="Cuéntanos tu experiencia (opcional)..."
-                  value={comment}
-                  onChange={e => setComment(e.target.value)}
-                  maxLength={500}
-                  className="h-24 resize-none"
-                />
-                <p className="text-xs text-gray-400 text-right mt-1">{comment.length}/500</p>
-              </div>
-
-              {avgRating > 0 && (
-                <div className="flex items-center gap-2 mb-5 text-sm text-gray-600">
-                  <div className="flex gap-0.5">
-                    {[1,2,3,4,5].map(s => (
-                      <Star key={s} className={`w-4 h-4 ${s <= avgRating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`} />
-                    ))}
-                  </div>
-                  <span>Nota media: <strong>{avgRating}/5</strong></span>
-                </div>
-              )}
-
-              <Button
-                onClick={handleSubmit}
-                disabled={submitting || Object.values(ratings).some(r => r === 0)}
-                className="w-full bg-amber-500 hover:bg-amber-600 h-12 font-semibold"
-              >
-                {submitting ? (
-                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Enviando...</>
+              <div className="flex flex-col items-center text-center">
+                {photo ? (
+                  <img
+                    src={photo}
+                    alt={businessName}
+                    width="72"
+                    height="72"
+                    className="w-[72px] h-[72px] rounded-full object-cover border border-slate-200"
+                    loading="eager"
+                  />
                 ) : (
-                  <><Star className="w-4 h-4 mr-2" /> Publicar valoración</>
+                  <InitialsAvatar name={businessName} size={72} />
                 )}
-              </Button>
-
-              {!user && (
-                <p className="text-xs text-center text-gray-400 mt-3">
-                  Al enviar, serás redirigido al login para confirmar tu identidad.
+                <h1 className="text-xl font-extrabold text-slate-900 mt-3">
+                  Valora a {businessName}
+                </h1>
+                <p className="text-sm text-slate-500 mt-1">
+                  Tu opinión ayuda a otras personas. Tarda menos de un minuto.
                 </p>
-              )}
+              </div>
+
+              <form onSubmit={onSubmit} className="mt-6 space-y-5">
+                <Field label="Tu valoración" required>
+                  <RatingRow value={rating} onChange={setRating} big />
+                </Field>
+
+                <Field label="Comentario (opcional)">
+                  <textarea
+                    rows={4}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Cuenta cómo fue la experiencia."
+                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                  />
+                </Field>
+
+                <Field label="Tu nombre (opcional)">
+                  <input
+                    type="text"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    placeholder="Cómo aparecerá tu valoración"
+                    autoComplete="name"
+                    className="w-full h-10 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                  />
+                </Field>
+
+                <details className="rounded-xl border border-slate-200 bg-white p-3">
+                  <summary className="text-sm font-semibold text-slate-700 cursor-pointer select-none">
+                    Detallar valoración (opcional)
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    <SubratingRow
+                      label="Comunicación"
+                      value={sub.comunicacion}
+                      onChange={(v) => setSub((s) => ({ ...s, comunicacion: v }))}
+                    />
+                    <SubratingRow
+                      label="Calidad"
+                      value={sub.calidad}
+                      onChange={(v) => setSub((s) => ({ ...s, calidad: v }))}
+                    />
+                    <SubratingRow
+                      label="Rapidez"
+                      value={sub.rapidez}
+                      onChange={(v) => setSub((s) => ({ ...s, rapidez: v }))}
+                    />
+                    <SubratingRow
+                      label="Precio / Satisfacción"
+                      value={sub.precio_satisfaccion}
+                      onChange={(v) => setSub((s) => ({ ...s, precio_satisfaccion: v }))}
+                    />
+                  </div>
+                </details>
+
+                <button
+                  type="submit"
+                  disabled={submitting || !rating}
+                  className="w-full h-12 rounded-xl text-base font-semibold text-white disabled:opacity-60"
+                  style={{ background: NAVY }}
+                >
+                  {submitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Enviando...
+                    </span>
+                  ) : (
+                    'Enviar valoración'
+                  )}
+                </button>
+              </form>
             </>
           )}
         </div>
       </div>
     </>
+  );
+}
+
+function Field({ label, required, children }) {
+  return (
+    <label className="block">
+      <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">
+        {label} {required && <span className="text-rose-500">*</span>}
+      </span>
+      <div className="mt-1.5">{children}</div>
+    </label>
+  );
+}
+
+function RatingRow({ value, onChange, big }) {
+  return (
+    <div className="inline-flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((n) => {
+        const active = n <= value;
+        const size = big ? 36 : 22;
+        return (
+          <button
+            type="button"
+            key={n}
+            onClick={() => onChange(n)}
+            className="p-1 -m-1 rounded"
+            aria-label={`${n} estrellas`}
+          >
+            <Star
+              width={size}
+              height={size}
+              className={active ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function SubratingRow({ label, value, onChange }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-sm text-slate-700">{label}</span>
+      <RatingRow value={value} onChange={onChange} />
+    </div>
+  );
+}
+
+function InvalidTokenView({ reason, onHome }) {
+  const map = {
+    ya_usado: {
+      title: 'Esta valoración ya se envió',
+      body: 'Este enlace de valoración solo puede usarse una vez. Si tienes que volver a opinar, pídele a tu profesional uno nuevo.',
+    },
+    ya_valorado: {
+      title: 'Ya has enviado tu valoración',
+      body: 'Este enlace ya ha recibido una reseña. Gracias por tu opinión.',
+    },
+    caducado: {
+      title: 'El enlace ha caducado',
+      body: 'Por seguridad, los enlaces de valoración tienen una duración limitada. Pídele al profesional uno nuevo.',
+    },
+    token_caducado: {
+      title: 'El enlace ha caducado',
+      body: 'Por seguridad, los enlaces de valoración tienen una duración limitada. Pídele al profesional uno nuevo.',
+    },
+    no_existe: {
+      title: 'Enlace no encontrado',
+      body: 'No hemos podido reconocer este enlace. Revisa que esté completo o pide otro al profesional.',
+    },
+  };
+  const v = map[reason] || map.no_existe;
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+      <div
+        className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
+        style={{ background: '#FEF3C7', color: '#92400E' }}
+      >
+        <AlertCircle className="w-6 h-6" />
+      </div>
+      <h1 className="font-semibold text-slate-900 mt-3">{v.title}</h1>
+      <p className="text-sm text-slate-600 mt-1">{v.body}</p>
+      <button
+        type="button"
+        onClick={onHome}
+        className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg text-sm font-semibold text-white"
+        style={{ background: NAVY }}
+      >
+        Ir a MisAutónomos
+      </button>
+    </div>
+  );
+}
+
+function SubmittedView({ businessName, onHome }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+      <div
+        className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
+        style={{ background: 'rgba(0,37,92,0.06)' }}
+      >
+        <CheckCircle2 className="w-6 h-6" style={{ color: NAVY }} />
+      </div>
+      <h1 className="font-semibold text-slate-900 mt-3">¡Gracias por tu reseña!</h1>
+      <p className="text-sm text-slate-600 mt-1">
+        Tu opinión sobre {businessName} ya está publicada.
+      </p>
+      <button
+        type="button"
+        onClick={onHome}
+        className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg text-sm font-semibold text-white"
+        style={{ background: NAVY }}
+      >
+        Ir a MisAutónomos
+      </button>
+    </div>
   );
 }

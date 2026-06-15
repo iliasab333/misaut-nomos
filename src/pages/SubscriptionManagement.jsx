@@ -38,6 +38,13 @@ import { useLanguage } from "../components/ui/LanguageSwitcher";
 import SEOHead from "../components/seo/SEOHead";
 import { getEffectivePlan } from "@/utils/subscription";
 import { Gift } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
+
+// En nativo (iOS/Android) ocultamos cualquier CTA de pago para cumplir con las
+// políticas de Apple/Google sobre IAP y porque el cobro va por Stripe en web.
+const IS_NATIVE = (() => {
+  try { return Capacitor?.isNativePlatform?.() === true; } catch { return false; }
+})();
 
 export default function SubscriptionManagementPage() {
   // 1. HOOKS PRIMERO
@@ -341,14 +348,59 @@ export default function SubscriptionManagementPage() {
     );
   }
 
+  if (IS_NATIVE) {
+    return (
+      <>
+        <SEOHead title={`${t('mySubscription')} - MisAutónomos`} noindex />
+        <div className="min-h-screen bg-white p-4 md:p-8">
+          <div className="max-w-2xl mx-auto">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(createPageUrl("MyProfile"))}
+              className="mb-6 hover:bg-gray-100"
+              aria-label={t('backToProfile')}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Volver
+            </Button>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl inline-flex items-center justify-center" style={{ background: 'rgba(0,37,92,0.08)', color: '#00255C' }}>
+                  <CreditCard className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-base font-semibold text-slate-900">Tu plan</h2>
+                  {subscription ? (
+                    <p className="text-sm text-slate-700 mt-0.5">
+                      Estado: <span className="font-semibold">{subscription.estado || '—'}</span>
+                      {subscription.fecha_expiracion ? (
+                        <> · Renueva el {new Date(subscription.fecha_expiracion).toLocaleDateString('es-ES')}</>
+                      ) : null}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-slate-700 mt-0.5">Sin plan activo.</p>
+                  )}
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                Gestiona tu plan en <a href="https://misautonomos.es" target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-2" style={{ color: '#00255C' }}>misautonomos.es</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
-      <SEOHead 
+      <SEOHead
         title={`${t('mySubscription')} - MisAutónomos`}
         description={t('manageProfessionalPlan')}
         noindex={true}
       />
-      
+
       <div className="min-h-screen bg-white p-4 md:p-8">
         <div className="max-w-3xl mx-auto">
           <Button

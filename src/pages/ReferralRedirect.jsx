@@ -78,7 +78,7 @@ export default function ReferralRedirect() {
       <div className="mb-8 text-center">
         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 mb-4">
           <img
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/render/image/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png?width=32&height=32&quality=80&format=webp"
+            src="/logo-192.png"
             alt="MisAutónomos"
             className="w-7 h-7 rounded-lg"
             width="28" height="28"

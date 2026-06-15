@@ -44,8 +44,8 @@ import AIAssistantPro from "../components/ai/AIAssistantPro";
 import ServicesSection from "../components/profile/ServicesSection";
 import AvailabilityCalendar from "../components/profile/AvailabilityCalendar";
 import IdentityVerificationWidget from "../components/verification/IdentityVerificationWidget";
-import ReferralBanner from "../components/referrals/ReferralBanner";
 import VerificationBanner from "../components/trust/VerificationBanner";
+import DeleteAccountButton from "../components/account/DeleteAccountButton";
 
 const isSubscriptionActive = (estado, fechaExpiracion) => {
   if (!estado) return false;
@@ -117,14 +117,13 @@ export default function MyProfilePage() {
   const [searchParams] = useSearchParams();
   
   const [user, setUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [success, setSuccess] = useState(false);
   const [isVerifyingSubscription, setIsVerifyingSubscription] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
-  const [sheetOpen, setSheetOpen] = useState(false);
   
   const MAX_POLLING_ATTEMPTS = 10;
   const reactivationSuccess = searchParams.get("reactivation");
@@ -434,7 +433,6 @@ export default function MyProfilePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myProfile'] });
-      setIsEditing(false);
       setSuccess(true);
       toast.success(t('professionalProfileUpdated'));
       setTimeout(() => setSuccess(false), 3000);
@@ -690,37 +688,43 @@ export default function MyProfilePage() {
       {/* HEADER MINIMALISTA */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 py-5 flex items-center justify-between gap-3 flex-wrap">
-          <div>
+          <div className="min-w-0">
             <h1 className="text-xl font-semibold text-gray-900">{t('myProfileTitle') || 'Mi Perfil'}</h1>
             <p className="text-sm text-gray-500 mt-0.5">{isProfessional ? (t('manageYourProfile') || 'Gestiona tu perfil público') : (t('manageYourInformation') || 'Gestiona tu información')}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {profile && isProfessional && (
-              <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg ${isProfileVisible ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+              <span
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg"
+                style={{
+                  background: isProfileVisible ? 'rgba(0,37,92,0.08)' : '#F1F5F9',
+                  color: isProfileVisible ? '#00255C' : '#475569',
+                }}
+              >
                 {isProfileVisible ? <Eye className="w-3.5 h-3.5"/> : <EyeOff className="w-3.5 h-3.5"/>}
                 {isProfileVisible ? (t('publishedProfile') || 'Perfil publicado') : (t('hiddenProfile') || 'Perfil oculto')}
               </span>
             )}
-            {!isEditing ? (
-              <button onClick={() => setIsEditing(true)}
-                className="inline-flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-colors">
-                <Pencil className="w-3.5 h-3.5"/>
-                <span className="hidden sm:inline">{t('editProfile') || 'Editar perfil'}</span>
-              </button>
-            ) : (
-              <>
-                <button onClick={() => { setIsEditing(false); queryClient.invalidateQueries({ queryKey: ['myProfile'] }); }}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
-                  <X className="w-3.5 h-3.5"/>
-                  <span className="hidden sm:inline">{t('cancel') || 'Cancelar'}</span>
-                </button>
-                <button onClick={handleSave} disabled={updateUserMutation.isPending || updateProfileMutation.isPending}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-colors disabled:opacity-50">
-                  {updateProfileMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <Save className="w-3.5 h-3.5"/>}
-                  <span className="hidden sm:inline">{t('saveChanges') || 'Guardar cambios'}</span>
-                </button>
-              </>
+            {profile?.slug_publico && isProfessional && (
+              <a
+                href={`/autonomo/${profile.slug_publico}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
+              >
+                <Eye className="w-3.5 h-3.5"/>
+                Ver perfil público
+              </a>
             )}
+            <button
+              onClick={handleSave}
+              disabled={updateUserMutation.isPending || updateProfileMutation.isPending}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-lg text-white disabled:opacity-50"
+              style={{ background: '#00255C' }}
+            >
+              {updateProfileMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <Save className="w-3.5 h-3.5"/>}
+              <span className="hidden sm:inline">{t('saveChanges') || 'Guardar cambios'}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -767,13 +771,6 @@ export default function MyProfilePage() {
           </Card>
         )}
 
-        {/* BANNER REFERIDOS */}
-        {isProfessional && profile && (
-          <div className="mb-4">
-            <ReferralBanner profile={profile} />
-          </div>
-        )}
-
         {/* BANNER VERIFICACIÓN */}
         {isProfessional && profile && (
           <div className="mb-4">
@@ -801,13 +798,13 @@ export default function MyProfilePage() {
         )}
 
         {/* PROFILE COMPLETENESS */}
-        {isProfessional && profile && !isEditing && (
+        {isProfessional && profile && (
           <div className="mb-6">
             <ProfileCompleteness profile={profile} user={user} />
           </div>
         )}
 
-        {/* TABS */}
+        {/* SECCIONES — sidebar vertical (desktop) + select (mobile) */}
         {(() => {
           const tabsConfig = [
             { value: 'personal', icon: User, label: t('tabPersonal') || 'Información' },
@@ -822,78 +819,51 @@ export default function MyProfilePage() {
               { value: 'invoicing', icon: Euro, label: t('tabInvoicing') || 'Facturación' },
             ] : [])
           ];
-          const currentTab = tabsConfig.find(tb => tb.value === activeTab) || tabsConfig[0];
           return (
-            <>
-              {/* MOBILE: selector estilo iOS (bottom sheet) */}
-              <div className="md:hidden mb-4">
-                <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-                  <SheetTrigger asChild>
-                    <button className="w-full bg-white border border-gray-200 rounded-xl px-4 py-4 flex items-center justify-between active:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-                          <currentTab.icon className="w-5 h-5 text-blue-700" />
-                        </div>
-                        <div className="text-left">
-                          <p className="text-xs text-gray-500 leading-tight">Sección</p>
-                          <p className="text-base font-semibold text-gray-900 leading-tight">{currentTab.label}</p>
-                        </div>
-                      </div>
-                      <ChevronDown className="w-5 h-5 text-gray-400" />
-                    </button>
-                  </SheetTrigger>
-                  <SheetContent side="bottom" className="rounded-t-2xl max-h-[80vh] overflow-y-auto p-0">
-                    <SheetHeader className="px-4 pt-5 pb-3 border-b border-gray-100">
-                      <SheetTitle className="text-left text-lg">Ir a sección</SheetTitle>
-                    </SheetHeader>
-                    <div className="py-2">
-                      {tabsConfig.map(({ value, icon: Icon, label, badge }) => (
-                        <button
-                          key={value}
-                          onClick={() => { setActiveTab(value); setSheetOpen(false); }}
-                          className={`w-full flex items-center gap-3 px-4 py-4 active:bg-gray-100 transition-colors ${
-                            activeTab === value ? 'bg-blue-50' : ''
-                          }`}
-                        >
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            activeTab === value ? 'bg-blue-100' : 'bg-gray-100'
-                          }`}>
-                            <Icon className={`w-5 h-5 ${activeTab === value ? 'text-blue-700' : 'text-gray-600'}`} />
-                          </div>
-                          <span className={`flex-1 text-left text-base ${activeTab === value ? 'font-semibold text-blue-900' : 'text-gray-800'}`}>
-                            {label}
-                          </span>
-                          {badge && <span className="bg-amber-100 text-amber-700 text-xs px-2 py-0.5 rounded-full font-bold">{badge}</span>}
-                          {activeTab === value && <Check className="w-5 h-5 text-blue-600" />}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="h-6" />
-                  </SheetContent>
-                </Sheet>
-              </div>
-
-              {/* DESKTOP: tabs horizontales */}
-              <div className="hidden md:block bg-white border border-gray-100 rounded-xl overflow-hidden mb-4">
-                <div className="overflow-x-auto scrollbar-hide">
-                  <div className="flex min-w-max border-b border-gray-100">
-                    {tabsConfig.map(({ value, icon: Icon, label, badge }) => (
-                      <button key={value} onClick={() => setActiveTab(value)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors flex-shrink-0 ${
-                          activeTab === value ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'
-                        }`}>
-                        <Icon className="w-4 h-4"/>
-                        <span>{label}</span>
-                        {badge && <span className="bg-amber-100 text-amber-700 text-xs px-1.5 py-0.5 rounded-full font-bold">{badge}</span>}
-                      </button>
+            <div className="md:grid md:grid-cols-[240px_1fr] md:gap-5 md:items-start">
+              {/* Sidebar */}
+              <aside className="mb-4 md:mb-0">
+                {/* Móvil: <select> */}
+                <div className="md:hidden">
+                  <label htmlFor="profile-section-select" className="block text-[10px] uppercase tracking-[0.1em] font-bold text-slate-500 mb-1.5">
+                    Sección
+                  </label>
+                  <select
+                    id="profile-section-select"
+                    value={activeTab}
+                    onChange={(e) => setActiveTab(e.target.value)}
+                    className="w-full h-11 px-3 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-800 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                  >
+                    {tabsConfig.map((tab) => (
+                      <option key={tab.value} value={tab.value}>{tab.label}</option>
                     ))}
-                  </div>
+                  </select>
                 </div>
-              </div>
-            </>
-          );
-        })()}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+                {/* Desktop: nav vertical */}
+                <nav className="hidden md:block rounded-2xl bg-white border border-slate-200 p-1.5 md:sticky" style={{ top: 88 }}>
+                  {tabsConfig.map(({ value, icon: Icon, label, badge }) => {
+                    const active = activeTab === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setActiveTab(value)}
+                        className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition mb-0.5 last:mb-0 ${active ? 'text-white' : 'text-slate-700 hover:bg-slate-50'}`}
+                        style={active ? { background: '#00255C', boxShadow: '0 1px 2px rgba(0,37,92,0.25)' } : undefined}
+                      >
+                        <Icon className={`w-4 h-4 ${active ? '' : 'text-slate-500'}`} />
+                        <span className={`flex-1 text-left ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
+                        {badge != null && (
+                          <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 ${active ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-700'}`}>{badge}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </nav>
+              </aside>
+              {/* Content */}
+              <div className="min-w-0">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
 
           {/* ==================== TAB: PERSONAL ==================== */}
           <TabsContent value="personal">
@@ -1035,17 +1005,10 @@ export default function MyProfilePage() {
                 </div>
 
                 {/* DELETE ACCOUNT */}
-                <div className="pt-6 border-t border-gray-200">
-                  <Button
-                    variant="destructive"
-                    onClick={() => setShowDeleteDialog(true)}
-                    className="w-full"
-                    size="sm"
-                  >
-                    Eliminar cuenta
-                  </Button>
-                  <p className="text-xs text-gray-500 mt-2 text-center">
-                    Esta acción es irreversible y eliminará todos tus datos
+                <div className="pt-6 border-t border-gray-200 flex flex-col items-center gap-2">
+                  <DeleteAccountButton className="w-full justify-center" redirectTo="/" />
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    Esta acción es irreversible y eliminará todos tus datos.
                   </p>
                 </div>
               </CardContent>
@@ -1771,7 +1734,24 @@ export default function MyProfilePage() {
               />
             </TabsContent>
           )}
-        </Tabs>
+                </Tabs>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* SAVE BAR — sticky en móvil */}
+        <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 px-4 py-3" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}>
+          <button
+            onClick={handleSave}
+            disabled={updateUserMutation.isPending || updateProfileMutation.isPending}
+            className="w-full h-12 rounded-xl text-base font-semibold text-white inline-flex items-center justify-center gap-2 disabled:opacity-60"
+            style={{ background: '#00255C' }}
+          >
+            {updateProfileMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
+            {t('saveChanges') || 'Guardar cambios'}
+          </button>
+        </div>
       </div>
 
       {/* DELETE ACCOUNT DIALOG */}

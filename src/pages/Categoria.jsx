@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { optimizeSupabaseImage } from "@/lib/supabaseImage";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import InitialsAvatar from "@/components/ui/InitialsAvatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
@@ -341,34 +342,51 @@ export default function CategoriaPage() {
             </div>
           )}
 
-          {/* Sin resultados */}
+          {/* Sin resultados — banda navy con CTA dorado para que sea un punto de conversión, no un hueco */}
           {!isLoading && profiles.length === 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center">
-                <Briefcase className="w-8 h-8 text-blue-600" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
-                Aún no hay profesionales de {displayName}{ciudadName ? ` en ${ciudadName}` : ''}
-              </h2>
-              <p className="text-gray-600 max-w-md mx-auto mb-6">
-                Estamos creciendo cada día. Si eres {displayName}{ciudadName ? ` en ${ciudadName}` : ''},
-                registra tu perfil gratis y empieza a recibir clientes.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button onClick={() => navigate(createPageUrl("PricingPlans"))} className="bg-blue-600 hover:bg-blue-700">
-                  Soy {displayName}, quiero registrarme
-                </Button>
-                <Button variant="outline" onClick={() => navigate(createPageUrl("Search"))}>
-                  Ver todos los profesionales
-                </Button>
+            <div
+              className="rounded-2xl overflow-hidden border"
+              style={{ borderColor: 'rgba(0,37,92,0.12)' }}
+            >
+              <div className="p-8 md:p-10 text-center" style={{ background: '#00255C', color: 'white' }}>
+                <div className="w-12 h-12 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,193,61,0.16)' }}>
+                  <Briefcase className="w-6 h-6" style={{ color: '#F5C13D' }} />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+                  Sé el primer {displayName}{ciudadName ? ` en ${ciudadName}` : ''} en MisAutónomos
+                </h2>
+                <p className="mt-3 text-white/80 max-w-xl mx-auto">
+                  Estamos creciendo. Si das de alta tu perfil ahora, sales tú primero cuando alguien busque este oficio.
+                  Sin permanencia, sin comisiones.
+                </p>
+                <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    onClick={() => navigate('/para-autonomos')}
+                    className="h-11 px-6 rounded-xl font-semibold"
+                    style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
+                  >
+                    Hazte autónomo · Gratis
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/buscar')}
+                    className="h-11 px-6 rounded-xl font-semibold bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
+                  >
+                    Ver todos los oficios
+                  </Button>
+                </div>
               </div>
               {ciudadName && (
-                <p className="text-sm text-gray-600 mt-6">
-                  💡 También puedes ver{' '}
-                  <button onClick={() => navigate(`/categoria/${categorySlug}`)} className="text-blue-600 underline font-medium">
-                    {displayName} en otras ciudades
+                <div className="bg-white p-4 text-center text-sm">
+                  ¿Buscas {displayName} en otra ciudad?{' '}
+                  <button
+                    onClick={() => navigate(`/categoria/${categorySlug}`)}
+                    className="font-medium underline underline-offset-2"
+                    style={{ color: '#00255C' }}
+                  >
+                    Ver {displayName} en toda España
                   </button>
-                </p>
+                </div>
               )}
             </div>
           )}
@@ -386,29 +404,45 @@ export default function CategoriaPage() {
                     <Card className={`bg-white hover:shadow-lg transition-all rounded-xl h-full ${profile.is_ads_plus ? 'ring-1 ring-amber-300' : ''}`}>
                       <CardContent className="p-4 flex flex-col h-full">
                         <div className="flex items-start gap-3 mb-3">
-                          <Avatar
-                            className="w-12 h-12 cursor-pointer"
-                            onClick={() => handleViewProfile(profile)}
-                          >
-                            {profile.imagen_principal ? (
-                              <AvatarImage src={profile.imagen_principal} alt={profile.business_name} />
-                            ) : (
-                              <AvatarFallback className="bg-blue-600 text-white">
-                                {profile.business_name?.charAt(0)}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
+                          {(() => {
+                            const rawPhoto =
+                              profile.imagen_principal ||
+                              (Array.isArray(profile.photos) && profile.photos[0]) ||
+                              null;
+                            const optimized = optimizeSupabaseImage(rawPhoto, { width: 128, quality: 70 });
+                            return (
+                              <div
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => handleViewProfile(profile)}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleViewProfile(profile); }}
+                                className="cursor-pointer"
+                              >
+                                <InitialsAvatar
+                                  name={profile.business_name || ""}
+                                  src={optimized || undefined}
+                                  size={48}
+                                />
+                              </div>
+                            );
+                          })()}
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
                               <h3
-                                className="font-semibold text-gray-900 cursor-pointer hover:text-blue-600 truncate"
+                                className="font-semibold text-slate-900 cursor-pointer truncate hover:underline underline-offset-2"
+                                style={{ textDecorationColor: '#00255C' }}
                                 onClick={() => handleViewProfile(profile)}
                               >
                                 {profile.business_name}
                               </h3>
                               {profile.is_ads_plus && (
-                                <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">⭐ Destacado</span>
+                                <span
+                                  className="text-[10px] font-semibold uppercase tracking-[0.06em] border px-1.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0"
+                                  style={{ color: '#7B5400', backgroundColor: '#FBF4DA', borderColor: '#EFD68A' }}
+                                >
+                                  Destacado
+                                </span>
                               )}
                             </div>
                             <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -444,7 +478,10 @@ export default function CategoriaPage() {
 
                         <Button
                           onClick={() => handleViewProfile(profile)}
-                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          className="w-full text-white font-semibold"
+                          style={{ backgroundColor: '#00255C' }}
+                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#001A45')}
+                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00255C')}
                         >
                           Ver perfil
                         </Button>

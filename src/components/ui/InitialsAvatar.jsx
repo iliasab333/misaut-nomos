@@ -1,68 +1,82 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-// Genera un color de fondo determinístico a partir de un string
-function getColorFromString(str = "") {
-  const COLORS = [
-    ["#1D4ED8", "#DBEAFE"], // blue
-    ["#7C3AED", "#EDE9FE"], // violet
-    ["#065F46", "#D1FAE5"], // green
-    ["#92400E", "#FEF3C7"], // amber
-    ["#9D174D", "#FCE7F3"], // pink
-    ["#0E7490", "#CFFAFE"], // cyan
-    ["#B45309", "#FEF9C3"], // yellow
-    ["#1E40AF", "#E0E7FF"], // indigo
-  ];
-  let hash = 0;
+// Paleta de marca discreta para las iniciales. Selección determinística según
+// el nombre, así el mismo profesional siempre tiene el mismo color.
+const PALETTE = [
+  ["#00255C", "#E8EEF8"], // navy
+  ["#3F4B6B", "#ECEFF6"], // ink slate
+  ["#1F3B6A", "#E7EEFB"], // deep cobalt
+  ["#6B5210", "#FAF1D7"], // gold ink on cream
+  ["#4F4F4F", "#F1F2F4"], // neutral
+];
+
+function pickPalette(str = "") {
+  let h = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    h = str.charCodeAt(i) + ((h << 5) - h);
   }
-  return COLORS[Math.abs(hash) % COLORS.length];
+  return PALETTE[Math.abs(h) % PALETTE.length];
+}
+
+function deriveInitials(name = "") {
+  const trimmed = String(name).trim();
+  if (!trimmed) return "··";
+  const parts = trimmed.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return ((parts[0][0] || "") + (parts[parts.length - 1][0] || "")).toUpperCase();
 }
 
 /**
- * Avatar con iniciales derivadas del nombre, sobre fondo de color determinístico.
- * Si `src` está disponible, muestra la imagen; si no, las iniciales.
+ * Avatar con `src` opcional. Si la imagen falla o no se pasa, renderiza
+ * iniciales sobre un fondo determinístico de marca. Sin "?" rotos.
  */
-export default function InitialsAvatar({ name = "", src, className = "", size = 48 }) {
-  const initials = name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() || "")
-    .join("") || "?";
+export default function InitialsAvatar({
+  name = "",
+  src,
+  size = 48,
+  className = "",
+  priority = false,
+}) {
+  const [errored, setErrored] = useState(false);
 
-  const [textColor, bgColor] = getColorFromString(name);
-  const fontSize = size <= 32 ? "10px" : size <= 48 ? "14px" : "18px";
+  useEffect(() => { setErrored(false); }, [src]);
 
-  if (src) {
+  const initials = deriveInitials(name);
+  const [textColor, bgColor] = pickPalette(name || "?");
+  const fontSize = size <= 28 ? 11 : size <= 40 ? 13 : size <= 56 ? 16 : Math.round(size * 0.34);
+
+  const baseStyle = { width: size, height: size, minWidth: size, minHeight: size };
+  const showImage = src && !errored;
+
+  if (showImage) {
     return (
       <img
         src={src}
-        alt={name}
-        className={`object-cover object-center rounded-full ${className}`}
-        style={{ width: size, height: size, minWidth: size, minHeight: size }}
-        onError={(e) => {
-          // Si la imagen falla, ocultar y mostrar fallback
-          e.target.style.display = "none";
-          e.target.nextSibling && (e.target.nextSibling.style.display = "flex");
-        }}
+        alt={name || ""}
+        width={size}
+        height={size}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "low"}
+        decoding={priority ? "sync" : "async"}
+        onError={() => setErrored(true)}
+        className={`rounded-full object-cover object-center ${className}`}
+        style={baseStyle}
       />
     );
   }
 
   return (
     <div
-      className={`rounded-full flex items-center justify-center font-bold select-none flex-shrink-0 ${className}`}
+      role="img"
+      aria-label={name || "Sin foto"}
+      className={`rounded-full flex items-center justify-center font-semibold select-none flex-shrink-0 ${className}`}
       style={{
-        width: size,
-        height: size,
-        minWidth: size,
-        minHeight: size,
+        ...baseStyle,
         backgroundColor: bgColor,
         color: textColor,
         fontSize,
+        letterSpacing: "0.02em",
       }}
-      aria-label={name}
     >
       {initials}
     </div>

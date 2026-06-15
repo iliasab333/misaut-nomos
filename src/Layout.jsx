@@ -27,7 +27,9 @@ import {
   Gift,
   BookOpen,
   Mail,
-  Megaphone
+  Megaphone,
+  BarChart3,
+  Star
 } from "lucide-react";
 import {
   Sidebar,
@@ -44,6 +46,23 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+// Link reutilizable para los logos de la cabecera/sidebars. Apunta SIEMPRE a /,
+// y si ya estás en /, hace scroll arriba en vez de no hacer nada.
+function HomeLogoLink({ children, className, ariaLabel }) {
+  const location = useLocation();
+  const handleClick = (e) => {
+    if (location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+  };
+  return (
+    <Link to="/" className={className} aria-label={ariaLabel} onClick={handleClick}>
+      {children}
+    </Link>
+  );
+}
+
 // Lazy load componentes no críticos
 const Footer = lazy(() => import("@/components/ui/Footer").catch(() => ({ default: () => null })));
 const CookieBanner = lazy(() => import("@/components/ui/CookieBanner").catch(() => ({ default: () => null })));
@@ -58,21 +77,21 @@ import LanguageSwitcher, { useLanguage, LanguageProvider } from "@/components/ui
 import { getEffectivePlan, isAdsPlus } from "@/utils/subscription";
 
 
-const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png';
+// Logo servido como asset estático de Vercel (no depende de Base44 ni de
+// Image Transform). 192px sirve perfectamente para todas las cajas de hasta
+// 96px en 2x.
+const LOGO_URL = '/logo-192.png';
+const LOGO_48 = '/logo-192.png';
+const LOGO_96 = '/logo-192.png';
+const LOGO_32 = '/logo-192.png';
+const LOGO_64 = '/logo-192.png';
 
-// Versiones optimizadas via Supabase Image Transform (WebP + resize) — ~1.2 MB menos por carga
-const LOGO_48  = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/render/image/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png?width=48&height=48&quality=80&format=webp';
-const LOGO_96  = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/render/image/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png?width=96&height=96&quality=80&format=webp';
-const LOGO_32  = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/render/image/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png?width=32&height=32&quality=80&format=webp';
-const LOGO_64  = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/render/image/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png?width=64&height=64&quality=80&format=webp';
-
-// Preload del logo optimizado para mejorar LCP
+// Preload para mejorar LCP del header
 if (typeof window !== 'undefined') {
   const link = document.createElement('link');
   link.rel = 'preload';
   link.as = 'image';
-  link.href = LOGO_48;
-  link.setAttribute('imagesrcset', `${LOGO_48} 1x, ${LOGO_96} 2x`);
+  link.href = LOGO_URL;
   link.fetchPriority = 'high';
   document.head.appendChild(link);
 }
@@ -82,7 +101,7 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
   return (
     <Sidebar className="border-r border-gray-200 bg-white shadow-sm hidden lg:flex">
       <SidebarHeader className="border-b border-gray-100 p-6">
-        <Link to={createPageUrl("Search")} className="flex items-center gap-3" aria-label="Ir a búsqueda de profesionales">
+        <HomeLogoLink className="flex items-center gap-3" ariaLabel="Inicio">
           <img
             src={LOGO_48}
             srcSet={`${LOGO_48} 1x, ${LOGO_96} 2x`}
@@ -96,10 +115,10 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
             style={{ width: '48px', height: '48px' }}
           />
           <div>
-            <h2 className="font-bold text-xl text-gray-900">MisAutónomos</h2>
+            <h2 className="font-bold text-xl text-gray-900 notranslate" translate="no">MisAutónomos</h2>
             <p className="text-xs text-gray-500">Plataforma de autónomos</p>
           </div>
-        </Link>
+        </HomeLogoLink>
       </SidebarHeader>
       
       <SidebarContent className="p-3">
@@ -308,24 +327,50 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
     return true;
   };
 
-  // Redirigir a onboarding si es profesional sin completar
+  // Guard de onboarding: SOLO redirige a /completar-perfil cuando un profesional
+  // sin ficha entra en una ruta PRIVADA propia de pros (dashboard, mi-perfil,
+  // facturas, clientes…). NUNCA desde rutas públicas, ni desde admin, ni
+  // tampoco si el usuario es admin.
+  //
+  // Bugs anteriores que rompía esto:
+  //   - admin (role==='admin') con user_type==='professionnel' sin ficha quedaba
+  //     atrapado: visitaba CUALQUIER página y era expulsado a /completar-perfil
+  //     en bucle.
+  //   - profesional sin ficha era expulsado al ver /buscar, /contacto, /blog…
   useEffect(() => {
     if (loadingUser || !user) return;
-    
-    const isOnboardingRoute = location.pathname === createPageUrl("ProfileOnboarding") || 
-                              location.pathname.startsWith(createPageUrl("ProfileOnboarding")) ||
-                              location.pathname === createPageUrl("PricingPlans") ||
-                              location.pathname === createPageUrl("SubscriptionManagement") ||
-                              location.pathname === createPageUrl("PaymentSuccess");
-    
-    if (user.user_type === "professionnel" && professionalProfile !== undefined) {
-      if (!professionalProfile || !professionalProfile.onboarding_completed) {
-        if (!isOnboardingRoute) {
-          navigate(createPageUrl("ProfileOnboarding"));
-        }
-      }
+    if (user.role === 'admin') return;                  // admin nunca al onboarding
+    if (user.user_type !== 'professionnel') return;     // solo profesionales
+    if (professionalProfile === undefined) return;      // aún cargando perfil
+
+    const hasProfile = !!professionalProfile && professionalProfile.onboarding_completed;
+    if (hasProfile) return;
+
+    // Rutas que SÍ requieren ficha completa. En cualquier otra ruta, ni se toca.
+    const PRO_PRIVATE_PREFIXES = [
+      '/dashboard',
+      '/mi-perfil',
+      '/perfil',
+      '/visibilidad',
+      '/mis-clientes',
+      '/clientes',
+      '/automatizaciones',
+      '/calendario',
+      '/proyectos',
+      '/facturas',
+      '/presupuestos',
+      '/mi-campana',
+      '/plan-ads',
+      '/trabajos',
+    ];
+    const needsProfile = PRO_PRIVATE_PREFIXES.some((p) => location.pathname.startsWith(p));
+    if (!needsProfile) return;
+
+    // Estamos en una zona pro privada sin ficha: una sola vez al onboarding.
+    if (location.pathname !== '/completar-perfil') {
+      navigate('/completar-perfil', { replace: true });
     }
-  }, [user, professionalProfile, loadingUser, location.pathname]);
+  }, [user, professionalProfile, loadingUser, location.pathname, navigate]);
 
   const loadUser = React.useCallback(async () => {
     try {
@@ -583,32 +628,32 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
 
   const navigationItems = useMemo(() => {
     if (isAdmin) {
+      // Menú admin acotado a las secciones útiles ahora. Pagos y Referidos
+      // existen como página pero quedan fuera del menú hasta tener KPIs y
+      // operativa propios. Soporte permanece.
       return [
-        { title: "Administración", url: createPageUrl("AdminDashboard"), icon: LayoutDashboard },
-        { title: "💰 Pagos", url: createPageUrl("AdminPayments"), icon: CreditCard },
-        { title: "Bandeja de Soporte", url: "/admin/soporte", icon: Headphones },
-        { title: "SEO Analytics", url: "/admin/seo", icon: TrendingUp },
+        { title: "Métricas", url: "/admin", icon: LayoutDashboard },
+        { title: "Usuarios", url: "/admin/usuarios", icon: Users },
         { title: "Blog", url: "/admin/blog", icon: BookOpen },
         { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
-        { title: "Referidos", url: "/admin/referidos", icon: Gift }
+        { title: "Soporte", url: "/admin/soporte", icon: Headphones },
       ];
     }
     
     if (isProfessional) {
+      // Menú compacto: solo lo que está construido y funcional. Pagos, invita y
+      // gana, facturas, presupuestos, proyectos, clientes/CRM, time-logs y
+      // visibilidad quedan fuera del menú (las páginas siguen existiendo).
       return [
         { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), icon: Home },
+        { title: 'Mi perfil', url: createPageUrl("MyProfile"), icon: User },
+        { title: 'Estadísticas', url: '/mis-estadisticas', icon: BarChart3, prefetch: () => import('./pages/MisEstadisticas') },
+        { title: 'Valoraciones', url: '/mis-valoraciones', icon: Star, prefetch: () => import('./pages/MisValoraciones') },
         { title: t('nav.messages'), url: createPageUrl("Messages"), icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
-        { title: t('nav.my_clients'), url: "/mis-clientes", icon: Users, prefetch: () => import('./pages/MisClientes') },
-        { title: t('nav.quotes'), url: "/presupuestos", icon: FileText },
-        { title: t('nav.invoices'), url: createPageUrl("Invoices"), icon: FileText, prefetch: () => import('./pages/Invoices') },
-        { title: t('nav.visibility'), url: "/visibilidad", icon: Eye },
-        userPlan === 'plan_adsplus' 
+        userPlan === 'plan_adsplus'
           ? { title: 'Mi campaña', url: '/mi-campana', icon: Megaphone, badge: null, prefetch: () => import('./pages/MiCampana') }
           : null,
-        { title: t('nav.my_profile'), url: createPageUrl("MyProfile"), icon: User },
-        { title: t('nav.my_subscription'), url: createPageUrl("SubscriptionManagement"), icon: CreditCard },
-        { title: 'Invita y gana', url: "/referidos", icon: Gift },
-        { title: t('nav.support'), url: "/soporte", icon: Headphones, prefetch: () => import('./pages/SupportChat') }
+        { title: 'Soporte', url: "/soporte", icon: Headphones, prefetch: () => import('./pages/Soporte') },
       ].filter(Boolean);
     }
     
@@ -620,7 +665,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
         { title: t('nav.my_profile'), url: createPageUrl("MyProfile"), icon: User },
         { title: t('nav.view_plans'), url: createPageUrl("PricingPlans"), icon: CreditCard },
         { title: t('nav.faq'), url: createPageUrl("FAQ"), icon: MessageSquare },
-        { title: t('nav.support'), url: "/soporte", icon: Headphones, prefetch: () => import('./pages/SupportChat') }
+        { title: t('nav.support'), url: "/soporte", icon: Headphones, prefetch: () => import('./pages/Soporte') }
       ];
     }
     
@@ -666,7 +711,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <div className="flex items-center gap-2">
                       <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt="" className="w-8 h-8 rounded" width="32" height="32" />
-                      <span className="font-bold text-gray-900">MisAutónomos</span>
+                      <span className="font-bold text-gray-900 notranslate" translate="no">MisAutónomos</span>
                     </div>
                     <button
                       onClick={() => setMobileMenuOpen(false)}
@@ -753,22 +798,13 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
 
                         <div className="pt-2 border-t border-gray-100 space-y-2 mt-2">
                           <Link
-                            to="/registro-cliente"
+                            to="/para-autonomos"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold text-white"
-                            style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation', background: '#16a34a' }}
-                          >
-                            <User className="w-5 h-5" />
-                            {t('nav.sign_up_client')}
-                          </Link>
-                          <Link
-                            to="/precios"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold text-white"
-                            style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation', background: '#2563eb' }}
+                            className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold"
+                            style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation', background: '#F5C13D', color: '#00255C' }}
                           >
                             <Briefcase className="w-5 h-5" />
-                            {t('nav.sign_up_pro')}
+                            Hazte autónomo · Gratis
                           </Link>
                           <button
                             onClick={() => { handleLogin(); setMobileMenuOpen(false); }}
@@ -828,31 +864,31 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                   <p className="text-sm text-gray-500 text-center mb-6">Elige tu perfil para empezar</p>
                   <div className="space-y-3">
                     <Link
-                      to="/registro-cliente"
+                      to="/buscar"
                       onClick={() => setJoinModalOpen(false)}
-                      className="flex items-center gap-4 w-full rounded-2xl p-4 text-white font-semibold"
-                      style={{ background: 'linear-gradient(135deg, #16a34a, #15803d)', touchAction: 'manipulation' }}
+                      className="flex items-center gap-4 w-full rounded-2xl p-4 font-semibold border"
+                      style={{ background: '#F8FAFF', borderColor: 'rgba(0,37,92,0.15)', color: '#0f172a', touchAction: 'manipulation' }}
                     >
-                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: '#00255C' }}>
                         <SearchIcon className="w-5 h-5" />
                       </div>
                       <div className="text-left">
                         <div className="font-bold">Soy cliente</div>
-                        <div className="text-xs text-green-100">Busco profesionales</div>
+                        <div className="text-xs text-slate-500">Buscar profesionales (sin registrarse)</div>
                       </div>
                     </Link>
                     <Link
-                      to="/precios"
+                      to="/para-autonomos"
                       onClick={() => setJoinModalOpen(false)}
-                      className="flex items-center gap-4 w-full rounded-2xl p-4 text-white font-semibold"
-                      style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', touchAction: 'manipulation' }}
+                      className="flex items-center gap-4 w-full rounded-2xl p-4 font-semibold"
+                      style={{ background: '#F5C13D', color: '#00255C', touchAction: 'manipulation' }}
                     >
-                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Briefcase className="w-5 h-5" />
+                      <div className="w-10 h-10 bg-white/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Briefcase className="w-5 h-5" style={{ color: '#00255C' }} />
                       </div>
                       <div className="text-left">
                         <div className="font-bold">Soy autónomo</div>
-                        <div className="text-xs text-blue-100">Quiero conseguir clientes</div>
+                        <div className="text-xs" style={{ color: 'rgba(0,37,92,0.7)' }}>Quiero conseguir clientes</div>
                       </div>
                     </Link>
                     <button
@@ -911,10 +947,10 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                 );
               })()}
 
-              <Link to={createPageUrl("Search")} className="flex items-center gap-2" aria-label="Inicio">
+              <HomeLogoLink className="flex items-center gap-2" ariaLabel="Inicio">
                 <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt="Logo MisAutónomos" className="w-8 h-8 rounded" width="32" height="32" loading="eager" fetchPriority="high" decoding="async" />
-                <span className="font-bold text-lg text-gray-900">MisAutónomos</span>
-              </Link>
+                <span className="font-bold text-lg text-gray-900 notranslate" translate="no">MisAutónomos</span>
+              </HomeLogoLink>
 
               <div style={{ width: '56px', height: '56px', margin: '-4px' }} className="flex items-center justify-end flex-shrink-0">
                 {user ? (
@@ -939,7 +975,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
               {!user && (
                   <header className="bg-white border-b border-gray-200 px-6 py-4 hidden lg:block sticky top-0 z-20 shadow-sm will-change-transform">
                   <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <Link to={createPageUrl("Search")} className="flex items-center gap-3" aria-label="Ir a búsqueda">
+                    <HomeLogoLink className="flex items-center gap-3" ariaLabel="Inicio">
                       <img
                         src={LOGO_48}
                         srcSet={`${LOGO_48} 1x, ${LOGO_96} 2x`}
@@ -952,10 +988,10 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         decoding="async"
                       />
                       <div style={{ minWidth: '150px' }}>
-                        <h1 className="font-bold text-xl text-gray-900">MisAutónomos</h1>
+                        <h1 className="font-bold text-xl text-gray-900 notranslate" translate="no">MisAutónomos</h1>
                         <p className="text-xs text-gray-500">{t('footer.tagline')}</p>
                       </div>
-                      </Link>
+                      </HomeLogoLink>
                     
                     <div className="flex items-center gap-3">
                       {!user && (
@@ -970,16 +1006,19 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         </Button>
                       )}
                       {!user && (
-                        <Link to={createPageUrl("ClientOnboarding")}>
-                          <Button className="bg-green-600 hover:bg-green-700 text-white shadow-sm">
-                            <User className="w-4 h-4 mr-2" aria-hidden="true" />
-                            {t('nav.sign_up_client')}
+                        <Link to="/buscar">
+                          <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900">
+                            <SearchIcon className="w-4 h-4 mr-2" aria-hidden="true" />
+                            Soy cliente
                           </Button>
                         </Link>
                       )}
                       {(!user || user.user_type !== 'professionnel') ? (
-                        <Link to="/completar-perfil">
-                          <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">
+                        <Link to="/para-autonomos">
+                          <Button
+                            className="font-semibold shadow-sm"
+                            style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
+                          >
                             <Briefcase className="w-4 h-4 mr-2" aria-hidden="true" />
                             Hazte autónomo · Gratis
                           </Button>

@@ -9,7 +9,12 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import SEOHead from "@/components/seo/SEOHead";
 import QuoteForm from "@/components/quotes/QuoteForm";
-import { downloadQuotePDFWithLogo } from "@/services/quotePdfGenerator";
+// quotePdfGenerator → jspdf (~600 KB). Carga dinámica al pulsar Descargar.
+const importQuotePdfGenerator = () => import('@/services/quotePdfGenerator');
+const downloadQuotePDFWithLogo = async (q) => {
+  const mod = await importQuotePdfGenerator();
+  return mod.downloadQuotePDFWithLogo(q);
+};
 import { useNavigate } from "react-router-dom";
 
 const STATUS_CONFIG = {

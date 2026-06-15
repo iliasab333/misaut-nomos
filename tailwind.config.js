@@ -12,6 +12,15 @@ module.exports = {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+  			brand: {
+  				navy: 'hsl(var(--brand-navy))',
+  				'navy-deep': 'hsl(var(--brand-navy-deep))',
+  				gold: 'hsl(var(--brand-gold))',
+  				'gold-deep': 'hsl(var(--brand-gold-deep))',
+  				cream: 'hsl(var(--brand-cream))',
+  				ink: 'hsl(var(--brand-ink))',
+  				surface: 'hsl(var(--brand-surface))'
+  			},
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'

@@ -12,7 +12,7 @@ import { FileText, CheckCircle, XCircle, Download, Eye, Euro, Calendar, User, Ma
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
-import { downloadQuotePDFWithLogo } from "@/services/quotePdfGenerator";
+// quotePdfGenerator → jspdf (~600 KB). Carga dinámica al pulsar Descargar.
 import SEOHead from "@/components/seo/SEOHead";
 
 const STATUS_CONFIG = {
@@ -494,7 +494,10 @@ export default function AcceptQuotePage() {
 
           {/* Botón descargar PDF con logo */}
           <Button
-            onClick={() => downloadQuotePDFWithLogo(quote)}
+            onClick={async () => {
+              const { downloadQuotePDFWithLogo } = await import('@/services/quotePdfGenerator');
+              return downloadQuotePDFWithLogo(quote);
+            }}
             variant="outline"
             className="w-full"
           >

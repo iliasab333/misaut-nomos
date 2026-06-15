@@ -16,7 +16,7 @@ export function OrganizationSchema() {
       "name": "MisAutónomos",
       "alternateName": "Mis Autónomos",
       "url": "https://misautonomos.es",
-      "logo": "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png",
+      "logo": "https://misautonomos.es/logo-512.png",
       "description": "Plataforma líder en España para conectar clientes con profesionales autónomos verificados. Electricistas, fontaneros, carpinteros y más.",
       "foundingDate": "2024",
       "contactPoint": {
@@ -151,7 +151,7 @@ export function ProductSchema({ products }) {
   return null;
 }
 
-const FALLBACK_IMAGE = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png';
+const FALLBACK_IMAGE = 'https://misautonomos.es/og-image.png';
 
 /**
  * MerchantListingSchema — @type Service

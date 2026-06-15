@@ -4,8 +4,9 @@
 import { lazy } from 'react';
 import __Layout from './Layout.jsx';
 
-// ✅ Main page — carga síncrona (es la primera pantalla)
-import Search from './pages/Search';
+// Search es lazy: el bundle inicial se reduce ~250 KB gzip (antes era único).
+// El componente se monta dentro del <Suspense> de AuthenticatedApp en App.jsx.
+const Search = lazy(() => import('./pages/Search'));
 
 // 🔴 PÁGINAS ADMIN — muy pesadas, solo las usa el admin
 const AdminDashboard     = lazy(() => import('./pages/AdminDashboard'));

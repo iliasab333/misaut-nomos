@@ -1,5 +1,8 @@
 User-agent: *
 
+# Login (página de entrada de auth, no SEO)
+Disallow: /login
+
 # Páginas de administración
 Disallow: /admin
 Disallow: /admin/
@@ -54,6 +57,7 @@ Disallow: /perfil
 Disallow: /valorar
 Disallow: /newsletter/unsubscribe
 Disallow: /NewsletterUnsubscribe
+Disallow: /baja-newsletter
 
 # Preferencias (no indexables)
 Disallow: /configuracion-cookies
@@ -84,6 +88,8 @@ Allow: /privacidad
 Allow: /terminos
 Allow: /cookies
 Allow: /aviso-legal
+Allow: /para-autonomos
+Allow: /contacto
 Allow: /
 
 Sitemap: https://misautonomos.es/sitemap.xml

@@ -30,11 +30,13 @@ export default function AdminBlogPage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    base44.auth.me().then(u => {
-      if (u?.role !== 'admin') { window.location.href = '/'; return; }
-      setUser(u);
-      loadPosts();
-    });
+    base44.auth.me()
+      .then((u) => {
+        if (u?.role !== 'admin') { window.location.href = '/'; return; }
+        setUser(u);
+        loadPosts();
+      })
+      .catch(() => { window.location.href = '/login?next=/admin/blog'; });
   }, []);
 
   const loadPosts = async () => {
@@ -98,7 +100,11 @@ export default function AdminBlogPage() {
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">{posts.length} artículos en total</p>
           </div>
-          <Button onClick={() => setEditing(false)} className="bg-gray-900 hover:bg-gray-800">
+          <Button
+            onClick={() => setEditing(false)}
+            className="text-white font-semibold"
+            style={{ background: '#00255C' }}
+          >
             <Plus className="w-4 h-4 mr-1" /> Nuevo artículo
           </Button>
         </div>

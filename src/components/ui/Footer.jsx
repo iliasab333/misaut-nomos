@@ -2,55 +2,84 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { Mail, Instagram, Check } from "lucide-react";
+import { Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png';
+const LOGO_URL = '/logo-192.png';
 
-const FacebookIcon = () => (
-  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+// Paleta de marca (mismos tokens que el resto de la home)
+const NAVY = "#00255C";
+
+const FacebookIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
   </svg>
 );
 
-const LinkedInIcon = () => (
-  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+const LinkedInIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
 );
 
-const TikTokIcon = () => (
-  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+const TikTokIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
   </svg>
 );
 
 const socialLinks = [
-  { href: "https://www.instagram.com/misautonomos/", label: "Instagram", icon: Instagram, hoverClass: "hover:bg-pink-600" },
-  { href: "https://www.facebook.com/misautonomos", label: "Facebook", icon: FacebookIcon, hoverClass: "hover:bg-blue-600" },
-  { href: "https://www.linkedin.com/company/misautonomos", label: "LinkedIn", icon: LinkedInIcon, hoverClass: "hover:bg-blue-700" },
-  { href: "https://www.tiktok.com/@misautonomos", label: "TikTok", icon: TikTokIcon, hoverClass: "hover:bg-gray-950" },
+  { href: "https://www.instagram.com/misautonomos/", label: "Instagram", Icon: Instagram },
+  { href: "https://www.facebook.com/misautonomos", label: "Facebook", Icon: FacebookIcon },
+  { href: "https://www.linkedin.com/company/misautonomos", label: "LinkedIn", Icon: LinkedInIcon },
+  { href: "https://www.tiktok.com/@misautonomos", label: "TikTok", Icon: TikTokIcon },
 ];
 
-const platformLinks = [
-  { label: "Sobre nosotros", to: createPageUrl("Home") },
-  { label: "Cómo funciona", to: createPageUrl("DashboardProInfo") },
-  { label: "Para autónomos", to: createPageUrl("PricingPlans") },
-  { label: "Para clientes", to: "/registro-cliente" },
-  { label: "Preguntas frecuentes", to: "/preguntas-frecuentes" },
+// Tres columnas exactas — Producto, Empresa, Legal. Todas las rutas verificadas
+// contra las <Route> declaradas en App.jsx: cero 404.
+const COLUMN_PRODUCTO = [
+  { label: "Buscar profesionales", to: "/buscar" },
+  { label: "Hazte autónomo", to: "/para-autonomos" },
+  { label: "Precios", to: "/precios" },
+];
+
+const COLUMN_EMPRESA = [
+  { label: "Cómo funciona", to: "/para-autonomos" },
   { label: "Centro de ayuda", to: "/ayuda" },
-];
-
-const resourceLinks = [
+  { label: "Preguntas frecuentes", to: "/preguntas-frecuentes" },
   { label: "Blog", to: "/blog" },
+  { label: "Contacto", to: "/contacto" },
 ];
 
-const legalLinks = [
-  { label: "Política de privacidad", to: createPageUrl("PrivacyPolicy") },
-  { label: "Términos de uso", to: createPageUrl("TermsConditions") },
-  { label: "Política de cookies", to: createPageUrl("CookiePolicy") },
-  { label: "Aviso legal", to: createPageUrl("LegalNotice") },
+const COLUMN_LEGAL = [
+  { label: "Privacidad", to: "/privacidad" },
+  { label: "Términos", to: "/terminos" },
+  { label: "Cookies", to: "/cookies" },
+  { label: "Aviso legal", to: "/aviso-legal" },
+];
+
+// Bloque SEO interno: enlaces a las páginas reales /categoria/:slug que ya
+// existen (Categoria.jsx resuelve los slugs contra service_categories).
+// Slugs verificados con slugify() de @/lib/seoUrl.
+const SEO_SERVICIOS = [
+  { label: "Electricistas", to: "/categoria/electricista" },
+  { label: "Fontaneros", to: "/categoria/fontanero" },
+  { label: "Albañiles / Reformas", to: "/categoria/albanil-reformas" },
+  { label: "Pintores", to: "/categoria/pintor" },
+  { label: "Cerrajeros", to: "/categoria/cerrajero" },
+  { label: "Asesoría / gestoría", to: "/categoria/asesoria-o-gestoria" },
+  { label: "Limpieza", to: "/categoria/autonomo-de-limpieza" },
+];
+
+// Para ciudades: /buscar?provincia=Madrid funciona contra los filtros que
+// Search.jsx ya lee de query params. Cero 404.
+const SEO_CIUDADES = [
+  { label: "Madrid", to: "/buscar?provincia=Madrid" },
+  { label: "Barcelona", to: "/buscar?provincia=Barcelona" },
+  { label: "Valencia", to: "/buscar?provincia=Valencia" },
+  { label: "Sevilla", to: "/buscar?provincia=Sevilla" },
+  { label: "Málaga", to: "/buscar?provincia=M%C3%A1laga" },
 ];
 
 function NewsletterInlineForm() {
@@ -61,7 +90,7 @@ function NewsletterInlineForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
-      toast.error('Por favor introduce un email válido');
+      toast.error('Introduce un email válido');
       return;
     }
     setIsSubmitting(true);
@@ -69,7 +98,6 @@ function NewsletterInlineForm() {
       const { NewsletterSubscriber } = base44.entities;
       const normalizedEmail = email.toLowerCase().trim();
 
-      // Verificar si ya existe (protegido contra undefined)
       let existing = [];
       try {
         const result = await NewsletterSubscriber.filter({ email: normalizedEmail });
@@ -81,10 +109,13 @@ function NewsletterInlineForm() {
 
       if (existing.length > 0) {
         if (existing[0].status === 'unsubscribed') {
-          await NewsletterSubscriber.update(existing[0].id, { status: 'confirmed', confirmed_at: new Date().toISOString() });
-          toast.success('¡Te hemos reactivado! Bienvenido de nuevo 🎉');
+          await NewsletterSubscriber.update(existing[0].id, {
+            status: 'confirmed',
+            confirmed_at: new Date().toISOString(),
+          });
+          toast.success('Te hemos reactivado. Bienvenido de nuevo.');
         } else {
-          toast.info('¡Ya estás suscrito! Gracias por seguir con nosotros 💌');
+          toast.info('Ya estás suscrito.');
         }
         setEmail('');
         return;
@@ -102,43 +133,44 @@ function NewsletterInlineForm() {
         unsubscribe_token: unsubscribeToken,
         confirmed_at: new Date().toISOString(),
         user_type_interest: 'ambos',
-        emails_sent: 0
+        emails_sent: 0,
       });
 
-      // Enviar email de bienvenida (sin bloquear el UX)
       base44.functions.invoke('sendNewsletterWelcome', {
         email: normalizedEmail,
         language: i18n.language || 'es',
-        unsubToken: unsubscribeToken
-      }).catch(err => console.warn('[Newsletter] Welcome email failed:', err));
+        unsubToken: unsubscribeToken,
+      }).catch((err) => console.warn('[Newsletter] Welcome email failed:', err));
 
-      toast.success('¡Suscripción confirmada! Revisa tu email 📬');
+      toast.success('Suscripción confirmada.');
       setEmail('');
     } catch (err) {
       console.error('[Newsletter] Error:', err);
-      toast.error('Error al suscribirte. Inténtalo de nuevo en unos segundos.');
+      toast.error('No se ha podido completar. Inténtalo de nuevo.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full md:w-auto md:min-w-[300px]">
+    <form onSubmit={handleSubmit} className="flex w-full sm:w-auto sm:min-w-[280px]">
       <input
         type="email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         placeholder="tu@email.com"
         required
         disabled={isSubmitting}
-        className="flex-1 bg-white/5 border border-white/10 rounded-l-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white/30 border-r-0"
+        aria-label="Tu email"
+        className="flex-1 h-9 bg-white border border-slate-200 rounded-l-lg px-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
       />
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         disabled={isSubmitting}
-        className="bg-white text-gray-900 text-xs font-medium px-3 py-1.5 rounded-r-lg hover:bg-gray-100 disabled:opacity-50 whitespace-nowrap"
+        className="h-9 text-xs font-semibold px-3 rounded-r-lg border border-l-0 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00255C]/20 disabled:opacity-50"
+        style={{ borderColor: NAVY, background: NAVY, color: 'white' }}
       >
-        {isSubmitting ? 'Enviando...' : 'Suscribirme'}
+        {isSubmitting ? 'Enviando…' : 'Suscribirme'}
       </button>
     </form>
   );
@@ -150,114 +182,122 @@ export default function Footer() {
 
   useEffect(() => {
     base44.auth.me()
-      .then(u => setCurrentUser(u))
+      .then((u) => setCurrentUser(u))
       .catch(() => setCurrentUser(null))
       .finally(() => setLoadingUser(false));
   }, []);
 
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="bg-slate-900 text-gray-300">
-      {/* Main content */}
-      <div className="max-w-7xl mx-auto px-6 pt-14 pb-24 md:pb-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
-
-          {/* Brand column */}
-          <div className="sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <img src={LOGO_URL} alt="MisAutónomos" className="w-11 h-11 rounded-xl" width="44" height="44" loading="lazy" />
-              <div>
-                <h3 className="text-white font-bold text-lg leading-tight">MisAutónomos</h3>
-                <p className="text-xs text-gray-400">Tu autónomo de confianza</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-400 leading-relaxed mb-5 max-w-xs">
-              La plataforma que conecta a clientes con profesionales autónomos verificados en toda España.
+    <footer className="border-t border-slate-200 bg-white text-slate-600">
+      <div className="max-w-6xl mx-auto px-5 py-6 md:py-8">
+        {/* Cabecera del footer: marca + 3 columnas. Gaps más ajustados. */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-6 md:gap-x-8 md:gap-y-6">
+          {/* Marca */}
+          <div className="col-span-2 sm:col-span-1">
+            <Link to="/" className="inline-flex items-center gap-2.5">
+              <img src={LOGO_URL} alt="" width="28" height="28" className="rounded-lg" loading="lazy" />
+              <span className="text-[15px] leading-none notranslate" translate="no">
+                <span style={{ color: NAVY, fontWeight: 500 }}>mis</span>
+                <span style={{ color: '#0f172a', fontWeight: 700 }}>autónomos</span>
+              </span>
+            </Link>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed max-w-[24ch]">
+              Profesionales verificados, contacto directo, sin comisiones.
             </p>
-            <div className="flex gap-2.5">
-              {socialLinks.map(({ href, label, icon: Icon, hoverClass }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                  className={`w-9 h-9 bg-slate-800 ${hoverClass} rounded-lg flex items-center justify-center transition-colors`}>
-                  <Icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
           </div>
 
-          {/* Platform links */}
+          {/* Producto */}
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Plataforma</h4>
-            <ul className="space-y-2.5">
-              {platformLinks.map(({ label, to }) => (
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-2">Producto</h4>
+            <ul className="space-y-1.5">
+              {COLUMN_PRODUCTO.map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className="text-sm text-gray-400 hover:text-white transition-colors">{label}</Link>
+                  <Link to={to} className="text-sm text-slate-700 hover:text-slate-900 hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Empresa */}
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Recursos</h4>
-            <ul className="space-y-2.5">
-              {resourceLinks.map(({ label, to }) => (
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-2">Empresa</h4>
+            <ul className="space-y-1.5">
+              {COLUMN_EMPRESA.map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className="text-sm text-gray-400 hover:text-white transition-colors">{label}</Link>
+                  <Link to={to} className="text-sm text-slate-700 hover:text-slate-900 hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Legal links */}
+          {/* Legal */}
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Legal</h4>
-            <ul className="space-y-2.5">
-              {legalLinks.map(({ label, to }) => (
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-2">Legal</h4>
+            <ul className="space-y-1.5">
+              {COLUMN_LEGAL.map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className="text-sm text-gray-400 hover:text-white transition-colors">{label}</Link>
+                  <Link to={to} className="text-sm text-slate-700 hover:text-slate-900 hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
                 </li>
               ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Contacto</h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="mailto:hola@misautonomos.es" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-                  <Mail className="w-4 h-4 flex-shrink-0" />
-                  hola@misautonomos.es
-                </a>
-              </li>
-              <li className="text-sm text-gray-500 pt-1">
-                Conectamos clientes con autónomos verificados en toda España. Contacto directo, sin comisiones.
-              </li>
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Newsletter compacta inline - SOLO para usuarios NO logueados */}
-      {!loadingUser && !currentUser && (
-        <div className="border-t border-slate-800/60">
-          <div className="max-w-7xl mx-auto px-6 py-5">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div className="text-xs text-gray-400">
-                <span className="text-white font-medium">Newsletter:</span> 1-2 emails al mes con consejos prácticos. Sin spam.
-              </div>
-              <NewsletterInlineForm />
-            </div>
-          </div>
+        {/* Bloque SEO interno compacto: TODO en una sola franja. Tipografía
+            más pequeña que los enlaces principales, con separador "·". */}
+        <div className="mt-5 pt-4 border-t border-slate-100 space-y-1.5">
+          <p className="text-[11px] leading-relaxed text-slate-500">
+            <span className="font-semibold text-slate-600 uppercase tracking-[0.06em] mr-2">Servicios</span>
+            {SEO_SERVICIOS.map(({ label, to }, i) => (
+              <React.Fragment key={label}>
+                {i > 0 && <span className="mx-1.5 text-slate-300" aria-hidden="true">·</span>}
+                <Link to={to} className="text-slate-600 hover:text-slate-900 hover:underline underline-offset-2">{label}</Link>
+              </React.Fragment>
+            ))}
+          </p>
+          <p className="text-[11px] leading-relaxed text-slate-500">
+            <span className="font-semibold text-slate-600 uppercase tracking-[0.06em] mr-2">Ciudades</span>
+            {SEO_CIUDADES.map(({ label, to }, i) => (
+              <React.Fragment key={label}>
+                {i > 0 && <span className="mx-1.5 text-slate-300" aria-hidden="true">·</span>}
+                <Link to={to} className="text-slate-600 hover:text-slate-900 hover:underline underline-offset-2">{label}</Link>
+              </React.Fragment>
+            ))}
+          </p>
         </div>
-      )}
 
-      {/* Bottom bar */}
-      <div className="border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-500 text-center sm:text-left">
-             © 2026 <span className="text-gray-400 font-medium">MisAutónomos</span>. Todos los derechos reservados.
-           </p>
-          <p className="text-xs text-gray-600">Tu autónomo de confianza</p>
+        {/* Newsletter inline — solo para no logueados. Compacta y sin borde
+            superior propio (cuelga directamente del bloque SEO). */}
+        {!loadingUser && !currentUser && (
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p className="text-xs text-slate-500">
+              <span className="text-slate-700 font-medium">Newsletter:</span> 1-2 emails al mes. Cero spam.
+            </p>
+            <NewsletterInlineForm />
+          </div>
+        )}
+
+        {/* Bottom bar: copyright + redes en una sola fila */}
+        <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-xs text-slate-500">
+            © {year} <span className="notranslate" translate="no">MisAutónomos</span>. Hecho en España.
+          </p>
+          <div className="flex items-center gap-1">
+            {socialLinks.map(({ href, label, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="w-8 h-8 inline-flex items-center justify-center rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00255C]/20"
+              >
+                <Icon className="w-4 h-4" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

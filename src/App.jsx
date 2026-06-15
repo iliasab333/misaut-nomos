@@ -10,8 +10,26 @@ import { setupIframeMessaging } from './lib/iframe-messaging';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { AppProvider } from '@/lib/AppContext';
+import { AutoTranslateProvider } from '@/lib/AutoTranslate';
+import ScrollToTop from '@/lib/ScrollToTop';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import { Suspense, lazy, React, Component } from 'react';
+import { Suspense, lazy, React, Component, useEffect } from 'react';
+
+// Reload SEGURO ante fallos de import dinámico:
+//  - Solo se recarga UNA vez por sesión, usando un flag en sessionStorage que
+//    sobrevive al reload. Si tras recargar el problema persiste, NO se vuelve
+//    a recargar (rompe el bucle).
+//  - El flag se limpia cuando la app monta correctamente (ver useEffect en App).
+const CHUNK_RELOAD_FLAG = 'chunk-reloaded';
+
+function isChunkLoadError(error) {
+  const msg = error?.message || '';
+  return (
+    msg.includes('Failed to fetch dynamically imported module') ||
+    msg.includes('Importing a module script failed') ||
+    msg.includes('error loading dynamically imported module')
+  );
+}
 
 // ErrorBoundary para capturar errores en producción
 class ErrorBoundary extends Component {
@@ -26,17 +44,18 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo);
-    // Auto-retry once for dynamic import failures (network glitch / stale cache)
-    if (
-      error?.message?.includes('Failed to fetch dynamically imported module') ||
-      error?.message?.includes('Importing a module script failed') ||
-      error?.message?.includes('error loading dynamically imported module')
-    ) {
-      if (!this._didRetry) {
-        this._didRetry = true;
-        window.location.reload();
-      }
+    if (!isChunkLoadError(error)) return;
+
+    // Reload de recuperación: solo si NO recargamos ya en esta sesión.
+    let alreadyReloaded = false;
+    try { alreadyReloaded = !!sessionStorage.getItem(CHUNK_RELOAD_FLAG); } catch (_e) { /* noop */ }
+    if (alreadyReloaded) {
+      // Ya intentamos recargar una vez y el chunk sigue fallando — no entramos
+      // en bucle. Mostramos la UI de error para que el usuario decida.
+      return;
     }
+    try { sessionStorage.setItem(CHUNK_RELOAD_FLAG, String(Date.now())); } catch (_e) { /* noop */ }
+    window.location.reload();
   }
 
   handleLogout = () => {
@@ -109,6 +128,9 @@ const AdminNewsletter = lazy(() => import('./pages/AdminNewsletter'));
 const AdminReferrals = lazy(() => import('./pages/AdminReferrals'));
 const AdminGifts = lazy(() => import('./pages/AdminGifts'));
 const AdminEmails = lazy(() => import('./pages/AdminEmails'));
+const AdminUsuarios = lazy(() => import('./pages/AdminUsuarios'));
+const AdminSoporte = lazy(() => import('./pages/AdminSoporte'));
+const BajaNewsletter = lazy(() => import('./pages/BajaNewsletter'));
 const EmailUnsubscribe = lazy(() => import('./pages/EmailUnsubscribe'));
 const SEOAnalysis = lazy(() => import('./pages/SEOAnalysis'));
 const BlogList = lazy(() => import('./pages/BlogList'));
@@ -122,11 +144,19 @@ const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const Calendar = lazy(() => import('./pages/Calendar'));
 const Jobs = lazy(() => import('./pages/Jobs'));
 const SupportChat = lazy(() => import('./pages/SupportChat.jsx'));
+const Soporte = lazy(() => import('./pages/Soporte'));
+const SoporteTicket = lazy(() => import('./pages/SoporteTicket'));
 const MiCampana = lazy(() => import('./pages/MiCampana'));
 const BriefingMensual = lazy(() => import('./pages/BriefingMensual'));
 const PlanAds = lazy(() => import('./pages/PlanAds'));
 const AcceptQuote = lazy(() => import('./pages/AcceptQuote'));
 const LeaveReview = lazy(() => import('./pages/LeaveReview'));
+const MisEstadisticas = lazy(() => import('./pages/MisEstadisticas'));
+const MisValoraciones = lazy(() => import('./pages/MisValoraciones'));
+const Login = lazy(() => import('./pages/Login'));
+const ParaAutonomos = lazy(() => import('./pages/ParaAutonomos'));
+const Landing = lazy(() => import('./pages/Landing'));
+const Contacto = lazy(() => import('./pages/Contacto'));
 
 // Sin spinner de carga — renderizar directamente
 const PageLoader = () => null;
@@ -235,7 +265,20 @@ const LegacyRedirect = () => {
 };
 
 const AuthenticatedApp = () => {
+  const location = useLocation();
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+
+  // /login se renderiza fullscreen, sin Layout, y sin esperar a que termine
+  // la carga de auth (la pantalla de login NO debe depender de auth).
+  if (location.pathname === '/login') {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Suspense>
+    );
+  }
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return null;
@@ -255,7 +298,7 @@ const AuthenticatedApp = () => {
       <LayoutWrapper currentPageName="Search">
         <Routes>
           {/* Raíz → página principal (búsqueda) */}
-          <Route path="/" element={<Pages.Search />} />
+          <Route path="/" element={<Landing />} />
 
           {/* ===== RUTAS PÚBLICAS (ES) ===== */}
           <Route path="/buscar" element={<Pages.Search />} />
@@ -266,10 +309,12 @@ const AuthenticatedApp = () => {
           <Route path="/categoria/:slug" element={<Pages.Categoria />} />            {/* legacy: ?name=X&ciudad=Y */}
           <Route path="/categoria/:cityCategory" element={<Pages.Categoria />} />     {/* SEO: /categoria/electricistas-en-antequera */}
           <Route path="/precios" element={<Pages.PricingPlans />} />
+          <Route path="/para-autonomos" element={<ParaAutonomos />} />
+          <Route path="/contacto" element={<Contacto />} />
           <Route path="/preguntas-frecuentes" element={<Pages.FAQ />} />
           <Route path="/preguntas-frecuentes/:slug" element={<Pages.FAQDetail />} />
           <Route path="/ayuda" element={<Pages.HelpCenter />} />
-          <Route path="/inicio" element={<Pages.Home />} />
+          {/* /inicio retirada: 301 → / via vercel.json. */}
           <Route path="/registro-cliente" element={<Pages.ClientOnboarding />} />
           <Route path="/registro" element={<Pages.UserTypeSelection />} />
           <Route path="/privacidad" element={<Pages.PrivacyPolicy />} />
@@ -282,10 +327,11 @@ const AuthenticatedApp = () => {
           <Route path="/mensajes" element={<Pages.Messages />} />
           <Route path="/favoritos" element={<Pages.Favorites />} />
           <Route path="/mi-perfil" element={<Pages.MyProfile />} />
-          <Route path="/soporte" element={<Suspense fallback={<PageLoader />}><SupportChat /></Suspense>} />
+          <Route path="/soporte" element={<Suspense fallback={<PageLoader />}><Soporte /></Suspense>} />
+          <Route path="/soporte/:id" element={<Suspense fallback={<PageLoader />}><SoporteTicket /></Suspense>} />
           <Route path="/presupuestos" element={<Pages.Presupuestos />} />
           <Route path="/presupuesto/:quoteId" element={<Suspense fallback={<PageLoader />}><AcceptQuote /></Suspense>} />
-          <Route path="/valorar/:professionalId" element={<Suspense fallback={<PageLoader />}><LeaveReview /></Suspense>} />
+          <Route path="/valorar/:token" element={<Suspense fallback={<PageLoader />}><LeaveReview /></Suspense>} />
           <Route path="/pedir-presupuesto" element={<Pages.RequestQuote />} />
           <Route path="/solicitudes" element={<Pages.QuoteRequests />} />
           <Route path="/notificaciones" element={<Pages.Notifications />} />
@@ -294,6 +340,8 @@ const AuthenticatedApp = () => {
           {/* Importante: /dashboard/info va ANTES que /dashboard para que matchee primero */}
           <Route path="/dashboard/info" element={<Pages.DashboardProInfo />} />
           <Route path="/dashboard" element={<Pages.ProfessionalDashboard />} />
+          <Route path="/mis-estadisticas" element={<Suspense fallback={<PageLoader />}><MisEstadisticas /></Suspense>} />
+          <Route path="/mis-valoraciones" element={<Suspense fallback={<PageLoader />}><MisValoraciones /></Suspense>} />
           <Route path="/mis-clientes" element={<Suspense fallback={<PageLoader />}><MisClientes /></Suspense>} />
           <Route path="/visibilidad" element={<Pages.MiVisibilidad />} />
           <Route path="/perfil" element={<Pages.ProfessionalProfile />} />
@@ -323,10 +371,11 @@ const AuthenticatedApp = () => {
           {/* Subrutas admin ANTES que /admin para matchear primero */}
           <Route path="/admin/pagos" element={<Suspense fallback={<PageLoader />}><AdminPayments /></Suspense>} />
           <Route path="/admin/tickets" element={<Suspense fallback={<PageLoader />}><AdminTickets /></Suspense>} />
-          <Route path="/admin/soporte" element={<Suspense fallback={<PageLoader />}><AdminSupport /></Suspense>} />
+          <Route path="/admin/soporte" element={<Suspense fallback={<PageLoader />}><AdminSoporte /></Suspense>} />
           <Route path="/admin/faq" element={<Suspense fallback={<PageLoader />}><AdminFAQ /></Suspense>} />
           <Route path="/admin/mensajes" element={<Suspense fallback={<PageLoader />}><AdminMessagesStats /></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
+          <Route path="/admin/usuarios" element={<Suspense fallback={<PageLoader />}><AdminUsuarios /></Suspense>} />
           <Route path="/admin/seo" element={<Suspense fallback={<PageLoader />}><SEOAnalysis /></Suspense>} />
           <Route path="/admin/blog" element={<Suspense fallback={<PageLoader />}><AdminBlog /></Suspense>} />
           <Route path="/admin/newsletter" element={<Suspense fallback={<PageLoader />}><AdminNewsletter /></Suspense>} />
@@ -334,6 +383,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin/regalos" element={<Suspense fallback={<PageLoader />}><AdminGifts /></Suspense>} />
           <Route path="/admin/emails" element={<Suspense fallback={<PageLoader />}><AdminEmails /></Suspense>} />
           <Route path="/newsletter/unsubscribe" element={<Suspense fallback={<PageLoader />}><EmailUnsubscribe /></Suspense>} />
+          <Route path="/baja-newsletter" element={<Suspense fallback={<PageLoader />}><BajaNewsletter /></Suspense>} />
           <Route path="/NewsletterUnsubscribe" element={<Suspense fallback={<PageLoader />}><EmailUnsubscribe /></Suspense>} />
 
           {/* ===== BLOG PÚBLICO ===== */}
@@ -355,18 +405,30 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  // Si la app montó correctamente, asumimos que los chunks cargaron bien.
+  // Limpiamos el flag tras un pequeño margen para que un fallo posterior
+  // (p.ej. al navegar a otra ruta lazy) pueda volver a recargar UNA vez.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try { sessionStorage.removeItem(CHUNK_RELOAD_FLAG); } catch (_e) { /* noop */ }
+    }, 4000);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <ErrorBoundary>
       <AuthProvider>
         <AppProvider>
           <QueryClientProvider client={queryClientInstance}>
-            <Router>
-              <NavigationTracker />
-              <AuthenticatedApp />
-            </Router>
-            <Toaster />
-            <VisualEditAgent />
+            <AutoTranslateProvider>
+              <Router>
+                <ScrollToTop />
+                <NavigationTracker />
+                <AuthenticatedApp />
+              </Router>
+              <Toaster />
+              <VisualEditAgent />
+            </AutoTranslateProvider>
           </QueryClientProvider>
         </AppProvider>
       </AuthProvider>

@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import ResponsiveModal from "@/components/ui/ResponsiveModal";
 import { Plus, Trash2, Loader2, FileText, Send, AlertTriangle, Download } from "lucide-react";
-import { downloadQuotePDFWithLogo } from "@/services/quotePdfGenerator";
+// `quotePdfGenerator` arrastra jspdf (~600 KB). Lo cargamos dinámico al
+// solicitar la descarga para que no entre en el chunk del entry.
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -283,6 +284,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
       toast.error("Completa al menos el cliente y el título para previsualizar");
       return;
     }
+    const { downloadQuotePDFWithLogo } = await import('@/services/quotePdfGenerator');
     await downloadQuotePDFWithLogo({ ...form, professional_id: user?.id, professional_name: user?.full_name || "" });
   };
 

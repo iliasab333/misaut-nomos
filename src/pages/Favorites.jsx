@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import OptimizedImage from "../components/ui/OptimizedImage";
+import { optimizeSupabaseImage } from "@/lib/supabaseImage";
 
 export default function FavoritesPage() {
   const navigate = useNavigate();
@@ -141,7 +142,7 @@ export default function FavoritesPage() {
                         >
                           {profileUser?.profile_picture ? (
                             <OptimizedImage
-                              src={profileUser.profile_picture}
+                              src={optimizeSupabaseImage(profileUser.profile_picture, { width: 96 })}
                               alt={profile.business_name || "Professional profile picture"}
                               className="w-full h-full"
                               objectFit="cover"

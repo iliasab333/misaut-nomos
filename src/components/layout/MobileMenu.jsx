@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png';
+const LOGO_URL = '/logo-192.png';
 
 export default function MobileMenu({ isOpen, onClose, user, isProfessional, unreadCount, displayName, profilePicture, onLogin, onLogout }) {
   const location = useLocation();
@@ -194,7 +194,7 @@ export default function MobileMenu({ isOpen, onClose, user, isProfessional, unre
 
               {/* Links */}
               <NavItem to="/buscar" icon={Search} label="Buscar autónomos" />
-              <NavItem to="/inicio" icon={Home} label="Cómo funciona" />
+              <NavItem to="/" icon={Home} label="Inicio" />
               <NavItem to="/precios" icon={CreditCard} label="Ver planes" />
 
               <Divider />

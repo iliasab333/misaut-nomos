@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { useNavigate } from "react-router-dom";
+import { supabase } from "@/api/supabaseClient";
+import { useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,10 +22,13 @@ import { useLanguage } from "../components/ui/LanguageSwitcher";
 import SEOHead from "../components/seo/SEOHead";
 import FileAttachment from "../components/messages/FileAttachment";
 import QuoteRequest from "../components/messages/QuoteRequest";
+import ReviewRequestBubble from "../components/messages/ReviewRequestBubble";
+import InboxTabs from "../components/messages/InboxTabs";
 import AIAssistantPro from "../components/ai/AIAssistantPro";
 import SendQuoteDialog from "../components/messages/SendQuoteDialog";
 import { notifyUser, pushTemplates } from "@/services/pushNotifications";
 import { createMessage } from "@/lib/createMessage";
+import { pickOtherName } from "@/lib/contactName";
 import PullToRefresh from "@/components/ui/PullToRefresh";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -192,6 +196,7 @@ export default function MessagesPage() {
 
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [reviewData, setReviewData] = useState({ rapidez: 0, comunicacion: 0, calidad: 0, precio_satisfaccion: 0, comment: "" });
+  const [askingReview, setAskingReview] = useState(false);
 
   const [showQuoteDialog, setShowQuoteDialog] = useState(false);
   const [quoteData, setQuoteData] = useState({ description: "", budget: "", deadline: "" });
@@ -280,10 +285,64 @@ export default function MessagesPage() {
     if (!user) return;
     setLoadingMessages(true);
     loadMessages().finally(() => setLoadingMessages(false));
-    // Polling every 10s
-    pollingRef.current = setInterval(loadMessages, 10000);
+    // Polling rebajado a 60 s como red de seguridad (antes 10 s causaba parpadeo
+    // y solapaba con la suscripción realtime).
+    pollingRef.current = setInterval(loadMessages, 60_000);
     return () => clearInterval(pollingRef.current);
   }, [user, loadMessages]);
+
+  // ─── Realtime: Supabase canal sobre `messages` ────────────────────────────
+  // - INSERT con recipient_id == yo  → mensaje entrante. Dedup por id.
+  // - UPDATE de mensajes míos        → reconciliación (p.ej. is_read marcado
+  //   por el otro extremo, edición, etc.).
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`messages-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `recipient_id=eq.${user.id}` },
+        (payload) => {
+          const m = payload.new;
+          if (!m || !m.id) return;
+          setAllMessages((prev) => {
+            // Sustituye un mensaje optimista de mi propio envío si coincide
+            // (no aplica aquí porque recipient_id soy yo, pero por
+            // simetría usamos dedup por id).
+            if (prev.some((x) => x.id === m.id)) return prev;
+            return [...prev, m];
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `sender_id=eq.${user.id}` },
+        (payload) => {
+          const m = payload.new;
+          if (!m || !m.id) return;
+          setAllMessages((prev) => {
+            // Quita optimistas que coincidan con este id real
+            const dropped = prev.filter((x) => !(x._optimistic && x.conversation_id === m.conversation_id && x.content === m.content));
+            if (dropped.some((x) => x.id === m.id)) return dropped;
+            return [...dropped, m];
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'messages' },
+        (payload) => {
+          const m = payload.new;
+          if (!m || !m.id) return;
+          // Solo nos interesan los nuestros y los nuestros entrantes
+          if (m.recipient_id !== user.id && m.sender_id !== user.id) return;
+          setAllMessages((prev) => prev.map((x) => (x.id === m.id ? { ...x, ...m } : x)));
+        }
+      )
+      .subscribe();
+
+    return () => { try { supabase.removeChannel(channel); } catch (_e) { /* noop */ } };
+  }, [user?.id]);
 
   // ─── Build conversations list ─────────────────────────────────────────────
   const conversations = useMemo(() => {
@@ -312,63 +371,24 @@ export default function MessagesPage() {
       }
     });
 
-    // Determine contact name: buscar en los mensajes el nombre del interlocutor (otherUserId).
-       // Estrategia: mirar mensajes donde el OTHER fue el sender — su nombre estará en professional_name o client_name.
-       // Si no hay mensajes del otro, mirar mensajes míos — también guardan ambos nombres.
-       // Prioridad final: profilesCache con datos reales del User entity.
-       // ESPECIAL: Para chats de Briefing, si el otro es el admin, mostrar "Equipo Plan Ads+"
-       const myId = user?.id;
-       Object.values(convMap).forEach(conv => {
-         const otherUserId = conv.otherUserId;
-
-         // 1. Buscar en mensajes donde el otro fue sender (nombre más fiable)
-         for (const msg of conv.messages) {
-           if (msg.sender_id !== otherUserId) continue;
-           // El otro envió este mensaje — su nombre está en professional_name o client_name
-           // Usamos el que NO sea el nombre del usuario actual
-           let name = msg.sender_name || msg.professional_name || msg.client_name || null;
-           // ESPECIAL: Para Briefing, si es "Equipo MisAutónomos" → "Equipo Plan Ads+"
-           if (conv.conversationId?.startsWith('briefing_') && name === 'Equipo MisAutónomos') {
-             name = 'Equipo Plan Ads+';
-           }
-           if (name && name.trim()) {
-             conv.contactName = name.trim();
-             break;
-           }
-         }
-
-         // 2. Si no encontramos nada, buscar en mensajes míos (también guardan ambos nombres)
-         if (!conv.contactName) {
-           for (const msg of conv.messages) {
-             if (msg.sender_id !== myId) continue;
-             // Yo envié este mensaje — los campos professional_name/client_name corresponden al otro
-             // Si soy profesional → client_name es el nombre del cliente (el otro)
-             // Si soy cliente → professional_name es el nombre del pro (el otro)
-             const myType = user?.user_type;
-             let name = myType === 'professionnel' 
-               ? (msg.client_name || msg.professional_name)
-               : (msg.professional_name || msg.client_name);
-             // ESPECIAL: Para Briefing, si es "Equipo MisAutónomos" → "Equipo Plan Ads+"
-             if (conv.conversationId?.startsWith('briefing_') && name === 'Equipo MisAutónomos') {
-               name = 'Equipo Plan Ads+';
-             }
-             if (name && name.trim()) {
-               conv.contactName = name.trim();
-               break;
-             }
-           }
-         }
-
-         // 3. Fallback: profilesCache (buscado via User/ProfessionalProfile entity)
-         if (!conv.contactName) {
-           const cached = profilesCache[otherUserId];
-           if (cached) {
-             conv.contactName = cached.business_name || cached.full_name || cached.email?.split('@')[0] || null;
-           }
-         }
-
-         conv.contactName = conv.contactName || "...";
-       });
+    // Nombre del interlocutor: regla única vía pickOtherName.
+    // Prioridad: business_name (perfil pro) > professional_name del mensaje
+    // > nombre personal. NUNCA mostramos email.
+    const myId = user?.id;
+    const myUserType = user?.user_type;
+    Object.values(convMap).forEach((conv) => {
+      const otherUserId = conv.otherUserId;
+      const cached = profilesCache[otherUserId];
+      const name = pickOtherName({
+        conversationId: conv.conversationId,
+        otherUserId,
+        myId,
+        myUserType,
+        cached,
+        messages: conv.messages,
+      });
+      conv.contactName = name || '...';
+    });
 
     return Object.values(convMap).sort((a, b) =>
       new Date(b.lastMessage.created_date) - new Date(a.lastMessage.created_date)
@@ -471,20 +491,25 @@ export default function MessagesPage() {
 
     missingIds.forEach(async (uid) => {
       try {
-        // Buscar primero en ProfessionalProfile (tiene business_name)
+        // 1) Si tiene ProfessionalProfile → es profesional; guardamos business_name + full_name.
         const profiles = await base44.entities.ProfessionalProfile.filter({ user_id: uid });
-        if (profiles[0]?.business_name || profiles[0]) {
+        if (profiles?.[0]) {
+          // Necesitamos también full_name como último recurso (sin email)
+          let fullName = null;
+          try {
+            const users = await base44.entities.User.filter({ id: uid });
+            fullName = users?.[0]?.full_name || null;
+          } catch {}
           setProfilesCache(prev => ({
             ...prev,
             [uid]: {
               business_name: profiles[0].business_name || null,
-              full_name: null,
-              email: null,
-              type: 'professional'
-            }
+              full_name: fullName,
+              type: 'professional',
+            },
           }));
         } else {
-          // Si no tiene perfil pro, buscar en User entity
+          // 2) Cliente: solo full_name. NO guardamos email para no exponerlo.
           const users = await base44.entities.User.filter({ id: uid });
           if (users[0]) {
             setProfilesCache(prev => ({
@@ -492,9 +517,8 @@ export default function MessagesPage() {
               [uid]: {
                 business_name: null,
                 full_name: users[0].full_name || null,
-                email: users[0].email || null,
-                type: 'client'
-              }
+                type: 'client',
+              },
             }));
           }
         }
@@ -542,17 +566,17 @@ export default function MessagesPage() {
   // ─── Resolved contact name for open chat header ───────────────────────────
   const resolvedContactName = useMemo(() => {
     if (!selectedConvId) return "";
-    // Para chats de Briefing Ads+, el admin siempre se muestra como "Equipo Plan Ads+"
-    if (selectedConvId?.startsWith('briefing_')) return "Equipo Plan Ads+";
     if (currentConv?.contactName && currentConv.contactName !== "...") return currentConv.contactName;
-    const cached = profilesCache[selectedOtherUserId];
-    if (cached) return cached.business_name || cached.full_name || cached.email?.split('@')[0] || "Usuario";
-    for (const msg of currentMessages) {
-      const name = getInterlocutorName(msg, selectedOtherUserId);
-      if (name && name.trim()) return name.trim();
-    }
-    return "...";
-  }, [selectedConvId, currentConv, profilesCache, selectedOtherUserId, currentMessages]);
+    const name = pickOtherName({
+      conversationId: selectedConvId,
+      otherUserId: selectedOtherUserId,
+      myId: user?.id,
+      myUserType: user?.user_type,
+      cached: profilesCache[selectedOtherUserId],
+      messages: currentMessages,
+    });
+    return name || "...";
+  }, [selectedConvId, currentConv, profilesCache, selectedOtherUserId, currentMessages, user?.id, user?.user_type]);
 
   // ─── Audio Recording ──────────────────────────────────────────────────────
   const startRecording = async () => {
@@ -632,7 +656,7 @@ export default function MessagesPage() {
       setPendingAudio(null);
 
       const profName = currentMessages.find(m => m.professional_name)?.professional_name || resolvedContactName || "";
-      const clientName = currentMessages.find(m => m.client_name)?.client_name || user.full_name || user.email || "";
+      const clientName = currentMessages.find(m => m.client_name)?.client_name || user.full_name || "";
 
       await createMessage({
         conversation_id: selectedConvId,
@@ -681,9 +705,9 @@ export default function MessagesPage() {
       }
 
       if (isProfessional) {
-        profName = profName || user.full_name || user.email || "";
+        profName = profName || user.full_name || "";
       } else {
-        clientName = clientName || user.full_name || user.email || "";
+        clientName = clientName || user.full_name || "";
         if (!profName) {
           const cached = profilesCache[otherUserId];
           profName = cached?.business_name || resolvedContactName || "";
@@ -770,7 +794,7 @@ export default function MessagesPage() {
     const otherUserId = currentConv?.otherUserId || selectedOtherUserId;
     if (!otherUserId) return;
     let profName = currentMessages.find(m => m.professional_name)?.professional_name || resolvedContactName;
-    let clientName = currentMessages.find(m => m.client_name)?.client_name || user.full_name || user.email;
+    let clientName = currentMessages.find(m => m.client_name)?.client_name || user.full_name || "";
     await createMessage({
       conversation_id: selectedConvId,
       sender_id: user.id,
@@ -839,9 +863,9 @@ export default function MessagesPage() {
       }
 
       if (isProfessional) {
-        profName = profName || user.full_name || user.email || "";
+        profName = profName || user.full_name || "";
       } else {
-        clientName = clientName || user.full_name || user.email || "";
+        clientName = clientName || user.full_name || "";
       }
 
       await createMessage({
@@ -880,6 +904,54 @@ export default function MessagesPage() {
     toast.success("Presupuesto actualizado");
   };
 
+  // ─── Pedir reseña (RPC) ───────────────────────────────────────────────────
+  // El profesional pulsa "Pedir reseña" en la cabecera del chat. Llamamos a
+  // create_review_request(conversation_id, client_id) → { token, url } y
+  // dejamos en la conversación un MENSAJE con quote_request marcado como
+  // review_request. El cliente verá una tarjeta con un único botón.
+  const handleAskReview = async () => {
+    if (!selectedConvId || !selectedOtherUserId) return;
+    if (askingReview) return;
+    setAskingReview(true);
+    try {
+      const { createReviewRequest } = await import('@/lib/reviewRpc');
+      const res = await createReviewRequest({
+        conversation_id: selectedConvId,
+        client_id: selectedOtherUserId,
+      });
+      const token = res?.token;
+      if (!token) throw new Error('No se ha recibido el token');
+      const professionalName =
+        currentMessages.find((m) => m.professional_name)?.professional_name ||
+        user?.full_name ||
+        'el profesional';
+      await createMessage({
+        conversation_id: selectedConvId,
+        sender_id: user.id,
+        recipient_id: selectedOtherUserId,
+        content: '⭐ Te he pedido una valoración',
+        professional_name: professionalName,
+        client_name:
+          currentMessages.find((m) => m.client_name)?.client_name || '',
+        is_read: false,
+        attachments: [],
+        quote_request: {
+          kind: 'review_request',
+          token,
+          url: res?.url || `/valorar/${token}`,
+          professional_name: professionalName,
+        },
+      });
+      await loadMessages();
+      scrollToBottom(true);
+      toast.success('Solicitud enviada al cliente.');
+    } catch (e) {
+      toast.error(e?.message || 'No se pudo crear la solicitud.');
+    } finally {
+      setAskingReview(false);
+    }
+  };
+
   // ─── Review ───────────────────────────────────────────────────────────────
   const handleSubmitReview = async () => {
     if (!reviewData.rapidez || !reviewData.comunicacion || !reviewData.calidad || !reviewData.precio_satisfaccion) {
@@ -898,7 +970,7 @@ export default function MessagesPage() {
         ...reviewData, rating: avg,
         professional_id: selectedOtherUserId,
         client_id: user.id,
-        client_name: user.full_name || user.email,
+        client_name: user.full_name || "",
         conversation_id: selectedConvId,
         is_verified: true, is_reported: false
       });
@@ -978,13 +1050,11 @@ export default function MessagesPage() {
         {/* ── Columna izquierda: Lista de conversaciones ── */}
         <div className={`flex-shrink-0 w-full md:w-80 bg-white border-r border-gray-200 flex flex-col min-h-0 ${selectedConvId ? 'hidden md:flex' : 'flex'}`}>
           <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0">
-            <div className="flex items-center gap-2 mb-3">
-              <MessageSquare className="w-5 h-5 text-blue-600" />
-              <h2 className="font-bold text-gray-900 text-base">Mensajes</h2>
-              {filteredConversations.length > 0 && (
-                <span className="ml-auto text-xs text-gray-400 font-medium">{filteredConversations.length}</span>
-              )}
-            </div>
+            {/* Tabs Mensajes / Soporte con contadores independientes.
+                "Mensajes" = chats cliente↔pro (tabla messages, esta página).
+                "Soporte"  = tickets (tabla tickets). Lleva a /soporte donde el
+                usuario abre/lee sus tickets. */}
+            <InboxTabs user={user} unreadChats={conversations.reduce((s, c) => s + (c.unreadCount || 0), 0)} />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -1133,15 +1203,11 @@ export default function MessagesPage() {
                   {/* Botón "Pedir reseña" para profesionales */}
                   {isProfessional && selectedOtherUserId && (
                     <Button
-                      onClick={async () => {
-                        const link = `${window.location.origin}/valorar/${user.id}`;
-                        const msg = `Hola! Me gustaría pedirte que dejes una valoración sobre mi trabajo. Solo tarda 2 minutos 🙏\n${link}`;
-                        setNewMessage(msg);
-                        toast.success("Mensaje preparado — revísalo y pulsa enviar");
-                      }}
+                      onClick={handleAskReview}
+                      disabled={askingReview}
                       size="sm"
                       variant="outline"
-                      className="h-8 border-amber-300 text-amber-700 hover:bg-amber-50"
+                      className="h-8 border-amber-300 text-amber-700 hover:bg-amber-50 disabled:opacity-60"
                       title="Pedir reseña a este cliente"
                     >
                       <Star className="w-3.5 h-3.5" />
@@ -1191,7 +1257,10 @@ export default function MessagesPage() {
                           )}
 
                           <div className={`max-w-[75%] md:max-w-[60%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                            {msg.quote_request && (
+                            {msg.quote_request && msg.quote_request.kind === 'review_request' && (
+                              <ReviewRequestBubble data={msg.quote_request} isMe={isMe} />
+                            )}
+                            {msg.quote_request && msg.quote_request.kind !== 'review_request' && (
                               <QuoteRequest
                                 quote={msg.quote_request}
                                 isProfessional={msg.sender_id !== user?.id && user?.user_type === "professionnel"}

@@ -50,7 +50,8 @@ const BASE_STYLES = `
   }
 `;
 
-const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png';
+// Email: necesita URL absoluta (las clientes de correo no resuelven rutas relativas).
+const LOGO_URL = 'https://misautonomos.es/logo-512.png';
 
 // Cabecera común
 const emailHeader = (title, subtitle = 'Tu autónomo de confianza', headerClass = '') => `

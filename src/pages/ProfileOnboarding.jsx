@@ -86,12 +86,25 @@ export default function ProfileOnboardingPage() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
+      // Admin: nunca debe quedarse atrapado en el alta de profesional.
+      if (currentUser?.role === 'admin') {
+        navigate('/admin', { replace: true });
+        return;
+      }
+      // Cliente que llega aquí por accidente → al buscador.
+      const t = currentUser?.user_type;
+      const isPro = t === 'professionnel' || t === 'profesional' || t === 'professional';
+      if (!isPro && currentUser) {
+        navigate('/buscar', { replace: true });
+        return;
+      }
+
       const profiles = await base44.entities.ProfessionalProfile.filter({
         user_id: currentUser.id
       });
 
       if (profiles.length > 0 && profiles[0].onboarding_completed) {
-        navigate(createPageUrl("MyProfile"));
+        navigate(createPageUrl("MyProfile"), { replace: true });
         return;
       }
 
@@ -415,10 +428,11 @@ export default function ProfileOnboardingPage() {
         });
       }).catch(() => {});
 
-      toast.success("¡Perfil publicado! Ya apareces en búsquedas 🎉", { duration: 5000 });
+      toast.success("Perfil publicado. Ya apareces en búsquedas.", { duration: 5000 });
       setTimeout(() => {
-        navigate(createPageUrl("ProfessionalDashboard"));
-      }, 2000);
+        // Flujo: /registro → /completar-perfil → /precios
+        navigate(createPageUrl("PricingPlans"));
+      }, 1500);
     } catch (error) {
       console.error("Error saving profile:", error);
       toast.error("Error al guardar el perfil: " + error.message);

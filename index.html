@@ -3,48 +3,56 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
-    <meta http-equiv="Cache-Control" content="public, max-age=31536000" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     
-    <!-- Preconnect crítico — solo los estrictamente necesarios above-the-fold -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://qtrypzzcjebvfcihiynt.supabase.co" />
-    <link rel="dns-prefetch" href="https://media.base44.com" />
+    <!-- Preconnect crítico: Supabase Storage (avatares de profesionales en LCP). -->
+    <link rel="preconnect" href="https://dquxsethatxtptfviiwd.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://dquxsethatxtptfviiwd.supabase.co" />
 
-    <!-- Preload del logo (LCP element en móvil) — WebP optimizado 48px 1x / 96px 2x -->
-    <link rel="preload" as="image" 
-      href="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/render/image/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png?width=48&height=48&quality=80&format=webp"
-      imagesrcset="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/render/image/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png?width=48&height=48&quality=80&format=webp 1x, https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/render/image/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png?width=96&height=96&quality=80&format=webp 2x"
-      fetchpriority="high"
-      crossorigin />
+    <!-- Preload del logo local (LCP en cabecera) -->
+    <link rel="preload" as="image" href="/logo-192.png" fetchpriority="high" />
 
-    <!-- Google Fonts: preload solo peso 700 (hero h1) + swap — no-bloqueante -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" /></noscript>
+    <!-- Fuente Inter self-hosted (vía @fontsource/inter en main.jsx). -->
+    <!-- Para CLS 0: una fuente de fallback con métricas ajustadas a Inter,
+         para que el swap NO mueva titulares. Valores de Google Fonts. -->
+    <style>
+      @font-face {
+        font-family: 'Inter Fallback';
+        src: local('Arial');
+        size-adjust: 107.4%;
+        ascent-override: 90%;
+        descent-override: 22.43%;
+        line-gap-override: 0%;
+      }
+      body, button, input, select, textarea {
+        font-family: 'Inter', 'Inter Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+    </style>
 
-    <link rel="icon" type="image/png" href="/logo-192.png" />
+    <!-- Iconos -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>MisAutónomos - Encuentra autónomos y profesionales en España</title>
     <meta name="description" content="Encuentra y contacta con los mejores profesionales autónomos verificados cerca de ti. Electricistas, fontaneros, carpinteros y más. 100% gratis para clientes." />
     <link rel="canonical" href="https://misautonomos.es/buscar" />
     <link rel="sitemap" type="application/xml" href="https://misautonomos.es/sitemap.xml" />
     <!-- Open Graph default (sobrescrito por SEOHead en cada página) -->
-    <meta property="og:site_name" content="MisAutónomos" />
+    <meta property="og:site_name" content="misAutónomos" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="MisAutónomos - Encuentra autónomos y profesionales en España" />
-    <meta property="og:description" content="Encuentra y contacta con los mejores profesionales autónomos verificados cerca de ti. Electricistas, fontaneros, carpinteros y más. 100% gratis para clientes." />
+    <meta property="og:title" content="misAutónomos" />
+    <meta property="og:description" content="Encuentra y contacta con los mejores autónomos verificados cerca de ti." />
     <meta property="og:url" content="https://misautonomos.es/buscar" />
-    <meta property="og:image" content="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/f1c507180_123.png" />
+    <meta property="og:image" content="https://misautonomos.es/og-image.png" />
     <meta property="og:locale" content="es_ES" />
     <!-- Twitter Card default -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@MisAutonomos" />
-    <meta name="twitter:title" content="MisAutónomos - Encuentra autónomos y profesionales en España" />
-    <meta name="twitter:description" content="Encuentra y contacta con los mejores profesionales autónomos verificados. 100% gratis para clientes." />
-    <meta name="twitter:image" content="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/f1c507180_123.png" />
+    <meta name="twitter:title" content="misAutónomos" />
+    <meta name="twitter:description" content="Encuentra y contacta con los mejores autónomos verificados cerca de ti." />
+    <meta name="twitter:image" content="https://misautonomos.es/og-image.png" />
     <!-- Schema.org Organization (estático, siempre visible para Google) -->
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"MisAutónomos","url":"https://misautonomos.es","logo":{"@type":"ImageObject","url":"https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690076ad86e673c796768de5/47f6f564f_ChatGPTImage13nov202511_25_45.png","width":512,"height":512},"description":"Directorio de profesionales autónomos verificados en España","areaServed":{"@type":"Country","name":"España"},"contactPoint":{"@type":"ContactPoint","email":"soporte@misautonomos.es","contactType":"customer support","areaServed":"ES"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"MisAutónomos","url":"https://misautonomos.es","logo":{"@type":"ImageObject","url":"https://misautonomos.es/logo-512.png","width":512,"height":512},"description":"Directorio de profesionales autónomos verificados en España","areaServed":{"@type":"Country","name":"España"},"contactPoint":{"@type":"ContactPoint","email":"soporte@misautonomos.es","contactType":"customer support","areaServed":"ES"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"MisAutónomos","url":"https://misautonomos.es","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://misautonomos.es/buscar?q={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
 
     <!-- Polyfill requestIdleCallback — NO existe en Safari (iOS/macOS < 15.4) -->
@@ -96,36 +104,40 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#1E40AF" />
+    <meta name="theme-color" content="#00255C" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="MisAutónomos" />
-    <link rel="apple-touch-icon" href="/logo-192.png" />
+    <meta name="apple-mobile-web-app-title" content="misAutónomos" />
     <!-- CSS crítico inline: evita CLS del layout inicial y FOUC -->
     <style>
       *,*::before,*::after{box-sizing:border-box}
-      html,body{margin:0;padding:0;background:#fff;color:#111827;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:hidden}
+      html,body{margin:0;padding:0;background:#fff;color:#111827;font-family:'Inter','Inter Fallback',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:hidden}
       #root{min-height:100vh}
-      /* Reservar espacio para el header móvil fijo — evita CLS */
       @media(max-width:1023px){.mobile-main-content{padding-top:56px!important}}
-      /* Bottom nav fijo — reservar espacio */
       @media(max-width:767px){body{padding-bottom:64px}}
-      /* Imágenes sin dimensiones explícitas — evitar layout shift */
       img{max-width:100%;height:auto;display:block}
-      /* Avatares — siempre dimensión fija */
       .avatar-fixed{width:48px;height:48px;min-width:48px;min-height:48px;flex-shrink:0;border-radius:9999px;overflow:hidden}
-      /* Cards profesional — altura mínima fija */
-      .pro-card{min-height:200px;contain:layout style}
-      /* Skeleton sin animación costosa */
+      .pro-card{min-height:220px;contain:layout style}
       .sk{background:#f3f4f6}
-      /* Fonts sistema como fallback instantáneo */
-      body{font-display:swap}
-      /* Reservar altura del hero de búsqueda para evitar CLS */
-      @media(max-width:767px){
-        .search-hero-placeholder{min-height:420px;background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#2563eb 100%)}
-      }
-      /* Texto del hero visible inmediatamente con fuente sistema */
-      h1{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#fff}
+      /* ── Reservas de altura above-the-fold (anti-CLS) ─────────────────────
+         La landing y /buscar montan secciones cuyo contenido llega tras un
+         fetch. Reservamos su altura mínima desde el primer paint para que la
+         carga de datos no empuje al usuario. */
+      .hero-landing{min-height:720px}
+      @media(max-width:767px){.hero-landing{min-height:980px}}
+      /* Rejilla de categorías del hero: 17 chips reales, ~5 filas en desktop,
+         ~9 en móvil. min-height suficiente para que el salto de 12→17 chips
+         no provoque shift mientras carga */
+      .hero-cats-grid{min-height:520px}
+      @media(min-width:640px){.hero-cats-grid{min-height:360px}}
+      @media(min-width:1024px){.hero-cats-grid{min-height:280px}}
+      /* /buscar: lista de profesionales — reservar el alto del grid para 6
+         tarjetas iniciales (220 px por tarjeta + gaps). */
+      .search-results-grid{min-height:1400px}
+      @media(min-width:768px){.search-results-grid{min-height:520px}}
+      @media(min-width:1024px){.search-results-grid{min-height:520px}}
+      /* Skeleton tarjeta (mismo height-shape que la final, 220 px) */
+      .card-skeleton{min-height:220px;contain:layout style paint}
     </style>
   </head>
   <body>

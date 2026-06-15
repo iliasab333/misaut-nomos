@@ -130,12 +130,17 @@ export default function BlogPostPage() {
         </Link>
       </div>
 
-      <article className="max-w-3xl mx-auto px-4 py-8">
+      <article className="max-w-3xl mx-auto px-4 py-10">
         <CategoryBadge category={post.category} />
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-3 tracking-tight leading-tight">{post.title_es}</h1>
+        <h1
+          className="font-semibold mt-4 tracking-tight"
+          style={{ color: '#00255C', fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: '-0.025em', lineHeight: 1.08 }}
+        >
+          {post.title_es}
+        </h1>
 
         {post.excerpt_es && (
-          <p className="mt-3 text-lg text-gray-500 leading-relaxed">{post.excerpt_es}</p>
+          <p className="mt-4 text-lg text-slate-600 leading-relaxed">{post.excerpt_es}</p>
         )}
 
         <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-5 pb-6 border-b border-gray-100">
@@ -175,7 +180,8 @@ export default function BlogPostPage() {
 
             {/* Content */}
             <div
-              className="blog-content prose prose-gray max-w-none prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-3 prose-h3:text-xl prose-h3:mt-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:my-4 prose-li:my-1 prose-img:rounded-xl"
+              className="blog-content prose prose-slate max-w-none prose-headings:font-semibold prose-h2:text-[26px] prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-[20px] prose-h3:mt-8 prose-h3:mb-3 prose-p:text-slate-700 prose-p:leading-[1.75] prose-a:no-underline hover:prose-a:underline prose-a:underline-offset-2 prose-strong:text-slate-900 prose-ul:my-4 prose-li:my-1 prose-img:rounded-2xl"
+              style={{ '--tw-prose-links': '#00255C' }}
               dangerouslySetInnerHTML={{ __html: post.content_es }}
             />
 
@@ -203,12 +209,18 @@ export default function BlogPostPage() {
               <NewsletterSignup variant="blog" source="blog_article" />
             </div>
 
-            {/* CTA */}
-            <div className="mt-6 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white">
-              <h3 className="text-lg font-semibold">¿Eres autónomo? Empieza en MisAutónomos</h3>
-              <p className="text-sm text-gray-300 mt-1">Crea tu perfil gratis, recibe clientes y gestiona todo desde un sitio. 7 días de prueba sin tarjeta.</p>
-              <Link to="/precios" className="inline-block mt-4 bg-white text-gray-900 font-medium text-sm px-5 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                Probar gratis
+            {/* CTA marca navy/gold */}
+            <div className="mt-6 rounded-2xl p-6" style={{ background: '#00255C', color: 'white' }}>
+              <h3 className="text-lg font-semibold">¿Eres autónomo? Apareces donde te buscan</h3>
+              <p className="text-sm text-white/80 mt-1">
+                Crea tu perfil en minutos, recibe clientes y gestiona todo desde un sitio. Sin comisiones.
+              </p>
+              <Link
+                to="/para-autonomos"
+                className="inline-block mt-4 text-sm font-semibold px-5 py-2 rounded-lg"
+                style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
+              >
+                Cómo funciona para autónomos
               </Link>
             </div>
           </div>
