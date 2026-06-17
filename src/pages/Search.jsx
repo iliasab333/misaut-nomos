@@ -667,11 +667,12 @@ export default function SearchPage() {
             )}
           </div>
 
-          {/* Skeleton loading — matches EXACT card shape for mobile (avatar+name row) and desktop (blue header) */}
+          {/* Skeleton loading — MISMA altura (288 px) que la tarjeta real
+              para que al swap no se empuje el contenido de abajo (anti-CLS). */}
           {isInitialLoading && (
-            <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
+            <div className="grid gap-4 search-results-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
               {[...Array(8)].map((_, idx) => (
-                <div key={idx} className="bg-white rounded-xl overflow-hidden border border-gray-100" style={{ minHeight: '200px', contain: 'layout style paint' }}>
+                <div key={idx} className="bg-white rounded-2xl overflow-hidden border border-slate-200" style={{ minHeight: '288px', contain: 'layout style paint' }}>
                   {/* Desktop: blue header bar */}
                   <div className="hidden md:block" style={{ height: '48px', background: '#e5e7eb' }} />
                   {/* Mobile: avatar + name row (matches real card mobile layout) */}
@@ -758,7 +759,7 @@ export default function SearchPage() {
             <>
               {viewMode === "grid" ? (
                 <>
-                  <div className="grid gap-4 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
+                  <div className="grid gap-4 items-stretch search-results-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
                     {filteredProfiles.slice(0, displayLimit).map((profile, idx) => (
                       <ProfileCard
                         key={profile.id}

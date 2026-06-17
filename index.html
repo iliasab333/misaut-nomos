@@ -125,19 +125,28 @@
          carga de datos no empuje al usuario. */
       .hero-landing{min-height:720px}
       @media(max-width:767px){.hero-landing{min-height:980px}}
-      /* Rejilla de categorías del hero: 17 chips reales, ~5 filas en desktop,
-         ~9 en móvil. min-height suficiente para que el salto de 12→17 chips
-         no provoque shift mientras carga */
-      .hero-cats-grid{min-height:520px}
-      @media(min-width:640px){.hero-cats-grid{min-height:360px}}
-      @media(min-width:1024px){.hero-cats-grid{min-height:280px}}
+      /* Rejilla de categorías del hero: hasta ~27 chips reales. En móvil
+         caben ~2 columnas (minmax 150px), así que con 27 chips de ~88px
+         + gap 12px tenemos ~1600px de alto real. Reservamos 1600 móvil
+         para que el salto skeleton→real NO mueva nada de lo que hay debajo.
+         (Esta fue la causa principal del CLS 0.939: skeleton 520px → real
+         1600px = 1080px de empuje hacia abajo.) */
+      .hero-cats-grid{min-height:1600px}
+      @media(min-width:480px){.hero-cats-grid{min-height:1100px}}
+      @media(min-width:640px){.hero-cats-grid{min-height:520px}}
+      @media(min-width:1024px){.hero-cats-grid{min-height:360px}}
       /* /buscar: lista de profesionales — reservar el alto del grid para 6
-         tarjetas iniciales (220 px por tarjeta + gaps). */
-      .search-results-grid{min-height:1400px}
-      @media(min-width:768px){.search-results-grid{min-height:520px}}
-      @media(min-width:1024px){.search-results-grid{min-height:520px}}
-      /* Skeleton tarjeta (mismo height-shape que la final, 220 px) */
-      .card-skeleton{min-height:220px;contain:layout style paint}
+         tarjetas iniciales (288 px por tarjeta + 16 gap = ~1820 móvil). */
+      .search-results-grid{min-height:1820px}
+      @media(min-width:768px){.search-results-grid{min-height:920px}}
+      @media(min-width:1024px){.search-results-grid{min-height:620px}}
+      /* Skeleton tarjeta — MISMO height-shape que la final (288 px) para
+         que pasar de skeleton a tarjeta real no empuje a las siguientes. */
+      .card-skeleton{min-height:288px;contain:layout style paint}
+      /* TrustSlider y otras secciones lazy del Landing: reserva mínima
+         del bloque para que su llegada no empuje al CTA de abajo. */
+      .trust-slider-reserve{min-height:680px}
+      @media(min-width:768px){.trust-slider-reserve{min-height:380px}}
     </style>
   </head>
   <body>

@@ -223,8 +223,13 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* TRUST SLIDER existente — banda blanca */}
-        <Suspense fallback={null}><TrustSlider /></Suspense>
+        {/* TRUST SLIDER existente — banda blanca.
+            Reservamos altura mínima en el fallback para que su llegada
+            no empuje al CTA de abajo (anti-CLS). Mismas dimensiones que
+            la sección real ya rendereada. */}
+        <Suspense fallback={<div className="trust-slider-reserve" aria-hidden="true" />}>
+          <TrustSlider />
+        </Suspense>
 
         {/* COBERTURA POR CIUDAD — banda blanca */}
         <section className="bg-white border-t border-slate-100">

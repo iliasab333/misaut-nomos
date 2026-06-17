@@ -302,7 +302,10 @@ export default function LandingHero() {
             style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}
           >
             {loadingCategories
-              ? Array.from({ length: 18 }).map((_, i) => <CategoryChipSkeleton key={i} />)
+              ? /* Skeleton count = nº esperado de categorías reales.
+                   La BD tiene ~24 categorías activas; renderizamos 24
+                   skeletons para que el grid no crezca al swap (anti-CLS). */
+                Array.from({ length: 24 }).map((_, i) => <CategoryChipSkeleton key={i} />)
               : categories.map((cat) => (
                   <button
                     key={cat.id || cat.slug}
