@@ -91,12 +91,22 @@ export default function ProfileOnboardingPage() {
         navigate('/admin', { replace: true });
         return;
       }
-      // Cliente que llega aquí por accidente → al buscador.
+      // Modelo freemium: cualquier usuario logueado (incluido un cliente que
+      // pulsa "Hazte autónomo / plan 0€") puede iniciar el alta de profesional.
+      // Convertimos el user_type a 'professionnel' al entrar para que el resto
+      // de la app (Layout, guards, caché) lo trate como pro sin redirecciones
+      // raras al cuestionario.
       const t = currentUser?.user_type;
       const isPro = t === 'professionnel' || t === 'profesional' || t === 'professional';
       if (!isPro && currentUser) {
-        navigate('/buscar', { replace: true });
-        return;
+        try {
+          await base44.auth.updateMe({ user_type: 'professionnel' });
+          currentUser.user_type = 'professionnel';
+          sessionStorage.removeItem('current_user');
+          setUser(currentUser);
+        } catch (e) {
+          console.warn('No se pudo marcar user_type=professionnel al entrar al onboarding:', e);
+        }
       }
 
       const profiles = await base44.entities.ProfessionalProfile.filter({
