@@ -253,6 +253,15 @@ const auth = {
     if (!u) throw new Error('Not authenticated');
     return usersApi.update(u.id, values);
   },
+  // Alias compatible con el SDK original de Base44. Toda la app llama
+  // base44.auth.updateMe({ user_type, ... }) — sin esto fallaba el upgrade
+  // de cliente a profesional, la actualización de avatar, notificaciones,
+  // etc., porque tiraba TypeError dentro de un try/catch silencioso.
+  async updateMe(values) {
+    const u = await currentAppUser();
+    if (!u) throw new Error('Not authenticated');
+    return usersApi.update(u.id, values);
+  },
   onAuthStateChange(cb) { return supabase.auth.onAuthStateChange(cb); },
 };
 

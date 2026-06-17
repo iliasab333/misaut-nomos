@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { supabase } from '@/api/supabaseClient';
 import { base44 } from '@/api/base44Client';
@@ -95,6 +95,25 @@ export default function LoginPage() {
 
   const [mode, setMode] = useState(initialMode);
   const [role, setRole] = useState(initialRole);
+
+  // Si el usuario ya está autenticado al entrar a /login (típico de un cliente
+  // que pulsa "Hazte autónomo" en /para-autonomos), no le hacemos rellenar el
+  // formulario de signup contra su propio email: le mandamos directamente al
+  // destino que pidió (?next=) o al destino por defecto según su tipo.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || cancelled) return;
+        const dest = nextUrl || await defaultDestinationForCurrentUser();
+        if (!cancelled) navigate(dest, { replace: true });
+      } catch (_e) {
+        // sin sesión válida → seguir mostrando la pantalla de login normal
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [navigate, nextUrl]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');

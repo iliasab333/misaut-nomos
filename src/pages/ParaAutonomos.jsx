@@ -86,7 +86,13 @@ const FAQS = [
   },
 ];
 
-const CTA_HREF = '/login?mode=signup&role=profesional&next=%2Fcompletar-perfil';
+// /registro (UserTypeSelection) decide automáticamente:
+//   - no logueado → /login?mode=signup&role=profesional&next=/completar-perfil
+//   - logueado como cliente o sin user_type → /completar-perfil
+//   - logueado como profesional con ficha → /dashboard
+// Así los CTAs funcionan tanto para visitantes nuevos como para clientes que
+// quieren hacerse profesionales sin tener que volver a "iniciar sesión".
+const CTA_HREF = '/registro';
 
 export default function ParaAutonomos() {
   return (
