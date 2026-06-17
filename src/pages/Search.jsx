@@ -206,6 +206,21 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
               Destacado
             </span>
           )}
+          {/* Botón Favorito: solo para clientes logueados, esquina sup. derecha.
+              Discreto pero visible, no ocupa espacio en la grilla principal. */}
+          {onToggleFavorite && (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+              aria-label={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+              title={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+              className="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white hover:bg-rose-50 transition-colors"
+            >
+              <Heart
+                className={`w-4 h-4 ${isFavorite ? 'fill-rose-500 text-rose-500' : 'text-slate-400'}`}
+              />
+            </button>
+          )}
         </div>
 
         {/* Descripción 2 líneas (altura reservada para uniformidad) */}

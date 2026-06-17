@@ -620,14 +620,20 @@ export default function AutonomoPage() {
               )}
               </div>
 
-              <Button
+              <button
+                type="button"
                 onClick={handleToggleFavorite}
-                variant="ghost"
-                size="icon"
-                className={`${isFavorite ? 'text-red-500' : 'text-gray-400'} h-9 w-9`}
+                aria-label={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+                title={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+                className={`inline-flex items-center gap-1.5 px-3 h-9 rounded-full border text-sm font-medium transition-colors ${
+                  isFavorite
+                    ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
+                }`}
               >
-                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-              </Button>
+                <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                {isFavorite ? 'Guardado' : 'Guardar'}
+              </button>
             </div>
 
             {/* BOTONES CONTACTO */}

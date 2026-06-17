@@ -5,7 +5,7 @@ import { createPageUrl } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Eye, EyeOff, UserPlus } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import SEOHead from "../components/seo/SEOHead";
@@ -181,29 +181,19 @@ export default function ClientOnboardingPage() {
         noindex={true}
       />
 
-      {/* Fondo */}
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
-        {/* Card / Sheet */}
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: '16px',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.10)',
-            width: '100%',
-            maxWidth: '420px',
-            padding: '36px 32px',
-          }}
-        >
-          {/* Header */}
+      {/* Fondo minimalista: blanco, sin sombras dobles, sin gradient. */}
+      <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-[400px]">
+          {/* Header sin iconos decorativos */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl mb-4">
-              <UserPlus className="w-6 h-6 text-white" />
-            </div>
-            <h1 style={{ color: '#111827', fontSize: '22px', fontWeight: 700, margin: '0 0 6px' }}>
-              Crea tu cuenta gratis
+            <h1
+              className="font-semibold tracking-tight"
+              style={{ color: '#00255C', fontSize: '24px', letterSpacing: '-0.02em', margin: 0 }}
+            >
+              Crea tu cuenta
             </h1>
-            <p style={{ color: '#6B7280', fontSize: '14px', margin: 0 }}>
-              Encuentra y contacta autónomos en segundos
+            <p style={{ color: '#6B7280', fontSize: '14px', marginTop: '6px' }}>
+              Contacta con autónomos verificados en segundos.
             </p>
           </div>
 
@@ -360,12 +350,12 @@ export default function ClientOnboardingPage() {
               disabled={completeOnboardingMutation.isPending}
               style={{
                 width: '100%',
-                height: '52px',
-                background: '#2563EB',
+                height: '48px',
+                background: '#00255C',
                 color: '#FFFFFF',
-                borderRadius: '12px',
-                fontSize: '16px',
-                fontWeight: 700,
+                borderRadius: '10px',
+                fontSize: '15px',
+                fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
                 marginTop: '8px',
@@ -374,7 +364,7 @@ export default function ClientOnboardingPage() {
               {completeOnboardingMutation.isPending ? (
                 <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Creando cuenta...</>
               ) : (
-                'Crear cuenta gratis'
+                'Crear cuenta'
               )}
             </Button>
           </form>
@@ -384,7 +374,7 @@ export default function ClientOnboardingPage() {
             ¿Ya tienes cuenta?{' '}
             <button
               onClick={() => base44.auth.redirectToLogin(createPageUrl("Search"))}
-              style={{ color: '#2563EB', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', padding: 0 }}
+              style={{ color: '#00255C', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', padding: 0 }}
             >
               Inicia sesión
             </button>

@@ -141,7 +141,11 @@
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- H1 estático para crawlers / Lighthouse / IA que no ejecutan JS.
+           React lo sustituye al montar (createRoot reemplaza el contenido). -->
+      <h1 style="position:absolute;left:-9999px;top:0;">MisAutónomos — Encuentra autónomos y profesionales verificados cerca de ti</h1>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
