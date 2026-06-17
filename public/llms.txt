@@ -1,0 +1,40 @@
+# MisAutónomos
+
+> Marketplace que conecta clientes con autónomos y profesionales verificados de toda España. Contacto directo con el profesional, sin comisiones, sin intermediarios. 100% gratuito tanto para clientes como para autónomos.
+
+MisAutónomos.es es un directorio español de profesionales autónomos verificados (electricistas, fontaneros, carpinteros, abogados, gestorías, jardineros, pintores, cerrajeros, informáticos y más). Los clientes filtran por servicio y zona, comparan perfiles con fotos de trabajos reales, valoraciones verificadas y precios orientativos, y contactan directamente al autónomo por chat interno, WhatsApp o teléfono. Los autónomos crean un perfil gratuito en minutos, aparecen en búsquedas de su ciudad y categoría, y conservan el 100% de lo que ganan: no hay comisiones por trabajo ni por contacto. Las reseñas provienen únicamente de clientes que sí han contactado al profesional, de modo que los perfiles destacados reflejan reputación real.
+
+El dominio canónico es `https://misautonomos.es`. La variante `https://www.misautonomos.es` redirige al canónico no-www, así que cualquiera de las dos sirve como punto de entrada.
+
+## Páginas principales
+
+- [Inicio](https://misautonomos.es/): landing con búsqueda guiada por servicio y ciudad.
+- [Buscar autónomos](https://misautonomos.es/buscar): listado filtrable de profesionales verificados en toda España.
+- [Hazte autónomo](https://misautonomos.es/para-autonomos): cómo darse de alta como profesional, qué incluye y cómo funciona la verificación.
+- [Planes](https://misautonomos.es/precios): plan gratuito permanente para autónomos y opciones de visibilidad de pago.
+- [Blog](https://misautonomos.es/blog): guías prácticas para autónomos y para clientes que buscan profesionales.
+- [Preguntas frecuentes](https://misautonomos.es/preguntas-frecuentes): respuestas sobre cuotas de autónomo, facturación, contratación y uso de la plataforma.
+- [Centro de ayuda](https://misautonomos.es/ayuda): soporte para clientes y autónomos registrados.
+- [Contacto](https://misautonomos.es/contacto): formulario de contacto con el equipo de MisAutónomos.
+
+## Categorías destacadas
+
+- [Electricistas](https://misautonomos.es/categoria/electricista): instalaciones, averías y reformas eléctricas.
+- [Fontaneros](https://misautonomos.es/categoria/fontanero): fugas, reparaciones y reformas de fontanería.
+- [Carpinteros](https://misautonomos.es/categoria/carpintero): muebles a medida, puertas, tarimas y carpintería en madera.
+- [Cerrajeros](https://misautonomos.es/categoria/cerrajero): aperturas, cambio de bombines y reparación de cerraduras.
+- [Pintores](https://misautonomos.es/categoria/pintor): pintura interior, fachadas y trabajos de acabado.
+- [Jardineros](https://misautonomos.es/categoria/jardinero): mantenimiento de jardines, podas y diseño de exteriores.
+- [Abogados](https://misautonomos.es/categoria/abogado): asesoramiento jurídico de abogados autónomos por especialidad y zona.
+
+## Legal
+
+- [Política de privacidad](https://misautonomos.es/privacidad): tratamiento de datos personales.
+- [Términos y condiciones](https://misautonomos.es/terminos): condiciones de uso de la plataforma.
+- [Política de cookies](https://misautonomos.es/cookies): cookies y tecnologías de seguimiento.
+- [Aviso legal](https://misautonomos.es/aviso-legal): titularidad y datos del responsable del sitio.
+
+## Optional
+
+- [Sitemap XML](https://misautonomos.es/sitemap.xml): índice completo y actualizado de todas las URLs públicas (incluye perfiles de autónomos individuales y artículos de blog).
+- [robots.txt](https://misautonomos.es/robots.txt): reglas de rastreo para crawlers.
