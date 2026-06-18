@@ -61,6 +61,28 @@ const mq = window.matchMedia('(prefers-color-scheme: dark)');
 applyColorScheme(mq.matches);
 mq.addEventListener('change', e => applyColorScheme(e.matches));
 
+// Microsoft Clarity: heatmaps de clic, scrollmaps y session recordings.
+// Gratis para siempre, sin coste por tráfico. Necesita VITE_CLARITY_PROJECT_ID
+// en Vercel env. Si falta, no se carga (no rompe nada).
+// Se carga DIFERIDO tras el primer paint para no penalizar el LCP.
+const CLARITY_PROJECT_ID = import.meta.env.VITE_CLARITY_PROJECT_ID;
+if (CLARITY_PROJECT_ID && typeof window !== 'undefined') {
+  const loadClarity = () => {
+    if (window.clarity) return;
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+      t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, 'clarity', 'script', CLARITY_PROJECT_ID);
+  };
+  // Tras la primera interacción O 4s tras carga — lo que ocurra primero.
+  // Así no entra en el LCP y se asegura registro completo de sesión.
+  ['click', 'touchstart', 'scroll', 'keydown'].forEach((e) =>
+    window.addEventListener(e, loadClarity, { once: true, passive: true }),
+  );
+  setTimeout(loadClarity, 4000);
+}
+
 // Registrar Service Worker diferido (no bloquea renderizado).
 // `updateViaCache: 'none'` evita que el navegador cachee el propio sw.js, así
 // el SW nuevo se detecta en cada carga y no quedamos atascados en uno antiguo.

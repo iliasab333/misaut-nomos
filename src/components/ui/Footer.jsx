@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { notifyAdminEvent } from "@/lib/notifyAdmin";
 
 const LOGO_URL = '/logo-192.png';
 
@@ -141,6 +142,15 @@ function NewsletterInlineForm() {
         language: i18n.language || 'es',
         unsubToken: unsubscribeToken,
       }).catch((err) => console.warn('[Newsletter] Welcome email failed:', err));
+
+      // Notificar al admin de la nueva alta (footer).
+      notifyAdminEvent({
+        event: 'newsletter_signup',
+        title: '📧 Nuevo suscriptor newsletter (footer)',
+        body: `<strong>${normalizedEmail}</strong> se ha suscrito al newsletter desde el footer.`,
+        data: { email: normalizedEmail, source: 'footer' },
+        userEmail: normalizedEmail,
+      });
 
       toast.success('Suscripción confirmada.');
       setEmail('');

@@ -1,16 +1,29 @@
-import { base44 } from '@/api/base44Client';
+// Notifica al admin de un evento. Fire-and-forget.
+//
+// Antes llamaba a una Supabase Edge Function 'notifyAdmin' que NUNCA se llegó
+// a desplegar (404 en producción), así que todas las notificaciones —
+// new_client, new_professional, newsletter_signup — se tragaban en silencio.
+//
+// Ahora pega contra /api/notify-admin (Vercel Serverless Function) que envía
+// vía Resend. Si RESEND_API_KEY no está en Vercel env, la función responde
+// {skipped:true} y nada explota — sigue siendo no-bloqueante.
 
 const ADMIN_EMAIL = 'bigseo.online.com@gmail.com';
 
-/**
- * Notifica al admin por email de un evento. Fire-and-forget.
- * No bloquea ni rompe el flujo si falla.
- * Ignora acciones del propio admin para evitar spam de testing.
- */
 export function notifyAdminEvent({ event, title, body = '', data = null, severity = 'low', userEmail = null }) {
-  // No notificar si el actor es el propio admin
+  // No notificar acciones del propio admin (evita spam de testing).
   if (userEmail === ADMIN_EMAIL) return;
 
-  base44.functions.invoke('notifyAdmin', { event, title, body, data, severity })
-    .catch(err => console.warn('notifyAdmin failed:', err));
+  try {
+    fetch('/api/notify-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event, title, body, data, severity }),
+      // keepalive: el evento puede dispararse justo antes de un navigate,
+      // y queremos que la petición se complete aunque la página cambie.
+      keepalive: true,
+    }).catch((err) => console.warn('notifyAdmin failed:', err));
+  } catch (err) {
+    console.warn('notifyAdmin failed (sync):', err);
+  }
 }
