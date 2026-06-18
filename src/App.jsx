@@ -13,6 +13,7 @@ import { AppProvider } from '@/lib/AppContext';
 import { AutoTranslateProvider } from '@/lib/AutoTranslate';
 import ScrollToTop from '@/lib/ScrollToTop';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Suspense, lazy, React, Component, useEffect } from 'react';
 
 // Reload SEGURO ante fallos de import dinámico:
@@ -428,6 +429,10 @@ function App() {
               </Router>
               <Toaster />
               <VisualEditAgent />
+              {/* Vercel RUM: Core Web Vitals reales (LCP/CLS/INP) por ruta.
+                  El componente carga el script de forma diferida, no afecta al
+                  LCP, y solo envía métricas en producción (en dev es no-op). */}
+              <SpeedInsights />
             </AutoTranslateProvider>
           </QueryClientProvider>
         </AppProvider>
