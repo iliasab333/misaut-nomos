@@ -17,21 +17,21 @@ import ReactDOM from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
 import App from '@/App.jsx'
 
-// Self-host Inter (sustituye a Google Fonts; un solo round-trip, woff2 cacheado).
-import '@fontsource/inter/400.css'
-import '@fontsource/inter/500.css'
-import '@fontsource/inter/600.css'
-import '@fontsource/inter/700.css'
-
-// Preload de los woff2 (anti-CLS): que el navegador empiece a descargarlos en
-// cuanto pueda, en paralelo a parsear el CSS, para que el swap ocurra antes
-// del LCP. Combinado con la `Inter Fallback` size-adjust del index.html, el
-// shift se aproxima a 0.
+// Self-host Inter — woff2 cacheado, un solo round-trip.
+// IMPORTANTE: NO importamos @fontsource/inter/*.css porque usa
+// `font-display: swap`, que provoca reflow visible al cambiar de la fuente
+// de sistema (fallback) a Inter. Lo declaramos abajo con `font-display: optional`
+// (si Inter no está lista en ~100 ms, el navegador deja la fallback fija
+// para esta sesión → CERO swap, CERO reflow). Inter se cachea y aplica en
+// visitas posteriores.
 import inter400 from '@fontsource/inter/files/inter-latin-400-normal.woff2?url'
+import inter500 from '@fontsource/inter/files/inter-latin-500-normal.woff2?url'
 import inter600 from '@fontsource/inter/files/inter-latin-600-normal.woff2?url'
 import inter700 from '@fontsource/inter/files/inter-latin-700-normal.woff2?url'
 
 if (typeof document !== 'undefined') {
+  // 1) Preload de los pesos críticos para que la descarga empiece YA y entre
+  //    dentro de la ventana ~100 ms de `font-display: optional`.
   ;[inter400, inter600, inter700].forEach((href) => {
     const link = document.createElement('link')
     link.rel = 'preload'
@@ -41,6 +41,18 @@ if (typeof document !== 'undefined') {
     link.href = href
     document.head.appendChild(link)
   })
+
+  // 2) @font-face con font-display: optional — antirreflow real.
+  const fontFaceCSS = `
+@font-face{font-family:'Inter';font-style:normal;font-display:optional;font-weight:400;src:url(${inter400}) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-display:optional;font-weight:500;src:url(${inter500}) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-display:optional;font-weight:600;src:url(${inter600}) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-display:optional;font-weight:700;src:url(${inter700}) format('woff2')}
+`.trim()
+  const style = document.createElement('style')
+  style.setAttribute('data-inter-override', 'true')
+  style.textContent = fontFaceCSS
+  document.head.appendChild(style)
 }
 
 import './globals.css'

@@ -1042,7 +1042,11 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
               )}
 
               <div className="flex-1 pb-16 md:pb-0 transition-opacity duration-150 ease-in-out mobile-main-content">
-                <Suspense fallback={null}>
+                {/* Suspense reserva 100svh para que el footer NUNCA nazca pegado
+                    al header mientras la página lazy carga. Sin esto, la home
+                    aporta un CLS de ~0.92 porque el footer se desplaza hacia
+                    abajo cuando llega el contenido. */}
+                <Suspense fallback={<div className="min-h-[100svh]" aria-hidden="true" />}>
                   <PageTransitions>
                     {children}
                   </PageTransitions>
