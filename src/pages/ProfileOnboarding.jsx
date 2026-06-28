@@ -352,10 +352,11 @@ export default function ProfileOnboardingPage() {
         })(),
       };
 
+      let savedProfile;
       if (existingProfile) {
-        await base44.entities.ProfessionalProfile.update(existingProfile.id, profileData);
+        savedProfile = await base44.entities.ProfessionalProfile.update(existingProfile.id, profileData);
       } else {
-        await base44.entities.ProfessionalProfile.create(profileData);
+        savedProfile = await base44.entities.ProfessionalProfile.create(profileData);
       }
 
       // ✅ SIEMPRE actualizar user_type a professionnel al completar onboarding
@@ -363,6 +364,26 @@ export default function ProfileOnboardingPage() {
         user_type: "professionnel",
         full_name: formData.business_name
       });
+
+      // ✅ Si el alta proviene de un outreach (URL ?ref=outreach&lead=...),
+      // marcamos el lead como convertido para atribución del motor de oferta.
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const leadId = urlParams.get('lead');
+        const ref = urlParams.get('ref');
+        if (leadId && (ref === 'outreach' || ref === 'email' || ref === 'whatsapp')) {
+          fetch('/api/lead-convert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lead_id: leadId,
+              user_id: user.id,
+              profile_id: savedProfile?.id,
+            }),
+            keepalive: true,
+          }).catch(() => {});
+        }
+      } catch (_e) { /* noop */ }
 
       // El perfil ya se crea activo y visible directamente (modelo freemium)
 

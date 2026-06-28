@@ -158,6 +158,27 @@ export default async function handler(req, res) {
     }));
   }
 
+  // Guías editoriales: 8 páginas con contenido único en el Vallès. Saltan el
+  // candado de densidad porque tienen valor por sí mismas (precios locales,
+  // FAQ, cómo elegir). Si crece la oferta, conviven con el listing real.
+  const EDITORIAL = [
+    { catSlug: 'fontanero',         ciudadSlug: 'sabadell' },
+    { catSlug: 'fontanero',         ciudadSlug: 'terrassa' },
+    { catSlug: 'electricista',      ciudadSlug: 'sabadell' },
+    { catSlug: 'electricista',      ciudadSlug: 'terrassa' },
+    { catSlug: 'cerrajero',         ciudadSlug: 'sabadell' },
+    { catSlug: 'cerrajero',         ciudadSlug: 'terrassa' },
+    { catSlug: 'albanil-reformas',  ciudadSlug: 'sabadell' },
+    { catSlug: 'albanil-reformas',  ciudadSlug: 'terrassa' },
+  ];
+  for (const { catSlug, ciudadSlug } of EDITORIAL) {
+    urls.push(urlEntry({
+      loc: `${SITE}/categoria/${catSlug}/${ciudadSlug}`,
+      changefreq: 'weekly',
+      priority: 0.8,
+    }));
+  }
+
   // Perfiles públicos: /autonomo/:cityCategory/:slug (formato SEO canónico)
   for (const p of data.profiles) {
     const nameSlug = p.slug_publico || slugify(p.business_name || '');

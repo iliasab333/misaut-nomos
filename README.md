@@ -78,8 +78,88 @@ una serverless function en horario fijo; la función llamaría al Deploy Hook.
 |---|---|---|
 | `VITE_SUPABASE_URL` | Cliente + build | Cliente Supabase del frontend y del prerender |
 | `VITE_SUPABASE_ANON_KEY` | Cliente + build | Igual |
+| `SUPABASE_SERVICE_ROLE_KEY` | Scripts + serverless | Outreach, seed-leads, lead-convert, lead-opt-out |
 | `VITE_STRIPE_PUBLIC_KEY` | Cliente | Stripe (legacy) |
-| `RESEND_API_KEY` | Serverless | Emails admin |
+| `RESEND_API_KEY` | Serverless | Emails admin + outreach |
 | `RESEND_FROM_EMAIL` | Serverless | Remitente Resend |
+| `GOOGLE_PLACES_API_KEY` | Script seed-leads | Descubrimiento de leads vía Places API |
 | `CLARITY_API_TOKEN` | Serverless | Data Export API Clarity |
-| `VITE_CLARITY_PROJECT_ID` | Cliente | Tracking Clarity (pendiente) |
+| `VITE_CLARITY_PROJECT_ID` | Cliente | Tracking Clarity |
+| `MAX_OUTREACH_POR_RUN` | Script outreach | Límite mensajes/run (default 30) |
+
+---
+
+## Motor de oferta (Fase 2): leads + outreach + guías locales
+
+**Regla dura:** los datos de Google Places son leads internos para outreach.
+**Nunca** se publican como perfiles públicos. El perfil público existe solo
+cuando el profesional se da de alta él mismo.
+
+### Pipeline
+
+```
+Google Places API (searchText "fontanero en Sabadell")
+    │
+    ▼
+scripts/seed-leads.mjs  →  outbound_leads.status='nuevo'
+    │
+    ▼
+scripts/outreach.mjs  →  WhatsApp (si phone) | Email Resend (si email)
+    │       │
+    │       ├─ phone     → wa.me link en notes, status='pending_wa' (envío manual)
+    │       └─ email     → enviado vía Resend, status='contactado'
+    │
+    ▼
+URL de alta `/para-autonomos?ref=outreach&lead=<id>`
+    │
+    ▼
+ProfileOnboarding.handleSubmit → POST /api/lead-convert
+    │
+    ▼
+outbound_leads.status='convertido' + notify admin
+```
+
+### Comandos
+
+```
+node scripts/seed-leads.mjs                                    # matriz por defecto (Vallès × 8 gremios)
+node scripts/seed-leads.mjs --cities=sabadell,terrassa --gremios=fontanero,cerrajero
+node scripts/seed-leads.mjs --dry-run                          # no escribe en BD
+
+node scripts/outreach.mjs                                      # hasta 30 leads/run
+node scripts/outreach.mjs --limit=10 --dry-run                 # prueba en seco
+node scripts/outreach.mjs --only-email                         # ignora leads con phone
+```
+
+### Cumplimiento RGPD
+
+- Cada mensaje incluye identificación del remitente (MisAutónomos + URL).
+- Cada mensaje incluye un link de baja con token único (`opt_out_token`).
+- El endpoint `/api/lead-opt-out?token=...` marca `opt_out=true` permanentemente.
+- Leads en `opt_out` o en estados avanzados (`contactado`, `respondido`,
+  `convertido`) nunca se vuelven a contactar ni se sobreescriben.
+
+### Guías editoriales locales (8 páginas)
+
+Solo estas 8 combinaciones ciudad×gremio saltan el candado de densidad ≥3
+porque llevan contenido editorial único (precios reales 2026, cómo elegir,
+errores comunes, FAQ con `FAQPage` JSON-LD):
+
+- `/categoria/fontanero/{sabadell,terrassa}`
+- `/categoria/electricista/{sabadell,terrassa}`
+- `/categoria/cerrajero/{sabadell,terrassa}`
+- `/categoria/albanil-reformas/{sabadell,terrassa}`
+
+Cada página incluye listing real si hay profesionales verificados en esa
+ciudad+gremio. Si no, CTA honesto: **"¿Eres X en Y? Sé el primero"**.
+Nada de listados fantasma.
+
+Para añadir/quitar guías edita `EDITORIAL_GUIDES` en `scripts/prerender.mjs`
+y el array `EDITORIAL` en `api/sitemap.xml.js`.
+
+### Migración pendiente
+
+`supabase/migrations/20260628120000_outbound_leads.sql` define la tabla con
+RLS, índices y triggers. Hay que aplicarla en el dashboard de Supabase
+(SQL editor) o vía `supabase db push` cuando se conecte el CLI. Sin esta
+migración, los scripts `seed-leads`/`outreach` fallarán al insertar.
