@@ -369,7 +369,7 @@ export default function LandingHero() {
             </div>
             <button
               type="button"
-              onClick={() => navigate("/para-autonomos")}
+              onClick={() => navigate("/registro")}
               className="rounded-xl font-semibold h-11 px-5 md:px-6 inline-flex items-center justify-center gap-2 flex-shrink-0 w-full md:w-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               style={{ backgroundColor: GOLD, color: NAVY }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = GOLD_HOVER)}

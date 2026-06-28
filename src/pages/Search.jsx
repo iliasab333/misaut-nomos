@@ -807,20 +807,13 @@ export default function SearchPage() {
                   Da de alta tu perfil y entra en los resultados de tu zona.
                   Sin comisiones, sin intermediarios, contacto directo con los clientes.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <div className="flex justify-center">
                   <Button
-                    onClick={() => navigate('/para-autonomos')}
+                    onClick={() => navigate('/registro')}
                     className="h-12 px-8 text-base font-semibold rounded-xl"
                     style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
                   >
                     Hazte autónomo · Gratis
-                  </Button>
-                  <Button
-                    onClick={() => navigate(createPageUrl("PricingPlans"))}
-                    variant="outline"
-                    className="h-12 px-8 text-base font-semibold rounded-xl bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
-                  >
-                    Ver planes
                   </Button>
                 </div>
               </div>

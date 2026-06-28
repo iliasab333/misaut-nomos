@@ -258,20 +258,14 @@ export default function Landing() {
             <p className="mt-4 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.88)' }}>
               Te damos de alta en minutos. Sin tarjeta. Sin comisiones. Contacto directo con los clientes.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="mt-8 flex justify-center">
               <Link
-                to="/para-autonomos"
+                to="/registro"
                 className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl font-semibold"
                 style={{ backgroundColor: GOLD, color: NAVY }}
               >
-                Cómo funciona para autónomos
+                Hazte autónomo · Gratis
                 <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/precios"
-                className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl font-semibold border border-white/30 text-white hover:bg-white/10 transition-colors"
-              >
-                Ver planes
               </Link>
             </div>
           </div>

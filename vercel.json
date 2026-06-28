@@ -10,7 +10,6 @@
     { "source": "/inicio", "destination": "/", "statusCode": 301 },
     { "source": "/autonomo", "destination": "/buscar", "statusCode": 301 },
     { "source": "/categoria", "destination": "/buscar", "statusCode": 301 },
-    { "source": "/registro", "destination": "/para-autonomos", "statusCode": 301 },
 
     { "source": "/autonomo/carpintero-en-barcelona/alberto---carpintero-evanista", "destination": "/autonomo/carpintero-en-barcelona/alberto-carpintero-evanista", "statusCode": 301 },
     { "source": "/autonomo/esdrújulo", "destination": "/autonomo/esdrujulo", "statusCode": 301 },
@@ -24,6 +23,7 @@
     { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
 
     { "source": "/login", "destination": "/index.html" },
+    { "source": "/registro", "destination": "/index.html" },
     { "source": "/registro-cliente", "destination": "/index.html" },
     { "source": "/configuracion-cookies", "destination": "/index.html" },
     { "source": "/bienvenida", "destination": "/index.html" },

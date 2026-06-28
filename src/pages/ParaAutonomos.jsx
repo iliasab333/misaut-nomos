@@ -128,7 +128,7 @@ export default function ParaAutonomos() {
               herramientas para llevar tu agenda. Tú trabajas; nosotros te traemos clientes.
             </p>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <div className="mt-8 flex">
               <Link
                 to={CTA_HREF}
                 className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-semibold text-[15px] transition-colors"
@@ -136,12 +136,6 @@ export default function ParaAutonomos() {
               >
                 Hazte autónomo · Gratis
                 <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/precios"
-                className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-semibold text-[15px] border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
-              >
-                Ver planes
               </Link>
             </div>
 
@@ -255,7 +249,7 @@ export default function ParaAutonomos() {
             <p className="mt-4 text-white/80 max-w-xl mx-auto">
               Te damos de alta en minutos. Sin tarjeta, sin permanencia.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="mt-8 flex justify-center">
               <Link
                 to={CTA_HREF}
                 className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl font-semibold"
@@ -263,12 +257,6 @@ export default function ParaAutonomos() {
               >
                 Hazte autónomo · Gratis
                 <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/precios"
-                className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl font-semibold border border-white/30 text-white hover:bg-white/10 transition-colors"
-              >
-                Ver planes
               </Link>
             </div>
           </div>
