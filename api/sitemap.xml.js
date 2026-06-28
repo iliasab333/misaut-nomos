@@ -125,6 +125,39 @@ export default async function handler(req, res) {
     }));
   }
 
+  // City × Category con candado de densidad: solo se indexan combinaciones
+  // con ≥ MIN_PROS_POR_CIUDAD_CATEGORIA perfiles visibles. Mismo umbral que
+  // scripts/prerender.mjs para no generar doorway pages.
+  const MIN_PROS = 3;
+  const catByName = new Map(data.categories.map((c) => [c.name, c]));
+  const buckets = new Map();
+  for (const p of data.profiles) {
+    const cats = Array.isArray(p.categories) ? p.categories : [];
+    const ciudad = (p.ciudad || '').trim();
+    if (!ciudad) continue;
+    const ciudadSlug = slugify(ciudad);
+    for (const catName of cats) {
+      const cat = catByName.get(catName);
+      if (!cat) continue;
+      const catSlug = cat.slug || slugify(cat.name);
+      if (!catSlug) continue;
+      const key = `${catSlug}::${ciudadSlug}`;
+      if (!buckets.has(key)) buckets.set(key, { catSlug, ciudadSlug, count: 0, lastmod: null });
+      const b = buckets.get(key);
+      b.count++;
+      if (p.updated_date && (!b.lastmod || p.updated_date > b.lastmod)) b.lastmod = p.updated_date;
+    }
+  }
+  for (const { catSlug, ciudadSlug, count, lastmod } of buckets.values()) {
+    if (count < MIN_PROS) continue;
+    urls.push(urlEntry({
+      loc: `${SITE}/categoria/${catSlug}/${ciudadSlug}`,
+      lastmod: lastmod ? new Date(lastmod).toISOString().slice(0, 10) : undefined,
+      changefreq: 'weekly',
+      priority: 0.75,
+    }));
+  }
+
   // Perfiles públicos: /autonomo/:cityCategory/:slug (formato SEO canónico)
   for (const p of data.profiles) {
     const nameSlug = p.slug_publico || slugify(p.business_name || '');

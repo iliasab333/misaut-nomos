@@ -1,56 +1,90 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "vite build",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "trailingSlash": false,
+  "cleanUrls": true,
+
   "redirects": [
     { "source": "/inicio", "destination": "/", "statusCode": 301 },
-    { "source": "/clientes", "destination": "/mis-clientes", "statusCode": 301 },
     { "source": "/autonomo", "destination": "/buscar", "statusCode": 301 },
     { "source": "/categoria", "destination": "/buscar", "statusCode": 301 },
-    { "source": "/registro", "destination": "/para-autonomos", "statusCode": 301 }
+    { "source": "/registro", "destination": "/para-autonomos", "statusCode": 301 },
+
+    { "source": "/autonomo/carpintero-en-barcelona/alberto---carpintero-evanista", "destination": "/autonomo/carpintero-en-barcelona/alberto-carpintero-evanista", "statusCode": 301 },
+    { "source": "/autonomo/esdrújulo", "destination": "/autonomo/esdrujulo", "statusCode": 301 },
+    { "source": "/autonomo/asesoria-o-gestoria-en-santa-pola/oscar-gómez", "destination": "/autonomo/asesoria-o-gestoria-en-santa-pola/oscar-gomez", "statusCode": 301 },
+    { "source": "/autonomo/albanil-reformas-en-barcelona/ruben-cárdenas-torres", "destination": "/autonomo/albanil-reformas-en-barcelona/ruben-cardenas-torres", "statusCode": 301 },
+    { "source": "/autonomo/informatico-a-domicilio-soporte-it-en-mollet-del-valles/sergi---fixtic---informàtica,-formació-i-consultoria-it-ia", "destination": "/autonomo/informatico-a-domicilio-soporte-it-en-mollet-del-valles/sergi-fixtic-informatica-formacio-i-consultoria-it-ia", "statusCode": 301 },
+    { "source": "/autonomo/pintor-en-vinaròs/rayan-", "destination": "/autonomo/pintor-en-vinaros/rayan", "statusCode": 301 }
   ],
+
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
-    { "source": "/(.*)", "destination": "/index.html" }
+
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/registro-cliente", "destination": "/index.html" },
+    { "source": "/configuracion-cookies", "destination": "/index.html" },
+    { "source": "/bienvenida", "destination": "/index.html" },
+
+    { "source": "/mensajes", "destination": "/index.html" },
+    { "source": "/mensajes/(.*)", "destination": "/index.html" },
+    { "source": "/favoritos", "destination": "/index.html" },
+    { "source": "/mi-perfil", "destination": "/index.html" },
+    { "source": "/mi-perfil/(.*)", "destination": "/index.html" },
+    { "source": "/soporte", "destination": "/index.html" },
+    { "source": "/soporte/(.*)", "destination": "/index.html" },
+    { "source": "/notificaciones", "destination": "/index.html" },
+    { "source": "/pedir-presupuesto", "destination": "/index.html" },
+    { "source": "/solicitudes", "destination": "/index.html" },
+    { "source": "/presupuestos", "destination": "/index.html" },
+    { "source": "/presupuesto/(.*)", "destination": "/index.html" },
+    { "source": "/valorar/(.*)", "destination": "/index.html" },
+    { "source": "/preguntas-frecuentes/(.*)", "destination": "/index.html" },
+
+    { "source": "/dashboard", "destination": "/index.html" },
+    { "source": "/dashboard/(.*)", "destination": "/index.html" },
+    { "source": "/mis-estadisticas", "destination": "/index.html" },
+    { "source": "/mis-valoraciones", "destination": "/index.html" },
+    { "source": "/mis-clientes", "destination": "/index.html" },
+    { "source": "/clientes", "destination": "/index.html" },
+    { "source": "/clientes/(.*)", "destination": "/index.html" },
+    { "source": "/visibilidad", "destination": "/index.html" },
+    { "source": "/perfil", "destination": "/index.html" },
+    { "source": "/perfil/(.*)", "destination": "/index.html" },
+    { "source": "/completar-perfil", "destination": "/index.html" },
+    { "source": "/proyectos", "destination": "/index.html" },
+    { "source": "/proyectos/(.*)", "destination": "/index.html" },
+    { "source": "/calendario", "destination": "/index.html" },
+    { "source": "/facturas", "destination": "/index.html" },
+    { "source": "/pagar", "destination": "/index.html" },
+    { "source": "/pagar/(.*)", "destination": "/index.html" },
+    { "source": "/automatizaciones", "destination": "/index.html" },
+    { "source": "/trabajos", "destination": "/index.html" },
+    { "source": "/suscripcion", "destination": "/index.html" },
+    { "source": "/pago-exitoso", "destination": "/index.html" },
+    { "source": "/mi-campana", "destination": "/index.html" },
+    { "source": "/mi-campana/(.*)", "destination": "/index.html" },
+    { "source": "/plan-ads", "destination": "/index.html" },
+
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/admin/(.*)", "destination": "/index.html" },
+
+    { "source": "/newsletter/unsubscribe", "destination": "/index.html" },
+    { "source": "/baja-newsletter", "destination": "/index.html" },
+    { "source": "/NewsletterUnsubscribe", "destination": "/index.html" },
+
+    { "source": "/r/(.*)", "destination": "/index.html" },
+    { "source": "/referidos", "destination": "/index.html" }
   ],
+
   "headers": [
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    },
-    {
-      "source": "/sw.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
-      ]
-    },
-    {
-      "source": "/OneSignalSDKWorker.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/manifest.json",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/index.html",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    }
+    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
+    { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }, { "key": "Service-Worker-Allowed", "value": "/" }] },
+    { "source": "/OneSignalSDKWorker.js", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
+    { "source": "/manifest.json", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
+    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
+    { "source": "/index.html", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] }
   ]
 }
