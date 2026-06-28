@@ -130,6 +130,7 @@ const AdminReferrals = lazy(() => import('./pages/AdminReferrals'));
 const AdminGifts = lazy(() => import('./pages/AdminGifts'));
 const AdminEmails = lazy(() => import('./pages/AdminEmails'));
 const AdminUsuarios = lazy(() => import('./pages/AdminUsuarios'));
+const AdminOutreachWhatsApp = lazy(() => import('./pages/AdminOutreachWhatsApp'));
 const AdminSoporte = lazy(() => import('./pages/AdminSoporte'));
 const BajaNewsletter = lazy(() => import('./pages/BajaNewsletter'));
 const EmailUnsubscribe = lazy(() => import('./pages/EmailUnsubscribe'));
@@ -383,6 +384,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin/referidos" element={<Suspense fallback={<PageLoader />}><AdminReferrals /></Suspense>} />
           <Route path="/admin/regalos" element={<Suspense fallback={<PageLoader />}><AdminGifts /></Suspense>} />
           <Route path="/admin/emails" element={<Suspense fallback={<PageLoader />}><AdminEmails /></Suspense>} />
+          <Route path="/admin/outreach-whatsapp" element={<Suspense fallback={<PageLoader />}><AdminOutreachWhatsApp /></Suspense>} />
           <Route path="/newsletter/unsubscribe" element={<Suspense fallback={<PageLoader />}><EmailUnsubscribe /></Suspense>} />
           <Route path="/baja-newsletter" element={<Suspense fallback={<PageLoader />}><BajaNewsletter /></Suspense>} />
           <Route path="/NewsletterUnsubscribe" element={<Suspense fallback={<PageLoader />}><EmailUnsubscribe /></Suspense>} />

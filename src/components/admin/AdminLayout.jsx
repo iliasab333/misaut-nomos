@@ -1,9 +1,9 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { 
-  LayoutDashboard, Users, Briefcase, CreditCard, 
-  BarChart2, Ticket, Settings, ChevronRight, Gift, Shield, Megaphone, Mail
+import {
+  LayoutDashboard, Users, Briefcase, CreditCard,
+  BarChart2, Ticket, Settings, ChevronRight, Gift, Shield, Megaphone, Mail, MessageCircle
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { id: "users", label: "Usuarios", icon: Users, emoji: "👥" },
   { id: "pending", label: "Pendientes", icon: Briefcase, emoji: "🔧" },
   { id: "subscriptions", label: "Suscripciones", icon: CreditCard, emoji: "💳" },
+  { id: "outreach", label: "Outreach WhatsApp", icon: MessageCircle, emoji: "💬" },
   { id: "gifts", label: "Regalos", icon: Gift, emoji: "🎁" },
   { id: "audit", label: "Auditoría", icon: Shield, emoji: "📋" },
   { id: "ads_briefings", label: "Briefings Ads+", icon: Megaphone, emoji: "📢" },
@@ -26,6 +27,7 @@ const SECTION_ROUTES = {
   users: "/admin",
   pending: "/admin",
   subscriptions: "/admin",
+  outreach: "/admin/outreach-whatsapp",
   gifts: "/admin/regalos",
   emails: "/admin",
   metrics: "/admin",
