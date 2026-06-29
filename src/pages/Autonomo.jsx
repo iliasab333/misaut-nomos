@@ -31,8 +31,10 @@ import {
   BadgeCheck,
   Briefcase,
   FileText,
-  Clock
+  Clock,
+  Share2
 } from "lucide-react";
+import { shareUrl, haptic } from "@/lib/native";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import InitialsAvatar from "@/components/ui/InitialsAvatar";
@@ -620,20 +622,39 @@ export default function AutonomoPage() {
               )}
               </div>
 
-              <button
-                type="button"
-                onClick={handleToggleFavorite}
-                aria-label={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-                title={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-                className={`inline-flex items-center gap-1.5 px-3 h-9 rounded-full border text-sm font-medium transition-colors ${
-                  isFavorite
-                    ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
-                }`}
-              >
-                <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-                {isFavorite ? 'Guardado' : 'Guardar'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    haptic('light');
+                    await shareUrl({
+                      title: profile?.business_name || 'Profesional verificado',
+                      text: `${profile?.business_name || 'Este profesional'} en MisAutónomos${profile?.ciudad ? ' · ' + profile.ciudad : ''}`,
+                      url: typeof window !== 'undefined' ? window.location.href : 'https://misautonomos.es',
+                      dialogTitle: 'Compartir perfil',
+                    });
+                  }}
+                  aria-label="Compartir perfil"
+                  title="Compartir"
+                  className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { haptic('light'); handleToggleFavorite(); }}
+                  aria-label={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+                  title={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+                  className={`inline-flex items-center gap-1.5 px-3 h-9 rounded-full border text-sm font-medium transition-colors ${
+                    isFavorite
+                      ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
+                      : 'bg-white border-slate-200 text-slate-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
+                  }`}
+                >
+                  <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                  {isFavorite ? 'Guardado' : 'Guardar'}
+                </button>
+              </div>
             </div>
 
             {/* BOTONES CONTACTO */}

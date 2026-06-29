@@ -65,6 +65,25 @@ import './i18n';
 import { initDeepLinkAuth } from '@/lib/deepLinkAuth';
 initDeepLinkAuth();
 
+// Capacitor: en nativo, registra el dispositivo con APNs/FCM y guarda el
+// token en sessionStorage para que el frontend pueda sincronizarlo con
+// OneSignal o con tu backend cuando el usuario inicie sesión. En web es no-op.
+import { initPushNotifications, isNative } from '@/lib/native';
+if (isNative()) {
+  // Diferimos un tick para no bloquear el primer paint.
+  setTimeout(() => {
+    initPushNotifications({
+      onToken: (token) => {
+        try { sessionStorage.setItem('apns_token', token); } catch (_) { /* noop */ }
+      },
+      onMessage: (notif) => {
+        // Toast nativo opcional — por ahora, log y dejar que iOS muestre la notificación.
+        console.log('[push] received:', notif?.title, notif?.body);
+      },
+    });
+  }, 800);
+}
+
 // ── Dark mode: sync with system preference ──────────────────────────────────
 const applyColorScheme = (dark) => {
   document.documentElement.classList.toggle('dark', dark);

@@ -17,6 +17,7 @@ import OnboardingTooltip from "../components/onboarding/OnboardingTooltip";
 import OnboardingChecklist from "../components/onboarding/OnboardingChecklist";
 import OnboardingTutorial from "../components/onboarding/OnboardingTutorial";
 import ProfilePreview from "../components/onboarding/ProfilePreview";
+import { pickPhoto, isNative, hapticSuccess } from "@/lib/native";
 
 // Categorías se cargan dinámicamente desde BD
 
@@ -513,24 +514,56 @@ export default function ProfileOnboardingPage() {
     }
   };
 
+  // Convierte un dataURL (base64) a File para reaprovechar UploadFile.
+  const dataUrlToFile = (dataUrl, format = 'image/jpeg', name = 'foto.jpg') => {
+    const arr = dataUrl.split(',');
+    const mime = arr[0].match(/:(.*?);/)?.[1] || format;
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8 = new Uint8Array(n);
+    while (n--) u8[n] = bstr.charCodeAt(n);
+    return new File([u8], name, { type: mime });
+  };
+
+  const uploadFileToBackend = async (file) => {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("La imagen no puede superar los 5MB");
+      return null;
+    }
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    return file_url;
+  };
+
+  // Web: callback del <input type="file">.
   const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen no puede superar los 5MB");
-      return;
-    }
-
     setUploadingPhoto(true);
-
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData({
-        ...formData,
-        photos: [...formData.photos, file_url]
-      });
+      const url = await uploadFileToBackend(file);
+      if (!url) return;
+      setFormData({ ...formData, photos: [...formData.photos, url] });
       toast.success("✅ Foto añadida");
+      hapticSuccess();
+    } catch (error) {
+      toast.error("Error al subir la foto");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  // Nativo: abre la action sheet "Cámara / Galería / Cancelar" de iOS.
+  const handlePhotoUploadNative = async () => {
+    const result = await pickPhoto({ source: 'prompt' });
+    if (!result?.dataUrl) return;
+    setUploadingPhoto(true);
+    try {
+      const file = dataUrlToFile(result.dataUrl, result.format || 'image/jpeg', `foto-${Date.now()}.${(result.format || 'jpeg').replace('image/', '')}`);
+      const url = await uploadFileToBackend(file);
+      if (!url) return;
+      setFormData({ ...formData, photos: [...formData.photos, url] });
+      toast.success("✅ Foto añadida");
+      hapticSuccess();
     } catch (error) {
       toast.error("Error al subir la foto");
     } finally {
@@ -1023,25 +1056,45 @@ export default function ProfileOnboardingPage() {
                     <p className="text-sm text-red-500 mb-2 font-semibold">{fieldErrors.photos}</p>
                   )}
                   {formData.photos.length < 10 && (
-                    <label className="cursor-pointer block">
-                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 transition-colors">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handlePhotoUpload}
-                          disabled={uploadingPhoto}
-                        />
+                    isNative() ? (
+                      // Nativo: botón que abre la action sheet de iOS / Android (Cámara / Galería).
+                      <button
+                        type="button"
+                        onClick={handlePhotoUploadNative}
+                        disabled={uploadingPhoto}
+                        className="w-full border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 transition-colors bg-transparent"
+                      >
                         {uploadingPhoto ? (
                           <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
                         ) : (
                           <>
                             <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                            <p className="text-sm text-gray-600">Haz clic para añadir foto ({formData.photos.length}/10)</p>
+                            <p className="text-sm text-gray-600">Añadir foto ({formData.photos.length}/10)</p>
                           </>
                         )}
-                      </div>
-                    </label>
+                      </button>
+                    ) : (
+                      // Web: input file clásico.
+                      <label className="cursor-pointer block">
+                        <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handlePhotoUpload}
+                            disabled={uploadingPhoto}
+                          />
+                          {uploadingPhoto ? (
+                            <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
+                          ) : (
+                            <>
+                              <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                              <p className="text-sm text-gray-600">Haz clic para añadir foto ({formData.photos.length}/10)</p>
+                            </>
+                          )}
+                        </div>
+                      </label>
+                    )
                   )}
 
                   {formData.photos.length > 0 && (
