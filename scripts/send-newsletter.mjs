@@ -44,7 +44,10 @@ for (const envFile of ['.env.local', '.env']) {
 // ── Configuración ────────────────────────────────────────────────────────
 const SITE = 'https://misautonomos.es';
 const FROM_EMAIL = 'hola@misautonomos.es';
-const FROM_NAME = 'MisAutónomos';
+// From name PERSONAL: bajamos el "marketing score" del clasificador de
+// Gmail (Promociones → Principal). "Empresa" en el From → casi seguro
+// Promociones. "Persona" en el From → bastante más probable Principal.
+const FROM_NAME = 'Ilias de MisAutónomos';
 const FROM_FORMATTED = `${FROM_NAME} <${FROM_EMAIL}>`;
 
 const SUBJECT = 'Faltan fontaneros y electricistas (y por eso el oficio nunca había valido tanto)';
@@ -170,9 +173,13 @@ function personalizeHtml(template, unsubscribeUrl, { first_name, email }) {
   let html = template;
   // 1) Reemplaza TODAS las ocurrencias del placeholder por el link único.
   html = html.split(UNSUB_PLACEHOLDER).join(unsubscribeUrl);
-  // 2) (Opcional) Sustituciones de personalización: {{first_name}} si lo
-  //    has dejado en el HTML. Si no, no hace nada.
-  html = html.replaceAll('{{first_name}}', first_name || '');
+  // 2) {{greeting}} → "Hola Mimoun," si tenemos first_name; si no, "Hola,"
+  //    Usar saludo personal aumenta la probabilidad de Principal en Gmail.
+  const cleanFirstName = (first_name || '').trim().replace(/[,.;:]+$/, '');
+  const greeting = cleanFirstName ? `Hola ${cleanFirstName},` : 'Hola,';
+  html = html.replaceAll('{{greeting}}', greeting);
+  // 3) Resto de sustituciones libres.
+  html = html.replaceAll('{{first_name}}', cleanFirstName);
   html = html.replaceAll('{{email}}', email || '');
   return html;
 }
@@ -219,12 +226,38 @@ async function main() {
   console.log(` Rate limit  : 1 email cada ${RATE_LIMIT_MS} ms`);
   console.log('═══════════════════════════════════════════════════════');
 
-  const audience = loadAudience(CSV_PATH);
-  console.log(`Cargados ${audience.length} contactos del CSV.`);
+  // Fuente 1: CSV con leads/profesionales curados manualmente.
+  const csvAudience = loadAudience(CSV_PATH);
+  console.log(`Cargados ${csvAudience.length} contactos del CSV.`);
+
+  // Fuente 2: todos los usuarios registrados en la plataforma (clientes +
+  // profesionales + admin), excluyendo los que ya han optado por la baja.
+  const { data: usersRows, error: e1 } = await supabase
+    .from('users')
+    .select('email, full_name, email_unsubscribed')
+    .not('email', 'is', null)
+    .eq('email_unsubscribed', false);
+  if (e1) throw e1;
+  const usersAudience = (usersRows || []).map((u) => {
+    const parts = String(u.full_name || '').trim().split(/\s+/);
+    return {
+      email: String(u.email).toLowerCase().trim(),
+      first_name: parts[0] || '',
+      last_name: parts.slice(1).join(' ') || '',
+    };
+  }).filter((u) => u.email);
+  console.log(`Cargados ${usersAudience.length} usuarios activos de la BD.`);
+
+  // Fusión + dedupe por email (gana el del CSV si hay choque, por su first_name explícito).
+  const byEmail = new Map();
+  for (const u of usersAudience) byEmail.set(u.email, u);
+  for (const c of csvAudience) byEmail.set(c.email.toLowerCase().trim(), c);
+  const fullAudience = Array.from(byEmail.values());
+  console.log(`Audiencia final tras dedupe: ${fullAudience.length} destinatarios.`);
 
   const targets = DRY_RUN
-    ? [{ email: TEST_EMAIL, first_name: 'Ilias (TEST)', last_name: '' }]
-    : audience;
+    ? [{ email: TEST_EMAIL, first_name: 'Ilias', last_name: '' }]
+    : fullAudience;
 
   const htmlTemplate = fs.readFileSync(HTML_PATH, 'utf8');
   if (!htmlTemplate.includes(UNSUB_PLACEHOLDER)) {

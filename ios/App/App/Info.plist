@@ -47,5 +47,43 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+
+	<!-- ── Permisos (usage descriptions) — obligatorios para App Store ── -->
+	<key>NSCameraUsageDescription</key>
+	<string>MisAutónomos necesita acceso a la cámara para que puedas hacer fotos de tus trabajos y añadirlas a tu perfil profesional.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MisAutónomos necesita acceso a tus fotos para que puedas seleccionar imágenes de tus trabajos y de tu logo profesional.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>MisAutónomos puede guardar comprobantes y QR de tu perfil en tu galería cuando lo pidas.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>MisAutónomos usa tu ubicación para mostrarte autónomos cerca de ti cuando buscas un servicio.</string>
+
+	<!-- ── Esquemas externos consultados (botones de contacto WhatsApp/Tel) ── -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
+
+	<!-- ── Deep link de Supabase OAuth / email confirmation ──
+	     El scheme `com.base690076ad86e673c796768de5.app` lo abre @capacitor/app
+	     y lo pasa a supabase.auth.exchangeCodeForSession. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.base690076ad86e673c796768de5.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.base690076ad86e673c796768de5.app</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- ── Encryption Export Compliance (evita la pantalla manual en ASC).
+	     La app NO usa criptografía no exenta. HTTPS (TLS) está exento. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
