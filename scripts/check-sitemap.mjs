@@ -144,6 +144,36 @@ async function pool(items, workers, fn) {
   return results;
 }
 
+// Verifica que www.misautonomos.es hace 3xx a la variante apex.
+// Si se salta y devuelve 200, Google elegirá canónicas divergentes.
+// Solo se ejecuta en modo remoto (post-deploy) o si CHECK_WWW=1.
+async function checkWwwRedirect() {
+  const target = 'https://www.misautonomos.es/';
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(target, { method: 'GET', redirect: 'manual', signal: ctl.signal });
+    const location = res.headers.get('location') || '';
+    if (res.status < 300 || res.status >= 400) {
+      console.error(`\n❌ www.misautonomos.es devolvió ${res.status} (esperaba 3xx).`);
+      console.error(`   Google marcará el subdominio www como URL alternativa y podría`);
+      console.error(`   elegir canónicas divergentes. Revisa vercel.json o el dominio en Vercel.`);
+      return false;
+    }
+    if (!/^https:\/\/misautonomos\.es\/?/.test(location)) {
+      console.error(`\n❌ www redirige a Location="${location}" — se esperaba https://misautonomos.es/`);
+      return false;
+    }
+    console.log(`[check-sitemap] ✔ www.misautonomos.es → ${res.status} → ${location}`);
+    return true;
+  } catch (err) {
+    console.error(`\n❌ Fallo al comprobar www: ${err.name === 'AbortError' ? 'timeout' : err.message || err}`);
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function main() {
   console.log(`[check-sitemap] Leyendo ${SITEMAP_URL}`);
   const xml = await fetchSitemapText();
@@ -179,16 +209,24 @@ async function main() {
     : await pool(urls, CONCURRENCY, checker);
 
   const failed = results.filter((r) => r.status !== 200);
-  if (failed.length === 0) {
-    console.log(`\n✅ Todas las ${urls.length} URLs responden 200`);
-    return;
+  if (failed.length > 0) {
+    console.error(`\n❌ ${failed.length} URLs no devuelven 200:`);
+    for (const { url, status, error } of failed) {
+      console.error(`   [${status || 'ERR'}]${error ? ` (${error})` : ''} ${url}`);
+    }
+    process.exit(1);
   }
+  console.log(`\n✅ Todas las ${urls.length} URLs responden 200`);
 
-  console.error(`\n❌ ${failed.length} URLs no devuelven 200:`);
-  for (const { url, status, error } of failed) {
-    console.error(`   [${status || 'ERR'}]${error ? ` (${error})` : ''} ${url}`);
+  // 3) Check www → apex. Solo en modo remoto (o forzado con CHECK_WWW=1),
+  //    porque local files no puede simular el redirect de host.
+  const shouldCheckWww = !useLocalFiles || process.env.CHECK_WWW === '1';
+  if (shouldCheckWww) {
+    const ok = await checkWwwRedirect();
+    if (!ok) process.exit(1);
+  } else {
+    console.log('[check-sitemap] (skip check www en modo local — usa CHECK_WWW=1 para forzar)');
   }
-  process.exit(1);
 }
 
 // Entry

@@ -6,6 +6,8 @@
   "trailingSlash": false,
 
   "redirects": [
+    { "source": "/:path*", "has": [{ "type": "host", "value": "www.misautonomos.es" }], "destination": "https://misautonomos.es/:path*", "permanent": true },
+
     { "source": "/inicio", "destination": "/", "statusCode": 301 },
     { "source": "/autonomo", "destination": "/buscar", "statusCode": 301 },
     { "source": "/categoria", "destination": "/buscar", "statusCode": 301 },
