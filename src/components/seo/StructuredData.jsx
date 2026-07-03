@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { slugify } from '@/lib/slugify';
 
 export function OrganizationSchema() {
   useEffect(() => {
@@ -164,13 +165,6 @@ export function MerchantListingSchema({ profile, reviews, professionalUser }) {
   useEffect(() => {
     if (!profile) return;
 
-    const slugify = (text) => {
-      if (!text) return '';
-      return text.toString().toLowerCase().trim()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/ñ/g, 'n').replace(/ç/g, 'c')
-        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-    };
 
     const profileSlug = profile.slug_publico || slugify(profile.business_name);
     const profileUrl = `https://misautonomos.es/autonomo/${profileSlug}`;
@@ -261,13 +255,6 @@ export function LocalBusinessSchema({ profile, reviews, professionalUser }) {
       document.head.appendChild(script);
     }
 
-    const slugify = (text) => {
-      if (!text) return '';
-      return text.toString().toLowerCase().trim()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/ñ/g, 'n').replace(/ç/g, 'c')
-        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-    };
     const profileSlug = profile.slug_publico || slugify(profile.business_name);
     // ✅ URL canónica con formato correcto /autonomo/:slug
     const profileUrl = `https://misautonomos.es/autonomo/${profileSlug}`;
@@ -444,13 +431,6 @@ export function ProfessionalPersonSchema({ profile, professionalUser }) {
       document.head.appendChild(script);
     }
 
-    const slugify = (text) => {
-      if (!text) return '';
-      return text.toString().toLowerCase().trim()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/ñ/g, 'n').replace(/ç/g, 'c')
-        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-    };
     const profileSlug = profile.slug_publico || slugify(profile.business_name);
     
     const schema = {

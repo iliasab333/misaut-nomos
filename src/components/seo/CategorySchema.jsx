@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { slugify } from '@/lib/slugify';
 
 export default function CategorySchema({ categoryName, professionals, location }) {
   useEffect(() => {
@@ -19,9 +20,7 @@ export default function CategorySchema({ categoryName, professionals, location }
       "description": `Encuentra profesionales de ${categoryName} verificados en ${location || 'toda España'}`,
       "numberOfItems": professionals?.length || 0,
       "itemListElement": (professionals || []).slice(0, 20).map((prof, index) => {
-        const profileSlug = prof.slug_publico || prof.business_name?.toLowerCase()
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const profileSlug = prof.slug_publico || slugify(prof.business_name);
 
         return {
           "@type": "ListItem",

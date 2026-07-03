@@ -22,7 +22,7 @@ import { createClient } from '@supabase/supabase-js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { slugify } from '../src/lib/seoUrl.js';
+import { slugify } from '../src/lib/slugify.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -786,8 +786,9 @@ async function main() {
     supabase.from('service_categories').select('slug, name, description').order('name'),
     supabase
       .from('professional_profiles')
-      .select('slug_publico, business_name, descripcion_corta, description, ciudad, municipio, provincia, categories, average_rating, total_reviews, imagen_principal, slug_publico_aliases')
-      .eq('visible_en_busqueda', true),
+      .select('slug_publico, business_name, descripcion_corta, description, ciudad, municipio, provincia, categories, average_rating, total_reviews, imagen_principal, slug_publico_aliases, estado_perfil, onboarding_completed')
+      .eq('visible_en_busqueda', true)
+      .eq('onboarding_completed', true),
     supabase
       .from('blog_posts')
       .select('slug, title_es, excerpt_es, meta_description_es, publish_date, updated_date, featured_image')
@@ -798,7 +799,12 @@ async function main() {
   if (profsRes.error) throw profsRes.error;
 
   const cats = catsRes.data || [];
-  const profs = profsRes.data || [];
+  // Excluir perfiles no-indexables (inactivo/suspendido/pendiente). estado_perfil
+  // null se acepta por compatibilidad con registros antiguos.
+  const profs = (profsRes.data || []).filter((p) => {
+    if (!p.business_name) return false;
+    return p.estado_perfil == null || p.estado_perfil === 'activo';
+  });
   const posts = postsRes.error ? [] : (postsRes.data || []);
 
   console.log(`[prerender] Data: ${cats.length} categorías · ${profs.length} pros visibles · ${posts.length} blog posts`);

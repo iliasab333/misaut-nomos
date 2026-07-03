@@ -1,47 +1,34 @@
-/**
- * Genera un slug limpio y URL-safe a partir de un texto
- * - Convierte a minúsculas
- * - Elimina tildes (á→a, é→e, ñ→n, etc.)
- * - Reemplaza espacios con guiones
- * - Elimina caracteres especiales
- * - Limpia guiones múltiples
- */
-export const generateSlug = (text) => {
-  if (!text) return '';
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // quitar tildes
-    .replace(/[^a-z0-9\s-]/g, '')    // solo letras, números, espacios, guiones
-    .trim()
-    .replace(/\s+/g, '-')            // espacios a guiones
-    .replace(/-+/g, '-')             // guiones múltiples a uno solo
-    .replace(/^-|-$/g, '');          // quitar guiones al inicio/fin
-};
+import { slugify } from '@/lib/slugify';
 
 /**
- * Verifica si un slug necesita limpieza (tiene caracteres sucios)
+ * Genera un slug limpio y URL-safe a partir de un texto.
+ * Alias de la función canónica @/lib/slugify — mantenida por compatibilidad
+ * con los importadores existentes que usan `generateSlug`.
+ */
+export const generateSlug = (text) => slugify(text);
+
+/**
+ * Verifica si un slug necesita limpieza (tiene caracteres sucios).
+ * Un slug está sucio si difiere del resultado canónico.
  */
 export const isSlugDirty = (slug) => {
   if (!slug) return true;
-  // Si contiene tildes, espacios, guiones múltiples, o es diferente al slug generado
-  return /[áéíóúñçÁÉÍÓÚÑÇ\s]|--/.test(slug) || slug !== generateSlug(slug);
+  return slug !== slugify(slug);
 };
 
 /**
- * Asegura que el slug sea único por contexto
- * Si el slug ya existe en otro perfil, añade el municipio o número
+ * Asegura que el slug sea único por contexto.
+ * Si el slug ya existe en otro perfil, añade un sufijo numérico.
  */
 export const ensureUniqueSlug = async (baseSlug, existingSlugs = []) => {
   if (!existingSlugs.includes(baseSlug)) {
     return baseSlug;
   }
-  // Si ya existe, añadir sufijos progresivos
   for (let i = 2; i <= 10; i++) {
     const newSlug = `${baseSlug}-${i}`;
     if (!existingSlugs.includes(newSlug)) {
       return newSlug;
     }
   }
-  return baseSlug; // fallback
+  return baseSlug;
 };

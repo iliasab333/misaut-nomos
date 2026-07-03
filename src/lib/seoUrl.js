@@ -1,24 +1,12 @@
 /**
  * Helper para generar URLs SEO-friendly de perfiles profesionales.
+ * La lógica de slugify vive en @/lib/slugify — este módulo la reexporta
+ * por compatibilidad con importadores existentes.
  */
 
-/**
- * Convierte un texto a slug URL-safe: minúsculas, sin tildes, sin caracteres especiales.
- * Ej: "Málaga" → "malaga", "Sant Cugat del Vallès" → "sant-cugat-del-valles"
- */
-export function slugify(text) {
-  if (!text) return '';
-  return text
-    .toString()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/ñ/g, 'n')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-}
+import { slugify } from './slugify';
+
+export { slugify };
 
 /**
  * Devuelve el path SEO-friendly completo de un perfil.

@@ -49,31 +49,14 @@ import { useProfileTranslation } from "../components/profile/useProfileTranslati
 import { ActionButtonsProfile } from "../components/profile/ActionButtons";
 import { generateSlug, isSlugDirty } from "../utils/slugUtils";
 import { getProfileSeoUrl } from '@/lib/seoUrl';
+import { slugify } from '@/lib/slugify';
 import CategoryCityLink from "../components/profile/CategoryCityLink";
 import GuestContactModal from "@/components/messages/GuestContactModal";
 
-// Función para generar slug limpio (sin acentos, sin IDs)
-function slugify(text) {
-  if (!text) return '';
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
-    .replace(/ñ/g, 'n')
-    .replace(/ç/g, 'c')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/-+/g, '-');
-}
-
-// Limpiar slug antiguo que puede tener IDs o acentos
+// Limpiar slug antiguo que puede tener IDs hex al final (ej: -5e8405).
 function cleanOldSlug(slug) {
   if (!slug) return '';
-  // Eliminar IDs hexadecimales al final (ej: -5e8405)
-  let cleaned = slug.replace(/-[a-f0-9]{6,}$/i, '');
-  // Aplicar slugify para limpiar acentos
+  const cleaned = slug.replace(/-[a-f0-9]{6,}$/i, '');
   return slugify(cleaned);
 }
 

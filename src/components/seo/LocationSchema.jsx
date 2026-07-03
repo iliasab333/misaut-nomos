@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { slugify } from '@/lib/slugify';
 
 export default function LocationSchema({ city, province, professionals, categories }) {
   useEffect(() => {
@@ -25,9 +26,7 @@ export default function LocationSchema({ city, province, professionals, categori
         "addressCountry": "ES"
       },
       "containsPlace": (professionals || []).slice(0, 15).map(prof => {
-        const profileSlug = prof.slug_publico || prof.business_name?.toLowerCase()
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const profileSlug = prof.slug_publico || slugify(prof.business_name);
 
         return {
           "@type": "ProfessionalService",

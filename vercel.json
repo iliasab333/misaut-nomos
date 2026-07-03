@@ -15,7 +15,16 @@
     { "source": "/autonomo/asesoria-o-gestoria-en-santa-pola/oscar-gómez", "destination": "/autonomo/asesoria-o-gestoria-en-santa-pola/oscar-gomez", "statusCode": 301 },
     { "source": "/autonomo/albanil-reformas-en-barcelona/ruben-cárdenas-torres", "destination": "/autonomo/albanil-reformas-en-barcelona/ruben-cardenas-torres", "statusCode": 301 },
     { "source": "/autonomo/informatico-a-domicilio-soporte-it-en-mollet-del-valles/sergi---fixtic---informàtica,-formació-i-consultoria-it-ia", "destination": "/autonomo/informatico-a-domicilio-soporte-it-en-mollet-del-valles/sergi-fixtic-informatica-formacio-i-consultoria-it-ia", "statusCode": 301 },
-    { "source": "/autonomo/pintor-en-vinaròs/rayan-", "destination": "/autonomo/pintor-en-vinaros/rayan", "statusCode": 301 }
+    { "source": "/autonomo/pintor-en-vinaròs/rayan-", "destination": "/autonomo/pintor-en-vinaros/rayan", "statusCode": 301 },
+
+    { "source": "/autonomo/pintor-en-vinaròs/:slug*", "destination": "/autonomo/pintor-en-vinaros/:slug*", "statusCode": 301 },
+    { "source": "/autonomo/:cat-en-vinaròs/:slug*", "destination": "/autonomo/:cat-en-vinaros/:slug*", "statusCode": 301 },
+    { "source": "/categoria/:cat/vinaròs", "destination": "/categoria/:cat/vinaros", "statusCode": 301 },
+
+    { "source": "/autonomo/:cat/:slug-", "destination": "/autonomo/:cat/:slug", "statusCode": 301 },
+    { "source": "/autonomo/:slug-", "destination": "/autonomo/:slug", "statusCode": 301 },
+    { "source": "/categoria/:cat-", "destination": "/categoria/:cat", "statusCode": 301 },
+    { "source": "/categoria/:cat/:ciudad-", "destination": "/categoria/:cat/:ciudad", "statusCode": 301 }
   ],
 
   "rewrites": [

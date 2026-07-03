@@ -5,6 +5,7 @@ import { ArrowLeft, RefreshCw, Eye, Upload, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { slugify } from '@/lib/slugify';
 
 const NAVY = '#00255C';
 const NAVY_INK = '#001A45';
@@ -17,15 +18,7 @@ const CATEGORIES = [
   { id: 'actualidad', label: 'Actualidad' },
 ];
 
-const generateSlug = (title) =>
-  (title || '')
-    .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .substring(0, 60);
+const generateSlug = (title) => slugify(title).substring(0, 60);
 
 const calcReadTime = (htmlContent) => {
   const text = (htmlContent || '').replace(/<[^>]+>/g, '');

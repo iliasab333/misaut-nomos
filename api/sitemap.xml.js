@@ -5,6 +5,7 @@
 // Cache 6 h en CDN y navegador (sitemap dinámico, pero no caro de regenerar).
 
 import { createClient } from '@supabase/supabase-js';
+import { slugify } from '../src/lib/slugify.js';
 
 const SITE = 'https://misautonomos.es';
 
@@ -38,18 +39,6 @@ function xmlEscape(s) {
     .replace(/'/g, '&apos;');
 }
 
-function slugify(text) {
-  if (!text) return '';
-  return text
-    .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
 function urlEntry({ loc, lastmod, changefreq, priority }) {
   const parts = [
     `  <url>`,
@@ -62,6 +51,42 @@ function urlEntry({ loc, lastmod, changefreq, priority }) {
   return parts.join('\n');
 }
 
+// Un perfil solo entra al sitemap si su estado permite indexación pública.
+// 'pendiente', 'inactivo' y 'suspendido' se excluyen aunque estén visibles
+// por error (defensa en profundidad frente a borrados/incidencias).
+const INDEXABLE_STATES = new Set(['activo']);
+
+function isIndexableProfile(p) {
+  if (!p) return false;
+  if (!p.business_name) return false;
+  if (p.visible_en_busqueda !== true) return false;
+  if (p.onboarding_completed !== true) return false;
+  // estado_perfil puede ser null en registros antiguos → asumir 'activo'.
+  if (p.estado_perfil != null && !INDEXABLE_STATES.has(p.estado_perfil)) return false;
+  return true;
+}
+
+// El slug canónico debe ser exactamente lo que slugify() produce ahora.
+// Si el slug_publico en BD estaba sucio (guiones colgantes, acentos), lo
+// re-normalizamos aquí para no emitir la variante rota.
+function canonicalNameSlug(p) {
+  const raw = p.slug_publico || p.business_name || '';
+  return slugify(raw);
+}
+
+// Sanity check: un <loc> válido solo contiene [a-z0-9/:.-] tras el dominio.
+// Nunca debería haber acentos, comas, guiones colgantes ni esquemas mixtos.
+const URL_SAFE = /^https:\/\/misautonomos\.es(\/[a-z0-9/-]*)?$/;
+function isSafeUrl(loc) {
+  if (typeof loc !== 'string') return false;
+  if (!URL_SAFE.test(loc)) return false;
+  if (loc.includes('//', 8)) return false;      // dobles slash tras dominio
+  if (/-\//.test(loc)) return false;            // guión seguido de /
+  if (/\/-/.test(loc)) return false;            // / seguido de guión
+  if (loc.endsWith('-')) return false;          // guión final
+  return true;
+}
+
 async function fetchAll(supabase) {
   const out = { profiles: [], categories: [], blog: [] };
   if (!supabase) return out;
@@ -69,7 +94,7 @@ async function fetchAll(supabase) {
   const [profilesRes, categoriesRes, blogRes] = await Promise.all([
     supabase
       .from('professional_profiles')
-      .select('slug_publico, business_name, categories, ciudad, updated_date, visible_en_busqueda, onboarding_completed')
+      .select('slug_publico, business_name, categories, ciudad, updated_date, visible_en_busqueda, onboarding_completed, estado_perfil')
       .eq('visible_en_busqueda', true)
       .eq('onboarding_completed', true)
       .limit(5000),
@@ -84,7 +109,9 @@ async function fetchAll(supabase) {
       .limit(2000),
   ]);
 
-  if (!profilesRes.error && Array.isArray(profilesRes.data)) out.profiles = profilesRes.data;
+  if (!profilesRes.error && Array.isArray(profilesRes.data)) {
+    out.profiles = profilesRes.data.filter(isIndexableProfile);
+  }
   if (!categoriesRes.error && Array.isArray(categoriesRes.data)) out.categories = categoriesRes.data;
   if (!blogRes.error && Array.isArray(blogRes.data)) out.blog = blogRes.data;
   return out;
@@ -179,18 +206,25 @@ export default async function handler(req, res) {
     }));
   }
 
-  // Perfiles públicos: /autonomo/:cityCategory/:slug (formato SEO canónico)
+  // Perfiles públicos: /autonomo/:cityCategory/:slug (formato SEO canónico).
+  // Cada segmento pasa por slugify() para eliminar acentos, comas y guiones
+  // colgantes. La URL final se valida con isSafeUrl() antes de emitirla.
+  let profileSkipped = 0;
   for (const p of data.profiles) {
-    const nameSlug = p.slug_publico || slugify(p.business_name || '');
-    if (!nameSlug) continue;
+    const nameSlug = canonicalNameSlug(p);
+    if (!nameSlug) { profileSkipped++; continue; }
     const cat = Array.isArray(p.categories) ? p.categories[0] : null;
     const ciudad = p.ciudad || '';
     let loc;
     if (cat && ciudad) {
-      loc = `${SITE}/autonomo/${slugify(cat)}-en-${slugify(ciudad)}/${nameSlug}`;
+      const catSlug = slugify(cat);
+      const ciudadSlug = slugify(ciudad);
+      if (!catSlug || !ciudadSlug) { profileSkipped++; continue; }
+      loc = `${SITE}/autonomo/${catSlug}-en-${ciudadSlug}/${nameSlug}`;
     } else {
       loc = `${SITE}/autonomo/${nameSlug}`;
     }
+    if (!isSafeUrl(loc)) { profileSkipped++; continue; }
     urls.push(urlEntry({
       loc,
       lastmod: p.updated_date ? new Date(p.updated_date).toISOString().slice(0, 10) : undefined,
@@ -202,12 +236,18 @@ export default async function handler(req, res) {
   // Blog: /blog/:slug
   for (const post of data.blog) {
     if (!post.slug) continue;
+    const loc = `${SITE}/blog/${post.slug}`;
+    if (!isSafeUrl(loc)) continue;
     urls.push(urlEntry({
-      loc: `${SITE}/blog/${post.slug}`,
+      loc,
       lastmod: post.updated_date ? new Date(post.updated_date).toISOString().slice(0, 10) : undefined,
       changefreq: 'monthly',
       priority: 0.6,
     }));
+  }
+
+  if (profileSkipped > 0) {
+    console.log(`[sitemap] Skipped ${profileSkipped} perfiles con slug/URL no canónica`);
   }
 
   const xml =
