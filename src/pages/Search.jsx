@@ -759,7 +759,7 @@ export default function SearchPage() {
             <>
               {viewMode === "grid" ? (
                 <>
-                  <div className="grid gap-4 items-stretch search-results-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
+                  <div className="grid gap-4 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
                     {filteredProfiles.slice(0, displayLimit).map((profile, idx) => (
                       <ProfileCard
                         key={profile.id}
