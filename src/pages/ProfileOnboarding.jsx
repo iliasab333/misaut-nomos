@@ -82,6 +82,20 @@ export default function ProfileOnboardingPage() {
     loadUser();
   }, []);
 
+  // Autosave del formulario en localStorage con debounce de 800 ms. Excluimos
+  // las fotos (URLs que pueden crecer mucho) del snapshot rápido.
+  useEffect(() => {
+    if (loading || !user?.id) return;
+    const key = `mn:profile-onboarding:v1:${user.id}`;
+    const t = setTimeout(() => {
+      try {
+        const snapshot = { formData, currentStep, savedAt: Date.now() };
+        localStorage.setItem(key, JSON.stringify(snapshot));
+      } catch (_e) { /* modo privado o cuota llena, ignoramos */ }
+    }, 800);
+    return () => clearTimeout(t);
+  }, [formData, currentStep, loading, user?.id]);
+
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
@@ -148,11 +162,32 @@ export default function ProfileOnboardingPage() {
           consiente_contacto_clientes: profiles[0].consiente_contacto_clientes || false
         });
       } else {
-        setFormData(prev => ({
-          ...prev,
-          email_contacto: currentUser.email,
-          telefono_contacto: currentUser.phone || ""
-        }));
+        // No hay perfil en BD todavía. Si hay borrador guardado en localStorage
+        // lo restauramos para que un usuario que se fue a WhatsApp o cerró la
+        // pestaña recupere lo escrito.
+        let restored = null;
+        try {
+          const key = `mn:profile-onboarding:v1:${currentUser.id}`;
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.formData) restored = parsed;
+          }
+        } catch (_e) { /* localStorage puede fallar en modo privado */ }
+
+        if (restored) {
+          setFormData(prev => ({ ...prev, ...restored.formData }));
+          if (Number.isFinite(restored.currentStep) && restored.currentStep >= 1 && restored.currentStep <= 3) {
+            setCurrentStep(restored.currentStep);
+          }
+          toast.success('Hemos recuperado lo que tenías a medias', { duration: 3500 });
+        } else {
+          setFormData(prev => ({
+            ...prev,
+            email_contacto: currentUser.email,
+            telefono_contacto: currentUser.phone || ""
+          }));
+        }
       }
 
       setLoading(false);
@@ -169,9 +204,9 @@ export default function ProfileOnboardingPage() {
       errors.business_name = "El nombre profesional debe tener al menos 2 caracteres";
     }
 
-    if (!formData.cif_nif || formData.cif_nif.length !== 9) {
-      errors.cif_nif = "El NIF/CIF debe tener exactamente 9 caracteres";
-    }
+    // NIF/CIF ya no se pide en el onboarding: se pide en /mi-perfil
+    // (sección Facturación) o antes de emitir la primera factura.
+    // Si el usuario ya lo tenía guardado se conserva; si no, se omite.
 
     if (!formData.email_contacto || !formData.email_contacto.includes("@")) {
       errors.email_contacto = "El email no es válido";
@@ -243,9 +278,9 @@ export default function ProfileOnboardingPage() {
       errors.formas_pago = "Selecciona al menos una forma de pago";
     }
 
-    if (formData.photos.length === 0) {
-      errors.photos = "Sube al menos 1 foto de tus trabajos — los perfiles con foto reciben 3× más contactos";
-    }
+    // Las fotos ya no bloquean la publicación: se mantiene el CTA para subirlas
+    // como recomendación en el paso 3, y en el perfil publicado se muestra un
+    // banner "Añade una foto y multiplica x3 tus contactos".
 
     if (!formData.acepta_terminos) {
       errors.acepta_terminos = "Debes aceptar los Términos y Condiciones";
@@ -461,6 +496,8 @@ export default function ProfileOnboardingPage() {
       }).catch(() => {});
 
       toast.success("Perfil publicado. Ya apareces en búsquedas.", { duration: 5000 });
+      // Autosave: limpiar el borrador porque ya está publicado en BD.
+      try { localStorage.removeItem(`mn:profile-onboarding:v1:${user.id}`); } catch (_e) {}
       setTimeout(() => {
         // Flujo: /registro → /completar-perfil → /precios
         navigate(createPageUrl("PricingPlans"));
@@ -694,39 +731,6 @@ export default function ProfileOnboardingPage() {
                     <p className="text-xs text-red-500 mt-1">Mínimo 2 caracteres</p>
                   )}
                   {formData.business_name.length >= 2 && (
-                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <Check className="w-3 h-3" /> Correcto
-                    </p>
-                  )}
-                </div>
-
-                <div id="cif_nif">
-                  <OnboardingTooltip content="Tu NIF/CIF es privado y solo se usa para verificación interna. NUNCA será visible para los clientes en tu perfil público.">
-                    <Label>NIF/CIF *</Label>
-                  </OnboardingTooltip>
-                  <p className="text-xs text-gray-500 mb-2">(Este dato NO se mostrará públicamente)</p>
-                  <Input
-                    value={formData.cif_nif}
-                    onChange={(e) => {
-                      setFormData({ ...formData, cif_nif: e.target.value.toUpperCase() });
-                      setFieldErrors({ ...fieldErrors, cif_nif: null });
-                    }}
-                    placeholder="12345678A"
-                    maxLength={9}
-                    inputMode="text"
-                    autoCapitalize="characters"
-                    autoComplete="off"
-                    spellCheck={false}
-                    enterKeyHint="next"
-                    className={`h-12 ${fieldErrors.cif_nif ? 'border-red-500' : formData.cif_nif.length === 9 ? 'border-green-500' : ''}`}
-                  />
-                  {fieldErrors.cif_nif && (
-                    <p className="text-xs text-red-500 mt-1 font-semibold">{fieldErrors.cif_nif}</p>
-                  )}
-                  {!fieldErrors.cif_nif && formData.cif_nif.length > 0 && formData.cif_nif.length !== 9 && (
-                    <p className="text-xs text-red-500 mt-1">Debe tener exactamente 9 caracteres</p>
-                  )}
-                  {formData.cif_nif.length === 9 && (
                     <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
                       <Check className="w-3 h-3" /> Correcto
                     </p>
@@ -1075,8 +1079,8 @@ export default function ProfileOnboardingPage() {
                 </div>
 
                 <div id="photos">
-                  <OnboardingTooltip content="Las fotos de tus trabajos son CLAVE. Los perfiles con más fotos reciben 3x más contactos. Sube fotos nítidas de trabajos reales que hayas completado. No uses imágenes de internet.">
-                    <Label className="mb-3 block">Portfolio de trabajos * (mínimo 1 foto)</Label>
+                  <OnboardingTooltip content="Las fotos de tus trabajos son CLAVE. Los perfiles con más fotos reciben 3x más contactos. Puedes publicar sin foto y añadirla después desde tu perfil.">
+                    <Label className="mb-3 block">Portfolio de trabajos <span className="text-slate-500 font-normal">(recomendado — x3 contactos)</span></Label>
                   </OnboardingTooltip>
                   {fieldErrors.photos && (
                     <p className="text-sm text-red-500 mb-2 font-semibold">{fieldErrors.photos}</p>
