@@ -219,6 +219,8 @@ export default function ClientOnboardingPage() {
                   if (fieldErrors.nombre) setFieldErrors(prev => ({ ...prev, nombre: null }));
                 }}
                 autoComplete="name"
+                autoCapitalize="words"
+                enterKeyHint="next"
                 style={{
                   background: '#FFFFFF',
                   border: fieldErrors.nombre ? '1.5px solid #EF4444' : '1.5px solid #E5E7EB',
@@ -250,6 +252,10 @@ export default function ClientOnboardingPage() {
                   if (fieldErrors.email) setFieldErrors(prev => ({ ...prev, email: null }));
                 }}
                 autoComplete="email"
+                inputMode="email"
+                autoCapitalize="none"
+                spellCheck={false}
+                enterKeyHint="next"
                 disabled={!!user}
                 style={{
                   background: user ? '#F9FAFB' : '#FFFFFF',
@@ -284,6 +290,7 @@ export default function ClientOnboardingPage() {
                       if (fieldErrors.password) setFieldErrors(prev => ({ ...prev, password: null }));
                     }}
                     autoComplete="new-password"
+                    enterKeyHint="go"
                     style={{
                       background: '#FFFFFF',
                       border: fieldErrors.password ? '1.5px solid #EF4444' : '1.5px solid #E5E7EB',

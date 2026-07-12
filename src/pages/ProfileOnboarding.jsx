@@ -682,6 +682,9 @@ export default function ProfileOnboardingPage() {
                       setFieldErrors({ ...fieldErrors, business_name: null });
                     }}
                     placeholder="Ej: Juan Pérez - Electricista"
+                    autoCapitalize="words"
+                    autoComplete="organization"
+                    enterKeyHint="next"
                     className={`h-12 ${fieldErrors.business_name ? 'border-red-500' : formData.business_name.length >= 2 ? 'border-green-500' : ''}`}
                   />
                   {fieldErrors.business_name && (
@@ -710,6 +713,11 @@ export default function ProfileOnboardingPage() {
                     }}
                     placeholder="12345678A"
                     maxLength={9}
+                    inputMode="text"
+                    autoCapitalize="characters"
+                    autoComplete="off"
+                    spellCheck={false}
+                    enterKeyHint="next"
                     className={`h-12 ${fieldErrors.cif_nif ? 'border-red-500' : formData.cif_nif.length === 9 ? 'border-green-500' : ''}`}
                   />
                   {fieldErrors.cif_nif && (
@@ -735,6 +743,11 @@ export default function ProfileOnboardingPage() {
                       setFieldErrors({ ...fieldErrors, email_contacto: null });
                     }}
                     placeholder="tu@email.com"
+                    inputMode="email"
+                    autoComplete="email"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    enterKeyHint="next"
                     className={`h-12 ${fieldErrors.email_contacto ? 'border-red-500' : formData.email_contacto.includes('@') && formData.email_contacto.includes('.') ? 'border-green-500' : ''}`}
                   />
                   {fieldErrors.email_contacto && (
@@ -753,12 +766,16 @@ export default function ProfileOnboardingPage() {
                 <div id="telefono_contacto">
                   <Label>Teléfono *</Label>
                   <Input
+                    type="tel"
                     value={formData.telefono_contacto}
                     onChange={(e) => {
                       setFormData({ ...formData, telefono_contacto: e.target.value });
                       setFieldErrors({ ...fieldErrors, telefono_contacto: null });
                     }}
                     placeholder="+34 612 345 678"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    enterKeyHint="next"
                     className={`h-12 ${fieldErrors.telefono_contacto ? 'border-red-500' : formData.telefono_contacto.replace(/\D/g, '').length >= 9 ? 'border-green-500' : ''}`}
                   />
                   {fieldErrors.telefono_contacto && (
@@ -881,6 +898,8 @@ export default function ProfileOnboardingPage() {
                         setFieldErrors({ ...fieldErrors, activity_other: null });
                       }}
                       placeholder="Ej: Instalador de paneles solares..."
+                      autoCapitalize="sentences"
+                      enterKeyHint="next"
                       className={`h-12 ${fieldErrors.activity_other ? 'border-red-500' : ''}`}
                     />
                     {fieldErrors.activity_other && (
@@ -901,6 +920,9 @@ export default function ProfileOnboardingPage() {
                     placeholder="5"
                     min="0"
                     max="50"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    enterKeyHint="next"
                     className={`h-12 ${fieldErrors.years_experience ? 'border-red-500' : formData.years_experience !== '' && parseInt(formData.years_experience) >= 0 ? 'border-green-500' : ''}`}
                   />
                   {fieldErrors.years_experience && (
@@ -928,6 +950,8 @@ export default function ProfileOnboardingPage() {
                       setFieldErrors({ ...fieldErrors, descripcion_corta: null });
                     }}
                     placeholder="Describe brevemente tus servicios..."
+                    autoCapitalize="sentences"
+                    enterKeyHint="enter"
                     className={`h-32 resize-none ${fieldErrors.descripcion_corta ? 'border-red-500' : ''}`}
                   />
                   {fieldErrors.descripcion_corta && (
@@ -1014,6 +1038,8 @@ export default function ProfileOnboardingPage() {
                     onChange={(e) => setFormData({ ...formData, tarifa_base: e.target.value })}
                     placeholder="35"
                     min="0"
+                    inputMode="decimal"
+                    enterKeyHint="next"
                     className="h-12"
                   />
                 </div>
@@ -1140,12 +1166,18 @@ export default function ProfileOnboardingPage() {
                     <div className="flex items-center gap-2">
                       <Instagram className="w-5 h-5 text-pink-600" />
                       <Input
+                        type="url"
                         value={formData.social_links.instagram}
                         onChange={(e) => setFormData({
                           ...formData,
                           social_links: { ...formData.social_links, instagram: e.target.value }
                         })}
                         placeholder="https://instagram.com/tuperfil"
+                        inputMode="url"
+                        autoComplete="url"
+                        autoCapitalize="none"
+                        spellCheck={false}
+                        enterKeyHint="next"
                         className="h-11"
                       />
                     </div>
@@ -1153,12 +1185,18 @@ export default function ProfileOnboardingPage() {
                     <div className="flex items-center gap-2">
                       <Facebook className="w-5 h-5 text-blue-600" />
                       <Input
+                        type="url"
                         value={formData.social_links.facebook}
                         onChange={(e) => setFormData({
                           ...formData,
                           social_links: { ...formData.social_links, facebook: e.target.value }
                         })}
                         placeholder="https://facebook.com/tupagina"
+                        inputMode="url"
+                        autoComplete="url"
+                        autoCapitalize="none"
+                        spellCheck={false}
+                        enterKeyHint="next"
                         className="h-11"
                       />
                     </div>
@@ -1166,9 +1204,15 @@ export default function ProfileOnboardingPage() {
                     <div className="flex items-center gap-2">
                       <Globe className="w-5 h-5 text-gray-600" />
                       <Input
+                        type="url"
                         value={formData.website}
                         onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                         placeholder="https://tuweb.com"
+                        inputMode="url"
+                        autoComplete="url"
+                        autoCapitalize="none"
+                        spellCheck={false}
+                        enterKeyHint="next"
                         className="h-11"
                       />
                     </div>
@@ -1176,12 +1220,18 @@ export default function ProfileOnboardingPage() {
                     <div className="flex items-center gap-2">
                       <Music className="w-5 h-5 text-gray-900" />
                       <Input
+                        type="url"
                         value={formData.social_links.tiktok}
                         onChange={(e) => setFormData({
                           ...formData,
                           social_links: { ...formData.social_links, tiktok: e.target.value }
                         })}
                         placeholder="https://tiktok.com/@tuperfil"
+                        inputMode="url"
+                        autoComplete="url"
+                        autoCapitalize="none"
+                        spellCheck={false}
+                        enterKeyHint="done"
                         className="h-11"
                       />
                     </div>

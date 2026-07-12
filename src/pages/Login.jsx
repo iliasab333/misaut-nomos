@@ -337,6 +337,8 @@ export default function LoginPage() {
                     id="name"
                     type="text"
                     autoComplete="name"
+                    autoCapitalize="words"
+                    enterKeyHint="next"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Tu nombre"
@@ -355,6 +357,10 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   autoComplete="email"
+                  inputMode="email"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  enterKeyHint={isSignIn ? 'go' : 'next'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@email.com"
@@ -384,6 +390,7 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete={isSignIn ? 'current-password' : 'new-password'}
+                  enterKeyHint="go"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={isSignIn ? 'Tu contraseña' : 'Mínimo 6 caracteres'}
