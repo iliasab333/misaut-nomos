@@ -1,0 +1,2222 @@
+[
+  {
+    "num": 1,
+    "label": "home",
+    "shotFile": "shots/01-home.png",
+    "loadMs": 2512,
+    "title": "MisAutónomos · Autónomos verificados en tu zona, sin comisiones",
+    "url": "https://misautonomos.es/",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "select",
+        "type": null,
+        "name": null,
+        "id": "hero-category",
+        "placeholder": null,
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "¿QUÉ NECESITAS?\nElige un servicio\nAbogado\nAlbañil / Reformas\nAsesoría o gestoría\nAutónomo de limpieza\nCarpintero\nCerrajero\nClimatización / Calefacción\nElectricista\nEmpresa multiservicios\nFontanero\nInformático a domicilio / soporte IT\nJardinero\nMarketing digital / diseño web\nPeluquería y estética a domicilio\nPersianas y toldos\nPintor\nTransportista"
+      },
+      {
+        "tag": "select",
+        "type": null,
+        "name": null,
+        "id": "hero-provincia",
+        "placeholder": null,
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "¿DÓNDE?\nProvincia\nA Coruña\nÁlava\nAlbacete\nAlicante\nAlmería\nAsturias\nÁvila\nBadajoz\nBarcelona\nBurgos\nCáceres\nCádiz\nCantabria\nCastellón\nCeuta\nCiudad Real\nCórdoba\nCuenca\nGirona\nGranada\nGuadalajara\nGuipúzcoa\nHuelva\nHuesca\nIslas Baleares\nJaén\nLa Rioja\nLas Palmas\nLeón\nLleida\nLugo\nMadrid\nMálaga\nMelilla\nMurcia\nNavarra\nOurense\nPalencia\nPontevedra\nSalamanca\nSanta Cruz de Tenerife\nSegovia\nSevilla\nSoria\nTarragona\nTeruel\nToledo\nValencia\nValladolid\nVizcaya\nZamora\nZaragoza"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": null,
+        "placeholder": "tu@email.com",
+        "required": true,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Tu email"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "MisAutónomos",
+        "aria": "Inicio",
+        "href": "/",
+        "y": 12
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Buscar",
+        "aria": null,
+        "href": null,
+        "y": 603
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Buscar por palabra clave",
+        "aria": null,
+        "href": null,
+        "y": 680
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "⚖️\nAbogado",
+        "aria": null,
+        "href": null,
+        "y": 819
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🏗️\nAlbañil / Reformas",
+        "aria": null,
+        "href": null,
+        "y": 819
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "📊\nAsesoría o gestoría",
+        "aria": null,
+        "href": null,
+        "y": 985
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🧹\nAutónomo de limpieza",
+        "aria": null,
+        "href": null,
+        "y": 985
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🪚\nCarpintero",
+        "aria": null,
+        "href": null,
+        "y": 1170
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🔑\nCerrajero",
+        "aria": null,
+        "href": null,
+        "y": 1170
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "❄️\nClimatización / Calefacción",
+        "aria": null,
+        "href": null,
+        "y": 1337
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "⚡\nElectricista",
+        "aria": null,
+        "href": null,
+        "y": 1337
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🛠️\nEmpresa multiservicios",
+        "aria": null,
+        "href": null,
+        "y": 1522
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🔧\nFontanero",
+        "aria": null,
+        "href": null,
+        "y": 1522
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "💻\nInformático a domicilio / soporte IT",
+        "aria": null,
+        "href": null,
+        "y": 1708
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🌿\nJardinero",
+        "aria": null,
+        "href": null,
+        "y": 1708
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "📱\nMarketing digital / diseño web",
+        "aria": null,
+        "href": null,
+        "y": 1913
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "💇\nPeluquería y estética a domicilio",
+        "aria": null,
+        "href": null,
+        "y": 1913
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🪟\nPersianas y toldos",
+        "aria": null,
+        "href": null,
+        "y": 2098
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🎨\nPintor",
+        "aria": null,
+        "href": null,
+        "y": 2098
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🚚\nTransportista",
+        "aria": null,
+        "href": null,
+        "y": 2264
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Ver todos los profesionales",
+        "aria": null,
+        "href": null,
+        "y": 2435
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Hazte autónomo · Gratis",
+        "aria": null,
+        "href": null,
+        "y": 2636
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Soy cliente",
+        "aria": null,
+        "href": null,
+        "y": 2976
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Soy autónomo",
+        "aria": null,
+        "href": null,
+        "y": 2976
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Madrid",
+        "aria": null,
+        "href": "/buscar?ciudad=Madrid",
+        "y": 5417
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Barcelona",
+        "aria": null,
+        "href": "/buscar?ciudad=Barcelona",
+        "y": 5417
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Valencia",
+        "aria": null,
+        "href": "/buscar?ciudad=Valencia",
+        "y": 5479
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Sevilla",
+        "aria": null,
+        "href": "/buscar?ciudad=Sevilla",
+        "y": 5479
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Málaga",
+        "aria": null,
+        "href": "/buscar?ciudad=M%C3%A1laga",
+        "y": 5541
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Bilbao",
+        "aria": null,
+        "href": "/buscar?ciudad=Bilbao",
+        "y": 5541
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Buscar",
+        "y": 603
+      },
+      {
+        "text": "Personalizar",
+        "y": 539
+      },
+      {
+        "text": "Aceptar todas",
+        "y": 591
+      }
+    ],
+    "progress": [],
+    "banners": [
+      {
+        "text": "",
+        "y": 340
+      }
+    ],
+    "errors": []
+  },
+  {
+    "num": 2,
+    "label": "home-after-cookie",
+    "shotFile": "shots/02-home-after-cookie.png",
+    "loadMs": 1202,
+    "title": "MisAutónomos · Autónomos verificados en tu zona, sin comisiones",
+    "url": "https://misautonomos.es/",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "select",
+        "type": null,
+        "name": null,
+        "id": "hero-category",
+        "placeholder": null,
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "¿QUÉ NECESITAS?\nElige un servicio\nAbogado\nAlbañil / Reformas\nAsesoría o gestoría\nAutónomo de limpieza\nCarpintero\nCerrajero\nClimatización / Calefacción\nElectricista\nEmpresa multiservicios\nFontanero\nInformático a domicilio / soporte IT\nJardinero\nMarketing digital / diseño web\nPeluquería y estética a domicilio\nPersianas y toldos\nPintor\nTransportista"
+      },
+      {
+        "tag": "select",
+        "type": null,
+        "name": null,
+        "id": "hero-provincia",
+        "placeholder": null,
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "¿DÓNDE?\nProvincia\nA Coruña\nÁlava\nAlbacete\nAlicante\nAlmería\nAsturias\nÁvila\nBadajoz\nBarcelona\nBurgos\nCáceres\nCádiz\nCantabria\nCastellón\nCeuta\nCiudad Real\nCórdoba\nCuenca\nGirona\nGranada\nGuadalajara\nGuipúzcoa\nHuelva\nHuesca\nIslas Baleares\nJaén\nLa Rioja\nLas Palmas\nLeón\nLleida\nLugo\nMadrid\nMálaga\nMelilla\nMurcia\nNavarra\nOurense\nPalencia\nPontevedra\nSalamanca\nSanta Cruz de Tenerife\nSegovia\nSevilla\nSoria\nTarragona\nTeruel\nToledo\nValencia\nValladolid\nVizcaya\nZamora\nZaragoza"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": null,
+        "placeholder": "tu@email.com",
+        "required": true,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Tu email"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "MisAutónomos",
+        "aria": "Inicio",
+        "href": "/",
+        "y": 12
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Buscar",
+        "aria": null,
+        "href": null,
+        "y": 603
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Buscar por palabra clave",
+        "aria": null,
+        "href": null,
+        "y": 680
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "⚖️\nAbogado",
+        "aria": null,
+        "href": null,
+        "y": 819
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🏗️\nAlbañil / Reformas",
+        "aria": null,
+        "href": null,
+        "y": 819
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "📊\nAsesoría o gestoría",
+        "aria": null,
+        "href": null,
+        "y": 985
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🧹\nAutónomo de limpieza",
+        "aria": null,
+        "href": null,
+        "y": 985
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🪚\nCarpintero",
+        "aria": null,
+        "href": null,
+        "y": 1170
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🔑\nCerrajero",
+        "aria": null,
+        "href": null,
+        "y": 1170
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "❄️\nClimatización / Calefacción",
+        "aria": null,
+        "href": null,
+        "y": 1337
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "⚡\nElectricista",
+        "aria": null,
+        "href": null,
+        "y": 1337
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🛠️\nEmpresa multiservicios",
+        "aria": null,
+        "href": null,
+        "y": 1522
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🔧\nFontanero",
+        "aria": null,
+        "href": null,
+        "y": 1522
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "💻\nInformático a domicilio / soporte IT",
+        "aria": null,
+        "href": null,
+        "y": 1708
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🌿\nJardinero",
+        "aria": null,
+        "href": null,
+        "y": 1708
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "📱\nMarketing digital / diseño web",
+        "aria": null,
+        "href": null,
+        "y": 1913
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "💇\nPeluquería y estética a domicilio",
+        "aria": null,
+        "href": null,
+        "y": 1913
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🪟\nPersianas y toldos",
+        "aria": null,
+        "href": null,
+        "y": 2098
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🎨\nPintor",
+        "aria": null,
+        "href": null,
+        "y": 2098
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "🚚\nTransportista",
+        "aria": null,
+        "href": null,
+        "y": 2264
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Ver todos los profesionales",
+        "aria": null,
+        "href": null,
+        "y": 2435
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Hazte autónomo · Gratis",
+        "aria": null,
+        "href": null,
+        "y": 2636
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Soy cliente",
+        "aria": null,
+        "href": null,
+        "y": 2976
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Soy autónomo",
+        "aria": null,
+        "href": null,
+        "y": 2976
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Madrid",
+        "aria": null,
+        "href": "/buscar?ciudad=Madrid",
+        "y": 5439
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Barcelona",
+        "aria": null,
+        "href": "/buscar?ciudad=Barcelona",
+        "y": 5439
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Valencia",
+        "aria": null,
+        "href": "/buscar?ciudad=Valencia",
+        "y": 5501
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Sevilla",
+        "aria": null,
+        "href": "/buscar?ciudad=Sevilla",
+        "y": 5501
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Málaga",
+        "aria": null,
+        "href": "/buscar?ciudad=M%C3%A1laga",
+        "y": 5563
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Bilbao",
+        "aria": null,
+        "href": "/buscar?ciudad=Bilbao",
+        "y": 5563
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Buscar",
+        "y": 603
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 3,
+    "label": "clicked-hazte-autonomo",
+    "shotFile": "shots/03-clicked-hazte-autonomo.png",
+    "loadMs": 1203,
+    "title": "MisAutónomos · Autónomos verificados en tu zona, sin comisiones",
+    "url": "https://misautonomos.es/login?mode=signup&role=profesional&next=%2Fcompletar-perfil",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "text",
+        "name": null,
+        "id": "name",
+        "placeholder": "Tu nombre",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "name",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Nombre"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": "email",
+        "placeholder": "tu@email.com",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "email",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Email"
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": null,
+        "id": "password",
+        "placeholder": "Mínimo 6 caracteres",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "new-password",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Contraseña"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 32
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Soy autónomo\n\nDate de alta y consigue clientes",
+        "aria": null,
+        "href": null,
+        "y": 255
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Busco profesionales\n\nEncuentra y contacta autónomos",
+        "aria": null,
+        "href": null,
+        "y": 255
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta como autónomo",
+        "aria": null,
+        "href": null,
+        "y": 636
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Continuar con Google",
+        "aria": null,
+        "href": null,
+        "y": 744
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Inicia sesión",
+        "aria": null,
+        "href": null,
+        "y": 861
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Soy autónomo\n\nDate de alta y consigue clientes",
+        "y": 255
+      },
+      {
+        "text": "Crear cuenta como autónomo",
+        "y": 636
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 4,
+    "label": "registro-directo",
+    "shotFile": "shots/04-registro-directo.png",
+    "loadMs": 1841,
+    "title": "MisAutónomos · Encuentra autónomos verificados en tu zona",
+    "url": "https://misautonomos.es/login?mode=signup&role=profesional&next=%2Fcompletar-perfil",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "text",
+        "name": null,
+        "id": "name",
+        "placeholder": "Tu nombre",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "name",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Nombre"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": "email",
+        "placeholder": "tu@email.com",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "email",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Email"
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": null,
+        "id": "password",
+        "placeholder": "Mínimo 6 caracteres",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "new-password",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Contraseña"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 32
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Soy autónomo\n\nDate de alta y consigue clientes",
+        "aria": null,
+        "href": null,
+        "y": 255
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Busco profesionales\n\nEncuentra y contacta autónomos",
+        "aria": null,
+        "href": null,
+        "y": 255
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta como autónomo",
+        "aria": null,
+        "href": null,
+        "y": 636
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Continuar con Google",
+        "aria": null,
+        "href": null,
+        "y": 744
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Inicia sesión",
+        "aria": null,
+        "href": null,
+        "y": 861
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Soy autónomo\n\nDate de alta y consigue clientes",
+        "y": 255
+      },
+      {
+        "text": "Crear cuenta como autónomo",
+        "y": 636
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 5,
+    "label": "login-signup-autonomo",
+    "shotFile": "shots/05-login-signup-autonomo.png",
+    "loadMs": 1780,
+    "title": "MisAutónomos · Encuentra autónomos verificados en tu zona",
+    "url": "https://misautonomos.es/login?mode=signup&role=profesional&next=%2Fcompletar-perfil",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "text",
+        "name": null,
+        "id": "name",
+        "placeholder": "Tu nombre",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "name",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Nombre"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": "email",
+        "placeholder": "tu@email.com",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "email",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Email"
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": null,
+        "id": "password",
+        "placeholder": "Mínimo 6 caracteres",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "new-password",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Contraseña"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 32
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Soy autónomo\n\nDate de alta y consigue clientes",
+        "aria": null,
+        "href": null,
+        "y": 255
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Busco profesionales\n\nEncuentra y contacta autónomos",
+        "aria": null,
+        "href": null,
+        "y": 255
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta como autónomo",
+        "aria": null,
+        "href": null,
+        "y": 636
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Continuar con Google",
+        "aria": null,
+        "href": null,
+        "y": 744
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Inicia sesión",
+        "aria": null,
+        "href": null,
+        "y": 861
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Soy autónomo\n\nDate de alta y consigue clientes",
+        "y": 255
+      },
+      {
+        "text": "Crear cuenta como autónomo",
+        "y": 636
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 6,
+    "label": "login-signup-cliente",
+    "shotFile": "shots/06-login-signup-cliente.png",
+    "loadMs": 1782,
+    "title": "MisAutónomos · Encuentra autónomos verificados en tu zona",
+    "url": "https://misautonomos.es/login?mode=signup&role=cliente&next=%2Fbuscar",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "text",
+        "name": null,
+        "id": "name",
+        "placeholder": "Tu nombre",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "name",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Nombre"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": "email",
+        "placeholder": "tu@email.com",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "email",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Email"
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": null,
+        "id": "password",
+        "placeholder": "Mínimo 6 caracteres",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "new-password",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Contraseña"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 32
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Soy autónomo\n\nDate de alta y consigue clientes",
+        "aria": null,
+        "href": null,
+        "y": 255
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Busco profesionales\n\nEncuentra y contacta autónomos",
+        "aria": null,
+        "href": null,
+        "y": 255
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta como cliente",
+        "aria": null,
+        "href": null,
+        "y": 636
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Continuar con Google",
+        "aria": null,
+        "href": null,
+        "y": 744
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Inicia sesión",
+        "aria": null,
+        "href": null,
+        "y": 861
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Busco profesionales\n\nEncuentra y contacta autónomos",
+        "y": 255
+      },
+      {
+        "text": "Crear cuenta como cliente",
+        "y": 636
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 7,
+    "label": "login-signin",
+    "shotFile": "shots/07-login-signin.png",
+    "loadMs": 1783,
+    "title": "MisAutónomos · Encuentra autónomos verificados en tu zona",
+    "url": "https://misautonomos.es/login",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": "email",
+        "placeholder": "tu@email.com",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "email",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Email"
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": null,
+        "id": "password",
+        "placeholder": "Tu contraseña",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "current-password",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Contraseña"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 32
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "¿Has olvidado tu contraseña?",
+        "aria": null,
+        "href": null,
+        "y": 311
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 419
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Continuar con Google",
+        "aria": null,
+        "href": null,
+        "y": 527
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear una",
+        "aria": null,
+        "href": null,
+        "y": 644
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Iniciar sesión",
+        "y": 419
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 8,
+    "label": "completar-perfil-noauth",
+    "shotFile": "shots/08-completar-perfil-noauth.png",
+    "loadMs": 1942,
+    "title": "MisAutónomos · Encuentra autónomos verificados en tu zona",
+    "url": "https://misautonomos.es/login?next=https%3A%2F%2Fmisautonomos.es%2Fcompletar-perfil",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": "email",
+        "placeholder": "tu@email.com",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "email",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Email"
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": null,
+        "id": "password",
+        "placeholder": "Tu contraseña",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "current-password",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Contraseña"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 32
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "¿Has olvidado tu contraseña?",
+        "aria": null,
+        "href": null,
+        "y": 311
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 419
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Continuar con Google",
+        "aria": null,
+        "href": null,
+        "y": 527
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear una",
+        "aria": null,
+        "href": null,
+        "y": 644
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Iniciar sesión",
+        "y": 419
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 9,
+    "label": "registro-cliente",
+    "shotFile": "shots/09-registro-cliente.png",
+    "loadMs": 1805,
+    "title": "Crea tu cuenta gratis - MisAutónomos",
+    "url": "https://misautonomos.es/registro-cliente",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "text",
+        "name": null,
+        "id": null,
+        "placeholder": "Tu nombre",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "name",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Nombre"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": null,
+        "placeholder": "tu@email.com",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "email",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Email"
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": null,
+        "id": null,
+        "placeholder": "Mínimo 6 caracteres",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "new-password",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": ""
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "name": null,
+        "id": "acepta_terminos_client",
+        "placeholder": null,
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Acepto los Términos y la Política de Privacidad"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": null,
+        "placeholder": "tu@email.com",
+        "required": true,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Tu email"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "MisAutónomos",
+        "aria": "Inicio",
+        "href": "/",
+        "y": 12
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Términos",
+        "aria": null,
+        "href": "/terminos",
+        "y": 465
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Política de Privacidad",
+        "aria": null,
+        "href": "/privacidad",
+        "y": 465
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta",
+        "aria": null,
+        "href": null,
+        "y": 532
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Inicia sesión",
+        "aria": null,
+        "href": null,
+        "y": 600
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 745
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Buscar profesionales",
+        "aria": null,
+        "href": "/buscar",
+        "y": 898
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Hazte autónomo",
+        "aria": null,
+        "href": "/para-autonomos",
+        "y": 928
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Precios",
+        "aria": null,
+        "href": "/precios",
+        "y": 958
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Cómo funciona",
+        "aria": null,
+        "href": "/para-autonomos",
+        "y": 898
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Centro de ayuda",
+        "aria": null,
+        "href": "/ayuda",
+        "y": 928
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Preguntas frecuentes",
+        "aria": null,
+        "href": "/preguntas-frecuentes",
+        "y": 958
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Blog",
+        "aria": null,
+        "href": "/blog",
+        "y": 988
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Contacto",
+        "aria": null,
+        "href": "/contacto",
+        "y": 1018
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Privacidad",
+        "aria": null,
+        "href": "/privacidad",
+        "y": 1091
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Términos",
+        "aria": null,
+        "href": "/terminos",
+        "y": 1121
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Cookies",
+        "aria": null,
+        "href": "/cookies",
+        "y": 1151
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Aviso legal",
+        "aria": null,
+        "href": "/aviso-legal",
+        "y": 1181
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Electricistas",
+        "aria": null,
+        "href": "/categoria/electricista",
+        "y": 1239
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Fontaneros",
+        "aria": null,
+        "href": "/categoria/fontanero",
+        "y": 1239
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Albañiles / Reformas",
+        "aria": null,
+        "href": "/categoria/albanil-reformas",
+        "y": 1239
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Pintores",
+        "aria": null,
+        "href": "/categoria/pintor",
+        "y": 1256
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Cerrajeros",
+        "aria": null,
+        "href": "/categoria/cerrajero",
+        "y": 1256
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Asesoría / gestoría",
+        "aria": null,
+        "href": "/categoria/asesoria-o-gestoria",
+        "y": 1256
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Limpieza",
+        "aria": null,
+        "href": "/categoria/autonomo-de-limpieza",
+        "y": 1274
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Madrid",
+        "aria": null,
+        "href": "/buscar?provincia=Madrid",
+        "y": 1298
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Barcelona",
+        "aria": null,
+        "href": "/buscar?provincia=Barcelona",
+        "y": 1298
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Valencia",
+        "aria": null,
+        "href": "/buscar?provincia=Valencia",
+        "y": 1298
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Sevilla",
+        "aria": null,
+        "href": "/buscar?provincia=Sevilla",
+        "y": 1298
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Málaga",
+        "aria": null,
+        "href": "/buscar?provincia=M%C3%A1laga",
+        "y": 1298
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Crear cuenta",
+        "y": 532
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 10,
+    "label": "reset-contrasena",
+    "shotFile": "shots/10-reset-contrasena.png",
+    "loadMs": 1788,
+    "title": "MisAutónomos · Encuentra autónomos verificados en tu zona",
+    "url": "https://misautonomos.es/login",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": "email",
+        "placeholder": "tu@email.com",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "email",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Email"
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": null,
+        "id": "password",
+        "placeholder": "Tu contraseña",
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": "current-password",
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Contraseña"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 32
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear cuenta",
+        "aria": null,
+        "href": null,
+        "y": 151
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "¿Has olvidado tu contraseña?",
+        "aria": null,
+        "href": null,
+        "y": 311
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Iniciar sesión",
+        "aria": null,
+        "href": null,
+        "y": 419
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Continuar con Google",
+        "aria": null,
+        "href": null,
+        "y": 527
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Crear una",
+        "aria": null,
+        "href": null,
+        "y": 644
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "Iniciar sesión",
+        "y": 419
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  },
+  {
+    "num": 11,
+    "label": "buscar",
+    "shotFile": "shots/11-buscar.png",
+    "loadMs": 2788,
+    "title": "Buscar Autónomos Profesionales - MisAutónomos",
+    "url": "https://misautonomos.es/buscar",
+    "viewport": {
+      "w": 390,
+      "h": 664
+    },
+    "inputs": [
+      {
+        "tag": "select",
+        "type": null,
+        "name": null,
+        "id": "select-categoria-mobile",
+        "placeholder": null,
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Categoría"
+      },
+      {
+        "tag": "select",
+        "type": null,
+        "name": null,
+        "id": "select-provincia-mobile",
+        "placeholder": null,
+        "required": false,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Provincia"
+      },
+      {
+        "tag": "select",
+        "type": null,
+        "name": null,
+        "id": "select-ciudad-mobile",
+        "placeholder": null,
+        "required": false,
+        "disabled": true,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Ciudad"
+      },
+      {
+        "tag": "input",
+        "type": "email",
+        "name": null,
+        "id": null,
+        "placeholder": "tu@email.com",
+        "required": true,
+        "disabled": false,
+        "maxLength": null,
+        "autoComplete": null,
+        "inputMode": null,
+        "enterKeyHint": null,
+        "autoCapitalize": null,
+        "spellCheck": null,
+        "label": "Tu email"
+      }
+    ],
+    "buttons": [
+      {
+        "tag": "a",
+        "role": null,
+        "text": "MisAutónomos",
+        "aria": "Inicio",
+        "href": "/",
+        "y": 12
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Contactar",
+        "aria": "Contactar con Ruben cárdenas torres",
+        "href": null,
+        "y": 647
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "WhatsApp",
+        "aria": "Abrir WhatsApp de Ruben cárdenas torres",
+        "href": "https://wa.me/34627267911",
+        "y": 699
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Llamar",
+        "aria": "Ver teléfono",
+        "href": null,
+        "y": 699
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Contactar",
+        "aria": "Contactar con Guccito",
+        "href": null,
+        "y": 956
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "WhatsApp",
+        "aria": "Abrir WhatsApp de Guccito",
+        "href": "https://wa.me/34644853733",
+        "y": 1008
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Llamar",
+        "aria": "Ver teléfono",
+        "href": null,
+        "y": 1008
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Contactar",
+        "aria": "Contactar con Zaid Bencharki ",
+        "href": null,
+        "y": 1265
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "WhatsApp",
+        "aria": "Abrir WhatsApp de Zaid Bencharki ",
+        "href": "https://wa.me/34632347975",
+        "y": 1317
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Contactar",
+        "aria": "Contactar con ANDRES F RODRIGUEZ ESTRADA ",
+        "href": null,
+        "y": 1570
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "WhatsApp",
+        "aria": "Abrir WhatsApp de ANDRES F RODRIGUEZ ESTRADA ",
+        "href": "https://wa.me/34641554973",
+        "y": 1622
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Llamar",
+        "aria": "Ver teléfono",
+        "href": null,
+        "y": 1622
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Contactar",
+        "aria": "Contactar con Fast Services Asesores ",
+        "href": null,
+        "y": 1878
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "WhatsApp",
+        "aria": "Abrir WhatsApp de Fast Services Asesores ",
+        "href": "https://wa.me/34627425518",
+        "y": 1930
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Llamar",
+        "aria": "Ver teléfono",
+        "href": null,
+        "y": 1930
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Contactar",
+        "aria": "Contactar con Oleksandr ",
+        "href": null,
+        "y": 2182
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "WhatsApp",
+        "aria": "Abrir WhatsApp de Oleksandr ",
+        "href": "https://wa.me/34602469317",
+        "y": 2234
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Llamar",
+        "aria": "Ver teléfono",
+        "href": null,
+        "y": 2234
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Cargar más profesionales (21 restantes)",
+        "aria": null,
+        "href": null,
+        "y": 2335
+      },
+      {
+        "tag": "button",
+        "role": null,
+        "text": "Hazte autónomo · Gratis",
+        "aria": null,
+        "href": null,
+        "y": 2723
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "misautónomos",
+        "aria": null,
+        "href": "/",
+        "y": 2848
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Buscar profesionales",
+        "aria": null,
+        "href": "/buscar",
+        "y": 3001
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Hazte autónomo",
+        "aria": null,
+        "href": "/para-autonomos",
+        "y": 3031
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Precios",
+        "aria": null,
+        "href": "/precios",
+        "y": 3061
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Cómo funciona",
+        "aria": null,
+        "href": "/para-autonomos",
+        "y": 3001
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Centro de ayuda",
+        "aria": null,
+        "href": "/ayuda",
+        "y": 3031
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Preguntas frecuentes",
+        "aria": null,
+        "href": "/preguntas-frecuentes",
+        "y": 3061
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Blog",
+        "aria": null,
+        "href": "/blog",
+        "y": 3091
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Contacto",
+        "aria": null,
+        "href": "/contacto",
+        "y": 3121
+      },
+      {
+        "tag": "a",
+        "role": null,
+        "text": "Privacidad",
+        "aria": null,
+        "href": "/privacidad",
+        "y": 3194
+      }
+    ],
+    "primaryCandidates": [
+      {
+        "text": "",
+        "y": 407
+      },
+      {
+        "text": "Contactar",
+        "y": 647
+      }
+    ],
+    "progress": [],
+    "banners": [],
+    "errors": []
+  }
+]
