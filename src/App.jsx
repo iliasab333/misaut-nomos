@@ -319,6 +319,7 @@ const AuthenticatedApp = () => {
           {/* /inicio retirada: 301 → / via vercel.json. */}
           <Route path="/registro-cliente" element={<Pages.ClientOnboarding />} />
           <Route path="/registro" element={<Pages.UserTypeSelection />} />
+          <Route path="/confirma-email" element={<Pages.ConfirmEmail />} />
           <Route path="/privacidad" element={<Pages.PrivacyPolicy />} />
           <Route path="/terminos" element={<Pages.TermsConditions />} />
           <Route path="/cookies" element={<Pages.CookiePolicy />} />

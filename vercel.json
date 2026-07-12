@@ -36,6 +36,7 @@
     { "source": "/login", "destination": "/index.html" },
     { "source": "/registro", "destination": "/index.html" },
     { "source": "/registro-cliente", "destination": "/index.html" },
+    { "source": "/confirma-email", "destination": "/index.html" },
     { "source": "/configuracion-cookies", "destination": "/index.html" },
     { "source": "/bienvenida", "destination": "/index.html" },
 

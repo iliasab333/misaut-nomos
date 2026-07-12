@@ -34,6 +34,7 @@ const Autonomo           = lazy(() => import('./pages/Autonomo'));
 const Categoria          = lazy(() => import('./pages/Categoria'));
 const ClientDetail       = lazy(() => import('./pages/ClientDetail'));
 const ClientOnboarding   = lazy(() => import('./pages/ClientOnboarding'));
+const ConfirmEmail       = lazy(() => import('./pages/ConfirmEmail'));
 const DashboardProInfo   = lazy(() => import('./pages/DashboardProInfo'));
 const Favorites          = lazy(() => import('./pages/Favorites'));
 const Messages           = lazy(() => import('./pages/Messages'));
@@ -77,6 +78,7 @@ export const PAGES = {
     "Categoria": Categoria,
     "ClientDetail": ClientDetail,
     "ClientOnboarding": ClientOnboarding,
+    "ConfirmEmail": ConfirmEmail,
     "CookiePolicy": CookiePolicy,
     "CookiePreferences": CookiePreferences,
     "DashboardProInfo": DashboardProInfo,
