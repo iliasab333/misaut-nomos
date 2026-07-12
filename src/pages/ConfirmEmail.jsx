@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/api/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Mail, RefreshCw, CheckCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import { emailRedirectFor } from '@/lib/native/auth';
 
 // Pantalla intermedia entre signup y onboarding cuando Supabase exige
 // confirmar el correo. Reemplaza el antiguo "info toast" que dejaba al
@@ -36,7 +37,7 @@ export default function ConfirmEmailPage() {
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,
-        options: { emailRedirectTo: window.location.origin + '/completar-perfil' },
+        options: { emailRedirectTo: emailRedirectFor('/completar-perfil') },
       });
       if (error) throw error;
       setStatus('ok');

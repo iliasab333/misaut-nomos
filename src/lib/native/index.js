@@ -117,6 +117,60 @@ export async function hapticSuccess() {
   } catch (_) { /* noop */ }
 }
 
+// ── StatusBar (color y estilo del texto de la barra de estado) ──────────
+// style: 'light' → letras blancas (fondo oscuro); 'dark' → letras negras.
+export async function setStatusBarStyle(style = 'dark') {
+  if (!isNative()) return;
+  try {
+    const { StatusBar, Style } = await import('@capacitor/status-bar');
+    await StatusBar.setStyle({ style: style === 'light' ? Style.Light : Style.Dark });
+  } catch (_) { /* noop */ }
+}
+
+export async function setStatusBarBackground(hex = '#FFFFFF') {
+  if (!isNative()) return;
+  try {
+    const { StatusBar } = await import('@capacitor/status-bar');
+    await StatusBar.setBackgroundColor({ color: hex });
+  } catch (_) { /* Android-only en la práctica */ }
+}
+
+// ── KV store portátil ───────────────────────────────────────────────────
+// En web: localStorage. En nativo: @capacitor/preferences (guardado en el
+// contenedor de la app, sobrevive a limpiezas del WKWebView).
+export const kv = {
+  async get(key) {
+    if (!isNative()) {
+      try { return localStorage.getItem(key); } catch (_e) { return null; }
+    }
+    try {
+      const { Preferences } = await import('@capacitor/preferences');
+      const { value } = await Preferences.get({ key });
+      return value ?? null;
+    } catch (_e) { return null; }
+  },
+  async set(key, value) {
+    if (!isNative()) {
+      try { localStorage.setItem(key, value); } catch (_e) {}
+      return;
+    }
+    try {
+      const { Preferences } = await import('@capacitor/preferences');
+      await Preferences.set({ key, value });
+    } catch (_e) {}
+  },
+  async remove(key) {
+    if (!isNative()) {
+      try { localStorage.removeItem(key); } catch (_e) {}
+      return;
+    }
+    try {
+      const { Preferences } = await import('@capacitor/preferences');
+      await Preferences.remove({ key });
+    } catch (_e) {}
+  },
+};
+
 // ── Network (estado online/offline) ─────────────────────────────────────
 export async function getNetworkStatus() {
   if (!isNative()) {

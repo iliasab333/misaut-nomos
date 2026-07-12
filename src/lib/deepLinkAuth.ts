@@ -110,6 +110,7 @@ async function handleDeepLink(url: string) {
 
     if (code) {
       await supabase.auth.exchangeCodeForSession(code);
+      await closeBrowserSafely();
       return;
     }
     if (accessToken && refreshToken) {
@@ -117,6 +118,7 @@ async function handleDeepLink(url: string) {
         access_token: accessToken,
         refresh_token: refreshToken,
       });
+      await closeBrowserSafely();
       return;
     }
 
@@ -125,6 +127,14 @@ async function handleDeepLink(url: string) {
   } catch (e) {
     console.error('[deepLinkAuth] error procesando URL:', e);
   }
+}
+
+// Cierra el @capacitor/browser abierto para OAuth. No lanza si no está.
+async function closeBrowserSafely() {
+  try {
+    const { Browser } = await import('@capacitor/browser');
+    await Browser.close();
+  } catch (_e) { /* no importa si no hay browser abierto */ }
 }
 
 // Init principal. Llamar UNA vez en el arranque (main.jsx).

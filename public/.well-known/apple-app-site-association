@@ -1,0 +1,25 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "REPLACE_TEAM_ID.com.base690076ad86e673c796768de5.app",
+        "paths": [
+          "/completar-perfil",
+          "/completar-perfil/*",
+          "/confirma-email",
+          "/confirma-email/*",
+          "/login",
+          "/login/*",
+          "/registro",
+          "/registro/*",
+          "/dashboard",
+          "/dashboard/*",
+          "/mi-perfil",
+          "/mi-perfil/*",
+          "/buscar"
+        ]
+      }
+    ]
+  }
+}

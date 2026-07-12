@@ -65,6 +65,12 @@ import './i18n';
 import { initDeepLinkAuth } from '@/lib/deepLinkAuth';
 initDeepLinkAuth();
 
+// Capacitor iOS: StatusBar por defecto en Style.Dark (texto oscuro sobre
+// fondo claro) porque la mayor parte de las pantallas usan fondo blanco.
+// Las pantallas con hero azul (dashboard) pueden cambiarlo localmente.
+import { setStatusBarStyle } from '@/lib/native';
+setStatusBarStyle('dark');
+
 // Capacitor: en nativo, registra el dispositivo con APNs/FCM y guarda el
 // token en sessionStorage para que el frontend pueda sincronizarlo con
 // OneSignal o con tu backend cuando el usuario inicie sesión. En web es no-op.

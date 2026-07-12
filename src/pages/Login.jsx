@@ -7,7 +7,8 @@ import { defaultDestinationFor, isProfessional } from '@/lib/roles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Mail, Lock, User as UserIcon, Eye, EyeOff, Briefcase, Search as SearchIcon, ShieldCheck } from 'lucide-react';
+import { Loader2, Mail, Lock, User as UserIcon, Eye, EyeOff, Briefcase, Search as SearchIcon, ShieldCheck, Apple } from 'lucide-react';
+import { signInWithGoogle, signInWithApple, emailRedirectFor, passwordResetRedirect, isNative, isIOS } from '@/lib/native/auth';
 
 const MODES = { SIGN_IN: 'signin', SIGN_UP: 'signup' };
 const ROLES = { PROFESIONAL: 'profesional', CLIENTE: 'cliente' };
@@ -124,6 +125,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
@@ -187,7 +189,7 @@ export default function LoginPage() {
         password,
         options: {
           data: { full_name: name.trim(), role },
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: emailRedirectFor('/completar-perfil'),
         },
       });
       if (signUpError) {
@@ -219,7 +221,7 @@ export default function LoginPage() {
     setResetting(true);
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: window.location.origin + '/login',
+        redirectTo: passwordResetRedirect(),
       });
       if (resetError) {
         setError(spanishAuthError(resetError));
@@ -238,17 +240,44 @@ export default function LoginPage() {
     setInfo('');
     setGoogleLoading(true);
     try {
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin },
-      });
-      if (oauthError) {
-        setError(spanishAuthError(oauthError));
+      const res = await signInWithGoogle();
+      if (res?.error) {
+        setError(spanishAuthError(res.error));
         setGoogleLoading(false);
       }
+      // En nativo el resultado llega por deep-link; el AuthStateChange redirige.
     } catch (err) {
       setError(spanishAuthError(err));
       setGoogleLoading(false);
+    }
+  };
+
+  const handleApple = async () => {
+    setError('');
+    setInfo('');
+    setAppleLoading(true);
+    try {
+      const res = await signInWithApple();
+      if (res?.error) {
+        setError(spanishAuthError(res.error));
+        setAppleLoading(false);
+        return;
+      }
+      // En iOS nativo el signInWithIdToken devuelve session directa: refrescamos.
+      if (res?.data?.session) {
+        await refreshUser();
+        const dest = nextUrl || await defaultDestinationForCurrentUser();
+        navigate(dest, { replace: true });
+      }
+    } catch (err) {
+      const raw = String(err?.message || err || '');
+      // El usuario cancela la hoja de SIWA: no lo tratamos como error.
+      if (raw.includes('canceled') || raw.includes('cancelled') || err?.code === '1001') {
+        setAppleLoading(false);
+        return;
+      }
+      setError(spanishAuthError(err));
+      setAppleLoading(false);
     }
   };
 
@@ -351,12 +380,33 @@ export default function LoginPage() {
             </p>
           )}
 
-          {/* Botón principal Google — arriba, es el atajo más rápido en móvil */}
+          {/* Botones sociales — arriba, atajos más rápidos en móvil.
+              En iOS nativo mostramos Sign in with Apple como primer botón
+              (compliance App Store §4.8: si ofreces cualquier otro OAuth,
+              debes ofrecer también SIWA cuando la plataforma lo soporta). */}
+          {isIOS() && isNative() && (
+            <Button
+              type="button"
+              onClick={handleApple}
+              disabled={appleLoading || googleLoading || submitting}
+              className="w-full h-11 rounded-xl text-white font-semibold mb-2"
+              style={{ backgroundColor: '#000000' }}
+            >
+              {appleLoading ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Conectando…</>
+              ) : (
+                <>
+                  <Apple className="w-4 h-4 mr-2" />
+                  <span>{isSignIn ? 'Continuar con Apple' : 'Registrarse con Apple'}</span>
+                </>
+              )}
+            </Button>
+          )}
           <Button
             type="button"
             variant="outline"
             onClick={handleGoogle}
-            disabled={googleLoading || submitting}
+            disabled={googleLoading || appleLoading || submitting}
             className="w-full h-11 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium mb-4"
           >
             {googleLoading ? (

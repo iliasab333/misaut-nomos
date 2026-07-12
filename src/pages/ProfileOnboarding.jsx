@@ -17,7 +17,7 @@ import OnboardingTooltip from "../components/onboarding/OnboardingTooltip";
 import OnboardingChecklist from "../components/onboarding/OnboardingChecklist";
 import OnboardingTutorial from "../components/onboarding/OnboardingTutorial";
 import ProfilePreview from "../components/onboarding/ProfilePreview";
-import { pickPhoto, isNative, hapticSuccess } from "@/lib/native";
+import { pickPhoto, isNative, hapticSuccess, haptic, kv } from "@/lib/native";
 
 // Categorías se cargan dinámicamente desde BD
 
@@ -82,16 +82,15 @@ export default function ProfileOnboardingPage() {
     loadUser();
   }, []);
 
-  // Autosave del formulario en localStorage con debounce de 800 ms. Excluimos
-  // las fotos (URLs que pueden crecer mucho) del snapshot rápido.
+  // Autosave del formulario con debounce de 800 ms.
+  // Web: localStorage. iOS/Android: @capacitor/preferences (persiste en el
+  // contenedor de la app, no lo purga WKWebView).
   useEffect(() => {
     if (loading || !user?.id) return;
     const key = `mn:profile-onboarding:v1:${user.id}`;
     const t = setTimeout(() => {
-      try {
-        const snapshot = { formData, currentStep, savedAt: Date.now() };
-        localStorage.setItem(key, JSON.stringify(snapshot));
-      } catch (_e) { /* modo privado o cuota llena, ignoramos */ }
+      const snapshot = { formData, currentStep, savedAt: Date.now() };
+      kv.set(key, JSON.stringify(snapshot));
     }, 800);
     return () => clearTimeout(t);
   }, [formData, currentStep, loading, user?.id]);
@@ -162,18 +161,18 @@ export default function ProfileOnboardingPage() {
           consiente_contacto_clientes: profiles[0].consiente_contacto_clientes || false
         });
       } else {
-        // No hay perfil en BD todavía. Si hay borrador guardado en localStorage
-        // lo restauramos para que un usuario que se fue a WhatsApp o cerró la
-        // pestaña recupere lo escrito.
+        // No hay perfil en BD todavía. Si hay borrador guardado (web: localStorage,
+        // nativo: @capacitor/preferences) lo restauramos para que un usuario que se
+        // fue a WhatsApp o cerró la app recupere lo escrito.
         let restored = null;
         try {
           const key = `mn:profile-onboarding:v1:${currentUser.id}`;
-          const raw = localStorage.getItem(key);
+          const raw = await kv.get(key);
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && parsed.formData) restored = parsed;
           }
-        } catch (_e) { /* localStorage puede fallar en modo privado */ }
+        } catch (_e) { /* modo privado / cuota llena */ }
 
         if (restored) {
           setFormData(prev => ({ ...prev, ...restored.formData }));
@@ -309,12 +308,14 @@ export default function ProfileOnboardingPage() {
   const handleNext = () => {
     if (currentStep === 1 && !validateStep1()) return;
     if (currentStep === 2 && !validateStep2()) return;
-    
+
+    haptic('light');
     setCurrentStep(currentStep + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBack = () => {
+    haptic('light');
     setCurrentStep(currentStep - 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -496,8 +497,9 @@ export default function ProfileOnboardingPage() {
       }).catch(() => {});
 
       toast.success("Perfil publicado. Ya apareces en búsquedas.", { duration: 5000 });
+      hapticSuccess();
       // Autosave: limpiar el borrador porque ya está publicado en BD.
-      try { localStorage.removeItem(`mn:profile-onboarding:v1:${user.id}`); } catch (_e) {}
+      kv.remove(`mn:profile-onboarding:v1:${user.id}`);
       setTimeout(() => {
         // Flujo: /registro → /completar-perfil → /precios
         navigate(createPageUrl("PricingPlans"));

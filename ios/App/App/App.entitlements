@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Sign in with Apple — obligatorio para pasar la review si ofreces
+	     otro OAuth (Google) como método de registro. -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+
+	<!-- Associated Domains para Universal Links: permite que un enlace a
+	     https://misautonomos.es/completar-perfil abierto desde Mail o
+	     Safari se resuelva DENTRO de la app en vez de en Safari.
+	     Requiere subir `apple-app-site-association` al servidor. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:misautonomos.es</string>
+		<string>applinks:www.misautonomos.es</string>
+	</array>
+</dict>
+</plist>
