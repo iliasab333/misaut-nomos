@@ -41,7 +41,7 @@ const socialLinks = [
 // contra las <Route> declaradas en App.jsx: cero 404.
 const COLUMN_PRODUCTO = [
   { label: "Buscar profesionales", to: "/buscar" },
-  { label: "Hazte autónomo", to: "/para-autonomos" },
+  { label: "Hazte autónomo", to: "/registro?tipo=autonomo" },
   { label: "Precios", to: "/precios" },
 ];
 

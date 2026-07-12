@@ -92,7 +92,7 @@ const FAQS = [
 //   - logueado como profesional con ficha → /dashboard
 // Así los CTAs funcionan tanto para visitantes nuevos como para clientes que
 // quieren hacerse profesionales sin tener que volver a "iniciar sesión".
-const CTA_HREF = '/registro';
+const CTA_HREF = '/registro?tipo=autonomo';
 
 export default function ParaAutonomos() {
   return (

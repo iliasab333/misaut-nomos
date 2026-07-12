@@ -743,7 +743,7 @@ export default function SearchPage() {
                     Aparece en los resultados de tu zona. Contacto directo con los clientes, sin comisiones.
                   </p>
                   <Button
-                    onClick={() => navigate('/para-autonomos')}
+                    onClick={() => navigate('/registro?tipo=autonomo')}
                     className="h-11 px-6 font-semibold rounded-xl"
                     style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
                   >
@@ -809,7 +809,7 @@ export default function SearchPage() {
                 </p>
                 <div className="flex justify-center">
                   <Button
-                    onClick={() => navigate('/registro')}
+                    onClick={() => navigate('/registro?tipo=autonomo')}
                     className="h-12 px-8 text-base font-semibold rounded-xl"
                     style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
                   >

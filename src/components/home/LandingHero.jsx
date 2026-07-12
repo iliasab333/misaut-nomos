@@ -160,15 +160,15 @@ export default function LandingHero() {
       className="relative w-full"
       style={{ background: "#FBFCFE" }}
     >
-      <div className="max-w-6xl mx-auto px-4 pt-14 pb-12 md:pt-20 md:pb-20">
+      <div className="max-w-6xl mx-auto px-4 pt-6 pb-10 md:pt-20 md:pb-20">
         {/* Eyebrow */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-3 md:mb-6">
           <div
-            className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
+            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] md:text-xs font-medium"
             style={{ backgroundColor: NAVY_SOFT, color: NAVY }}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            Profesionales verificados · Sin comisiones · Contacto directo
+            Verificados · Sin comisiones · Contacto directo
           </div>
         </div>
 
@@ -177,9 +177,9 @@ export default function LandingHero() {
           className="text-center font-semibold tracking-tight"
           style={{
             color: NAVY,
-            lineHeight: 1.06,
+            lineHeight: 1.05,
             letterSpacing: "-0.025em",
-            fontSize: "clamp(2rem, 5.6vw, 3.5rem)",
+            fontSize: "clamp(1.6rem, 5.6vw, 3.5rem)",
           }}
         >
           Encuentra al autónomo
@@ -188,13 +188,13 @@ export default function LandingHero() {
           <span style={{ color: GOLD }}>cerca de ti</span>
         </h1>
 
-        <p className="text-center text-slate-600 mt-5 max-w-xl mx-auto text-[17px] md:text-lg leading-relaxed">
-          Filtra por servicio y zona. Contactas directamente con el profesional, sin intermediarios.
+        <p className="text-center text-slate-600 mt-2 md:mt-5 max-w-xl mx-auto text-[14px] md:text-lg leading-snug md:leading-relaxed">
+          Filtra por servicio y zona. Contactas directo con el profesional.
         </p>
 
         {/* Panel de búsqueda guiada */}
         <div
-          className="mt-9 md:mt-12 mx-auto bg-white border border-slate-100"
+          className="mt-4 md:mt-12 mx-auto bg-white border border-slate-100"
           style={{
             maxWidth: 920,
             borderRadius: RADIUS.xxl,
@@ -369,7 +369,7 @@ export default function LandingHero() {
             </div>
             <button
               type="button"
-              onClick={() => navigate("/registro")}
+              onClick={() => navigate("/registro?tipo=autonomo")}
               className="rounded-xl font-semibold h-11 px-5 md:px-6 inline-flex items-center justify-center gap-2 flex-shrink-0 w-full md:w-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               style={{ backgroundColor: GOLD, color: NAVY }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = GOLD_HOVER)}

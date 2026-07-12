@@ -95,6 +95,10 @@ export default function LoginPage() {
 
   const [mode, setMode] = useState(initialMode);
   const [role, setRole] = useState(initialRole);
+  // Cuando la URL trae ?role= (típicamente porque venimos de un CTA
+  // "Hazte autónomo · Gratis"), evitamos el paso extra de "elegir rol":
+  // ocultamos la selección visual y el usuario ve directamente Google + email.
+  const rolePreselected = Boolean(urlParams.get('role'));
 
   // Si el usuario ya está autenticado al entrar a /login (típico de un cliente
   // que pulsa "Hazte autónomo" en /para-autonomos), no le hacemos rellenar el
@@ -253,35 +257,36 @@ export default function LoginPage() {
     : 'Crear cuenta como cliente';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-start sm:items-center justify-center px-4 py-8 sm:py-12">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-start sm:items-center justify-center px-4 py-3 sm:py-12">
       <div className="w-full max-w-md">
-        {/* Cabecera con lockup */}
-        <div className="flex flex-col items-center text-center mb-6">
-          <Link to="/" className="inline-flex items-center gap-3 group">
+        {/* Cabecera con lockup — compacta en móvil para que el CTA de Google
+            entre en el primer viewport (390×844). */}
+        <div className="flex flex-col items-center text-center mb-3 sm:mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 sm:gap-3 group">
             <img
               src="/logo-192.png"
               alt=""
-              width="38"
-              height="38"
-              className="rounded-[9px] shadow-sm"
-              style={{ width: 38, height: 38 }}
+              width="32"
+              height="32"
+              className="rounded-[8px] shadow-sm sm:w-[38px] sm:h-[38px]"
+              style={{ width: 32, height: 32 }}
             />
-            <span className="text-[26px] leading-none tracking-tight">
+            <span className="text-[22px] sm:text-[26px] leading-none tracking-tight">
               <span className="notranslate" translate="no" style={{ display: 'contents' }}>
                 <span style={{ color: '#00255C', fontWeight: 500 }}>mis</span>
                 <span style={{ color: '#0f172a', fontWeight: 700 }}>autónomos</span>
               </span>
             </span>
           </Link>
-          <p className="mt-3 text-sm text-slate-500">
+          <p className="hidden sm:block mt-3 text-sm text-slate-500">
             Conecta con los mejores autónomos de España
           </p>
         </div>
 
         {/* Tarjeta principal */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-7">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-7">
           {/* Segmented control */}
-          <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl mb-6">
+          <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl mb-3 sm:mb-6">
             <button
               type="button"
               onClick={() => switchMode(MODES.SIGN_IN)}
@@ -306,8 +311,11 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Selector de rol (solo en Crear cuenta) */}
-          {!isSignIn && (
+          {/* Selector de rol — solo en Crear cuenta y solo si el usuario NO
+              llega ya con ?role=. Si viene de un CTA "Hazte autónomo · Gratis"
+              (o "Soy cliente"), evitamos ese clic extra y le mostramos Google
+              + email directamente. */}
+          {!isSignIn && !rolePreselected && (
             <div className="mb-5">
               <h3 className="text-sm font-semibold text-slate-900 mb-3">¿Cómo quieres empezar?</h3>
               <div className="grid grid-cols-2 gap-3">
@@ -327,6 +335,20 @@ export default function LoginPage() {
                 />
               </div>
             </div>
+          )}
+          {!isSignIn && rolePreselected && (
+            <p className="text-xs text-slate-500 mb-4 text-center">
+              {role === ROLES.PROFESIONAL
+                ? 'Creas tu cuenta como autónomo. ¿Buscas profesionales? '
+                : 'Creas tu cuenta como cliente. ¿Eres autónomo? '}
+              <button
+                type="button"
+                onClick={() => setRole(role === ROLES.PROFESIONAL ? ROLES.CLIENTE : ROLES.PROFESIONAL)}
+                className="text-blue-700 hover:underline font-medium"
+              >
+                Cambiar
+              </button>
+            </p>
           )}
 
           {/* Botón principal Google — arriba, es el atajo más rápido en móvil */}

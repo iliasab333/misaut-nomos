@@ -798,7 +798,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
 
                         <div className="pt-2 border-t border-gray-100 space-y-2 mt-2">
                           <Link
-                            to="/para-autonomos"
+                            to="/registro?tipo=autonomo"
                             onClick={() => setMobileMenuOpen(false)}
                             className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold"
                             style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation', background: '#F5C13D', color: '#00255C' }}
@@ -878,7 +878,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                       </div>
                     </Link>
                     <Link
-                      to="/para-autonomos"
+                      to="/registro?tipo=autonomo"
                       onClick={() => setJoinModalOpen(false)}
                       className="flex items-center gap-4 w-full rounded-2xl p-4 font-semibold"
                       style={{ background: '#F5C13D', color: '#00255C', touchAction: 'manipulation' }}
@@ -1014,7 +1014,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         </Link>
                       )}
                       {(!user || user.user_type !== 'professionnel') ? (
-                        <Link to="/para-autonomos">
+                        <Link to="/registro?tipo=autonomo">
                           <Button
                             className="font-semibold shadow-sm"
                             style={{ backgroundColor: '#F5C13D', color: '#00255C' }}

@@ -173,7 +173,7 @@ export default function MobileMenu({ isOpen, onClose, user, isProfessional, unre
               {/* Botones principales */}
               <div style={{ padding: '8px 16px 8px' }}>
                 <Link
-                  to={createPageUrl("ClientOnboarding")}
+                  to="/buscar"
                   onClick={onClose}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px', borderRadius: 12, background: '#16a34a', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none', marginBottom: 8, touchAction: 'manipulation' }}
                 >
@@ -181,12 +181,12 @@ export default function MobileMenu({ isOpen, onClose, user, isProfessional, unre
                   Soy cliente
                 </Link>
                 <Link
-                  to={createPageUrl("PricingPlans")}
+                  to="/registro?tipo=autonomo"
                   onClick={onClose}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px', borderRadius: 12, background: '#1d4ed8', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none', touchAction: 'manipulation' }}
                 >
                   <Briefcase style={{ width: 18, height: 18 }} />
-                  Hazte autónomo · 7 días
+                  Hazte autónomo · Gratis
                 </Link>
               </div>
 

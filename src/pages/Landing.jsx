@@ -260,7 +260,7 @@ export default function Landing() {
             </p>
             <div className="mt-8 flex justify-center">
               <Link
-                to="/registro"
+                to="/registro?tipo=autonomo"
                 className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl font-semibold"
                 style={{ backgroundColor: GOLD, color: NAVY }}
               >

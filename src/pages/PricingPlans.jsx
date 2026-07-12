@@ -29,7 +29,11 @@ export default function PricingPlansPage() {
   const navigate = useNavigate();
 
   const handleSignup = () => {
-    navigate('/completar-perfil');
+    // /registro?tipo=autonomo re-encamina automáticamente:
+    //   - usuario nuevo → /login?mode=signup&role=profesional&next=/completar-perfil
+    //   - cliente logueado que se pasa a pro → /completar-perfil
+    //   - profesional con ficha → /dashboard
+    navigate('/registro?tipo=autonomo');
   };
 
   return (

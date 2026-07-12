@@ -361,7 +361,7 @@ export default function CategoriaPage() {
                 </p>
                 <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
                   <Button
-                    onClick={() => navigate('/para-autonomos')}
+                    onClick={() => navigate('/registro?tipo=autonomo')}
                     className="h-11 px-6 rounded-xl font-semibold"
                     style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
                   >
