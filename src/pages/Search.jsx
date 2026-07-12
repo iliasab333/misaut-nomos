@@ -670,7 +670,7 @@ export default function SearchPage() {
           {/* Skeleton loading — MISMA altura (288 px) que la tarjeta real
               para que al swap no se empuje el contenido de abajo (anti-CLS). */}
           {isInitialLoading && (
-            <div className="grid gap-4 items-start search-results-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', alignContent: 'start' }}>
+            <div className="grid gap-4 search-results-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
               {[...Array(8)].map((_, idx) => (
                 <div key={idx} className="bg-white rounded-2xl overflow-hidden border border-slate-200" style={{ minHeight: '288px', contain: 'layout style paint' }}>
                   {/* Desktop: blue header bar */}
@@ -759,7 +759,7 @@ export default function SearchPage() {
             <>
               {viewMode === "grid" ? (
                 <>
-                  <div className="grid gap-4 items-start search-results-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', alignContent: 'start' }}>
+                  <div className="grid gap-4 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
                     {filteredProfiles.slice(0, displayLimit).map((profile, idx) => (
                       <ProfileCard
                         key={profile.id}
