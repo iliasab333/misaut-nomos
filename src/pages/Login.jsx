@@ -195,7 +195,9 @@ export default function LoginPage() {
         navigate(nextUrl || defaultDestinationForRole(role), { replace: true });
         return;
       }
-      setInfo('Cuenta creada. Revisa tu email para confirmar la cuenta antes de iniciar sesión.');
+      // Sin sesión inmediata → Supabase exige confirmación por email.
+      // Enviamos al usuario a la pantalla dedicada (contador + reenviar).
+      navigate(`/confirma-email?email=${encodeURIComponent(email.trim())}`, { replace: true });
     } catch (err) {
       setError(spanishAuthError(err));
     } finally {
@@ -327,6 +329,34 @@ export default function LoginPage() {
             </div>
           )}
 
+          {/* Botón principal Google — arriba, es el atajo más rápido en móvil */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleGoogle}
+            disabled={googleLoading || submitting}
+            className="w-full h-11 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium mb-4"
+          >
+            {googleLoading ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Conectando...</>
+            ) : (
+              <>
+                <GoogleIcon />
+                <span className="ml-2">{isSignIn ? 'Continuar con Google' : 'Registrarse con Google'}</span>
+              </>
+            )}
+          </Button>
+
+          {/* Separador */}
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white px-3 text-slate-400">o {isSignIn ? 'inicia sesión' : 'crea tu cuenta'} con email</span>
+            </div>
+          </div>
+
           <form onSubmit={isSignIn ? handleSignIn : handleSignUp} className="space-y-4" noValidate>
             {!isSignIn && (
               <div>
@@ -434,33 +464,6 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Separador */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-slate-400">o</span>
-            </div>
-          </div>
-
-          {/* Botón secundario Google */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleGoogle}
-            disabled={googleLoading || submitting}
-            className="w-full h-11 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium"
-          >
-            {googleLoading ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Conectando...</>
-            ) : (
-              <>
-                <GoogleIcon />
-                Continuar con Google
-              </>
-            )}
-          </Button>
         </div>
 
         {/* Pie */}
