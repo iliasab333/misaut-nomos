@@ -135,11 +135,10 @@
       @media(min-width:480px){.hero-cats-grid{min-height:1100px}}
       @media(min-width:640px){.hero-cats-grid{min-height:520px}}
       @media(min-width:1024px){.hero-cats-grid{min-height:360px}}
-      /* /buscar: lista de profesionales — reservar el alto del grid para 6
-         tarjetas iniciales (288 px por tarjeta + 16 gap = ~1820 móvil). */
-      .search-results-grid{min-height:1820px}
-      @media(min-width:768px){.search-results-grid{min-height:920px}}
-      @media(min-width:1024px){.search-results-grid{min-height:620px}}
+      /* /buscar: no fijar min-height con resultados — con align-content: start
+         evitamos que el grid estire filas por espacio sobrante cuando quedan
+         pocas tarjetas tras filtrar. El CLS de carga lo cubren los skeletons. */
+      .search-results-grid{align-content:start}
       /* Skeleton tarjeta — MISMO height-shape que la final (288 px) para
          que pasar de skeleton a tarjeta real no empuje a las siguientes. */
       .card-skeleton{min-height:288px;contain:layout style paint}
