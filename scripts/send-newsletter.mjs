@@ -50,10 +50,10 @@ const FROM_EMAIL = 'hola@misautonomos.es';
 const FROM_NAME = 'Ilias de MisAutónomos';
 const FROM_FORMATTED = `${FROM_NAME} <${FROM_EMAIL}>`;
 
-const SUBJECT = 'Faltan fontaneros y electricistas (y por eso el oficio nunca había valido tanto)';
+const SUBJECT = 'Que la cuota de autónomos esté congelada en 2026 no es toda la verdad';
 
 const CSV_PATH = path.join(ROOT, 'data', 'audiencia-resend-misautonomos.csv');
-const HTML_PATH = path.join(ROOT, 'preview-correo-newsletter-misautonomos.html');
+const HTML_PATH = path.join(ROOT, 'preview-correo-newsletter-cuota-autonomos-2026.html');
 
 const TEST_EMAIL = process.env.TEST_EMAIL || 'bigseo.online.com@gmail.com';
 const DRY_RUN = String(process.env.DRY_RUN ?? 'true').toLowerCase() !== 'false';
