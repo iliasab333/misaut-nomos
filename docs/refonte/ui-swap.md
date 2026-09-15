@@ -61,8 +61,10 @@ No toques ficheros fuera de tu lote. No edites `src/components/ui/*`,
 | `toast` de `sonner` / `use-toast` / `@/components/ui/toaster` | `import { toast } from '@/lib/toast'` — **misma llamada** `toast.success('…')`, `toast.error('…')`, `toast.info('…')`. La única llamada con objeto (`toast({ title, description })`) está en `NotificationPermissionBanner.jsx`: pásala a `toast.info(title)`. |
 | `cn(...)` de `@/lib/utils` | Plantillas literales: `` className={`btn-primary ${disabled ? 'opacity-50' : ''}`} ``. `cn`/`clsx`/`tailwind-merge` desaparecen con shadcn. |
 | iconos de `lucide-react` | `import { IconX } from '@/components/Icons'`. Si el icono que necesitas no está en `Icons.jsx`, **añádelo ahí** (una línea `export const IconNombre = mk(Nombre);` + el import de lucide arriba) — es el único sitio donde se importa lucide. No importes lucide en tu fichero. |
-| `Loader` (`ui/Loader.jsx`) | `<IconSpinner className="animate-spin text-c-muted" />` o un esqueleto de `ListStates.jsx` |
-| `InitialsAvatar`, `MobileSelect`, `PullToRefresh`, `NativeBackButton`, `OptimizedImage`, `OptimizedLogo`, `LanguageSwitcher`, `CookieBanner`, `Footer` | **Se quedan** (no son shadcn). Cambia el import a su nueva ruta `@/components/<Nombre>` — se están moviendo fuera de `ui/`. Si al importar no existe todavía en la ruta nueva, deja el import viejo y dilo en el informe. |
+| `Loader` (`ui/Loader.jsx`) | `<IconSpinner className="text-c-muted" />` (ya gira) o un esqueleto de `ListStates.jsx` |
+| `PageTransitions` (`ui/PageTransitions.jsx`, framer-motion) | Se elimina: renderiza los `children` directamente. khdemlidaba no tiene transiciones de página. |
+| `ScrollToTop` (`ui/ScrollToTop.jsx`) | Se elimina el import: `App.jsx` ya monta `@/lib/ScrollToTop`. |
+| `InitialsAvatar`, `MobileSelect`, `PullToRefresh`, `OptimizedImage`, `LanguageSwitcher`, `CookieBanner`, `Footer` | **Se quedan** (no son shadcn). Ya viven en `@/components/<Nombre>`; lo que hay en `ui/<Nombre>.jsx` es un re-export temporal. Cambia el import a `@/components/<Nombre>` (también los `lazy(() => import(…))`). `useLanguage` de LanguageSwitcher: si el fichero sólo lo usaba para `t`, pásalo a `useTranslation`; si usaba `language`, `const { i18n } = useTranslation()` y `i18n.language.split('-')[0]`. |
 
 Estados de lista (carga / error / vacío): si el fichero tenía un spinner
 sobre vacío, un «Error» sin botón o un «No hay X» sin acción, usa
