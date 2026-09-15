@@ -6,6 +6,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { slugify } from "@/lib/seoUrl";
+import { useTranslation } from "react-i18next";
 
 function normalize(text) {
   if (!text) return '';
@@ -17,6 +18,7 @@ function normalize(text) {
 }
 
 export default function CategoryCityLink({ categoryName, ciudad }) {
+  const { t } = useTranslation();
   const { data: categories = [] } = useQuery({
     queryKey: ['serviceCategories'],
     queryFn: () => base44.entities.ServiceCategory.list(),
@@ -39,7 +41,7 @@ export default function CategoryCityLink({ categoryName, ciudad }) {
         href={href}
         className="text-blue-600 hover:text-blue-700 underline font-medium"
       >
-        Ver más {categoryName} en {ciudad} →
+        {t("proProfile.categoryCity.seeMore", { category: categoryName, city: ciudad })}
       </a>
     </p>
   );

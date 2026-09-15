@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Briefcase, CreditCard, MessageSquare, Star, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -33,6 +34,7 @@ function StatCard({ icon: Icon, label, value, sub, color = "blue" }) {
 }
 
 export default function AdminDashboardStats({ users, profiles, subscriptions, messages, reviews }) {
+  const { t } = useTranslation();
   const now = new Date();
 
   const stats = useMemo(() => {
@@ -69,22 +71,22 @@ export default function AdminDashboardStats({ users, profiles, subscriptions, me
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">📊 Resumen General</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">{t("admin.dashboardStats.title")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <StatCard icon={Users} label="Total usuarios" value={stats.totalUsers} sub={`+${stats.usersThisWeek} esta semana · +${stats.usersThisMonth} este mes`} color="blue" />
-          <StatCard icon={Briefcase} label="Profesionales activos" value={stats.activeProfiles} sub={`${stats.pendingProfiles} pendientes de aprobar`} color="green" />
-          <StatCard icon={CreditCard} label="Suscripciones activas" value={stats.activeSubs} sub={`${stats.trialSubs} en prueba`} color="purple" />
-          <StatCard icon={TrendingUp} label="Expiradas este mes" value={stats.expiredThisMonth} color="orange" />
-          <StatCard icon={MessageSquare} label="Mensajes totales" value={stats.totalMessages} color="blue" />
-          <StatCard icon={Star} label="Reseñas totales" value={stats.totalReviews} color="orange" />
-          <StatCard icon={Users} label="Sin user_type" value={users.filter(u => !u.user_type).length} sub="Usuarios sin clasificar" color="gray" />
-          <StatCard icon={CreditCard} label="Sin suscripción" value={users.filter(u => !subscriptions.find(s => s.user_id === u.id)).length} color="gray" />
+          <StatCard icon={Users} label={t("admin.dashboardStats.totalUsers")} value={stats.totalUsers} sub={t("admin.dashboardStats.usersSub", { week: stats.usersThisWeek, month: stats.usersThisMonth })} color="blue" />
+          <StatCard icon={Briefcase} label={t("admin.dashboardStats.activeProfessionals")} value={stats.activeProfiles} sub={t("admin.dashboardStats.pendingApproval", { count: stats.pendingProfiles })} color="green" />
+          <StatCard icon={CreditCard} label={t("admin.dashboardStats.activeSubscriptions")} value={stats.activeSubs} sub={t("admin.dashboardStats.inTrial", { count: stats.trialSubs })} color="purple" />
+          <StatCard icon={TrendingUp} label={t("admin.dashboardStats.expiredThisMonth")} value={stats.expiredThisMonth} color="orange" />
+          <StatCard icon={MessageSquare} label={t("admin.dashboardStats.totalMessages")} value={stats.totalMessages} color="blue" />
+          <StatCard icon={Star} label={t("admin.dashboardStats.totalReviews")} value={stats.totalReviews} color="orange" />
+          <StatCard icon={Users} label={t("admin.dashboardStats.noUserType")} value={users.filter(u => !u.user_type).length} sub={t("admin.dashboardStats.unclassifiedUsers")} color="gray" />
+          <StatCard icon={CreditCard} label={t("admin.dashboardStats.noSubscription")} value={users.filter(u => !subscriptions.find(s => s.user_id === u.id)).length} color="gray" />
         </div>
       </div>
 
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold text-gray-700">Nuevos registros — últimas 8 semanas</CardTitle>
+          <CardTitle className="text-base font-semibold text-gray-700">{t("admin.dashboardStats.weeklySignups")}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
@@ -93,7 +95,7 @@ export default function AdminDashboardStats({ users, profiles, subscriptions, me
               <XAxis dataKey="week" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip />
-              <Bar dataKey="usuarios" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="usuarios" name={t("admin.dashboardStats.usersSeries")} fill="#3b82f6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

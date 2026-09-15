@@ -20,8 +20,10 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function AdminPaymentsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
@@ -72,10 +74,10 @@ export default function AdminPaymentsPage() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['allProfiles'] });
-      toast.success(`🔥 Perfil activado: ${data.payments_count} pagos confirmados (${data.total_paid.toFixed(2)}€)`);
+      toast.success(t('admin.payments.profileActivated', { payments: data.payments_count, total: data.total_paid.toFixed(2) }));
     },
     onError: (error) => {
-      toast.error("Error: " + (error.response?.data?.error || error.message));
+      toast.error(t('admin.payments.errorGeneric', { message: error.response?.data?.error || error.message }));
     }
   });
 
@@ -86,10 +88,10 @@ export default function AdminPaymentsPage() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['adminPayments'] });
-      toast.success(`✅ ${data.results.registered} pagos sincronizados desde Stripe`);
+      toast.success(t('admin.payments.syncSuccess', { registered: data.results.registered }));
     },
     onError: (error) => {
-      toast.error("Error sincronizando: " + error.message);
+      toast.error(t('admin.payments.syncError', { message: error.message }));
     }
   });
 
@@ -130,8 +132,8 @@ export default function AdminPaymentsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">💰 Pagos Recibidos</h1>
-            <p className="text-gray-600">Registro completo de todos los pagos de Stripe</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t('admin.payments.title')}</h1>
+            <p className="text-gray-600">{t('admin.payments.subtitle')}</p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -142,12 +144,12 @@ export default function AdminPaymentsPage() {
               {syncPaymentsMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Sincronizando...
+                  {t('admin.payments.syncing')}
                 </>
               ) : (
                 <>
                   <RefreshCw className="w-4 h-4" />
-                  Sincronizar con Stripe
+                  {t('admin.payments.syncWithStripe')}
                 </>
               )}
             </Button>
@@ -157,7 +159,7 @@ export default function AdminPaymentsPage() {
               className="gap-2"
             >
               <RefreshCw className="w-4 h-4" />
-              Actualizar
+              {t('admin.payments.refresh')}
             </Button>
           </div>
         </div>
@@ -167,7 +169,7 @@ export default function AdminPaymentsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
                 <DollarSign className="w-4 h-4" />
-                Ingresos totales
+                {t('admin.payments.totalRevenue')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -181,7 +183,7 @@ export default function AdminPaymentsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
                 <Users className="w-4 h-4" />
-                Clientes de pago
+                {t('admin.payments.payingCustomers')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -195,7 +197,7 @@ export default function AdminPaymentsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
                 <Eye className="w-4 h-4" />
-                Perfiles visibles
+                {t('admin.payments.visibleProfiles')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -209,7 +211,7 @@ export default function AdminPaymentsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
-                Total pagos
+                {t('admin.payments.totalPayments')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -225,7 +227,7 @@ export default function AdminPaymentsPage() {
             <div className="flex items-center gap-3">
               <Search className="w-5 h-5 text-gray-400" />
               <Input
-                placeholder="Buscar por email, plan, ID de factura..."
+                placeholder={t('admin.payments.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="max-w-md"
@@ -242,14 +244,14 @@ export default function AdminPaymentsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-3 text-sm font-semibold text-gray-700">Fecha</th>
-                      <th className="text-left p-3 text-sm font-semibold text-gray-700">Usuario</th>
-                      <th className="text-left p-3 text-sm font-semibold text-gray-700">Plan</th>
-                      <th className="text-left p-3 text-sm font-semibold text-gray-700">Importe</th>
-                      <th className="text-left p-3 text-sm font-semibold text-gray-700">Estado</th>
-                      <th className="text-left p-3 text-sm font-semibold text-gray-700">Período</th>
-                      <th className="text-left p-3 text-sm font-semibold text-gray-700">Perfil</th>
-                      <th className="text-left p-3 text-sm font-semibold text-gray-700">Acción</th>
+                      <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('admin.payments.table.date')}</th>
+                      <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('admin.payments.table.user')}</th>
+                      <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('admin.payments.table.plan')}</th>
+                      <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('admin.payments.table.amount')}</th>
+                      <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('admin.payments.table.status')}</th>
+                      <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('admin.payments.table.period')}</th>
+                      <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('admin.payments.table.profile')}</th>
+                      <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('admin.payments.table.action')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -265,14 +267,14 @@ export default function AdminPaymentsPage() {
                           <td className="p-3 text-sm">
                             <div>
                               <p className="font-medium text-gray-900">{payment.user_email}</p>
-                              <p className="text-xs text-gray-500">{userInfo?.full_name || 'N/A'}</p>
+                              <p className="text-xs text-gray-500">{userInfo?.full_name || t('admin.payments.notAvailable')}</p>
                             </div>
                           </td>
                           <td className="p-3 text-sm">
                             <div>
                               <p className="font-medium">{payment.plan_nombre}</p>
                               {payment.is_trial && (
-                                <Badge variant="outline" className="text-xs mt-1">Trial</Badge>
+                                <Badge variant="outline" className="text-xs mt-1">{t('admin.payments.trialBadge')}</Badge>
                               )}
                             </div>
                           </td>
@@ -283,12 +285,12 @@ export default function AdminPaymentsPage() {
                             {payment.status === 'succeeded' ? (
                               <Badge className="bg-green-100 text-green-800 gap-1">
                                 <CheckCircle className="w-3 h-3" />
-                                Exitoso
+                                {t('admin.payments.status.succeeded')}
                               </Badge>
                             ) : payment.status === 'failed' ? (
                               <Badge className="bg-red-100 text-red-800 gap-1">
                                 <XCircle className="w-3 h-3" />
-                                Fallido
+                                {t('admin.payments.status.failed')}
                               </Badge>
                             ) : (
                               <Badge variant="outline">{payment.status}</Badge>
@@ -304,10 +306,10 @@ export default function AdminPaymentsPage() {
                                 ? "bg-green-100 text-green-800" 
                                 : "bg-red-100 text-red-800"
                               }>
-                                {profile.visible_en_busqueda ? "✅ Visible" : "❌ Oculto"}
+                                {profile.visible_en_busqueda ? t('admin.payments.profileVisible') : t('admin.payments.profileHidden')}
                               </Badge>
                             ) : (
-                              <Badge variant="outline">Sin perfil</Badge>
+                              <Badge variant="outline">{t('admin.payments.noProfile')}</Badge>
                             )}
                           </td>
                           <td className="p-3">
@@ -321,12 +323,12 @@ export default function AdminPaymentsPage() {
                                 {activateProfileMutation.isPending ? (
                                   <Loader2 className="w-3 h-3 animate-spin" />
                                 ) : (
-                                  <>🔥 Activar</>
+                                  <>{t('admin.payments.activate')}</>
                                 )}
                               </Button>
                             )}
                             {!profile && payment.status === 'succeeded' && (
-                              <span className="text-xs text-orange-600">⚠️ Sin perfil</span>
+                              <span className="text-xs text-orange-600">{t('admin.payments.noProfileWarning')}</span>
                             )}
                           </td>
                         </tr>

@@ -16,10 +16,10 @@ import InvoicesList from "../components/invoicing/InvoicesList";
 import InvoicingSettingsForm from "../components/invoicing/InvoicingSettingsForm";
 import InvoicingStats from "../components/invoicing/InvoicingStats";
 import InvoiceExportDialog from "../components/invoicing/InvoiceExportDialog";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { useTranslation, Trans } from "react-i18next";
 
 export default function InvoicesPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
@@ -86,7 +86,7 @@ export default function InvoicesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['invoicingSettings']);
-      toast.success(t('settingsSaved') || 'Configuración guardada');
+      toast.success(t('settingsSaved'));
     },
   });
 
@@ -118,7 +118,7 @@ export default function InvoicesPage() {
       queryClient.invalidateQueries(['invoicingSettings']);
       setShowDialog(false);
       setEditingInvoice(null);
-      toast.success(t('invoiceCreated') || 'Factura creada');
+      toast.success(t('invoiceCreated'));
     },
   });
 
@@ -128,7 +128,7 @@ export default function InvoicesPage() {
       queryClient.invalidateQueries(['invoices']);
       setShowDialog(false);
       setEditingInvoice(null);
-      toast.success(t('invoiceUpdated') || 'Factura actualizada');
+      toast.success(t('invoiceUpdated'));
     },
   });
 
@@ -136,7 +136,7 @@ export default function InvoicesPage() {
     mutationFn: (id) => base44.entities.Invoice.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries(['invoices']);
-      toast.success(t('invoiceDeleted') || 'Factura eliminada');
+      toast.success(t('invoiceDeleted'));
     },
   });
 
@@ -144,7 +144,7 @@ export default function InvoicesPage() {
     mutationFn: ({ id, status }) => base44.entities.Invoice.update(id, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries(['invoices']);
-      toast.success(t('statusUpdated') || 'Estado actualizado');
+      toast.success(t('statusUpdated'));
     },
   });
 
@@ -183,10 +183,10 @@ export default function InvoicesPage() {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
       
-      toast.success(t('pdfDownloaded') || 'PDF descargado');
+      toast.success(t('pdfDownloaded'));
     } catch (error) {
       console.error('Error downloading PDF:', error);
-      toast.error(t('errorGeneratingPDF') || 'Error al generar PDF');
+      toast.error(t('errorGeneratingPDF'));
     } finally {
       setLoadingActions(prev => ({ ...prev, [`pdf_${invoice.id}`]: false }));
     }
@@ -195,7 +195,7 @@ export default function InvoicesPage() {
   // Enviar factura por email al cliente
   const handleSendEmail = async (invoice) => {
     if (!invoice.client_email) {
-      toast.error('Esta factura no tiene email de cliente');
+      toast.error(t('invoices.page.noClientEmail'));
       return;
     }
     
@@ -209,11 +209,11 @@ export default function InvoicesPage() {
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
-        toast.success(`📧 Factura enviada a ${invoice.client_email}`);
+        toast.success(t('invoices.page.invoiceSentTo', { email: invoice.client_email }));
         queryClient.invalidateQueries(['invoices']);
       }
     } catch (error) {
-      toast.error('Error al enviar la factura');
+      toast.error(t('invoices.page.sendInvoiceError'));
     } finally {
       setLoadingActions(prev => ({ ...prev, [`email_${invoice.id}`]: false }));
     }
@@ -237,13 +237,13 @@ export default function InvoicesPage() {
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
-        toast.success('💳 Link de pago creado');
+        toast.success(t('invoices.page.paymentLinkCreated'));
         queryClient.invalidateQueries(['invoices']);
         // Mostrar diálogo con el link
         setPaymentLinkDialog({ ...invoice, payment_link: response.data.url });
       }
     } catch (error) {
-      toast.error('Error al crear link de pago');
+      toast.error(t('invoices.page.paymentLinkError'));
     } finally {
       setLoadingActions(prev => ({ ...prev, [`stripe_${invoice.id}`]: false }));
     }
@@ -252,11 +252,11 @@ export default function InvoicesPage() {
   // Enviar email con link de pago
   const handleSendPaymentEmail = async (invoice) => {
     if (!invoice.client_email) {
-      toast.error('Esta factura no tiene email de cliente');
+      toast.error(t('invoices.page.noClientEmail'));
       return;
     }
     if (!invoice.payment_link) {
-      toast.error('Esta factura no tiene link de pago. Créalo primero.');
+      toast.error(t('invoices.page.noPaymentLink'));
       return;
     }
     
@@ -271,11 +271,11 @@ export default function InvoicesPage() {
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
-        toast.success(`💳 Enlace de pago enviado a ${invoice.client_email}`);
+        toast.success(t('invoices.page.paymentLinkSentTo', { email: invoice.client_email }));
         queryClient.invalidateQueries(['invoices']);
       }
     } catch (error) {
-      toast.error('Error al enviar el enlace de pago');
+      toast.error(t('invoices.page.sendPaymentLinkError'));
     } finally {
       setLoadingActions(prev => ({ ...prev, [`payemail_${invoice.id}`]: false }));
     }
@@ -295,10 +295,10 @@ export default function InvoicesPage() {
         payment_date: new Date().toISOString().split('T')[0],
         payment_method: 'manual'
       });
-      toast.success('✅ Factura marcada como pagada');
+      toast.success(t('invoices.page.markedAsPaid'));
       queryClient.invalidateQueries(['invoices']);
     } catch (error) {
-      toast.error('Error al actualizar la factura');
+      toast.error(t('invoices.page.updateInvoiceError'));
     } finally {
       setConfirmPaidDialog(null);
     }
@@ -306,7 +306,7 @@ export default function InvoicesPage() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    toast.success('Link copiado al portapapeles');
+    toast.success(t('invoices.page.linkCopied'));
   };
 
   if (loading || loadingSettings) {
@@ -322,17 +322,17 @@ export default function InvoicesPage() {
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900">Facturas</h1>
-            <p className="text-gray-500 text-sm mt-0.5">{invoices.length} facturas en total</p>
+            <h1 className="text-2xl font-extrabold text-gray-900">{t('nav.invoices')}</h1>
+            <p className="text-gray-500 text-sm mt-0.5">{t('invoices.page.totalCount', { count: invoices.length })}</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setShowExportDialog(true)} className="hidden sm:flex">
               <Download className="w-4 h-4 mr-2" />
-              Exportar
+              {t('invoices.page.export')}
             </Button>
             <Button onClick={() => { setEditingInvoice(null); setShowDialog(true); }} className="bg-blue-600 hover:bg-blue-700 rounded-xl">
               <Plus className="w-4 h-4 mr-2" />
-              Nueva factura
+              {t('newInvoice')}
             </Button>
           </div>
         </div>
@@ -341,15 +341,15 @@ export default function InvoicesPage() {
           <TabsList className="bg-white shadow-sm">
             <TabsTrigger value="invoices">
               <FileText className="w-4 h-4 mr-2" />
-              Facturas
+              {t('nav.invoices')}
             </TabsTrigger>
             <TabsTrigger value="stats">
               <BarChart3 className="w-4 h-4 mr-2" />
-              Estadísticas
+              {t('invoices.page.statsTab')}
             </TabsTrigger>
             <TabsTrigger value="settings">
               <Settings className="w-4 h-4 mr-2" />
-              Datos de facturación
+              {t('invoices.page.settingsTab')}
             </TabsTrigger>
           </TabsList>
 
@@ -400,7 +400,7 @@ export default function InvoicesPage() {
         <ResponsiveModal
           isOpen={showPreview}
           onClose={() => setShowPreview(false)}
-          title={t('invoicePreview') || 'Vista previa de factura'}
+          title={t('invoicePreview')}
           maxWidth="md:max-w-4xl"
         >
           <InvoicePreview invoiceData={previewData} />
@@ -411,21 +411,21 @@ export default function InvoicesPage() {
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <span className="text-2xl">💳</span> Link de pago Stripe
+                <span className="text-2xl">💳</span> {t('invoices.paymentLink.title')}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                 <p className="text-sm text-purple-800 mb-2">
-                  <strong>Factura:</strong> {paymentLinkDialog?.invoice_number}
+                  <strong>{t('invoices.labels.invoice')}</strong> {paymentLinkDialog?.invoice_number}
                 </p>
                 <p className="text-sm text-purple-800">
-                  <strong>Importe:</strong> {paymentLinkDialog?.total?.toFixed(2)}€
+                  <strong>{t('invoices.labels.amount')}</strong> {paymentLinkDialog?.total?.toFixed(2)}€
                 </p>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-2">Link de pago:</p>
+                <p className="text-xs text-gray-500 mb-2">{t('invoices.paymentLink.linkLabel')}</p>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -449,7 +449,7 @@ export default function InvoicesPage() {
                   onClick={() => window.open(paymentLinkDialog?.payment_link, '_blank')}
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  Abrir link
+                  {t('invoices.paymentLink.open')}
                 </Button>
                 <Button
                   variant="outline"
@@ -460,12 +460,12 @@ export default function InvoicesPage() {
                   }}
                 >
                   <Copy className="w-4 h-4 mr-2" />
-                  Copiar y cerrar
+                  {t('invoices.paymentLink.copyAndClose')}
                 </Button>
               </div>
               
               <p className="text-xs text-gray-500 text-center">
-                Comparte este link con tu cliente para que pague con tarjeta.
+                {t('invoices.paymentLink.shareHint')}
               </p>
             </div>
           </DialogContent>
@@ -482,19 +482,23 @@ export default function InvoicesPage() {
         <AlertDialog open={!!confirmPaidDialog} onOpenChange={() => setConfirmPaidDialog(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>¿Marcar factura como pagada?</AlertDialogTitle>
+              <AlertDialogTitle>{t('invoices.markPaid.title')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Vas a marcar la factura <strong>{confirmPaidDialog?.invoice_number}</strong> como pagada manualmente.
+                <Trans
+                  i18nKey="invoices.markPaid.description"
+                  values={{ number: confirmPaidDialog?.invoice_number }}
+                  components={{ strong: <strong /> }}
+                />
                 <br /><br />
-                <strong>Importe:</strong> {confirmPaidDialog?.total?.toFixed(2)}€
+                <strong>{t('invoices.labels.amount')}</strong> {confirmPaidDialog?.total?.toFixed(2)}€
                 <br />
-                <strong>Cliente:</strong> {confirmPaidDialog?.client_name}
+                <strong>{t('invoices.labels.client')}</strong> {confirmPaidDialog?.client_name}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
               <AlertDialogAction onClick={confirmMarkAsPaid} className="bg-green-600 hover:bg-green-700">
-                Sí, marcar como pagada
+                {t('invoices.markPaid.confirm')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

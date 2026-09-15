@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, MoreVertical, Gift } from "lucide-react";
@@ -19,6 +20,7 @@ function getStatusBadge(estado) {
 }
 
 export default function AdminSubscriptionsTable({ subscriptions, users }) {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState("todos");
   const [giftModalOpen, setGiftModalOpen] = useState(false);
   const [selectedSubscriber, setSelectedSubscriber] = useState(null);
@@ -38,11 +40,11 @@ export default function AdminSubscriptionsTable({ subscriptions, users }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">💳 Suscripciones</h2>
+        <h2 className="text-lg font-bold text-gray-900">{t("admin.subscriptionsTable.title")}</h2>
         {expiringSoon.length > 0 && (
           <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 text-orange-700 text-xs px-3 py-1.5 rounded-lg font-semibold">
             <AlertTriangle className="w-3.5 h-3.5" />
-            {expiringSoon.length} expiran en 7 días
+            {t("admin.subscriptionsTable.expiringSoon", { count: expiringSoon.length })}
           </div>
         )}
       </div>
@@ -54,7 +56,7 @@ export default function AdminSubscriptionsTable({ subscriptions, users }) {
             onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${filter === f ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
           >
-            {f === "todos" ? "Todos" : f}
+            {f === "todos" ? t("admin.subscriptionsTable.filterAll") : f}
           </button>
         ))}
       </div>
@@ -64,20 +66,20 @@ export default function AdminSubscriptionsTable({ subscriptions, users }) {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">Usuario</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">Plan</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">Precio</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">Estado</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">Inicio</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">Expiración</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">Acciones</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">{t("admin.subscriptionsTable.columns.user")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">{t("admin.subscriptionsTable.columns.plan")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">{t("admin.subscriptionsTable.columns.price")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">{t("admin.subscriptionsTable.columns.status")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">{t("admin.subscriptionsTable.columns.start")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">{t("admin.subscriptionsTable.columns.expiry")}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">{t("admin.subscriptionsTable.columns.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filtered.map(sub => {
                 const userEmail = users.find(u => u.id === sub.user_id)?.email || sub.user_id;
                 let expiresInDays = null;
-                try { expiresInDays = differenceInDays(new Date(sub.fecha_expiracion), new Date()); } catch {}
+                try { expiresInDays = differenceInDays(new Date(sub.fecha_expiracion), new Date()); } catch { /* fecha inválida: se ignora */ }
                 const expiringSoon = expiresInDays !== null && expiresInDays >= 0 && expiresInDays <= 7 && (sub.estado === "activo" || sub.estado === "en_prueba");
 
                 return (
@@ -88,18 +90,18 @@ export default function AdminSubscriptionsTable({ subscriptions, users }) {
                       {sub.gifted_plan_id && sub.gifted_until && new Date(sub.gifted_until) > new Date() && (
                         <span className="ml-1.5 inline-flex items-center gap-0.5 bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">
                           <Gift className="w-2.5 h-2.5" />
-                          regalo: {sub.gifted_plan_name || sub.gifted_plan_id} hasta {new Date(sub.gifted_until).toLocaleDateString('es-ES', {day:'numeric', month:'numeric'})}
+                          {t("admin.subscriptionsTable.giftBadge", { plan: sub.gifted_plan_name || sub.gifted_plan_id, date: new Date(sub.gifted_until).toLocaleDateString('es-ES', {day:'numeric', month:'numeric'}) })}
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-600">{sub.plan_precio ? `${sub.plan_precio}€/mes` : "—"}</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">{sub.plan_precio ? t("admin.subscriptionsTable.pricePerMonth", { price: sub.plan_precio }) : "—"}</td>
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-1">
                         {getStatusBadge(sub.estado)}
                         {sub.gifted_until && new Date(sub.gifted_until) > new Date() && (
                           <span className="inline-flex items-center gap-0.5 bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[10px] font-semibold">
                             <Gift className="w-2.5 h-2.5" />
-                            Regalado hasta {new Date(sub.gifted_until).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}
+                            {t("admin.subscriptionsTable.giftedUntil", { date: new Date(sub.gifted_until).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) })}
                           </span>
                         )}
                       </div>
@@ -123,7 +125,7 @@ export default function AdminSubscriptionsTable({ subscriptions, users }) {
                           className="flex items-center gap-1.5 text-xs text-amber-700 hover:text-amber-900 font-medium px-2 py-1 rounded hover:bg-amber-50"
                         >
                           <Gift className="w-3.5 h-3.5" />
-                          Regalar upgrade
+                          {t("admin.subscriptionsTable.giftUpgrade")}
                         </button>
                       </div>
                     </td>

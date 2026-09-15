@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -7,32 +8,36 @@ import {
   Zap, Droplets, Hammer, Paintbrush, Trees, Sparkles, Wrench, Search,
 } from "lucide-react";
 
+// `name` es el valor técnico que viaja en la URL (?category=…) y coincide con
+// la categoría en la BD: no se traduce. `labelKey` es lo que ve el usuario,
+// resuelto con t() en render. Mapa explícito y completo de claves.
 const CATEGORIES = [
-  { name: "Electricista", icon: Zap, gradient: "from-amber-400 to-yellow-500", soft: "bg-amber-50" },
-  { name: "Fontanero", icon: Droplets, gradient: "from-blue-400 to-cyan-500", soft: "bg-blue-50" },
-  { name: "Carpintero", icon: Hammer, gradient: "from-orange-400 to-red-500", soft: "bg-orange-50" },
-  { name: "Pintor", icon: Paintbrush, gradient: "from-pink-400 to-rose-500", soft: "bg-pink-50" },
-  { name: "Jardinero", icon: Trees, gradient: "from-green-400 to-emerald-500", soft: "bg-green-50" },
-  { name: "Autónomo de limpieza", label: "Limpieza", icon: Sparkles, gradient: "from-purple-400 to-indigo-500", soft: "bg-purple-50" },
-  { name: "Albañil / Reformas", label: "Reformas", icon: Wrench, gradient: "from-slate-400 to-gray-600", soft: "bg-slate-50" },
-  { name: "Ver todos", icon: Search, gradient: "from-blue-600 to-indigo-600", soft: "bg-blue-50", featured: true },
+  { name: "Electricista", labelKey: "categories.electrician", icon: Zap, gradient: "from-amber-400 to-yellow-500", soft: "bg-amber-50" },
+  { name: "Fontanero", labelKey: "categories.plumber", icon: Droplets, gradient: "from-blue-400 to-cyan-500", soft: "bg-blue-50" },
+  { name: "Carpintero", labelKey: "categories.carpenter", icon: Hammer, gradient: "from-orange-400 to-red-500", soft: "bg-orange-50" },
+  { name: "Pintor", labelKey: "categories.painter", icon: Paintbrush, gradient: "from-pink-400 to-rose-500", soft: "bg-pink-50" },
+  { name: "Jardinero", labelKey: "categories.gardener", icon: Trees, gradient: "from-green-400 to-emerald-500", soft: "bg-green-50" },
+  { name: "Autónomo de limpieza", labelKey: "home.categories.cleaning", icon: Sparkles, gradient: "from-purple-400 to-indigo-500", soft: "bg-purple-50" },
+  { name: "Albañil / Reformas", labelKey: "home.categories.renovations", icon: Wrench, gradient: "from-slate-400 to-gray-600", soft: "bg-slate-50" },
+  { name: "Ver todos", labelKey: "home.categories.viewAll", icon: Search, gradient: "from-blue-600 to-indigo-600", soft: "bg-blue-50", featured: true },
 ];
 
 export default function CategoriesGrid() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <section className="py-16 md:py-20 bg-white">
       <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-10 md:mb-12">
           <Badge className="mb-3 bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 border-0 font-semibold">
-            Servicios más buscados
+            {t('home.categories.badge')}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-            ¿Qué necesitas hoy?
+            {t('home.categories.title')}
           </h2>
           <p className="text-gray-600 mt-3 text-lg">
-            Toca una categoría para encontrar profesionales cerca de ti
+            {t('home.categories.subtitle')}
           </p>
         </div>
 
@@ -63,11 +68,11 @@ export default function CategoriesGrid() {
                     <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                   </div>
                   <p className="font-bold text-sm md:text-base text-gray-900 group-hover:text-white transition-colors">
-                    {cat.label || cat.name}
+                    {t(cat.labelKey)}
                   </p>
                 </div>
                 <div className="relative z-10 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 text-white text-xs font-semibold mt-2">
-                  Explorar →
+                  {t('home.categories.explore')}
                 </div>
               </motion.button>
             );

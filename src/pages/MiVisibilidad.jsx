@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,25 +17,20 @@ import {
 } from "recharts";
 import SEOHead from "../components/seo/SEOHead";
 
-const TIPS = [
-  { icon: Image, label: "Añade foto de perfil", key: "imagen_principal", cta: "Subir foto" },
-  { icon: FileText, label: "Completa tu descripción", key: "description", cta: "Editar perfil" },
-  { icon: Star, label: "Pide tu primera reseña", key: "reviews", cta: "Ver perfil público" },
-  { icon: Image, label: "Sube fotos de trabajos", key: "photos", cta: "Añadir fotos" },
-];
-
-function getMissingTips(profile) {
-  if (!profile) return TIPS;
+// Recibe la lista de consejos (ya traducida) en vez de leer una constante de módulo.
+function getMissingTips(profile, tips) {
+  if (!profile) return tips;
   const missing = [];
-  if (!profile.imagen_principal) missing.push(TIPS[0]);
-  if (!profile.description || profile.description.length < 80) missing.push(TIPS[1]);
-  if (!profile.total_reviews || profile.total_reviews === 0) missing.push(TIPS[2]);
-  if (!profile.photos || profile.photos.length < 3) missing.push(TIPS[3]);
+  if (!profile.imagen_principal) missing.push(tips[0]);
+  if (!profile.description || profile.description.length < 80) missing.push(tips[1]);
+  if (!profile.total_reviews || profile.total_reviews === 0) missing.push(tips[2]);
+  if (!profile.photos || profile.photos.length < 3) missing.push(tips[3]);
   return missing.slice(0, 4);
 }
 
 export default function MiVisibilidadPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -96,7 +92,15 @@ export default function MiVisibilidadPage() {
   const totalMessages = metrics.reduce((s, m) => s + (m.messages_received || 0), 0);
   const totalClicks = metrics.reduce((s, m) => s + (m.contact_clicks || 0), 0);
 
-  const tips = getMissingTips(profile);
+  // Antes constante de módulo (TIPS): dentro del componente para que pase por t().
+  const TIPS = [
+    { icon: Image, label: t('stats.visibility.tips.addPhoto'), key: "imagen_principal", cta: t('stats.visibility.tips.addPhotoCta') },
+    { icon: FileText, label: t('stats.visibility.tips.completeDescription'), key: "description", cta: t('editProfile') },
+    { icon: Star, label: t('stats.visibility.tips.firstReview'), key: "reviews", cta: t('stats.visibility.tips.firstReviewCta') },
+    { icon: Image, label: t('stats.visibility.tips.workPhotos'), key: "photos", cta: t('stats.visibility.tips.workPhotosCta') },
+  ];
+
+  const tips = getMissingTips(profile, TIPS);
 
   // Preparar datos para el gráfico — últimos 30 días
   const today = new Date();
@@ -114,21 +118,21 @@ export default function MiVisibilidadPage() {
   }
 
   const statsCards = [
-    { label: "Vistas al perfil", value: totalViews, icon: Eye, color: "from-blue-500 to-cyan-500" },
-    { label: "Apariciones en búsqueda", value: totalSearches, icon: Search, color: "from-violet-500 to-purple-500" },
-    { label: "Mensajes recibidos", value: totalMessages, icon: MessageSquare, color: "from-emerald-500 to-green-500" },
-    { label: "Clics de contacto", value: totalClicks, icon: MousePointerClick, color: "from-amber-500 to-orange-500" },
+    { label: t('stats.metrics.profileViews'), value: totalViews, icon: Eye, color: "from-blue-500 to-cyan-500" },
+    { label: t('stats.visibility.searchAppearances'), value: totalSearches, icon: Search, color: "from-violet-500 to-purple-500" },
+    { label: t('stats.metrics.messagesReceived'), value: totalMessages, icon: MessageSquare, color: "from-emerald-500 to-green-500" },
+    { label: t('stats.visibility.contactClicks'), value: totalClicks, icon: MousePointerClick, color: "from-amber-500 to-orange-500" },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <SEOHead title="Mi Visibilidad — MisAutónomos" noindex />
+      <SEOHead title={t('stats.visibility.seoTitle')} noindex />
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900">Mi Visibilidad</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Últimos 30 días</p>
+          <h1 className="text-2xl font-extrabold text-gray-900">{t('stats.visibility.title')}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{t('stats.periods.last30Days')}</p>
         </div>
 
         {/* CTA si no tiene suscripción */}
@@ -141,10 +145,9 @@ export default function MiVisibilidadPage() {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <p className="font-bold text-lg">Activa tu plan para aparecer en búsquedas</p>
+                <p className="font-bold text-lg">{t('stats.visibility.noPlanTitle')}</p>
                 <p className="text-blue-100 text-sm mt-1">
-                  Sin un plan activo tu perfil no es visible para los clientes. 
-                  Actívalo hoy — primeros 7 días gratis.
+                  {t('stats.visibility.noPlanText')}
                 </p>
               </div>
             </div>
@@ -153,7 +156,7 @@ export default function MiVisibilidadPage() {
               onClick={() => navigate(createPageUrl("PricingPlans"))}
             >
               <Zap className="w-4 h-4 mr-2" />
-              Activar plan — 7 días gratis
+              {t('stats.visibility.activatePlan')}
             </Button>
           </motion.div>
         )}
@@ -185,15 +188,15 @@ export default function MiVisibilidadPage() {
           <CardHeader className="pb-3 pt-5 px-5">
             <CardTitle className="text-base font-bold text-gray-900 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-blue-600" />
-              Vistas del perfil — últimos 30 días
+              {t('stats.visibility.chartTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent className="px-3 pb-5">
             {totalViews === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 text-center">
                 <Eye className="w-12 h-12 text-gray-200 mb-3" />
-                <p className="text-gray-500 text-sm font-medium">Aún no hay vistas registradas</p>
-                <p className="text-gray-400 text-xs mt-1">Las vistas aparecerán cuando los clientes visiten tu perfil</p>
+                <p className="text-gray-500 text-sm font-medium">{t('stats.visibility.noViewsTitle')}</p>
+                <p className="text-gray-400 text-xs mt-1">{t('stats.visibility.noViewsText')}</p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={200}>
@@ -209,7 +212,7 @@ export default function MiVisibilidadPage() {
                   <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
                   <Tooltip
                     contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E5E7EB', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                    formatter={(v, n) => [v, n === 'vistas' ? 'Vistas' : 'Mensajes']}
+                    formatter={(v, n) => [v, n === 'vistas' ? t('stats.visibility.chartViews') : t('nav.messages')]}
                   />
                   <Area type="monotone" dataKey="vistas" stroke="#3B82F6" strokeWidth={2} fill="url(#colorVistas)" />
                 </AreaChart>
@@ -222,7 +225,7 @@ export default function MiVisibilidadPage() {
         {tips.length > 0 && (
           <Card className="border-0 shadow-sm rounded-2xl bg-white">
             <CardHeader className="pb-3 pt-5 px-5">
-              <CardTitle className="text-base font-bold text-gray-900">💡 Mejora tu visibilidad</CardTitle>
+              <CardTitle className="text-base font-bold text-gray-900">{t('stats.visibility.tipsTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="px-5 pb-5 space-y-3">
               {tips.map((tip, i) => (
@@ -257,7 +260,7 @@ export default function MiVisibilidadPage() {
         {tips.length === 0 && (
           <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-xl">
             <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-            <p className="text-sm font-semibold text-green-800">¡Perfil optimizado! Sigues haciendo las cosas bien.</p>
+            <p className="text-sm font-semibold text-green-800">{t('stats.visibility.optimized')}</p>
           </div>
         )}
 
@@ -271,7 +274,7 @@ export default function MiVisibilidadPage() {
           }}
         >
           <Eye className="w-4 h-4 mr-2" />
-          Ver cómo me ven los clientes
+          {t('stats.visibility.viewAsClients')}
         </Button>
 
       </div>

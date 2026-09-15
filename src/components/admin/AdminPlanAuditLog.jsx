@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, Search, Shield, Gift, ArrowRightLeft, XCircle, Play, RotateCcw } from 'lucide-react';
@@ -6,19 +7,21 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const CHANGE_TYPE_CONFIG = {
-  gift_upgrade:         { label: 'Regalo upgrade',       color: 'bg-amber-100 text-amber-700',  icon: Gift },
-  gift_revoke:          { label: 'Regalo revocado',      color: 'bg-red-100 text-red-700',      icon: XCircle },
-  gift_expire:          { label: 'Regalo expirado',      color: 'bg-gray-100 text-gray-600',    icon: RotateCcw },
-  plan_change:          { label: 'Cambio de plan',       color: 'bg-blue-100 text-blue-700',    icon: ArrowRightLeft },
-  trial_start:          { label: 'Trial iniciado',       color: 'bg-green-100 text-green-700',  icon: Play },
-  subscription_cancel:  { label: 'Suscripción cancelada', color: 'bg-red-100 text-red-700',    icon: XCircle },
-  subscription_reactivate: { label: 'Reactivada',       color: 'bg-green-100 text-green-700',  icon: Play },
-};
-
 export default function AdminPlanAuditLog() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+
+  // Antes constante de módulo (CHANGE_TYPE_CONFIG); dentro para que las etiquetas sigan al idioma
+  const changeTypeConfig = {
+    gift_upgrade:         { label: t('admin.planAudit.types.giftUpgrade'),            color: 'bg-amber-100 text-amber-700',  icon: Gift },
+    gift_revoke:          { label: t('admin.planAudit.types.giftRevoke'),             color: 'bg-red-100 text-red-700',      icon: XCircle },
+    gift_expire:          { label: t('admin.planAudit.types.giftExpire'),             color: 'bg-gray-100 text-gray-600',    icon: RotateCcw },
+    plan_change:          { label: t('admin.planAudit.types.planChange'),             color: 'bg-blue-100 text-blue-700',    icon: ArrowRightLeft },
+    trial_start:          { label: t('admin.planAudit.types.trialStart'),             color: 'bg-green-100 text-green-700',  icon: Play },
+    subscription_cancel:  { label: t('admin.planAudit.types.subscriptionCancel'),     color: 'bg-red-100 text-red-700',      icon: XCircle },
+    subscription_reactivate: { label: t('admin.planAudit.types.subscriptionReactivate'), color: 'bg-green-100 text-green-700', icon: Play },
+  };
 
   const { data: logs = [], isLoading, refetch } = useQuery({
     queryKey: ['planAuditLogs'],
@@ -39,11 +42,11 @@ export default function AdminPlanAuditLog() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">📋 Registro de auditoría</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Histórico de todos los cambios de planes</p>
+          <h2 className="text-lg font-bold text-gray-900">{t('admin.planAudit.title')}</h2>
+          <p className="text-xs text-gray-500 mt-0.5">{t('admin.planAudit.subtitle')}</p>
         </div>
         <button onClick={refetch} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium hover:bg-gray-50">
-          <RefreshCw className="w-3.5 h-3.5" /> Actualizar
+          <RefreshCw className="w-3.5 h-3.5" /> {t('admin.planAudit.refresh')}
         </button>
       </div>
 
@@ -53,7 +56,7 @@ export default function AdminPlanAuditLog() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
           <input
             type="text"
-            placeholder="Buscar por email o motivo..."
+            placeholder={t('admin.planAudit.searchPlaceholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg"
@@ -64,8 +67,8 @@ export default function AdminPlanAuditLog() {
           onChange={e => setTypeFilter(e.target.value)}
           className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
         >
-          <option value="all">Todos los tipos</option>
-          {Object.entries(CHANGE_TYPE_CONFIG).map(([key, cfg]) => (
+          <option value="all">{t('admin.planAudit.allTypes')}</option>
+          {Object.entries(changeTypeConfig).map(([key, cfg]) => (
             <option key={key} value={key}>{cfg.label}</option>
           ))}
         </select>
@@ -78,8 +81,8 @@ export default function AdminPlanAuditLog() {
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <Shield className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500 font-medium">Sin registros todavía</p>
-          <p className="text-xs text-gray-400 mt-1">Los cambios de planes quedarán registrados aquí</p>
+          <p className="text-gray-500 font-medium">{t('admin.planAudit.empty.title')}</p>
+          <p className="text-xs text-gray-400 mt-1">{t('admin.planAudit.empty.description')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -87,18 +90,18 @@ export default function AdminPlanAuditLog() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Fecha</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Tipo</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Usuario afectado</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Cambio</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Realizado por</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Motivo</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Válido hasta</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">{t('admin.planAudit.columns.date')}</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">{t('admin.planAudit.columns.type')}</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">{t('admin.planAudit.columns.user')}</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">{t('admin.planAudit.columns.change')}</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">{t('admin.planAudit.columns.changedBy')}</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">{t('admin.planAudit.columns.reason')}</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">{t('admin.planAudit.columns.validUntil')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map(log => {
-                  const cfg = CHANGE_TYPE_CONFIG[log.change_type] || { label: log.change_type, color: 'bg-gray-100 text-gray-600', icon: ArrowRightLeft };
+                  const cfg = changeTypeConfig[log.change_type] || { label: log.change_type, color: 'bg-gray-100 text-gray-600', icon: ArrowRightLeft };
                   const Icon = cfg.icon;
                   return (
                     <tr key={log.id} className="hover:bg-gray-50">
@@ -131,7 +134,7 @@ export default function AdminPlanAuditLog() {
             </table>
           </div>
           <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 text-xs text-gray-400">
-            {filtered.length} registro{filtered.length !== 1 ? 's' : ''}
+            {t('admin.planAudit.count', { count: filtered.length })}
           </div>
         </div>
       )}

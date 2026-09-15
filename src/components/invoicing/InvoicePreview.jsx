@@ -1,10 +1,10 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export default function InvoicePreview({ invoiceData }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   if (!invoiceData) return null;
 
@@ -16,11 +16,11 @@ export default function InvoicePreview({ invoiceData }) {
           {invoiceData.emisor_logo_url && (
             <img 
               src={invoiceData.emisor_logo_url} 
-              alt="Logo" 
+              alt={t('invoices.labels.logoAlt')} 
               className="h-16 w-auto mb-4"
             />
           )}
-          <h1 className="text-3xl font-bold text-gray-900">{t('invoice') || 'FACTURA'}</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('invoices.preview.title')}</h1>
           <p className="text-xl text-gray-600 mt-1">{invoiceData.invoice_number}</p>
         </div>
         
@@ -30,8 +30,8 @@ export default function InvoicePreview({ invoiceData }) {
           <p className="text-gray-600">{invoiceData.emisor_direccion}</p>
           <p className="text-gray-600">{invoiceData.emisor_cp} {invoiceData.emisor_ciudad}</p>
           <p className="text-gray-600">{invoiceData.emisor_provincia}, {invoiceData.emisor_pais}</p>
-          {invoiceData.emisor_telefono && <p className="text-gray-600">{t('phone')}: {invoiceData.emisor_telefono}</p>}
-          {invoiceData.emisor_email && <p className="text-gray-600">{t('email')}: {invoiceData.emisor_email}</p>}
+          {invoiceData.emisor_telefono && <p className="text-gray-600">{t('phoneField')}: {invoiceData.emisor_telefono}</p>}
+          {invoiceData.emisor_email && <p className="text-gray-600">{t('emailField')}: {invoiceData.emisor_email}</p>}
           {invoiceData.emisor_web && <p className="text-gray-600">{invoiceData.emisor_web}</p>}
         </div>
       </div>
@@ -41,7 +41,7 @@ export default function InvoicePreview({ invoiceData }) {
       {/* DATOS CLIENTE Y FECHAS */}
       <div className="grid grid-cols-2 gap-8 mb-8">
         <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{t('billedTo') || 'Facturar a'}</p>
+          <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{t('invoices.preview.billedTo')}</p>
           <div className="text-sm">
             <p className="font-semibold text-gray-900">{invoiceData.client_name}</p>
             {invoiceData.client_nif && <p className="text-gray-600">{t('nifCif')}: {invoiceData.client_nif}</p>}
@@ -54,15 +54,15 @@ export default function InvoicePreview({ invoiceData }) {
         <div>
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">{t('issueDate') || 'Fecha emisión'}:</span>
+              <span className="text-gray-600">{t('issueDate')}:</span>
               <span className="font-semibold">{new Date(invoiceData.issue_date).toLocaleDateString('es-ES')}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">{t('dueDate') || 'Vencimiento'}:</span>
+              <span className="text-gray-600">{t('dueDate')}:</span>
               <span className="font-semibold">{new Date(invoiceData.due_date).toLocaleDateString('es-ES')}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">{t('paymentMethod') || 'Forma de pago'}:</span>
+              <span className="text-gray-600">{t('paymentMethod')}:</span>
               <span className="font-semibold">{invoiceData.payment_method}</span>
             </div>
           </div>
@@ -74,12 +74,12 @@ export default function InvoicePreview({ invoiceData }) {
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
             <tr>
-              <th className="text-left p-2 font-semibold">{t('description') || 'Descripción'}</th>
-              <th className="text-center p-2 font-semibold w-16">{t('qty') || 'Cant.'}</th>
-              <th className="text-right p-2 font-semibold w-24">{t('unitPrice') || 'P. Unit.'}</th>
-              <th className="text-right p-2 font-semibold w-16">{t('discount') || 'Dto.'}</th>
-              <th className="text-right p-2 font-semibold w-16">{t('vat') || 'IVA'}</th>
-              <th className="text-right p-2 font-semibold w-24">{t('total') || 'Total'}</th>
+              <th className="text-left p-2 font-semibold">{t('description')}</th>
+              <th className="text-center p-2 font-semibold w-16">{t('qty')}</th>
+              <th className="text-right p-2 font-semibold w-24">{t('unitPrice')}</th>
+              <th className="text-right p-2 font-semibold w-16">{t('discount')}</th>
+              <th className="text-right p-2 font-semibold w-16">{t('vat')}</th>
+              <th className="text-right p-2 font-semibold w-24">{t('total')}</th>
             </tr>
           </thead>
           <tbody>
@@ -91,7 +91,7 @@ export default function InvoicePreview({ invoiceData }) {
                 <td className="text-right p-2">{item.discount_percent > 0 ? `${item.discount_percent}%` : '-'}</td>
                 <td className="text-right p-2">
                   {item.exenta_iva ? (
-                    <span className="text-xs text-gray-500">{t('exempt') || 'Exenta'}</span>
+                    <span className="text-xs text-gray-500">{t('invoices.preview.exempt')}</span>
                   ) : (
                     `${item.iva_percent}%`
                   )}
@@ -107,17 +107,17 @@ export default function InvoicePreview({ invoiceData }) {
       <div className="flex justify-end">
         <div className="w-80 space-y-2 text-sm">
           <div className="flex justify-between py-1">
-            <span className="text-gray-600">{t('taxableBase') || 'Base imponible'}:</span>
+            <span className="text-gray-600">{t('taxableBase')}:</span>
             <span className="font-semibold">{invoiceData.subtotal.toFixed(2)}€</span>
           </div>
           <div className="flex justify-between py-1">
-            <span className="text-gray-600">{t('totalVAT') || 'Total IVA'}:</span>
+            <span className="text-gray-600">{t('totalVAT')}:</span>
             <span className="font-semibold">{invoiceData.total_iva.toFixed(2)}€</span>
           </div>
           
           {invoiceData.aplica_retencion && (
             <div className="flex justify-between py-1 text-red-600">
-              <span>{t('irpfRetention') || 'Retención IRPF'} ({invoiceData.porcentaje_retencion}%):</span>
+              <span>{t('invoices.preview.irpfRetention')} ({invoiceData.porcentaje_retencion}%):</span>
               <span className="font-semibold">-{invoiceData.total_retencion.toFixed(2)}€</span>
             </div>
           )}
@@ -125,7 +125,7 @@ export default function InvoicePreview({ invoiceData }) {
           <Separator className="my-2" />
           
           <div className="flex justify-between py-2 text-lg font-bold bg-blue-50 px-3 rounded">
-            <span>{t('totalInvoice') || 'TOTAL'}:</span>
+            <span>{t('totalInvoice')}:</span>
             <span className="text-blue-700">{invoiceData.total.toFixed(2)}€</span>
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function InvoicePreview({ invoiceData }) {
       {/* INFORMACIÓN DE PAGO */}
       {invoiceData.emisor_iban && (
         <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs font-semibold text-gray-700 mb-2">{t('bankDetails') || 'Datos bancarios para el pago'}:</p>
+          <p className="text-xs font-semibold text-gray-700 mb-2">{t('invoices.preview.bankDetails')}:</p>
           <p className="text-sm font-mono">{invoiceData.emisor_iban}</p>
         </div>
       )}
@@ -142,7 +142,7 @@ export default function InvoicePreview({ invoiceData }) {
       {/* NOTAS */}
       {invoiceData.notes && (
         <div className="mt-6">
-          <p className="text-xs font-semibold text-gray-700 mb-1">{t('observations') || 'Observaciones'}:</p>
+          <p className="text-xs font-semibold text-gray-700 mb-1">{t('observations')}:</p>
           <p className="text-sm text-gray-600 whitespace-pre-wrap">{invoiceData.notes}</p>
         </div>
       )}

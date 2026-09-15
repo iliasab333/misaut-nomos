@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Sparkles, X } from 'lucide-react';
 import AIAssistantChat from './AIAssistantChat';
@@ -8,19 +9,20 @@ import AIAssistantChat from './AIAssistantChat';
 const PROACTIVE_TRIGGERS = {
   search_idle: {
     delay: 45000, // 45 segundos en búsqueda sin acción
-    message: '¿Necesitas ayuda para encontrar un profesional? Puedo refinar la búsqueda según tus necesidades.'
+    key: 'assistant.proactive.searchIdle'
   },
   category_browsing: {
     delay: 30000,
-    message: '¿Buscas un servicio específico en esta categoría? Cuéntame qué necesitas y te ayudo.'
+    key: 'assistant.proactive.categoryBrowsing'
   },
   profile_viewing: {
     delay: 20000,
-    message: '¿Te interesa este profesional? Puedo ayudarte a contactarlo o buscar opciones similares.'
+    key: 'assistant.proactive.profileViewing'
   }
 };
 
 export default function AIAssistantButton() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [proactiveMessage, setProactiveMessage] = useState(null);
   const [showProactiveBubble, setShowProactiveBubble] = useState(false);
@@ -115,11 +117,11 @@ export default function AIAssistantButton() {
         if (timeSinceActivity >= delay - 5000) {
           if ('requestIdleCallback' in window) {
             requestIdleCallback(() => {
-              setProactiveMessage(trigger.message);
+              setProactiveMessage(t(trigger.key));
               setShowProactiveBubble(true);
             });
           } else {
-            setProactiveMessage(trigger.message);
+            setProactiveMessage(t(trigger.key));
             setShowProactiveBubble(true);
           }
         }
@@ -129,7 +131,7 @@ export default function AIAssistantButton() {
 
     const timer = scheduleProactive();
     return () => clearTimeout(timer);
-  }, [location.pathname, isOpen, browsingContext.lastActivity]);
+  }, [location.pathname, isOpen, browsingContext.lastActivity, t]);
 
   // Registrar actividad del usuario
   const registerActivity = useCallback(() => {
@@ -180,7 +182,7 @@ export default function AIAssistantButton() {
                   className="mt-2 bg-blue-600 hover:bg-blue-700 text-xs h-8"
                   onClick={() => handleOpenChat(proactiveMessage)}
                 >
-                  Sí, ayúdame
+                  {t('assistant.proactive.accept')}
                 </Button>
               </div>
             </div>
@@ -192,7 +194,7 @@ export default function AIAssistantButton() {
         onClick={() => handleOpenChat()}
         className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-40 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all hover:scale-105"
         size="icon"
-        aria-label="Abrir asistente IA"
+        aria-label={t('assistant.button.open')}
       >
         <div className="relative">
           <MessageSquare className="w-6 h-6" />

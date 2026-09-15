@@ -6,6 +6,7 @@ import {
   Mail, Briefcase, TrendingUp,
 } from 'lucide-react';
 import SEOHead from '@/components/seo/SEOHead';
+import { useTranslation } from 'react-i18next';
 
 const NAVY = '#00255C';
 const NAVY_SOFT = 'rgba(0,37,92,0.06)';
@@ -30,11 +31,12 @@ function StatCard({ icon: Icon, label, value, sub }) {
 }
 
 function Breakdown({ title, items, total, accent = NAVY }) {
+  const { t } = useTranslation();
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5">
       <h3 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 mb-4">{title}</h3>
       {items.length === 0 ? (
-        <p className="text-sm text-slate-400">Sin datos.</p>
+        <p className="text-sm text-slate-400">{t('admin.dashboard.noData')}</p>
       ) : (
         <ul className="space-y-2.5">
           {items.map(({ key, count }) => {
@@ -42,7 +44,7 @@ function Breakdown({ title, items, total, accent = NAVY }) {
             return (
               <li key={key || 'sin'}>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-800 truncate pr-3">{key || 'Sin asignar'}</span>
+                  <span className="text-slate-800 truncate pr-3">{key || t('admin.dashboard.unassigned')}</span>
                   <span className="font-semibold text-slate-900 tabular-nums">{count}</span>
                 </div>
                 <div className="mt-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#EEF2F8' }}>
@@ -58,6 +60,7 @@ function Breakdown({ title, items, total, accent = NAVY }) {
 }
 
 export default function AdminDashboardPage() {
+  const { t } = useTranslation();
   const [range, setRange] = useState(30);
 
   const { data: users = [], isLoading: loadingUsers } = useQuery({
@@ -140,15 +143,15 @@ export default function AdminDashboardPage() {
 
   return (
     <>
-      <SEOHead title="Métricas · Admin" noindex />
+      <SEOHead title={t('admin.dashboard.seoTitle')} noindex />
       <main className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
           <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em' }}>
-                Métricas
+                {t('admin.dashboard.title')}
               </h1>
-              <p className="text-sm text-slate-500 mt-1">Datos en directo de la plataforma.</p>
+              <p className="text-sm text-slate-500 mt-1">{t('admin.dashboard.subtitle')}</p>
             </div>
             <div className="inline-flex p-1 rounded-xl bg-slate-100">
               {[7, 30, 90].map((d) => (
@@ -160,7 +163,7 @@ export default function AdminDashboardPage() {
                     range === d ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  {d}d
+                  {t('admin.dashboard.rangeDays', { days: d })}
                 </button>
               ))}
             </div>
@@ -178,25 +181,25 @@ export default function AdminDashboardPage() {
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard icon={Users} label="Usuarios" value={stats.users} sub={`${stats.newUsers} nuevos ${range}d`} />
-                <StatCard icon={Briefcase} label="Profesionales activos" value={stats.activeProfiles} sub={`${profiles.length} totales`} />
-                <StatCard icon={Mail} label="Suscriptores" value={stats.subsActive} sub={`${subscribers.length} totales`} />
-                <StatCard icon={MessageSquare} label="Mensajes" value={stats.msgsInRange} sub={`últimos ${range}d`} />
+                <StatCard icon={Users} label={t('admin.dashboard.stats.users')} value={stats.users} sub={t('admin.dashboard.stats.newUsers', { count: stats.newUsers, days: range })} />
+                <StatCard icon={Briefcase} label={t('admin.dashboard.stats.activeProfessionals')} value={stats.activeProfiles} sub={t('admin.dashboard.stats.totalCount', { count: profiles.length })} />
+                <StatCard icon={Mail} label={t('admin.dashboard.stats.subscribers')} value={stats.subsActive} sub={t('admin.dashboard.stats.totalCount', { count: subscribers.length })} />
+                <StatCard icon={MessageSquare} label={t('messages.title')} value={stats.msgsInRange} sub={t('admin.dashboard.stats.lastDays', { days: range })} />
               </div>
 
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 mt-10 mb-3">Actividad ({range}d)</h2>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 mt-10 mb-3">{t('admin.dashboard.activity', { days: range })}</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard icon={Eye} label="Vistas de perfil" value={stats.views} />
-                <StatCard icon={SearchIcon} label="Apariciones en búsqueda" value={stats.appearances} />
-                <StatCard icon={MousePointerClick} label="Clics de contacto" value={stats.contactClicks} />
-                <StatCard icon={TrendingUp} label="Mensajes recibidos" value={stats.messagesReceived} />
+                <StatCard icon={Eye} label={t('admin.dashboard.stats.profileViews')} value={stats.views} />
+                <StatCard icon={SearchIcon} label={t('admin.dashboard.stats.searchAppearances')} value={stats.appearances} />
+                <StatCard icon={MousePointerClick} label={t('admin.dashboard.stats.contactClicks')} value={stats.contactClicks} />
+                <StatCard icon={TrendingUp} label={t('admin.dashboard.stats.messagesReceived')} value={stats.messagesReceived} />
               </div>
 
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 mt-10 mb-3">Reparto de profesionales activos</h2>
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 mt-10 mb-3">{t('admin.dashboard.breakdownTitle')}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Breakdown title="Top categorías" items={byCategory} total={stats.activeProfiles} accent={NAVY} />
-                <Breakdown title="Top provincias" items={byProvincia} total={stats.activeProfiles} accent={NAVY} />
-                <Breakdown title="Top ciudades" items={byCiudad} total={stats.activeProfiles} accent={GOLD} />
+                <Breakdown title={t('admin.dashboard.topCategories')} items={byCategory} total={stats.activeProfiles} accent={NAVY} />
+                <Breakdown title={t('admin.dashboard.topProvinces')} items={byProvincia} total={stats.activeProfiles} accent={NAVY} />
+                <Breakdown title={t('admin.dashboard.topCities')} items={byCiudad} total={stats.activeProfiles} accent={GOLD} />
               </div>
             </>
           )}

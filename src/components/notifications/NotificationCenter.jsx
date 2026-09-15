@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Bell, Check, CheckCheck, Trash2, Mail, Star, AlertCircle, Info } from "lucide-react";
@@ -19,6 +20,7 @@ import { es } from "date-fns/locale";
 import { toast } from "sonner";
 
 export default function NotificationCenter({ user }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
@@ -62,7 +64,7 @@ export default function NotificationCenter({ user }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Todas las notificaciones marcadas como leídas');
+      toast.success(t('notifications.center.allRead'));
     }
   });
 
@@ -73,7 +75,7 @@ export default function NotificationCenter({ user }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Notificación eliminada');
+      toast.success(t('notifications.toast.deleted'));
     }
   });
 
@@ -145,7 +147,7 @@ export default function NotificationCenter({ user }) {
           type="button"
           style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', background: 'none', border: 'none', padding: 0 }}
           className="relative w-14 h-14 flex items-center justify-center rounded-lg text-gray-700 active:bg-gray-100"
-          aria-label="Notificaciones"
+          aria-label={t('notifications.title')}
         >
           <Bell className="w-5 h-5 pointer-events-none" />
           {unreadCount > 0 && (
@@ -158,7 +160,7 @@ export default function NotificationCenter({ user }) {
       
       <DropdownMenuContent align="end" className="w-80 md:w-96">
         <DropdownMenuLabel className="flex items-center justify-between">
-          <span className="text-base font-bold">Notificaciones</span>
+          <span className="text-base font-bold">{t('notifications.title')}</span>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
@@ -168,7 +170,7 @@ export default function NotificationCenter({ user }) {
               className="h-7 text-xs"
             >
               <CheckCheck className="w-3 h-3 mr-1" />
-              Marcar todas como leídas
+              {t('notifications.center.markAllRead')}
             </Button>
           )}
         </DropdownMenuLabel>
@@ -178,13 +180,13 @@ export default function NotificationCenter({ user }) {
         <ScrollArea className="h-[400px]">
           {isLoading ? (
             <div className="p-8 text-center text-gray-500">
-              <p className="text-sm">Cargando notificaciones...</p>
+              <p className="text-sm">{t('notifications.center.loading')}</p>
             </div>
           ) : notifications.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p className="text-sm font-medium">Sin notificaciones</p>
-              <p className="text-xs">Te avisaremos cuando haya novedades</p>
+              <p className="text-sm font-medium">{t('notifications.empty')}</p>
+              <p className="text-xs">{t('notifications.emptyHint')}</p>
             </div>
           ) : (
             notifications.map((notification) => (
@@ -250,7 +252,7 @@ export default function NotificationCenter({ user }) {
                   setIsOpen(false);
                 }}
               >
-                Ver todas las notificaciones
+                {t('notifications.center.viewAll')}
               </Button>
             </div>
           </>

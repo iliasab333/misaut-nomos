@@ -8,11 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import MobileSelect from "@/components/ui/MobileSelect";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2, Eye, Sparkles, Download } from "lucide-react";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import InvoiceAIAssistant from "./InvoiceAIAssistant";
 
 export default function InvoiceForm({ invoice, settings, clients = [], onSave, onCancel, onPreview, onDownloadPDF }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   
   const getNextInvoiceNumber = () => {
     if (!settings) return "001";
@@ -207,7 +207,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
           className={showAIAssistant ? "bg-purple-50 text-purple-700 border-purple-300" : ""}
         >
           <Sparkles className="w-4 h-4 mr-1.5" />
-          IA
+          {t('invoices.form.aiButton')}
         </Button>
         <div className="flex-1" />
         <Button size="sm" variant="outline" onClick={onCancel}>
@@ -215,7 +215,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
         </Button>
         <Button size="sm" variant="outline" onClick={() => onPreview(formData)}>
           <Eye className="w-4 h-4 mr-1.5" />
-          {t('preview') || 'Vista previa'}
+          {t('preview')}
         </Button>
         {invoice && onDownloadPDF && (
           <Button
@@ -247,7 +247,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t('issuerData') || 'Datos del emisor'}</CardTitle>
+            <CardTitle className="text-base">{t('issuerData')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="text-sm space-y-1">
@@ -259,23 +259,23 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
               {formData.emisor_telefono && <p className="text-gray-600">{formData.emisor_telefono}</p>}
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              {t('editInProfile') || 'Edita estos datos en "Datos de facturación"'}
+              {t('editInProfile')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t('clientData') || 'Datos del cliente'}</CardTitle>
+            <CardTitle className="text-base">{t('clientData')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {clients.length > 0 && (
               <div>
-                <Label>{t('selectExistingClient') || 'Cliente guardado'}</Label>
+                <Label>{t('selectExistingClient')}</Label>
                 <MobileSelect
                   onValueChange={loadClientData}
-                  placeholder={t('newClient') || 'Nuevo cliente...'}
-                  label={t('selectExistingClient') || 'Cliente guardado'}
+                  placeholder={t('newClient')}
+                  label={t('selectExistingClient')}
                 >
                   {clients.map(client => (
                     <SelectItem key={client.id} value={client.id}>
@@ -288,15 +288,15 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label>{t('clientName') || 'Nombre/Empresa'} *</Label>
+                <Label>{t('clientName')} *</Label>
                 <Input
                   value={formData.client_name}
                   onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
-                  placeholder="Acme S.L."
+                  placeholder={t('invoices.placeholders.clientName')}
                 />
               </div>
               <div>
-                <Label>{t('clientNif') || 'NIF/CIF'}</Label>
+                <Label>{t('clientNif')}</Label>
                 <Input
                   value={formData.client_nif}
                   onChange={(e) => setFormData({ ...formData, client_nif: e.target.value.toUpperCase() })}
@@ -306,17 +306,17 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
             </div>
 
             <div>
-              <Label>{t('clientAddress') || 'Dirección'}</Label>
+              <Label>{t('clientAddress')}</Label>
               <Input
                 value={formData.client_address}
                 onChange={(e) => setFormData({ ...formData, client_address: e.target.value })}
-                placeholder="Calle Principal, 45"
+                placeholder={t('invoices.placeholders.clientAddress')}
               />
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <div>
-                <Label>{t('postalCode') || 'CP'}</Label>
+                <Label>{t('postalCode')}</Label>
                 <Input
                   value={formData.client_cp}
                   onChange={(e) => setFormData({ ...formData, client_cp: e.target.value })}
@@ -324,30 +324,30 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
                 />
               </div>
               <div>
-                <Label>{t('city') || 'Ciudad'}</Label>
+                <Label>{t('city')}</Label>
                 <Input
                   value={formData.client_ciudad}
                   onChange={(e) => setFormData({ ...formData, client_ciudad: e.target.value })}
-                  placeholder="Madrid"
+                  placeholder={t('invoices.placeholders.city')}
                 />
               </div>
               <div>
-                <Label>{t('province') || 'Provincia'}</Label>
+                <Label>{t('province')}</Label>
                 <Input
                   value={formData.client_provincia}
                   onChange={(e) => setFormData({ ...formData, client_provincia: e.target.value })}
-                  placeholder="Madrid"
+                  placeholder={t('invoices.placeholders.city')}
                 />
               </div>
             </div>
 
             <div>
-              <Label>{t('clientEmail') || 'Email del cliente'}</Label>
+              <Label>{t('clientEmail')}</Label>
               <Input
                 type="email"
                 value={formData.client_email}
                 onChange={(e) => setFormData({ ...formData, client_email: e.target.value })}
-                placeholder="cliente@email.com"
+                placeholder={t('invoices.placeholders.clientEmail')}
               />
             </div>
           </CardContent>
@@ -356,16 +356,16 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{t('invoiceDetails') || 'Detalles de la factura'}</CardTitle>
+          <CardTitle className="text-base">{t('invoiceDetails')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label>{t('invoiceNumber') || 'Nº Factura'}</Label>
+              <Label>{t('invoiceNumber')}</Label>
               <Input value={formData.invoice_number} disabled className="bg-gray-50" />
             </div>
             <div>
-              <Label>{t('issueDate') || 'Fecha emisión'} *</Label>
+              <Label>{t('issueDate')} *</Label>
               <Input
                 type="date"
                 value={formData.issue_date}
@@ -376,7 +376,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
               />
             </div>
             <div>
-              <Label>{t('dueDate') || 'Fecha vencimiento'}</Label>
+              <Label>{t('dueDate')}</Label>
               <Input
                 type="date"
                 value={formData.due_date}
@@ -384,16 +384,16 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
               />
             </div>
             <div>
-              <Label>{t('paymentMethod') || 'Método de pago'}</Label>
+              <Label>{t('paymentMethod')}</Label>
               <MobileSelect
                 value={formData.payment_method}
                 onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
-                label={t('paymentMethod') || 'Método de pago'}
+                label={t('paymentMethod')}
               >
-                <SelectItem value="Transferencia bancaria">{t('bankTransfer') || 'Transferencia'}</SelectItem>
+                <SelectItem value="Transferencia bancaria">{t('bankTransfer')}</SelectItem>
                 <SelectItem value="Tarjeta">{t('card')}</SelectItem>
                 <SelectItem value="Efectivo">{t('cash')}</SelectItem>
-                <SelectItem value="Bizum">Bizum</SelectItem>
+                <SelectItem value="Bizum">{t('invoices.paymentMethods.bizum')}</SelectItem>
               </MobileSelect>
             </div>
           </div>
@@ -403,10 +403,10 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">{t('invoiceLines') || 'Líneas de factura'}</CardTitle>
+            <CardTitle className="text-base">{t('invoiceLines')}</CardTitle>
             <Button onClick={addItem} size="sm" variant="outline">
               <Plus className="w-4 h-4 mr-1" />
-              {t('addLine') || 'Añadir línea'}
+              {t('addLine')}
             </Button>
           </div>
         </CardHeader>
@@ -416,16 +416,16 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
               <div key={idx} className="p-4 border rounded-lg space-y-3 bg-gray-50">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
                   <div className="md:col-span-4">
-                    <Label className="text-xs">{t('description') || 'Descripción'}</Label>
+                    <Label className="text-xs">{t('description')}</Label>
                     <Input
                       value={item.description}
                       onChange={(e) => updateItem(idx, 'description', e.target.value)}
-                      placeholder={t('serviceConcept') || 'Concepto del servicio'}
+                      placeholder={t('serviceConcept')}
                       className="text-sm"
                     />
                   </div>
                   <div className="md:col-span-1">
-                    <Label className="text-xs">{t('qty') || 'Cant.'}</Label>
+                    <Label className="text-xs">{t('qty')}</Label>
                     <Input
                       type="number"
                       value={item.quantity}
@@ -436,7 +436,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label className="text-xs">{t('unitPrice') || 'Precio unit.'}</Label>
+                    <Label className="text-xs">{t('unitPrice')}</Label>
                     <Input
                       type="number"
                       value={item.unit_price}
@@ -447,7 +447,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
                     />
                   </div>
                   <div className="md:col-span-1">
-                    <Label className="text-xs">{t('discount') || 'Dto %'}</Label>
+                    <Label className="text-xs">{t('discount')}</Label>
                     <Input
                       type="number"
                       value={item.discount_percent}
@@ -458,7 +458,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label className="text-xs">{t('vat') || 'IVA %'}</Label>
+                    <Label className="text-xs">{t('vat')}</Label>
                     <Select
                       value={item.iva_percent.toString()}
                       onValueChange={(value) => updateItem(idx, 'iva_percent', parseFloat(value))}
@@ -497,7 +497,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
                     checked={item.exenta_iva}
                     onCheckedChange={(checked) => updateItem(idx, 'exenta_iva', checked)}
                   />
-                  <Label className="text-xs text-gray-600">{t('exemptVAT') || 'Exenta de IVA'}</Label>
+                  <Label className="text-xs text-gray-600">{t('exemptVAT')}</Label>
                 </div>
               </div>
             ))}
@@ -506,17 +506,17 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
           <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-700">{t('taxableBase') || 'Base imponible'}:</span>
+                <span className="text-gray-700">{t('taxableBase')}:</span>
                 <span className="font-semibold">{formData.subtotal.toFixed(2)}€</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-700">{t('totalVAT') || 'Total IVA'}:</span>
+                <span className="text-gray-700">{t('totalVAT')}:</span>
                 <span className="font-semibold">{formData.total_iva.toFixed(2)}€</span>
               </div>
               
               <div className="pt-2 border-t border-blue-200">
                 <div className="flex items-center justify-between mb-2">
-                  <Label className="text-sm">{t('applyIRPFRetention') || 'Aplicar retención IRPF'}</Label>
+                  <Label className="text-sm">{t('applyIRPFRetention')}</Label>
                   <Switch
                     checked={formData.aplica_retencion}
                     onCheckedChange={(checked) => setFormData({ ...formData, aplica_retencion: checked })}
@@ -526,7 +526,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
                 {formData.aplica_retencion && (
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <Label className="text-xs">{t('retentionPercentage') || '% Retención'}</Label>
+                      <Label className="text-xs">{t('retentionPercentage')}</Label>
                       <Select
                         value={formData.porcentaje_retencion.toString()}
                         onValueChange={(value) => setFormData({ ...formData, porcentaje_retencion: parseFloat(value) })}
@@ -543,7 +543,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-xs">{t('retentionAmount') || 'Importe'}</Label>
+                      <Label className="text-xs">{t('retentionAmount')}</Label>
                       <Input value={`-${formData.total_retencion.toFixed(2)}€`} disabled className="h-8 text-sm bg-white" />
                     </div>
                   </div>
@@ -551,7 +551,7 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
               </div>
               
               <div className="flex justify-between pt-2 border-t border-blue-300 text-lg font-bold">
-                <span>{t('totalInvoice') || 'TOTAL'}:</span>
+                <span>{t('totalInvoice')}:</span>
                 <span className="text-blue-700">{formData.total.toFixed(2)}€</span>
               </div>
             </div>
@@ -561,24 +561,24 @@ export default function InvoiceForm({ invoice, settings, clients = [], onSave, o
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{t('notesAndLegal') || 'Notas y texto legal'}</CardTitle>
+          <CardTitle className="text-base">{t('notesAndLegal')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label>{t('observations') || 'Observaciones'}</Label>
+            <Label>{t('observations')}</Label>
             <Textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder={t('notesPlaceholder') || 'Cualquier información adicional para el cliente...'}
+              placeholder={t('notesPlaceholder')}
               className="h-20"
             />
           </div>
           <div>
-            <Label>{t('legalFooter') || 'Texto legal (pie de factura)'}</Label>
+            <Label>{t('legalFooter')}</Label>
             <Textarea
               value={formData.legal_text}
               onChange={(e) => setFormData({ ...formData, legal_text: e.target.value })}
-              placeholder={t('legalTextPlaceholder') || 'Factura sujeta a...'}
+              placeholder={t('legalTextPlaceholder')}
               className="h-20"
             />
           </div>

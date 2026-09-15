@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ const STATUS_COLORS = {
 };
 
 export default function AdminSupportTickets({ tickets }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [filter, setFilter] = useState("abierto");
 
@@ -30,17 +32,17 @@ export default function AdminSupportTickets({ tickets }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">🎫 Tickets de soporte</h2>
+        <h2 className="text-lg font-bold text-gray-900">{t("admin.supportTickets.title")}</h2>
         <div className="flex items-center gap-2">
           {openTickets.length > 0 && (
             <div className="flex items-center gap-1.5 bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-1.5 rounded-lg font-semibold">
               <AlertCircle className="w-3.5 h-3.5" />
-              {openTickets.length} sin resolver
+              {t("admin.supportTickets.unresolved", { count: openTickets.length })}
             </div>
           )}
           <Button size="sm" variant="outline" onClick={() => navigate(createPageUrl("AdminTickets"))}>
             <ExternalLink className="w-3.5 h-3.5 mr-1" />
-            Ver todos
+            {t("admin.supportTickets.viewAll")}
           </Button>
         </div>
       </div>
@@ -52,7 +54,7 @@ export default function AdminSupportTickets({ tickets }) {
             onClick={() => setFilter(s)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${filter === s ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
           >
-            {s === "todos" ? "Todos" : s.replace("_", " ")}
+            {s === "todos" ? t("admin.supportTickets.filterAll") : s.replace("_", " ")}
           </button>
         ))}
       </div>
@@ -61,7 +63,7 @@ export default function AdminSupportTickets({ tickets }) {
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <Clock className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-            <p>No hay tickets con este filtro</p>
+            <p>{t("admin.supportTickets.empty")}</p>
           </div>
         ) : (
           filtered.slice(0, 50).map(ticket => (

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Users, TrendingUp, Star, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function SocialProof({ profilesCount = 0 }) {
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     professionals: 0,
     jobsCompleted: 0,
@@ -35,7 +37,7 @@ export default function SocialProof({ profilesCount = 0 }) {
       >
         <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
         <p className="text-2xl font-bold text-blue-900">{stats.professionals}+</p>
-        <p className="text-xs text-blue-700">Profesionales activos</p>
+        <p className="text-xs text-blue-700">{t('pricing.socialProof.activeProfessionals')}</p>
       </motion.div>
 
       <motion.div 
@@ -46,7 +48,7 @@ export default function SocialProof({ profilesCount = 0 }) {
       >
         <TrendingUp className="w-6 h-6 text-green-600 mx-auto mb-2" />
         <p className="text-2xl font-bold text-green-900">{stats.jobsCompleted}+</p>
-        <p className="text-xs text-green-700">Trabajos este mes</p>
+        <p className="text-xs text-green-700">{t('pricing.socialProof.jobsThisMonth')}</p>
       </motion.div>
 
       <motion.div 
@@ -57,7 +59,7 @@ export default function SocialProof({ profilesCount = 0 }) {
       >
         <Star className="w-6 h-6 text-yellow-600 mx-auto mb-2 fill-yellow-600" />
         <p className="text-2xl font-bold text-yellow-900">{stats.avgRating}</p>
-        <p className="text-xs text-yellow-700">Valoración media</p>
+        <p className="text-xs text-yellow-700">{t('pricing.socialProof.avgRating')}</p>
       </motion.div>
 
       <motion.div 
@@ -68,7 +70,7 @@ export default function SocialProof({ profilesCount = 0 }) {
       >
         <Award className="w-6 h-6 text-purple-600 mx-auto mb-2" />
         <p className="text-2xl font-bold text-purple-900">{stats.satisfaction}%</p>
-        <p className="text-xs text-purple-700">Satisfacción</p>
+        <p className="text-xs text-purple-700">{t('pricing.socialProof.satisfaction')}</p>
       </motion.div>
     </div>
   );

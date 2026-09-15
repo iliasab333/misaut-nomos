@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Loader2 } from "lucide-react";
@@ -15,6 +16,7 @@ import { Loader2 } from "lucide-react";
 //     - Logueado             → /buscar
 // Sin formularios, sin pantallas intermedias innecesarias.
 export default function UserTypeSelectionPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -81,7 +83,7 @@ export default function UserTypeSelectionPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <Loader2 className="w-6 h-6 animate-spin text-slate-400" aria-label="Cargando" />
+      <Loader2 className="w-6 h-6 animate-spin text-slate-400" aria-label={t('onboarding.userType.loading')} />
     </div>
   );
 }

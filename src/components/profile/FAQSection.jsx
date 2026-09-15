@@ -8,21 +8,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle, Plus, Edit2, Trash2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
-
-const FAQ_SUGGESTIONS = [
-  { q: "¿Cuánto cuesta una revisión/presupuesto?", a: "Los presupuestos son gratuitos y sin compromiso." },
-  { q: "¿En qué zonas trabajáis?", a: "Trabajamos en toda la zona metropolitana." },
-  { q: "¿Ofrecéis garantía?", a: "Sí, todos nuestros trabajos tienen garantía." },
-  { q: "¿Cuál es el tiempo de respuesta?", a: "Normalmente respondemos en menos de 24 horas." },
-  { q: "¿Aceptáis trabajos urgentes?", a: "Sí, disponemos de servicio de urgencias." },
-  { q: "¿Qué formas de pago aceptáis?", a: "Aceptamos efectivo, tarjeta, transferencia y Bizum." },
-];
+import { useTranslation } from "react-i18next";
 
 export default function FAQSection({ 
   faqItems = [], 
   isEditing, 
   onFAQChange 
 }) {
+  const { t } = useTranslation();
+  // Dentro del componente para que las sugerencias sigan al idioma activo.
+  const FAQ_SUGGESTIONS = [
+    { q: t("proProfile.faq.suggestions.quoteCostQuestion"), a: t("proProfile.faq.suggestions.quoteCostAnswer") },
+    { q: t("proProfile.faq.suggestions.areasQuestion"), a: t("proProfile.faq.suggestions.areasAnswer") },
+    { q: t("proProfile.faq.suggestions.warrantyQuestion"), a: t("proProfile.faq.suggestions.warrantyAnswer") },
+    { q: t("proProfile.faq.suggestions.responseTimeQuestion"), a: t("proProfile.faq.suggestions.responseTimeAnswer") },
+    { q: t("proProfile.faq.suggestions.urgentQuestion"), a: t("proProfile.faq.suggestions.urgentAnswer") },
+    { q: t("proProfile.faq.suggestions.paymentQuestion"), a: t("proProfile.faq.suggestions.paymentAnswer") },
+  ];
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
@@ -58,7 +60,7 @@ export default function FAQSection({
 
   const saveItem = () => {
     if (!formData.question.trim() || !formData.answer.trim()) {
-      toast.error("Completa la pregunta y la respuesta");
+      toast.error(t("proProfile.faq.requiredBoth"));
       return;
     }
 
@@ -80,12 +82,12 @@ export default function FAQSection({
     onFAQChange(updatedItems);
     setShowAddDialog(false);
     resetForm();
-    toast.success(editingItem ? "Pregunta actualizada" : "Pregunta añadida");
+    toast.success(editingItem ? t("proProfile.faq.updated") : t("proProfile.faq.added"));
   };
 
   const deleteItem = (itemId) => {
     onFAQChange(faqItems.filter(item => item.id !== itemId));
-    toast.success("Pregunta eliminada");
+    toast.success(t("proProfile.faq.deleted"));
   };
 
   return (
@@ -94,29 +96,29 @@ export default function FAQSection({
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <HelpCircle className="w-5 h-5 text-green-600" />
-            Preguntas Frecuentes ({faqItems.length})
+            {t("proProfile.faq.title")} ({faqItems.length})
           </CardTitle>
           {isEditing && (
             <Button onClick={openAddDialog} size="sm" className="bg-green-600 hover:bg-green-700">
               <Plus className="w-4 h-4 mr-1" />
-              Añadir pregunta
+              {t("proProfile.faq.add")}
             </Button>
           )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-gray-600">
-          Configura preguntas frecuentes para que los clientes encuentren respuestas rápidamente
+          {t("proProfile.faq.intro")}
         </p>
 
         {faqItems.length === 0 ? (
           <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
             <MessageSquare className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500">No hay preguntas frecuentes</p>
+            <p className="text-gray-500">{t("proProfile.faq.empty")}</p>
             {isEditing && (
               <Button onClick={openAddDialog} variant="outline" className="mt-3">
                 <Plus className="w-4 h-4 mr-1" />
-                Añadir primera pregunta
+                {t("proProfile.faq.addFirst")}
               </Button>
             )}
           </div>
@@ -140,7 +142,7 @@ export default function FAQSection({
                           onClick={() => openEditDialog(item)}
                         >
                           <Edit2 className="w-3 h-3 mr-1" />
-                          Editar
+                          {t("common.edit")}
                         </Button>
                         <Button 
                           size="sm" 
@@ -149,7 +151,7 @@ export default function FAQSection({
                           onClick={() => deleteItem(item.id)}
                         >
                           <Trash2 className="w-3 h-3 mr-1" />
-                          Eliminar
+                          {t("common.delete")}
                         </Button>
                       </div>
                     )}
@@ -165,14 +167,14 @@ export default function FAQSection({
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>
-                {editingItem ? "Editar pregunta" : "Añadir pregunta frecuente"}
+                {editingItem ? t("proProfile.faq.edit") : t("proProfile.faq.addNew")}
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
               {!editingItem && (
                 <div>
-                  <Label className="text-sm text-gray-600">Sugerencias rápidas:</Label>
+                  <Label className="text-sm text-gray-600">{t("proProfile.faq.quickSuggestions")}</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {FAQ_SUGGESTIONS.slice(0, 4).map((s, idx) => (
                       <button
@@ -188,20 +190,20 @@ export default function FAQSection({
               )}
 
               <div>
-                <Label>Pregunta *</Label>
+                <Label>{t("proProfile.faq.questionLabel")}</Label>
                 <Input
                   value={formData.question}
                   onChange={(e) => setFormData(prev => ({ ...prev, question: e.target.value }))}
-                  placeholder="Ej: ¿Cuánto cuesta el servicio?"
+                  placeholder={t("proProfile.faq.questionPlaceholder")}
                 />
               </div>
 
               <div>
-                <Label>Respuesta *</Label>
+                <Label>{t("proProfile.faq.answerLabel")}</Label>
                 <Textarea
                   value={formData.answer}
                   onChange={(e) => setFormData(prev => ({ ...prev, answer: e.target.value }))}
-                  placeholder="Escribe una respuesta clara y concisa..."
+                  placeholder={t("proProfile.faq.answerPlaceholder")}
                   className="h-24"
                 />
               </div>
@@ -209,10 +211,10 @@ export default function FAQSection({
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                Cancelar
+                {t("common.cancel")}
               </Button>
               <Button onClick={saveItem} className="bg-green-600 hover:bg-green-700">
-                {editingItem ? "Guardar cambios" : "Añadir pregunta"}
+                {editingItem ? t("proProfile.form.saveChanges") : t("proProfile.faq.add")}
               </Button>
             </DialogFooter>
           </DialogContent>

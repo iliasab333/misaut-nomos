@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,14 +16,24 @@ import { toast } from "sonner";
 // quotePdfGenerator → jspdf (~600 KB). Carga dinámica al pulsar Descargar.
 import SEOHead from "@/components/seo/SEOHead";
 
+// Sólo estilos: la etiqueta de cada estado sale de STATUS_LABEL_KEYS vía t().
 const STATUS_CONFIG = {
-  borrador: { label: "Borrador", className: "bg-gray-100 text-gray-700" },
-  enviado: { label: "Enviado", className: "bg-blue-50 text-blue-700" },
-  aceptado: { label: "Aceptado", className: "bg-green-50 text-green-700" },
-  rechazado: { label: "Rechazado", className: "bg-red-50 text-red-700" },
+  borrador: { className: "bg-gray-100 text-gray-700" },
+  enviado: { className: "bg-blue-50 text-blue-700" },
+  aceptado: { className: "bg-green-50 text-green-700" },
+  rechazado: { className: "bg-red-50 text-red-700" },
+};
+
+// Mapa explícito estado → clave i18n.
+const STATUS_LABEL_KEYS = {
+  borrador: 'draft',
+  enviado: 'quotes.status.sent',
+  aceptado: 'quotes.status.accepted',
+  rechazado: 'quotes.status.rejected',
 };
 
 export default function AcceptQuotePage() {
+  const { t } = useTranslation();
   const { quoteId } = useParams();
   const navigate = useNavigate();
   const [quote, setQuote] = useState(null);
@@ -45,7 +56,7 @@ export default function AcceptQuotePage() {
       setLoading(true);
       const quotes = await base44.entities.Quote.filter({ id: quoteId });
       if (!quotes || quotes.length === 0) {
-        toast.error("Presupuesto no encontrado");
+        toast.error(t('quotes.accept.notFound'));
         navigate("/buscar");
         return;
       }
@@ -57,7 +68,7 @@ export default function AcceptQuotePage() {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
         if (currentUser.id !== q.client_id && currentUser.role !== "admin") {
-          toast.error("No tienes permiso para ver este presupuesto");
+          toast.error(t('quotes.accept.noPermission'));
           navigate("/buscar");
         }
       } catch {
@@ -65,7 +76,7 @@ export default function AcceptQuotePage() {
       }
     } catch (error) {
       console.error("Error loading quote:", error);
-      toast.error("Error al cargar el presupuesto");
+      toast.error(t('quotes.accept.loadError'));
     } finally {
       setLoading(false);
     }
@@ -73,7 +84,7 @@ export default function AcceptQuotePage() {
 
   const handleAccept = async () => {
     if (!fullName.trim() || !termsAccepted) {
-      toast.error("Debes completar tu nombre y aceptar los términos");
+      toast.error(t('quotes.accept.validationError'));
       return;
     }
 
@@ -104,7 +115,7 @@ export default function AcceptQuotePage() {
         });
       } catch {}
 
-      toast.success("¡Presupuesto aceptado correctamente!");
+      toast.success(t('quotes.accept.acceptedToast'));
       setShowAcceptDialog(false);
       setQuote(prev => ({
         ...prev,
@@ -114,7 +125,7 @@ export default function AcceptQuotePage() {
       }));
     } catch (error) {
       console.error("Error accepting quote:", error);
-      toast.error("Error al aceptar el presupuesto");
+      toast.error(t('quotes.accept.acceptError'));
     } finally {
       setAccepting(false);
     }
@@ -122,7 +133,7 @@ export default function AcceptQuotePage() {
 
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
-      toast.error("Por favor, indica el motivo del rechazo");
+      toast.error(t('quotes.accept.reasonRequired'));
       return;
     }
 
@@ -151,7 +162,7 @@ export default function AcceptQuotePage() {
         });
       } catch {}
 
-      toast.success("Presupuesto rechazado");
+      toast.success(t('quotesPage.quoteRejected'));
       setShowRejectDialog(false);
       setQuote(prev => ({
         ...prev,
@@ -160,7 +171,7 @@ export default function AcceptQuotePage() {
       }));
     } catch (error) {
       console.error("Error rejecting quote:", error);
-      toast.error("Error al rechazar el presupuesto");
+      toast.error(t('quotes.accept.rejectError'));
     } finally {
       setRejecting(false);
     }
@@ -191,12 +202,13 @@ export default function AcceptQuotePage() {
   const isAccepted = quote.status === "aceptado";
   const isRejected = quote.status === "rechazado";
   const canInteract = user && user.id === quote.client_id;
+  const statusLabelKey = STATUS_LABEL_KEYS[quote.status];
 
   return (
     <>
       <SEOHead 
-        title={`Presupuesto ${quote.quote_number} — ${quote.title}`} 
-        description={`Presupuesto de ${quote.professional_name}: ${quote.title}`} 
+        title={t('quotes.accept.seoTitle', { number: quote.quote_number, title: quote.title })} 
+        description={t('quotes.accept.seoDescription', { professional: quote.professional_name, title: quote.title })} 
       />
 
       <div className="min-h-screen bg-gray-50 pb-24 md:pb-8">
@@ -208,7 +220,7 @@ export default function AcceptQuotePage() {
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
             >
               <ArrowLeft className="w-4 h-4" />
-              Volver
+              {t('common.back')}
             </button>
             <div className="flex items-center justify-between">
               <div>
@@ -216,7 +228,7 @@ export default function AcceptQuotePage() {
                 <p className="text-sm text-gray-500 mt-1">{quote.quote_number}</p>
               </div>
               <Badge className={STATUS_CONFIG[quote.status]?.className || STATUS_CONFIG.borrador.className}>
-                {STATUS_CONFIG[quote.status]?.label}
+                {statusLabelKey ? t(statusLabelKey) : null}
               </Badge>
             </div>
           </div>
@@ -228,7 +240,7 @@ export default function AcceptQuotePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <User className="w-5 h-5" />
-                Profesional
+                {t('professionalLabel')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -253,7 +265,7 @@ export default function AcceptQuotePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <User className="w-5 h-5" />
-                Cliente
+                {t('clientLabel')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -265,7 +277,7 @@ export default function AcceptQuotePage() {
                 </p>
               )}
               {quote.client_nif && (
-                <p className="text-sm text-gray-600">NIF: {quote.client_nif}</p>
+                <p className="text-sm text-gray-600">{t('quotes.accept.nif', { nif: quote.client_nif })}</p>
               )}
             </CardContent>
           </Card>
@@ -275,25 +287,25 @@ export default function AcceptQuotePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Calendar className="w-5 h-5" />
-                Fechas
+                {t('quotes.accept.dates')}
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-gray-500">Fecha de emisión</p>
+                <p className="text-xs text-gray-500">{t('quotes.fields.issueDate')}</p>
                 <p className="font-medium text-gray-900">
                   {quote.issue_date ? new Date(quote.issue_date).toLocaleDateString("es-ES", { locale: es }) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Válido hasta</p>
+                <p className="text-xs text-gray-500">{t('quotes.fields.validUntil')}</p>
                 <p className="font-medium text-gray-900">
                   {quote.valid_until ? new Date(quote.valid_until).toLocaleDateString("es-ES", { locale: es }) : "—"}
                 </p>
               </div>
               {isAccepted && quote.accepted_date && (
                 <div className="col-span-2">
-                  <p className="text-xs text-gray-500">Aceptado el</p>
+                  <p className="text-xs text-gray-500">{t('quotes.accept.acceptedOn')}</p>
                   <p className="font-medium text-green-700">
                     {new Date(quote.accepted_date).toLocaleDateString("es-ES", { 
                       locale: es, 
@@ -303,14 +315,14 @@ export default function AcceptQuotePage() {
                   </p>
                   {quote.client_signature && (
                     <p className="text-xs text-gray-600 mt-1">
-                      Firmado por: {quote.client_signature}
+                      {t('quotes.accept.signedBy', { name: quote.client_signature })}
                     </p>
                   )}
                 </div>
               )}
               {isRejected && quote.rejection_date && (
                 <div className="col-span-2">
-                  <p className="text-xs text-gray-500">Rechazado el</p>
+                  <p className="text-xs text-gray-500">{t('quotes.accept.rejectedOn')}</p>
                   <p className="font-medium text-red-700">
                     {new Date(quote.rejection_date).toLocaleDateString("es-ES", { 
                       locale: es, 
@@ -327,7 +339,7 @@ export default function AcceptQuotePage() {
           {quote.description && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Descripción</CardTitle>
+                <CardTitle className="text-lg">{t('description')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-700 whitespace-pre-wrap">{quote.description}</p>
@@ -340,7 +352,7 @@ export default function AcceptQuotePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <FileText className="w-5 h-5" />
-                Desglose
+                {t('quotes.accept.breakdown')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -348,10 +360,10 @@ export default function AcceptQuotePage() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b">
                     <tr>
-                      <th className="text-left px-3 py-2 font-medium text-gray-600">Concepto</th>
-                      <th className="text-center px-3 py-2 font-medium text-gray-600">Cant.</th>
-                      <th className="text-right px-3 py-2 font-medium text-gray-600">Precio</th>
-                      <th className="text-right px-3 py-2 font-medium text-gray-600">Total</th>
+                      <th className="text-left px-3 py-2 font-medium text-gray-600">{t('quotes.table.concept')}</th>
+                      <th className="text-center px-3 py-2 font-medium text-gray-600">{t('qty')}</th>
+                      <th className="text-right px-3 py-2 font-medium text-gray-600">{t('quotes.table.price')}</th>
+                      <th className="text-right px-3 py-2 font-medium text-gray-600">{t('total')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -370,13 +382,13 @@ export default function AcceptQuotePage() {
                   </tbody>
                   <tfoot className="bg-gray-50 font-medium">
                     <tr className="border-t">
-                      <td colSpan={3} className="px-3 py-1.5 text-right">Subtotal:</td>
+                      <td colSpan={3} className="px-3 py-1.5 text-right">{t('quotes.table.subtotal')}</td>
                       <td className="px-3 py-1.5 text-right">
                         {parseFloat(quote.subtotal || 0).toFixed(2)}€
                       </td>
                     </tr>
                     <tr>
-                      <td colSpan={3} className="px-3 py-1.5 text-right">IVA:</td>
+                      <td colSpan={3} className="px-3 py-1.5 text-right">{t('quotes.table.vat')}</td>
                       <td className="px-3 py-1.5 text-right">
                         {parseFloat(quote.total_iva || 0).toFixed(2)}€
                       </td>
@@ -384,7 +396,7 @@ export default function AcceptQuotePage() {
                     {quote.aplica_retencion && (
                       <tr>
                         <td colSpan={3} className="px-3 py-1.5 text-right text-red-600">
-                          Retención ({quote.porcentaje_retencion}%):
+                          {t('quotes.table.retention', { percent: quote.porcentaje_retencion })}
                         </td>
                         <td className="px-3 py-1.5 text-right text-red-600">
                           -{parseFloat(quote.total_retencion || 0).toFixed(2)}€
@@ -393,7 +405,7 @@ export default function AcceptQuotePage() {
                     )}
                     <tr className="border-t-2">
                       <td colSpan={3} className="px-3 py-2 text-right font-bold text-lg">
-                        TOTAL:
+                        {t('quotes.table.grandTotal')}
                       </td>
                       <td className="px-3 py-2 text-right font-bold text-green-700 text-xl">
                         {parseFloat(quote.total || 0).toFixed(2)}€
@@ -409,18 +421,18 @@ export default function AcceptQuotePage() {
           {(quote.payment_conditions || quote.notes) && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Condiciones</CardTitle>
+                <CardTitle className="text-lg">{t('quotes.accept.conditions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {quote.payment_conditions && (
                   <div>
-                    <p className="text-xs text-gray-500 font-medium">Condiciones de pago</p>
+                    <p className="text-xs text-gray-500 font-medium">{t('quotes.fields.paymentConditions')}</p>
                     <p className="text-sm text-gray-700">{quote.payment_conditions}</p>
                   </div>
                 )}
                 {quote.notes && (
                   <div>
-                    <p className="text-xs text-gray-500 font-medium">Notas</p>
+                    <p className="text-xs text-gray-500 font-medium">{t('quotes.accept.notes')}</p>
                     <p className="text-sm text-gray-700">{quote.notes}</p>
                   </div>
                 )}
@@ -434,7 +446,7 @@ export default function AcceptQuotePage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-red-700">
                   <XCircle className="w-5 h-5" />
-                  Motivo del rechazo
+                  {t('quotes.accept.rejectionReason')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -447,7 +459,7 @@ export default function AcceptQuotePage() {
           {quote.legal_text && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Información legal</CardTitle>
+                <CardTitle className="text-lg">{t('quotes.accept.legalInfo')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-gray-500">{quote.legal_text}</p>
@@ -463,7 +475,7 @@ export default function AcceptQuotePage() {
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6 text-lg"
               >
                 <CheckCircle className="w-5 h-5 mr-2" />
-                Aceptar presupuesto
+                {t('quotes.actions.acceptQuote')}
               </Button>
               <Button
                 onClick={() => setShowRejectDialog(true)}
@@ -471,7 +483,7 @@ export default function AcceptQuotePage() {
                 className="flex-1 border-red-200 text-red-700 hover:bg-red-50 py-6"
               >
                 <XCircle className="w-5 h-5 mr-2" />
-                Rechazar
+                {t('common.reject')}
               </Button>
             </div>
           )}
@@ -482,9 +494,9 @@ export default function AcceptQuotePage() {
                 <div className="flex items-center gap-3 text-green-700">
                   <CheckCircle className="w-8 h-8" />
                   <div>
-                    <p className="font-semibold text-lg">¡Presupuesto aceptado!</p>
+                    <p className="font-semibold text-lg">{t('quotes.accept.acceptedTitle')}</p>
                     <p className="text-sm">
-                      El profesional ha sido notificado. Podéis proceder con el trabajo.
+                      {t('quotes.accept.acceptedText')}
                     </p>
                   </div>
                 </div>
@@ -502,7 +514,7 @@ export default function AcceptQuotePage() {
             className="w-full"
           >
             <Download className="w-4 h-4 mr-2" />
-            Descargar PDF
+            {t('downloadPDF')}
           </Button>
         </div>
       </div>
@@ -513,26 +525,29 @@ export default function AcceptQuotePage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-green-700">
               <CheckCircle className="w-6 h-6" />
-              Aceptar presupuesto
+              {t('quotes.actions.acceptQuote')}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4">
               <p>
-                Vas a aceptar el presupuesto <strong>{quote.title}</strong> por importe de{" "}
-                <strong className="text-green-700">{parseFloat(quote.total || 0).toFixed(2)}€</strong>.
+                <Trans
+                  i18nKey="quotes.accept.confirmAcceptText"
+                  values={{ title: quote.title, total: parseFloat(quote.total || 0).toFixed(2) }}
+                  components={{ 1: <strong />, 3: <strong className="text-green-700" /> }}
+                />
               </p>
 
               <div className="space-y-3 pt-2">
                 <div>
-                  <Label htmlFor="fullName">Tu nombre completo *</Label>
+                  <Label htmlFor="fullName">{t('quotes.accept.fullNameLabel')}</Label>
                   <Input
                     id="fullName"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Nombre y apellidos"
+                    placeholder={t('quotes.accept.fullNamePlaceholder')}
                     className="mt-1"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Este nombre aparecerá como firma digital del contrato.
+                    {t('quotes.accept.signatureHint')}
                   </p>
                 </div>
 
@@ -543,22 +558,21 @@ export default function AcceptQuotePage() {
                     onCheckedChange={setTermsAccepted}
                   />
                   <label htmlFor="terms" className="text-xs text-gray-600 leading-relaxed">
-                    Acepto los términos y condiciones del presupuesto, incluyendo el importe, 
-                    las condiciones de pago y el plazo de ejecución estimado.
+                    {t('quotes.accept.termsLabel')}
                   </label>
                 </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleAccept}
               disabled={accepting || !fullName.trim() || !termsAccepted}
               className="bg-green-600 hover:bg-green-700"
             >
               {accepting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <CheckCircle className="w-4 h-4 mr-2" />}
-              Confirmar aceptación
+              {t('quotes.accept.confirmAccept')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -570,37 +584,41 @@ export default function AcceptQuotePage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-red-700">
               <XCircle className="w-6 h-6" />
-              Rechazar presupuesto
+              {t('quotes.accept.rejectTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4">
               <p>
-                Vas a rechazar el presupuesto <strong>{quote.title}</strong>.
+                <Trans
+                  i18nKey="quotes.accept.confirmRejectText"
+                  values={{ title: quote.title }}
+                  components={{ 1: <strong /> }}
+                />
               </p>
 
               <div>
-                <Label htmlFor="reason">Motivo del rechazo *</Label>
+                <Label htmlFor="reason">{t('quotes.accept.reasonLabel')}</Label>
                 <textarea
                   id="reason"
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="Indica brevemente el motivo..."
+                  placeholder={t('quotes.accept.reasonPlaceholder')}
                   className="w-full mt-1 px-3 py-2 border rounded-lg text-sm min-h-[100px]"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  El profesional recibirá este mensaje.
+                  {t('quotes.accept.reasonHint')}
                 </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleReject}
               disabled={rejecting || !rejectionReason.trim()}
               className="bg-red-600 hover:bg-red-700"
             >
               {rejecting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <XCircle className="w-4 h-4 mr-2" />}
-              Confirmar rechazo
+              {t('quotes.accept.confirmReject')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

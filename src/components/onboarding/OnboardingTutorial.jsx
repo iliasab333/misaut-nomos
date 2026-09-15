@@ -1,37 +1,41 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, FileText, Calendar, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 
-const tutorialSteps = [
-  {
-    icon: MessageSquare,
-    title: "📨 Recibirás mensajes de clientes",
-    description: "Los clientes interesados te escribirán directamente por el chat interno de la plataforma.",
-    tip: "💡 Responde rápido para mejorar tu reputación"
-  },
-  {
-    icon: FileText,
-    title: "📋 Sistema de presupuestos integrado",
-    description: "Los clientes pueden solicitar presupuestos formales. Tú respondes con detalles y el cliente acepta o rechaza.",
-    tip: "💡 Presupuestos detallados = más confianza"
-  },
-  {
-    icon: Calendar,
-    title: "🗓️ Gestiona tus trabajos",
-    description: "Cuando un cliente acepta, puedes gestionar el trabajo en tu dashboard, marcar progreso y finalizarlo.",
-    tip: "💡 Marca trabajos completados para pedir reseñas"
-  },
-  {
-    icon: TrendingUp,
-    title: "⭐ Las reseñas mejoran tu visibilidad",
-    description: "Anima a tus clientes satisfechos a dejar reseñas. Las buenas valoraciones te posicionan mejor en búsquedas.",
-    tip: "💡 Más reseñas = más clientes nuevos"
-  }
-];
-
 export default function OnboardingTutorial({ open, onClose }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
+
+  // Dentro del componente para que se retraduzca al cambiar de idioma.
+  const tutorialSteps = [
+    {
+      icon: MessageSquare,
+      title: t('onboarding.tutorial.steps.messages.title'),
+      description: t('onboarding.tutorial.steps.messages.description'),
+      tip: t('onboarding.tutorial.steps.messages.tip'),
+    },
+    {
+      icon: FileText,
+      title: t('onboarding.tutorial.steps.quotes.title'),
+      description: t('onboarding.tutorial.steps.quotes.description'),
+      tip: t('onboarding.tutorial.steps.quotes.tip'),
+    },
+    {
+      icon: Calendar,
+      title: t('onboarding.tutorial.steps.jobs.title'),
+      description: t('onboarding.tutorial.steps.jobs.description'),
+      tip: t('onboarding.tutorial.steps.jobs.tip'),
+    },
+    {
+      icon: TrendingUp,
+      title: t('onboarding.tutorial.steps.reviews.title'),
+      description: t('onboarding.tutorial.steps.reviews.description'),
+      tip: t('onboarding.tutorial.steps.reviews.tip'),
+    },
+  ];
+
   const currentStep = tutorialSteps[step];
   const Icon = currentStep.icon;
 
@@ -40,7 +44,7 @@ export default function OnboardingTutorial({ open, onClose }) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">
-            ¿Cómo funciona MisAutónomos?
+            {t('onboarding.tutorial.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -83,7 +87,7 @@ export default function OnboardingTutorial({ open, onClose }) {
               className="flex-1"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
-              Anterior
+              {t('onboarding.nav.previous')}
             </Button>
           )}
           
@@ -92,7 +96,7 @@ export default function OnboardingTutorial({ open, onClose }) {
               onClick={() => setStep(step + 1)}
               className="flex-1 bg-blue-600 hover:bg-blue-700"
             >
-              Siguiente
+              {t('common.next')}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (
@@ -100,7 +104,7 @@ export default function OnboardingTutorial({ open, onClose }) {
               onClick={onClose}
               className="flex-1 bg-green-600 hover:bg-green-700"
             >
-              ¡Entendido!
+              {t('onboarding.tutorial.done')}
             </Button>
           )}
         </div>

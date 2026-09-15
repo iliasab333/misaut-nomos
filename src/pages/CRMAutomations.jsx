@@ -58,30 +58,36 @@ import {
   RefreshCw
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import Loader from "@/components/ui/Loader";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
-const TRIGGER_TYPES = {
-  client_created: { label: "Nuevo cliente creado", icon: Users, color: "bg-blue-100 text-blue-700" },
-  status_changed: { label: "Cambio de estado", icon: RefreshCw, color: "bg-purple-100 text-purple-700" },
-  job_completed: { label: "Trabajo completado", icon: Briefcase, color: "bg-green-100 text-green-700" },
-  jobs_count: { label: "Nº de trabajos alcanzado", icon: TrendingUp, color: "bg-amber-100 text-amber-700" },
-  days_inactive: { label: "Días sin contacto", icon: Clock, color: "bg-red-100 text-red-700" },
-  birthday: { label: "Cumpleaños del cliente", icon: Gift, color: "bg-pink-100 text-pink-700" },
-  contract_end: { label: "Fin de contrato/garantía", icon: Calendar, color: "bg-orange-100 text-orange-700" },
-};
+// Los catálogos reciben `t`: a nivel de módulo se evaluarían una sola vez al
+// importar y no se retraducirían al cambiar de idioma.
+const getTriggerTypes = (t) => ({
+  client_created: { label: t('crm.automations.triggerTypes.clientCreated'), icon: Users, color: "bg-blue-100 text-blue-700" },
+  status_changed: { label: t('crm.automations.triggerTypes.statusChanged'), icon: RefreshCw, color: "bg-purple-100 text-purple-700" },
+  job_completed: { label: t('crm.automations.triggerTypes.jobCompleted'), icon: Briefcase, color: "bg-green-100 text-green-700" },
+  jobs_count: { label: t('crm.automations.triggerTypes.jobsCount'), icon: TrendingUp, color: "bg-amber-100 text-amber-700" },
+  days_inactive: { label: t('crm.automations.triggerTypes.daysInactive'), icon: Clock, color: "bg-red-100 text-red-700" },
+  birthday: { label: t('crm.automations.triggerTypes.birthday'), icon: Gift, color: "bg-pink-100 text-pink-700" },
+  contract_end: { label: t('crm.automations.triggerTypes.contractEnd'), icon: Calendar, color: "bg-orange-100 text-orange-700" },
+});
 
-const ACTION_TYPES = {
-  add_tag: { label: "Añadir etiqueta", icon: Tag },
-  remove_tag: { label: "Quitar etiqueta", icon: Tag },
-  change_status: { label: "Cambiar estado", icon: RefreshCw },
-  change_segment: { label: "Cambiar segmento", icon: Users },
-  create_reminder: { label: "Crear recordatorio", icon: Bell },
-  create_activity: { label: "Registrar actividad", icon: CheckCircle },
-};
+const getActionTypes = (t) => ({
+  add_tag: { label: t('crm.automations.actionTypes.addTag'), icon: Tag },
+  remove_tag: { label: t('crm.automations.actionTypes.removeTag'), icon: Tag },
+  change_status: { label: t('crm.automations.actionTypes.changeStatus'), icon: RefreshCw },
+  change_segment: { label: t('crm.automations.actionTypes.changeSegment'), icon: Users },
+  create_reminder: { label: t('crm.automations.actionTypes.createReminder'), icon: Bell },
+  create_activity: { label: t('crm.automations.actionTypes.createActivity'), icon: CheckCircle },
+});
 
 export default function CRMAutomationsPage() {
+  const { t } = useTranslation();
+  const TRIGGER_TYPES = getTriggerTypes(t);
+  const ACTION_TYPES = getActionTypes(t);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
@@ -135,7 +141,7 @@ export default function CRMAutomationsPage() {
       queryClient.invalidateQueries(['automations']);
       setShowDialog(false);
       resetForm();
-      toast.success("Automatización creada");
+      toast.success(t('crm.toast.automationCreated'));
     },
   });
 
@@ -145,7 +151,7 @@ export default function CRMAutomationsPage() {
       queryClient.invalidateQueries(['automations']);
       setShowDialog(false);
       resetForm();
-      toast.success("Automatización actualizada");
+      toast.success(t('crm.toast.automationUpdated'));
     },
   });
 
@@ -154,7 +160,7 @@ export default function CRMAutomationsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(['automations']);
       setDeleteDialog(null);
-      toast.success("Automatización eliminada");
+      toast.success(t('crm.toast.automationDeleted'));
     },
   });
 
@@ -162,7 +168,7 @@ export default function CRMAutomationsPage() {
     mutationFn: ({ id, is_active }) => base44.entities.CRMAutomation.update(id, { is_active }),
     onSuccess: (_, { is_active }) => {
       queryClient.invalidateQueries(['automations']);
-      toast.success(is_active ? "Automatización activada" : "Automatización pausada");
+      toast.success(is_active ? t('crm.toast.automationActivated') : t('crm.toast.automationPaused'));
     },
   });
 
@@ -253,16 +259,16 @@ export default function CRMAutomationsPage() {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(createPageUrl("CRM"))}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver al CRM
+              {t('crm.actions.backToCrm')}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Automatizaciones</h1>
-              <p className="text-gray-600">Automatiza tareas repetitivas de tu CRM</p>
+              <h1 className="text-2xl font-bold text-gray-900">{t('crm.automations.title')}</h1>
+              <p className="text-gray-600">{t('crm.automations.subtitle')}</p>
             </div>
           </div>
           <Button onClick={() => { resetForm(); setShowDialog(true); }} className="bg-blue-600 hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" />
-            Nueva automatización
+            {t('crm.automations.newAutomation')}
           </Button>
         </div>
 
@@ -275,7 +281,7 @@ export default function CRMAutomationsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.total}</p>
-                <p className="text-xs text-gray-500">Total</p>
+                <p className="text-xs text-gray-500">{t('total')}</p>
               </div>
             </CardContent>
           </Card>
@@ -286,7 +292,7 @@ export default function CRMAutomationsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.active}</p>
-                <p className="text-xs text-gray-500">Activas</p>
+                <p className="text-xs text-gray-500">{t('crm.automations.active')}</p>
               </div>
             </CardContent>
           </Card>
@@ -297,7 +303,7 @@ export default function CRMAutomationsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.executions}</p>
-                <p className="text-xs text-gray-500">Ejecuciones</p>
+                <p className="text-xs text-gray-500">{t('crm.automations.statExecutions')}</p>
               </div>
             </CardContent>
           </Card>
@@ -306,11 +312,11 @@ export default function CRMAutomationsPage() {
         {/* Tabs y lista */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-white shadow-sm">
-            <TabsTrigger value="all">Todas</TabsTrigger>
-            <TabsTrigger value="active">Activas</TabsTrigger>
-            <TabsTrigger value="sequence">Secuencias</TabsTrigger>
-            <TabsTrigger value="auto_tag">Auto-etiquetas</TabsTrigger>
-            <TabsTrigger value="auto_reminder">Recordatorios</TabsTrigger>
+            <TabsTrigger value="all">{t('crm.automations.tabAll')}</TabsTrigger>
+            <TabsTrigger value="active">{t('crm.automations.active')}</TabsTrigger>
+            <TabsTrigger value="sequence">{t('crm.automations.tabSequences')}</TabsTrigger>
+            <TabsTrigger value="auto_tag">{t('crm.automations.tabAutoTags')}</TabsTrigger>
+            <TabsTrigger value="auto_reminder">{t('crm.automations.tabReminders')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab} className="mt-4">
@@ -320,11 +326,11 @@ export default function CRMAutomationsPage() {
               <Card className="border-0 shadow-sm">
                 <CardContent className="p-12 text-center">
                   <Zap className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No hay automatizaciones</h3>
-                  <p className="text-gray-600 mb-6">Crea tu primera automatización para ahorrar tiempo</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('crm.automations.emptyTitle')}</h3>
+                  <p className="text-gray-600 mb-6">{t('crm.automations.emptyDescription')}</p>
                   <Button onClick={() => { resetForm(); setShowDialog(true); }} className="bg-blue-600 hover:bg-blue-700">
                     <Plus className="w-4 h-4 mr-2" />
-                    Crear automatización
+                    {t('crm.automations.createAutomation')}
                   </Button>
                 </CardContent>
               </Card>
@@ -347,19 +353,18 @@ export default function CRMAutomationsPage() {
                               <div className="flex items-center gap-2 mb-1">
                                 <h3 className="font-bold text-gray-900">{automation.name}</h3>
                                 <Badge variant={automation.is_active ? "default" : "secondary"} className={automation.is_active ? "bg-green-100 text-green-800" : ""}>
-                                  {automation.is_active ? "Activa" : "Pausada"}
+                                  {automation.is_active ? t('crm.automations.statusActive') : t('crm.automations.statusPaused')}
                                 </Badge>
                                 <Badge variant="outline" className="text-xs">
-                                  {automation.type === 'sequence' ? 'Secuencia' : 
-                                   automation.type === 'auto_tag' ? 'Auto-etiqueta' : 'Recordatorio'}
+                                  {automation.type === 'sequence' ? t('crm.automations.typeSequence') :
+                                   automation.type === 'auto_tag' ? t('crm.automations.typeAutoTag') : t('crm.automations.typeReminder')}
                                 </Badge>
                               </div>
                               <p className="text-sm text-gray-600">
-                                Disparador: {triggerConfig?.label || automation.trigger?.event}
+                                {t('crm.automations.triggerSummary', { trigger: triggerConfig?.label || automation.trigger?.event })}
                               </p>
                               <p className="text-xs text-gray-400 mt-1">
-                                {automation.actions?.length || 0} acciones • 
-                                Ejecutada {automation.execution_count || 0} veces
+                                {t('crm.automations.actionsCount', { count: automation.actions?.length || 0 })} • {t('crm.automations.executedTimes', { count: automation.execution_count || 0 })}
                               </p>
                             </div>
                           </div>
@@ -389,20 +394,20 @@ export default function CRMAutomationsPage() {
         {/* Plantillas predefinidas */}
         <Card className="border-0 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Plantillas rápidas</CardTitle>
+            <CardTitle className="text-lg">{t('crm.automations.quickTemplates')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 onClick={() => {
                   setFormData({
-                    name: "Bienvenida a nuevos leads",
+                    name: t('crm.automations.templates.welcome.name'),
                     type: "sequence",
                     trigger: { event: "client_created", conditions: { status: "lead" } },
                     actions: [
-                      { type: "create_activity", delay_days: 0, params: { title: "Nuevo lead registrado", activity_type: "note" } },
-                      { type: "create_reminder", delay_days: 3, params: { title: "Seguimiento inicial" } },
-                      { type: "create_reminder", delay_days: 7, params: { title: "Segundo contacto" } },
+                      { type: "create_activity", delay_days: 0, params: { title: t('crm.automations.templates.welcome.activityTitle'), activity_type: "note" } },
+                      { type: "create_reminder", delay_days: 3, params: { title: t('crm.automations.templates.welcome.firstFollowup') } },
+                      { type: "create_reminder", delay_days: 7, params: { title: t('crm.automations.templates.welcome.secondFollowup') } },
                     ],
                   });
                   setShowDialog(true);
@@ -410,18 +415,18 @@ export default function CRMAutomationsPage() {
                 className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-left"
               >
                 <Mail className="w-8 h-8 text-blue-600 mb-2" />
-                <h4 className="font-semibold">Secuencia de bienvenida</h4>
-                <p className="text-sm text-gray-500">Seguimiento automático a nuevos leads</p>
+                <h4 className="font-semibold">{t('crm.automations.templates.welcome.title')}</h4>
+                <p className="text-sm text-gray-500">{t('crm.automations.templates.welcome.description')}</p>
               </button>
 
               <button
                 onClick={() => {
                   setFormData({
-                    name: "Cliente recurrente",
+                    name: t('crm.automations.templates.recurring.name'),
                     type: "auto_tag",
                     trigger: { event: "jobs_count", conditions: { min_jobs: 2 } },
                     actions: [
-                      { type: "add_tag", delay_days: 0, params: { tag: "Recurrente" } },
+                      { type: "add_tag", delay_days: 0, params: { tag: t('crm.automations.templates.recurring.tag') } },
                       { type: "change_status", delay_days: 0, params: { status: "vip" } },
                     ],
                   });
@@ -430,18 +435,18 @@ export default function CRMAutomationsPage() {
                 className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-amber-400 hover:bg-amber-50 transition-all text-left"
               >
                 <Tag className="w-8 h-8 text-amber-600 mb-2" />
-                <h4 className="font-semibold">Marcar recurrentes</h4>
-                <p className="text-sm text-gray-500">Etiqueta clientes con +2 trabajos</p>
+                <h4 className="font-semibold">{t('crm.automations.templates.recurring.title')}</h4>
+                <p className="text-sm text-gray-500">{t('crm.automations.templates.recurring.description')}</p>
               </button>
 
               <button
                 onClick={() => {
                   setFormData({
-                    name: "Felicitación de cumpleaños",
+                    name: t('crm.automations.templates.birthday.name'),
                     type: "auto_reminder",
                     trigger: { event: "birthday", conditions: {} },
                     actions: [
-                      { type: "create_reminder", delay_days: 0, params: { title: "Felicitar cumpleaños" } },
+                      { type: "create_reminder", delay_days: 0, params: { title: t('crm.automations.templates.birthday.reminderTitle') } },
                     ],
                   });
                   setShowDialog(true);
@@ -449,8 +454,8 @@ export default function CRMAutomationsPage() {
                 className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-pink-400 hover:bg-pink-50 transition-all text-left"
               >
                 <Gift className="w-8 h-8 text-pink-600 mb-2" />
-                <h4 className="font-semibold">Cumpleaños</h4>
-                <p className="text-sm text-gray-500">Recordatorio para felicitar</p>
+                <h4 className="font-semibold">{t('crm.automations.templates.birthday.title')}</h4>
+                <p className="text-sm text-gray-500">{t('crm.automations.templates.birthday.description')}</p>
               </button>
             </div>
           </CardContent>
@@ -461,28 +466,28 @@ export default function CRMAutomationsPage() {
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingAutomation ? "Editar automatización" : "Nueva automatización"}</DialogTitle>
+            <DialogTitle>{editingAutomation ? t('crm.automations.editAutomation') : t('crm.automations.newAutomation')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nombre y tipo */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Nombre *</Label>
+                <Label>{t('crm.form.nameRequired')}</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Ej: Seguimiento de leads"
+                  placeholder={t('crm.automations.namePlaceholder')}
                   required
                 />
               </div>
               <div>
-                <Label>Tipo</Label>
+                <Label>{t('crm.form.type')}</Label>
                 <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="sequence">Secuencia de seguimiento</SelectItem>
-                    <SelectItem value="auto_tag">Auto-etiquetado</SelectItem>
-                    <SelectItem value="auto_reminder">Recordatorio automático</SelectItem>
+                    <SelectItem value="sequence">{t('crm.automations.typeSequenceFull')}</SelectItem>
+                    <SelectItem value="auto_tag">{t('crm.automations.typeAutoTagFull')}</SelectItem>
+                    <SelectItem value="auto_reminder">{t('crm.automations.typeReminderFull')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -490,7 +495,7 @@ export default function CRMAutomationsPage() {
 
             {/* Disparador */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Disparador</Label>
+              <Label className="text-base font-semibold">{t('crm.automations.trigger')}</Label>
               <Select 
                 value={formData.trigger.event} 
                 onValueChange={(v) => setFormData({ ...formData, trigger: { ...formData.trigger, event: v, conditions: {} } })}
@@ -507,25 +512,25 @@ export default function CRMAutomationsPage() {
               {formData.trigger.event === "status_changed" && (
                 <div className="grid grid-cols-2 gap-4 p-3 bg-gray-50 rounded-lg">
                   <div>
-                    <Label className="text-xs">Estado anterior</Label>
+                    <Label className="text-xs">{t('crm.automations.previousStatus')}</Label>
                     <Select value={formData.trigger.conditions.from_status || ""} onValueChange={(v) => updateTriggerCondition('from_status', v)}>
-                      <SelectTrigger><SelectValue placeholder="Cualquiera" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t('crm.form.any')} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="any">Cualquiera</SelectItem>
-                        <SelectItem value="lead">Lead</SelectItem>
-                        <SelectItem value="contacted">Contactado</SelectItem>
-                        <SelectItem value="negotiating">Negociando</SelectItem>
+                        <SelectItem value="any">{t('crm.form.any')}</SelectItem>
+                        <SelectItem value="lead">{t('crm.status.lead')}</SelectItem>
+                        <SelectItem value="contacted">{t('crm.status.contacted')}</SelectItem>
+                        <SelectItem value="negotiating">{t('crm.status.negotiating')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs">Nuevo estado</Label>
+                    <Label className="text-xs">{t('crm.automations.newStatus')}</Label>
                     <Select value={formData.trigger.conditions.to_status || ""} onValueChange={(v) => updateTriggerCondition('to_status', v)}>
-                      <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t('crm.form.select')} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="client">Cliente</SelectItem>
-                        <SelectItem value="vip">VIP</SelectItem>
-                        <SelectItem value="inactive">Inactivo</SelectItem>
+                        <SelectItem value="client">{t('clientLabel')}</SelectItem>
+                        <SelectItem value="vip">{t('crm.status.vip')}</SelectItem>
+                        <SelectItem value="inactive">{t('crm.status.inactive')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -534,7 +539,7 @@ export default function CRMAutomationsPage() {
 
               {formData.trigger.event === "jobs_count" && (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <Label className="text-xs">Número mínimo de trabajos</Label>
+                  <Label className="text-xs">{t('crm.automations.minJobs')}</Label>
                   <Input
                     type="number"
                     min="1"
@@ -547,7 +552,7 @@ export default function CRMAutomationsPage() {
 
               {formData.trigger.event === "days_inactive" && (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <Label className="text-xs">Días sin contacto</Label>
+                  <Label className="text-xs">{t('crm.automations.triggerTypes.daysInactive')}</Label>
                   <Input
                     type="number"
                     min="1"
@@ -562,10 +567,10 @@ export default function CRMAutomationsPage() {
             {/* Acciones */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">Acciones</Label>
+                <Label className="text-base font-semibold">{t('crm.automations.actions')}</Label>
                 <Button type="button" variant="outline" size="sm" onClick={addAction}>
                   <Plus className="w-4 h-4 mr-1" />
-                  Añadir acción
+                  {t('crm.automations.addAction')}
                 </Button>
               </div>
 
@@ -573,7 +578,7 @@ export default function CRMAutomationsPage() {
                 <Card key={index} className="border shadow-sm">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <Badge variant="outline">Acción {index + 1}</Badge>
+                      <Badge variant="outline">{t('crm.automations.actionNumber', { number: index + 1 })}</Badge>
                       {formData.actions.length > 1 && (
                         <Button type="button" variant="ghost" size="sm" onClick={() => removeAction(index)}>
                           <Trash2 className="w-4 h-4 text-red-500" />
@@ -583,7 +588,7 @@ export default function CRMAutomationsPage() {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-xs">Tipo de acción</Label>
+                        <Label className="text-xs">{t('crm.automations.actionType')}</Label>
                         <Select value={action.type} onValueChange={(v) => updateAction(index, 'type', v)}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
@@ -594,7 +599,7 @@ export default function CRMAutomationsPage() {
                         </Select>
                       </div>
                       <div>
-                        <Label className="text-xs">Retraso (días)</Label>
+                        <Label className="text-xs">{t('crm.automations.delayDays')}</Label>
                         <Input
                           type="number"
                           min="0"
@@ -607,27 +612,27 @@ export default function CRMAutomationsPage() {
                     {/* Parámetros según tipo de acción */}
                     {(action.type === "add_tag" || action.type === "remove_tag") && (
                       <div>
-                        <Label className="text-xs">Etiqueta</Label>
+                        <Label className="text-xs">{t('crm.form.tag')}</Label>
                         <Input
                           value={action.params.tag || ""}
                           onChange={(e) => updateAction(index, 'params', { tag: e.target.value })}
-                          placeholder="Ej: Recurrente, VIP, Urgente..."
+                          placeholder={t('crm.automations.tagPlaceholder')}
                         />
                       </div>
                     )}
 
                     {action.type === "change_status" && (
                       <div>
-                        <Label className="text-xs">Nuevo estado</Label>
+                        <Label className="text-xs">{t('crm.automations.newStatus')}</Label>
                         <Select value={action.params.status || ""} onValueChange={(v) => updateAction(index, 'params', { status: v })}>
-                          <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder={t('crm.form.select')} /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="lead">Lead</SelectItem>
-                            <SelectItem value="contacted">Contactado</SelectItem>
-                            <SelectItem value="negotiating">Negociando</SelectItem>
-                            <SelectItem value="client">Cliente</SelectItem>
-                            <SelectItem value="vip">VIP</SelectItem>
-                            <SelectItem value="inactive">Inactivo</SelectItem>
+                            <SelectItem value="lead">{t('crm.status.lead')}</SelectItem>
+                            <SelectItem value="contacted">{t('crm.status.contacted')}</SelectItem>
+                            <SelectItem value="negotiating">{t('crm.status.negotiating')}</SelectItem>
+                            <SelectItem value="client">{t('clientLabel')}</SelectItem>
+                            <SelectItem value="vip">{t('crm.status.vip')}</SelectItem>
+                            <SelectItem value="inactive">{t('crm.status.inactive')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -635,14 +640,14 @@ export default function CRMAutomationsPage() {
 
                     {action.type === "change_segment" && (
                       <div>
-                        <Label className="text-xs">Nuevo segmento</Label>
+                        <Label className="text-xs">{t('crm.automations.newSegment')}</Label>
                         <Select value={action.params.segment || ""} onValueChange={(v) => updateAction(index, 'params', { segment: v })}>
-                          <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder={t('crm.form.select')} /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="residential">Residencial</SelectItem>
-                            <SelectItem value="commercial">Comercial</SelectItem>
-                            <SelectItem value="industrial">Industrial</SelectItem>
-                            <SelectItem value="government">Administración</SelectItem>
+                            <SelectItem value="residential">{t('crm.segment.residential')}</SelectItem>
+                            <SelectItem value="commercial">{t('crm.segment.commercial')}</SelectItem>
+                            <SelectItem value="industrial">{t('crm.segment.industrial')}</SelectItem>
+                            <SelectItem value="government">{t('crm.segment.governmentShort')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -650,11 +655,11 @@ export default function CRMAutomationsPage() {
 
                     {action.type === "create_reminder" && (
                       <div>
-                        <Label className="text-xs">Título del recordatorio</Label>
+                        <Label className="text-xs">{t('crm.automations.reminderTitle')}</Label>
                         <Input
                           value={action.params.title || ""}
                           onChange={(e) => updateAction(index, 'params', { title: e.target.value })}
-                          placeholder="Ej: Llamar para seguimiento"
+                          placeholder={t('crm.automations.reminderTitlePlaceholder')}
                         />
                       </div>
                     )}
@@ -662,21 +667,21 @@ export default function CRMAutomationsPage() {
                     {action.type === "create_activity" && (
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label className="text-xs">Título</Label>
+                          <Label className="text-xs">{t('crm.automations.activityTitle')}</Label>
                           <Input
                             value={action.params.title || ""}
                             onChange={(e) => updateAction(index, 'params', { title: e.target.value })}
-                            placeholder="Ej: Lead registrado"
+                            placeholder={t('crm.automations.activityTitlePlaceholder')}
                           />
                         </div>
                         <div>
-                          <Label className="text-xs">Tipo actividad</Label>
+                          <Label className="text-xs">{t('crm.automations.activityType')}</Label>
                           <Select value={action.params.activity_type || "note"} onValueChange={(v) => updateAction(index, 'params', { activity_type: v })}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="note">Nota</SelectItem>
-                              <SelectItem value="call">Llamada</SelectItem>
-                              <SelectItem value="email">Email</SelectItem>
+                              <SelectItem value="note">{t('crm.activityType.note')}</SelectItem>
+                              <SelectItem value="call">{t('crm.activityType.call')}</SelectItem>
+                              <SelectItem value="email">{t('emailField')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -689,11 +694,11 @@ export default function CRMAutomationsPage() {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => { setShowDialog(false); resetForm(); }}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                 {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {editingAutomation ? "Guardar" : "Crear"}
+                {editingAutomation ? t('common.save') : t('crm.automations.create')}
               </Button>
             </DialogFooter>
           </form>
@@ -704,15 +709,15 @@ export default function CRMAutomationsPage() {
       <AlertDialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar automatización?</AlertDialogTitle>
+            <AlertDialogTitle>{t('crm.automations.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Estás a punto de eliminar "{deleteDialog?.name}". Esta acción no se puede deshacer.
+              {t('crm.automations.deleteDescription', { name: deleteDialog?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={() => deleteMutation.mutate(deleteDialog.id)} className="bg-red-600 hover:bg-red-700">
-              Eliminar
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

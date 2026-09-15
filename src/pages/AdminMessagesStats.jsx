@@ -13,8 +13,10 @@ import {
   Search
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function AdminMessagesStatsPage() {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -26,7 +28,7 @@ export default function AdminMessagesStatsPage() {
     try {
       const currentUser = await base44.auth.me();
       if (currentUser.role !== 'admin') {
-        toast.error('Acceso denegado');
+        toast.error(t('admin.messagesStats.accessDenied'));
         return;
       }
       setUser(currentUser);
@@ -124,7 +126,7 @@ export default function AdminMessagesStatsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="p-8">
-          <p className="text-center text-gray-700">Acceso denegado - Solo administradores</p>
+          <p className="text-center text-gray-700">{t('admin.messagesStats.accessDeniedAdminsOnly')}</p>
         </Card>
       </div>
     );
@@ -134,8 +136,8 @@ export default function AdminMessagesStatsPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Estadísticas de Mensajes</h1>
-          <p className="text-gray-600">Profesionales contactados por mensajes de la web</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('admin.messagesStats.title')}</h1>
+          <p className="text-gray-600">{t('admin.messagesStats.subtitle')}</p>
         </div>
 
         {/* Tarjetas de estadísticas generales */}
@@ -144,7 +146,7 @@ export default function AdminMessagesStatsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm mb-1">Total Profesionales</p>
+                  <p className="text-blue-100 text-sm mb-1">{t('admin.messagesStats.totalProfessionals')}</p>
                   <p className="text-3xl font-bold">{totalStats.totalProfessionals}</p>
                 </div>
                 <Users className="w-12 h-12 text-blue-200" />
@@ -156,7 +158,7 @@ export default function AdminMessagesStatsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100 text-sm mb-1">Total Mensajes</p>
+                  <p className="text-green-100 text-sm mb-1">{t('admin.messagesStats.totalMessages')}</p>
                   <p className="text-3xl font-bold">{totalStats.totalMessages}</p>
                 </div>
                 <MessageSquare className="w-12 h-12 text-green-200" />
@@ -168,7 +170,7 @@ export default function AdminMessagesStatsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm mb-1">Clientes Únicos</p>
+                  <p className="text-purple-100 text-sm mb-1">{t('admin.messagesStats.uniqueClients')}</p>
                   <p className="text-3xl font-bold">{totalStats.totalUniqueClients}</p>
                 </div>
                 <Users className="w-12 h-12 text-purple-200" />
@@ -180,7 +182,7 @@ export default function AdminMessagesStatsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-orange-100 text-sm mb-1">Media por Pro</p>
+                  <p className="text-orange-100 text-sm mb-1">{t('admin.messagesStats.avgPerPro')}</p>
                   <p className="text-3xl font-bold">{totalStats.avgMessagesPerProfessional}</p>
                 </div>
                 <TrendingUp className="w-12 h-12 text-orange-200" />
@@ -195,10 +197,10 @@ export default function AdminMessagesStatsPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-blue-700" />
-                Profesionales Contactados
+                {t('admin.messagesStats.contactedProfessionals')}
               </CardTitle>
               <Badge variant="outline" className="text-sm">
-                {filteredStats.length} profesionales
+                {t('admin.messagesStats.professionalsCount', { count: filteredStats.length })}
               </Badge>
             </div>
           </CardHeader>
@@ -207,7 +209,7 @@ export default function AdminMessagesStatsPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  placeholder="Buscar por nombre, email o categoría..."
+                  placeholder={t('admin.messagesStats.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 max-w-md"
@@ -225,13 +227,13 @@ export default function AdminMessagesStatsPage() {
                   <thead className="bg-gray-50 border-b">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">#</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Profesional</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Email</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Categorías</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Ubicación</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">Total Mensajes</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">Clientes Únicos</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Último Contacto</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">{t('professionalLabel')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">{t('emailField')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">{t('admin.messagesStats.table.categories')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">{t('admin.messagesStats.table.location')}</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('admin.messagesStats.totalMessages')}</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{t('admin.messagesStats.uniqueClients')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">{t('admin.messagesStats.table.lastContact')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -241,7 +243,7 @@ export default function AdminMessagesStatsPage() {
                           {index + 1}
                         </td>
                         <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                          {stat.business_name || 'Sin nombre'}
+                          {stat.business_name || t('admin.messagesStats.noName')}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-700">
                           {stat.email || '-'}
@@ -299,7 +301,7 @@ export default function AdminMessagesStatsPage() {
 
                 {filteredStats.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
-                    No se encontraron profesionales
+                    {t('admin.messagesStats.noResults')}
                   </div>
                 )}
               </div>

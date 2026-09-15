@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MessageSquare, Headphones } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
@@ -12,6 +13,7 @@ const NAVY = '#00255C';
 // cuyo updated_date > last_seen_by_user. Versión simple: cuenta tickets abiertos.
 export default function InboxTabs({ user, unreadChats = 0 }) {
   const { pathname } = useLocation();
+  const { t } = useTranslation();
   const isMensajes = pathname.startsWith('/mensajes') || pathname.startsWith('/messages');
   const [ticketsOpen, setTicketsOpen] = useState(0);
 
@@ -52,8 +54,8 @@ export default function InboxTabs({ user, unreadChats = 0 }) {
 
   return (
     <div className="inline-flex w-full p-1 rounded-xl bg-slate-100 mb-3">
-      <Tab active={isMensajes} icon={MessageSquare} label="Mensajes" href="/mensajes" count={unreadChats} />
-      <Tab active={!isMensajes} icon={Headphones} label="Soporte" href="/soporte" count={ticketsOpen} />
+      <Tab active={isMensajes} icon={MessageSquare} label={t('nav.messages')} href="/mensajes" count={unreadChats} />
+      <Tab active={!isMensajes} icon={Headphones} label={t('nav.support')} href="/soporte" count={ticketsOpen} />
     </div>
   );
 }

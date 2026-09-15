@@ -7,12 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Briefcase, Plus, X, Edit2, Trash2, Euro } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function ServicesSection({ 
   services = [], 
   isEditing, 
   onServicesChange 
 }) {
+  const { t } = useTranslation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [formData, setFormData] = useState({
@@ -53,7 +55,7 @@ export default function ServicesSection({
 
   const saveService = () => {
     if (!formData.name.trim()) {
-      toast.error("El nombre del servicio es obligatorio");
+      toast.error(t("proProfile.services.requiredName"));
       return;
     }
 
@@ -74,12 +76,12 @@ export default function ServicesSection({
     onServicesChange(updatedServices);
     setShowAddDialog(false);
     resetForm();
-    toast.success(editingService ? "Servicio actualizado" : "Servicio añadido");
+    toast.success(editingService ? t("proProfile.services.updated") : t("proProfile.services.added"));
   };
 
   const deleteService = (serviceId) => {
     onServicesChange(services.filter(service => service.id !== serviceId));
-    toast.success("Servicio eliminado");
+    toast.success(t("proProfile.services.deleted"));
   };
 
   return (
@@ -88,29 +90,29 @@ export default function ServicesSection({
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-blue-700" />
-            Servicios ofrecidos ({services.length})
+            {t("profile_page.services")} ({services.length})
           </CardTitle>
           {isEditing && (
             <Button onClick={openAddDialog} size="sm" className="bg-blue-600 hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-1" />
-              Añadir servicio
+              {t("proProfile.services.add")}
             </Button>
           )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-gray-600">
-          Describe detalladamente los servicios que ofreces a tus clientes
+          {t("proProfile.services.intro")}
         </p>
 
         {services.length === 0 ? (
           <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
             <Briefcase className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500">No hay servicios añadidos</p>
+            <p className="text-gray-500">{t("proProfile.services.empty")}</p>
             {isEditing && (
               <Button onClick={openAddDialog} variant="outline" className="mt-3">
                 <Plus className="w-4 h-4 mr-1" />
-                Añadir primer servicio
+                {t("proProfile.services.addFirst")}
               </Button>
             )}
           </div>
@@ -155,7 +157,7 @@ export default function ServicesSection({
                   )}
                   {service.duration && (
                     <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded">
-                      Duración: {service.duration}
+                      {t("proProfile.services.durationLabel", { duration: service.duration })}
                     </span>
                   )}
                 </div>
@@ -169,33 +171,33 @@ export default function ServicesSection({
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>
-                {editingService ? "Editar servicio" : "Añadir servicio"}
+                {editingService ? t("proProfile.services.edit") : t("proProfile.services.add")}
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
               <div>
-                <Label>Nombre del servicio *</Label>
+                <Label>{t("proProfile.services.nameLabel")}</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Ej: Reforma integral de baño"
+                  placeholder={t("proProfile.services.namePlaceholder")}
                 />
               </div>
 
               <div>
-                <Label>Descripción</Label>
+                <Label>{t("description")}</Label>
                 <Textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Describe qué incluye este servicio, materiales, proceso..."
+                  placeholder={t("proProfile.services.descriptionPlaceholder")}
                   className="h-24"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
-                  <Label>Precio (€)</Label>
+                  <Label>{t("proProfile.services.priceLabel")}</Label>
                   <Input
                     type="number"
                     value={formData.price}
@@ -205,36 +207,36 @@ export default function ServicesSection({
                   />
                 </div>
                 <div>
-                  <Label>Por</Label>
+                  <Label>{t("proProfile.services.perLabel")}</Label>
                   <select
                     value={formData.unit}
                     onChange={(e) => setFormData(prev => ({ ...prev, unit: e.target.value }))}
                     className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white"
                   >
-                    <option value="hora">Hora</option>
-                    <option value="servicio">Servicio</option>
-                    <option value="día">Día</option>
+                    <option value="hora">{t("proProfile.services.unitHour")}</option>
+                    <option value="servicio">{t("proProfile.services.unitService")}</option>
+                    <option value="día">{t("proProfile.services.unitDay")}</option>
                     <option value="m²">m²</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <Label>Duración estimada</Label>
+                <Label>{t("proProfile.services.durationEstimate")}</Label>
                 <Input
                   value={formData.duration}
                   onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
-                  placeholder="Ej: 2-3 horas, 1 día, 1 semana"
+                  placeholder={t("proProfile.services.durationPlaceholder")}
                 />
               </div>
             </div>
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                Cancelar
+                {t("common.cancel")}
               </Button>
               <Button onClick={saveService} className="bg-blue-600 hover:bg-blue-700">
-                {editingService ? "Guardar cambios" : "Añadir servicio"}
+                {editingService ? t("proProfile.form.saveChanges") : t("proProfile.services.add")}
               </Button>
             </DialogFooter>
           </DialogContent>

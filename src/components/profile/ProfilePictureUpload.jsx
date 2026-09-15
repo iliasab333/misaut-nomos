@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Camera, X } from "lucide-react";
 import { toast } from "sonner";
 import OptimizedImage from "../ui/OptimizedImage";
+import { useTranslation } from "react-i18next";
 
 export default function ProfilePictureUpload({ user, currentPicture, onUpdate, size = "lg", allowedForClients = true }) {
+  const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(currentPicture);
   
@@ -21,12 +23,12 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
     if (!file) return;
     
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen no puede superar los 5MB");
+      toast.error(t("proProfile.picture.tooLarge"));
       return;
     }
     
     if (!file.type.startsWith('image/')) {
-      toast.error("Solo se permiten archivos de imagen");
+      toast.error(t("proProfile.picture.imagesOnly"));
       return;
     }
     
@@ -67,10 +69,10 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
         onUpdate(file_url);
       }
       
-      toast.success("✅ Foto de perfil actualizada correctamente");
+      toast.success(t("proProfile.picture.updated"));
     } catch (error) {
       console.error("❌ Error uploading profile picture:", error);
-      toast.error("Error al subir la foto: " + error.message);
+      toast.error(t("proProfile.picture.uploadError", { message: error.message }));
       setPreviewUrl(currentPicture);
     } finally {
       setUploading(false);
@@ -78,7 +80,7 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
   };
 
   const handleRemove = async () => {
-    if (!confirm('¿Seguro que quieres eliminar tu foto de perfil?')) {
+    if (!confirm(t('proProfile.picture.confirmRemove'))) {
       return;
     }
 
@@ -90,10 +92,10 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
         onUpdate("");
       }
       
-      toast.success("Foto eliminada correctamente");
+      toast.success(t("proProfile.picture.removed"));
     } catch (error) {
       console.error("Error removing profile picture:", error);
-      toast.error("Error al eliminar la foto");
+      toast.error(t("proProfile.picture.removeError"));
     }
   };
   
@@ -119,7 +121,7 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
           {previewUrl ? (
             <OptimizedImage
               src={previewUrl}
-              alt="Foto de perfil"
+              alt={t("proProfile.picture.alt")}
               className="w-full h-full"
               objectFit="cover"
               priority={true}
@@ -152,7 +154,7 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
           <button
             onClick={handleRemove}
             className="absolute top-0 left-0 w-8 h-8 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-            aria-label="Eliminar foto"
+            aria-label={t("proProfile.picture.removeAria")}
           >
             <X className="w-4 h-4 text-white" />
           </button>
@@ -161,10 +163,10 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
       
       <div className="text-center">
         <p className={`font-semibold text-gray-900 ${sizes[size].text}`}>
-          {previewUrl ? 'Cambiar foto' : 'Añadir foto de perfil'}
+          {previewUrl ? t("proProfile.picture.change") : t("proProfile.picture.add")}
         </p>
         <p className="text-xs text-gray-500 mt-1">
-          Máx 5MB - JPG, PNG o WEBP
+          {t("proProfile.picture.hint")}
         </p>
       </div>
     </div>

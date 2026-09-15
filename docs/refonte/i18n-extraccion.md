@@ -196,3 +196,62 @@ Al terminar, devuelve:
 6. Erratas o inconsistencias del español original que hayas visto.
 7. Cualquier hook que hayas tenido que mover o constante que hayas metido
    dentro de un componente (fichero + nombre), para poder revisarlo.
+
+## Reconstrucción de partes perdidas (segunda oleada)
+
+La primera oleada de agentes se cortó por cuota. En varios lotes el JSX ya
+está convertido a `t('clave')` pero la parte JSON nunca se escribió: esas
+claves están **huérfanas** (pintan la clave cruda en pantalla). El nombrado
+ya está hecho y es bueno — no lo rehagas. Lo que hay que recuperar es el
+texto español original, y está en git.
+
+### Cómo recuperar el español original
+
+El commit **`bbde76d`** es el último ANTES de que ningún agente tocara
+nada. Para cada fichero de tu lote:
+
+```bash
+git diff bbde76d -- src/pages/MiCampana.jsx
+```
+
+Cada clave nueva aparece en una línea `+` con `t('ads.campaign.x')`, y la
+línea `-` correspondiente (la de justo encima o unas pocas más arriba) lleva
+el texto español tal cual estaba. Ése es el valor de `es`, **carácter por
+carácter** (misma puntuación, mismas mayúsculas, mismos acentos). Si la
+línea original tenía interpolación a mano (`{nombre}` en JSX, o
+`'Hola ' + nombre`), el valor de `es` lleva `{{nombre}}` y la llamada del
+código debe pasar `{ nombre }` — comprueba que lo haga.
+
+Lista las huérfanas de tus ficheros con:
+
+```bash
+node scripts/i18n-orphans.mjs --files <tus ficheros>
+```
+
+Al terminar debe decir `OK: 0 claves huérfanas`. Ese script tiene en cuenta
+las partes ya escritas en `src/i18n/parts/` y los plurales (`x.count` con
+`x.count_one`/`x.count_other` no es huérfana).
+
+### Reglas que no cambian
+
+- Tu parte se llama como tu lote: `src/i18n/parts/<lote>.json`. Si ya
+  existe (otro agente la escribió parcialmente), **añade** a ella, no la
+  sobrescribas: léela, fusiona, escribe.
+- `es` calca el original; `en` es inglés natural tuyo. Misma forma clave a
+  clave.
+- No inventes valores para una huérfana que no encuentres en el diff: dilo
+  en el informe con fichero y clave, y déjala.
+- Después de reconstruir, sigue con la extracción normal de lo que quede a
+  mano en tus ficheros (`node scripts/i18n-inventory.mjs --files …`), con
+  las reglas de arriba.
+
+### Verificación de la segunda oleada
+
+Las tres de antes (inventario a cero, eslint, parte parseable) **más**:
+
+```bash
+node scripts/i18n-orphans.mjs --files <tus ficheros>
+```
+
+Y en el informe, añade un punto 8: claves que reconstruiste desde el diff
+(número) y las que no pudiste (lista).

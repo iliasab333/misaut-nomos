@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import { Shield, X, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +10,7 @@ const STORAGE_KEY = "verify_prompt_shown";
  * Se muestra solo una vez — usa sessionStorage para no repetir.
  */
 export default function VerificationPromptModal({ profile }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -34,6 +36,12 @@ export default function VerificationPromptModal({ profile }) {
     navigate("/mi-perfil");
   };
 
+  const benefits = [
+    t('verification.modal.benefits.searches'),
+    t('verification.modal.benefits.trust'),
+    t('verification.modal.benefits.reviews'),
+  ];
+
   return (
     <>
       {/* Overlay */}
@@ -55,19 +63,16 @@ export default function VerificationPromptModal({ profile }) {
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Shield className="w-8 h-8 text-blue-600" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Activa tu badge Verificado</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('verification.modal.title')}</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Tu perfil está activo, pero los clientes priorizan los perfiles verificados.
-              Verificar tu identidad solo tarda <strong>2 minutos</strong>.
+              <Trans i18nKey="verification.modal.body">
+                Tu perfil está activo, pero los clientes priorizan los perfiles verificados. Verificar tu identidad solo tarda <strong>2 minutos</strong>.
+              </Trans>
             </p>
           </div>
 
           <div className="space-y-2.5 mb-6">
-            {[
-              "Apareces como Verificado en búsquedas",
-              "Los clientes confían más y contactan más",
-              "Puedes dejar y recibir reseñas verificadas",
-            ].map((item) => (
+            {benefits.map((item) => (
               <div key={item} className="flex items-center gap-2.5">
                 <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                 <span className="text-sm text-gray-700">{item}</span>
@@ -79,13 +84,13 @@ export default function VerificationPromptModal({ profile }) {
             onClick={handleVerify}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors"
           >
-            Verificar ahora — Es gratis
+            {t('verification.modal.cta')}
           </button>
           <button
             onClick={() => setOpen(false)}
             className="w-full text-center text-sm text-gray-400 mt-3 py-1"
           >
-            Ahora no
+            {t('notifications.not_now')}
           </button>
         </div>
       </div>

@@ -21,9 +21,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 export default function AdminFAQPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [editingFaq, setEditingFaq] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -42,7 +44,7 @@ export default function AdminFAQPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminFaqs'] });
-      toast.success('FAQ creado correctamente');
+      toast.success(t('admin.faq.created'));
       setShowDialog(false);
       setEditingFaq(null);
     },
@@ -54,7 +56,7 @@ export default function AdminFAQPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminFaqs'] });
-      toast.success('FAQ actualizado correctamente');
+      toast.success(t('admin.faq.updated'));
       setShowDialog(false);
       setEditingFaq(null);
     },
@@ -66,7 +68,7 @@ export default function AdminFAQPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminFaqs'] });
-      toast.success('FAQ eliminado correctamente');
+      toast.success(t('admin.faq.deleted'));
     },
   });
 
@@ -76,13 +78,13 @@ export default function AdminFAQPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminFaqs'] });
-      toast.success('Estado actualizado');
+      toast.success(t('statusUpdated'));
     },
   });
 
   const handleSave = () => {
     if (!editingFaq.title_es || !editingFaq.title_en || !editingFaq.content_es || !editingFaq.content_en || !editingFaq.category) {
-      toast.error('Completa todos los campos obligatorios');
+      toast.error(t('admin.faq.requiredFields'));
       return;
     }
 
@@ -116,13 +118,13 @@ export default function AdminFAQPage() {
 
   const getCategoryLabel = (category) => {
     const labels = {
-      platform: "Plataforma",
-      clients: "Clientes",
-      professionals: "Autónomos",
-      security: "Seguridad",
-      payments: "Pagos",
-      profile: "Perfil",
-      troubleshooting: "Problemas"
+      platform: t('admin.faq.categories.platform'),
+      clients: t('admin.faq.categories.clients'),
+      professionals: t('admin.faq.categories.professionals'),
+      security: t('admin.faq.categories.security'),
+      payments: t('nav.payments'),
+      profile: t('admin.faq.categories.profile'),
+      troubleshooting: t('admin.faq.categories.troubleshooting')
     };
     return labels[category] || category;
   };
@@ -132,12 +134,12 @@ export default function AdminFAQPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestión de FAQs</h1>
-            <p className="text-gray-600">Administra el contenido del centro de ayuda</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('admin.faq.title')}</h1>
+            <p className="text-gray-600">{t('admin.faq.subtitle')}</p>
           </div>
           <Button onClick={handleNew} className="bg-blue-600 hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" />
-            Nuevo artículo
+            {t('admin.faq.newFaq')}
           </Button>
         </div>
 
@@ -178,8 +180,8 @@ export default function AdminFAQPage() {
                   {faq.summary_es}
                 </p>
                 <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span>{faq.views || 0} vistas</span>
-                  <span>{faq.helpful_count || 0} útiles</span>
+                  <span>{t('admin.faq.views', { count: faq.views || 0 })}</span>
+                  <span>{t('admin.faq.helpful', { count: faq.helpful_count || 0 })}</span>
                 </div>
               </CardContent>
             </Card>
@@ -189,13 +191,13 @@ export default function AdminFAQPage() {
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingFaq?.id ? 'Editar FAQ' : 'Nuevo FAQ'}</DialogTitle>
+              <DialogTitle>{editingFaq?.id ? t('admin.faq.dialog.editTitle') : t('admin.faq.dialog.newTitle')}</DialogTitle>
             </DialogHeader>
 
             {editingFaq && (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Categoría *</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.faq.form.category')}</label>
                   <Select
                     value={editingFaq.category}
                     onValueChange={(value) => setEditingFaq({...editingFaq, category: value})}
@@ -204,27 +206,27 @@ export default function AdminFAQPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="platform">Plataforma</SelectItem>
-                      <SelectItem value="clients">Clientes</SelectItem>
-                      <SelectItem value="professionals">Autónomos</SelectItem>
-                      <SelectItem value="security">Seguridad</SelectItem>
-                      <SelectItem value="payments">Pagos</SelectItem>
-                      <SelectItem value="profile">Perfil</SelectItem>
-                      <SelectItem value="troubleshooting">Problemas</SelectItem>
+                      <SelectItem value="platform">{t('admin.faq.categories.platform')}</SelectItem>
+                      <SelectItem value="clients">{t('admin.faq.categories.clients')}</SelectItem>
+                      <SelectItem value="professionals">{t('admin.faq.categories.professionals')}</SelectItem>
+                      <SelectItem value="security">{t('admin.faq.categories.security')}</SelectItem>
+                      <SelectItem value="payments">{t('nav.payments')}</SelectItem>
+                      <SelectItem value="profile">{t('admin.faq.categories.profile')}</SelectItem>
+                      <SelectItem value="troubleshooting">{t('admin.faq.categories.troubleshooting')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Título (ES) *</label>
+                    <label className="block text-sm font-medium mb-2">{t('admin.faq.form.titleEs')}</label>
                     <Input
                       value={editingFaq.title_es}
                       onChange={(e) => setEditingFaq({...editingFaq, title_es: e.target.value})}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Título (EN) *</label>
+                    <label className="block text-sm font-medium mb-2">{t('admin.faq.form.titleEn')}</label>
                     <Input
                       value={editingFaq.title_en}
                       onChange={(e) => setEditingFaq({...editingFaq, title_en: e.target.value})}
@@ -234,7 +236,7 @@ export default function AdminFAQPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Resumen (ES)</label>
+                    <label className="block text-sm font-medium mb-2">{t('admin.faq.form.summaryEs')}</label>
                     <Textarea
                       value={editingFaq.summary_es}
                       onChange={(e) => setEditingFaq({...editingFaq, summary_es: e.target.value})}
@@ -242,7 +244,7 @@ export default function AdminFAQPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Resumen (EN)</label>
+                    <label className="block text-sm font-medium mb-2">{t('admin.faq.form.summaryEn')}</label>
                     <Textarea
                       value={editingFaq.summary_en}
                       onChange={(e) => setEditingFaq({...editingFaq, summary_en: e.target.value})}
@@ -253,7 +255,7 @@ export default function AdminFAQPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Contenido (ES) *</label>
+                    <label className="block text-sm font-medium mb-2">{t('admin.faq.form.contentEs')}</label>
                     <Textarea
                       value={editingFaq.content_es}
                       onChange={(e) => setEditingFaq({...editingFaq, content_es: e.target.value})}
@@ -261,7 +263,7 @@ export default function AdminFAQPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Contenido (EN) *</label>
+                    <label className="block text-sm font-medium mb-2">{t('admin.faq.form.contentEn')}</label>
                     <Textarea
                       value={editingFaq.content_en}
                       onChange={(e) => setEditingFaq({...editingFaq, content_en: e.target.value})}
@@ -271,16 +273,16 @@ export default function AdminFAQPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Etiquetas (separadas por comas)</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.faq.form.tags')}</label>
                   <Input
                     value={(editingFaq.tags || []).join(', ')}
                     onChange={(e) => setEditingFaq({...editingFaq, tags: e.target.value.split(',').map(t => t.trim())})}
-                    placeholder="registro, cuenta, contraseña"
+                    placeholder={t('admin.faq.form.tagsPlaceholder')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Orden</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.faq.form.order')}</label>
                   <Input
                     type="number"
                     value={editingFaq.order || 0}
@@ -292,10 +294,10 @@ export default function AdminFAQPage() {
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowDialog(false)}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                Guardar
+                {t('common.save')}
               </Button>
             </DialogFooter>
           </DialogContent>

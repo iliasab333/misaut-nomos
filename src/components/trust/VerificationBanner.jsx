@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import { Shield, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +9,7 @@ import { useNavigate } from "react-router-dom";
  * Se puede cerrar (solo en sesión), no se vuelve a mostrar hasta F5.
  */
 export default function VerificationBanner({ profile }) {
+  const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
   const navigate = useNavigate();
 
@@ -19,9 +21,11 @@ export default function VerificationBanner({ profile }) {
         <Shield className="w-5 h-5 text-blue-600" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-gray-900 text-sm">🛡️ Verifica tu identidad y aparece como Verificado</p>
+        <p className="font-semibold text-gray-900 text-sm">{t('verification.banner.title')}</p>
         <p className="text-xs text-gray-600 mt-0.5">
-          Los perfiles verificados reciben hasta <strong>3× más contactos</strong>. Solo tarda 2 minutos.
+          <Trans i18nKey="verification.banner.body">
+            Los perfiles verificados reciben hasta <strong>3× más contactos</strong>. Solo tarda 2 minutos.
+          </Trans>
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
@@ -29,12 +33,12 @@ export default function VerificationBanner({ profile }) {
           onClick={() => navigate("/mi-perfil")}
           className="text-xs font-semibold text-blue-700 bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
         >
-          Verificar ahora →
+          {t('verification.banner.cta')}
         </button>
         <button
           onClick={() => setDismissed(true)}
           className="text-gray-400 hover:text-gray-600 transition-colors"
-          aria-label="Cerrar banner"
+          aria-label={t('verification.banner.close')}
         >
           <X className="w-4 h-4" />
         </button>

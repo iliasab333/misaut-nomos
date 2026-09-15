@@ -1,26 +1,11 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Users, Briefcase, CreditCard,
   BarChart2, Ticket, Settings, ChevronRight, Gift, Shield, Megaphone, Mail, MessageCircle
 } from "lucide-react";
-
-const NAV_ITEMS = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, emoji: "📊" },
-  { id: "users", label: "Usuarios", icon: Users, emoji: "👥" },
-  { id: "pending", label: "Pendientes", icon: Briefcase, emoji: "🔧" },
-  { id: "subscriptions", label: "Suscripciones", icon: CreditCard, emoji: "💳" },
-  { id: "outreach", label: "Outreach WhatsApp", icon: MessageCircle, emoji: "💬" },
-  { id: "gifts", label: "Regalos", icon: Gift, emoji: "🎁" },
-  { id: "audit", label: "Auditoría", icon: Shield, emoji: "📋" },
-  { id: "ads_briefings", label: "Briefings Ads+", icon: Megaphone, emoji: "📢" },
-  { id: "referrals", label: "Referidos", icon: Gift, emoji: "🤝" },
-  { id: "emails", label: "Emails", icon: Mail, emoji: "📧" },
-  { id: "metrics", label: "Métricas", icon: BarChart2, emoji: "📈" },
-  { id: "support", label: "Soporte", icon: Ticket, emoji: "🎫" },
-  { id: "verifications", label: "Verificaciones", icon: Settings, emoji: "🛡️" },
-];
 
 const SECTION_ROUTES = {
   dashboard: "/admin",
@@ -37,8 +22,26 @@ const SECTION_ROUTES = {
 };
 
 export default function AdminLayout({ activeSection, currentSection, onSectionChange, openTickets = 0, children }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const active = activeSection || currentSection;
+
+  // Antes constante de módulo (NAV_ITEMS); dentro para que las etiquetas sigan al idioma
+  const navItems = [
+    { id: "dashboard", label: t("admin.layout.nav.dashboard"), icon: LayoutDashboard, emoji: "📊" },
+    { id: "users", label: t("admin.layout.nav.users"), icon: Users, emoji: "👥" },
+    { id: "pending", label: t("admin.layout.nav.pending"), icon: Briefcase, emoji: "🔧" },
+    { id: "subscriptions", label: t("admin.layout.nav.subscriptions"), icon: CreditCard, emoji: "💳" },
+    { id: "outreach", label: t("admin.layout.nav.outreach"), icon: MessageCircle, emoji: "💬" },
+    { id: "gifts", label: t("admin.layout.nav.gifts"), icon: Gift, emoji: "🎁" },
+    { id: "audit", label: t("admin.layout.nav.audit"), icon: Shield, emoji: "📋" },
+    { id: "ads_briefings", label: t("admin.layout.nav.adsBriefings"), icon: Megaphone, emoji: "📢" },
+    { id: "referrals", label: t("admin.layout.nav.referrals"), icon: Gift, emoji: "🤝" },
+    { id: "emails", label: t("admin.layout.nav.emails"), icon: Mail, emoji: "📧" },
+    { id: "metrics", label: t("admin.layout.nav.metrics"), icon: BarChart2, emoji: "📈" },
+    { id: "support", label: t("admin.layout.nav.support"), icon: Ticket, emoji: "🎫" },
+    { id: "verifications", label: t("admin.layout.nav.verifications"), icon: Settings, emoji: "🛡️" },
+  ];
 
   const handleSectionChange = (id) => {
     if (typeof onSectionChange === 'function') {
@@ -54,11 +57,11 @@ export default function AdminLayout({ activeSection, currentSection, onSectionCh
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col">
         <div className="p-6 border-b border-gray-100">
-          <h1 className="font-bold text-lg text-gray-900">⚙️ Admin Panel</h1>
+          <h1 className="font-bold text-lg text-gray-900">{t("admin.layout.title")}</h1>
           <p className="text-xs text-gray-500 mt-0.5">MisAutónomos</p>
         </div>
         <nav className="flex-1 p-3 space-y-1">
-          {NAV_ITEMS.map(item => (
+          {navItems.map(item => (
             <button
               key={item.id}
               onClick={() => handleSectionChange(item.id)}
@@ -86,7 +89,7 @@ export default function AdminLayout({ activeSection, currentSection, onSectionCh
       {/* Mobile top tabs */}
       <div className="flex-1 flex flex-col min-w-0">
         <div className="md:hidden flex overflow-x-auto bg-white border-b border-gray-200 px-2 py-2 gap-1">
-          {NAV_ITEMS.map(item => (
+          {navItems.map(item => (
             <button
               key={item.id}
               onClick={() => handleSectionChange(item.id)}

@@ -35,7 +35,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import ProfilePictureUpload from "../components/profile/ProfilePictureUpload";
 import ProfileCompleteness from "../components/profile/ProfileCompleteness";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { useTranslation, Trans } from "react-i18next";
 import InvoicingSettingsForm from "../components/invoicing/InvoicingSettingsForm";
 import SkillsSection from "../components/profile/SkillsSection";
 import PortfolioSection from "../components/profile/PortfolioSection";
@@ -111,7 +111,7 @@ const ciudadesPorProvincia = {
 };
 
 export default function MyProfilePage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
@@ -311,14 +311,14 @@ export default function MyProfilePage() {
       startSubscriptionPolling();
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (onboardingCompleted) {
-      toast.success('🎉 ¡Enhorabuena! Tu perfil está publicado y visible para clientes.', {
+      toast.success(t('myProfile.toasts.onboardingCompleted'), {
         duration: 8000
       });
       window.history.replaceState({}, document.title, window.location.pathname);
       queryClient.invalidateQueries({ queryKey: ['myProfile'] });
       queryClient.invalidateQueries({ queryKey: ['subscription'] });
     } else if (reactivationSuccess === "canceled") {
-      toast.info("Reactivación cancelada. Puedes intentarlo de nuevo cuando quieras.");
+      toast.info(t('myProfile.toasts.reactivationCanceled'));
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [reactivationSuccess, onboardingPending, onboardingCompleted]);
@@ -344,11 +344,11 @@ export default function MyProfilePage() {
           setIsVerifyingSubscription(false);
           
           if (reactivationSuccess === "success") {
-            toast.success("🎉 ¡Tu suscripción ha sido reactivada! Tu perfil ya es visible en búsquedas.", {
+            toast.success(t('myProfile.toasts.subscriptionReactivated'), {
               duration: 6000
             });
           } else if (onboardingPending === "pending") {
-            toast.success("✅ ¡Pago confirmado! Ahora completa tu perfil profesional.", {
+            toast.success(t('myProfile.toasts.paymentConfirmed'), {
               duration: 8000
             });
             setTimeout(() => navigate(createPageUrl("ProfileOnboarding")), 2000);
@@ -368,10 +368,10 @@ export default function MyProfilePage() {
               await queryClient.refetchQueries({ queryKey: ['subscription'] });
               
               if (syncResponse.data.needs_onboarding) {
-                toast.success("✅ ¡Suscripción activada! Completa tu perfil profesional.", { duration: 8000 });
+                toast.success(t('myProfile.toasts.subscriptionActivatedOnboarding'), { duration: 8000 });
                 setTimeout(() => navigate(createPageUrl("ProfileOnboarding")), 2000);
               } else {
-                toast.success("🎉 ¡Tu suscripción está activa!", { duration: 6000 });
+                toast.success(t('myProfile.toasts.subscriptionActive'), { duration: 6000 });
               }
               
               setIsVerifyingSubscription(false);
@@ -396,8 +396,8 @@ export default function MyProfilePage() {
     setIsVerifyingSubscription(false);
     toast.error(
       <div>
-        <p className="font-semibold">No se pudo verificar tu suscripción</p>
-        <p className="text-sm mt-1">Por favor, contacta con soporte: soporte@misautonomos.es</p>
+        <p className="font-semibold">{t('myProfile.subscription.verifyFailedTitle')}</p>
+        <p className="text-sm mt-1">{t('myProfile.subscription.verifyFailedBody', { email: 'soporte@misautonomos.es' })}</p>
       </div>,
       { duration: 15000 }
     );
@@ -408,7 +408,7 @@ export default function MyProfilePage() {
     mutationFn: (data) => base44.auth.updateMe(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myProfile'] });
-      toast.success(t('personalDataUpdated'));
+      toast.success(t('myProfile.toasts.personalDataUpdated'));
     },
   });
 
@@ -434,7 +434,7 @@ export default function MyProfilePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myProfile'] });
       setSuccess(true);
-      toast.success(t('professionalProfileUpdated'));
+      toast.success(t('myProfile.toasts.professionalProfileUpdated'));
       setTimeout(() => setSuccess(false), 3000);
     },
   });
@@ -447,7 +447,7 @@ export default function MyProfilePage() {
     },
     onSuccess: (_, visible) => {
       queryClient.invalidateQueries({ queryKey: ['myProfile'] });
-      toast.success(visible ? t('profileNowVisible') : t('profileNowHidden'));
+      toast.success(visible ? t('myProfile.toasts.profileNowVisible') : t('myProfile.toasts.profileNowHidden'));
     },
   });
 
@@ -464,7 +464,7 @@ export default function MyProfilePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['invoicingSettings']);
-      toast.success(t('invoicingSettingsSaved') || 'Datos de facturación guardados');
+      toast.success(t('myProfile.toasts.invoicingSettingsSaved'));
     },
   });
 
@@ -489,7 +489,7 @@ export default function MyProfilePage() {
 
     const validFiles = files.filter(file => {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error(t('exceedsSize').replace('{filename}', file.name));
+        toast.error(t('myProfile.toasts.exceedsSize', { filename: file.name }));
         return false;
       }
       return true;
@@ -517,10 +517,10 @@ export default function MyProfilePage() {
         queryClient.invalidateQueries({ queryKey: ['myProfile'] });
       }
 
-      toast.success(t('photosAdded').replace('{count}', validFiles.length));
+      toast.success(t('myProfile.toasts.photosAdded', { number: validFiles.length }));
     } catch (error) {
       console.error("Error uploading photos:", error);
-      toast.error(t('errorUploadingPhotos'));
+      toast.error(t('myProfile.toasts.errorUploadingPhotos'));
     } finally {
       setUploadingPhoto(false);
       e.target.value = '';
@@ -539,10 +539,10 @@ export default function MyProfilePage() {
           imagen_principal: user?.profile_picture || newPhotos[0] || ""
         });
         queryClient.invalidateQueries({ queryKey: ['myProfile'] });
-        toast.success(t('photoRemoved'));
+        toast.success(t('myProfile.toasts.photoRemoved'));
       } catch (error) {
         console.error("Error removing photo:", error);
-        toast.error(t('errorRemovingPhoto'));
+        toast.error(t('myProfile.toasts.errorRemovingPhoto'));
       }
     }
   };
@@ -564,13 +564,13 @@ export default function MyProfilePage() {
     setDeletingAccount(true);
     try {
       await base44.functions.invoke('deleteUser', { userId: user.id });
-      toast.success('Tu cuenta ha sido eliminada correctamente');
+      toast.success(t('myProfile.toasts.accountDeleted'));
       setTimeout(() => {
         base44.auth.logout(createPageUrl("Search"));
       }, 1500);
     } catch (error) {
       console.error('Error deleting account:', error);
-      toast.error('Error al eliminar la cuenta. Contacta con soporte.');
+      toast.error(t('myProfile.toasts.accountDeleteError'));
       setDeletingAccount(false);
     }
   };
@@ -593,10 +593,10 @@ export default function MyProfilePage() {
     
     if (normalizedState === "en_prueba" || normalizedState === "trialing" || normalizedState === "trial_active") {
       return {
-        text: "Periodo de prueba",
+        text: t('myProfile.subscription.trialPeriod'),
         badge: "🟡",
         color: "bg-blue-100 text-blue-800 border border-blue-300",
-        details: isActive ? `${daysLeft} días de prueba restantes` : "Prueba finalizada",
+        details: isActive ? t('myProfile.subscription.trialDaysLeft', { days: daysLeft }) : t('myProfile.subscription.trialEnded'),
         isActive: isActive,
         showUpgrade: true,
         showReactivate: false
@@ -605,10 +605,10 @@ export default function MyProfilePage() {
     
     if (normalizedState === "activo" || normalizedState === "active" || normalizedState === "actif") {
       return {
-        text: "Suscripción activa",
+        text: t('myProfile.subscription.active'),
         badge: "🟢",
         color: "bg-green-100 text-green-800 border border-green-300",
-        details: `Renovación: ${expirationDate.toLocaleDateString('es-ES')}`,
+        details: t('myProfile.subscription.renewal', { date: expirationDate.toLocaleDateString('es-ES') }),
         isActive: true,
         showUpgrade: false,
         showReactivate: false
@@ -617,14 +617,14 @@ export default function MyProfilePage() {
     
     if (normalizedState === "cancelado" || normalizedState === "canceled") {
       return {
-        text: isActive ? "Suscripción cancelada" : "Suscripción finalizada",
+        text: isActive ? t('myProfile.subscription.cancelled') : t('myProfile.subscription.ended'),
         badge: isActive ? "⚪" : "🔴",
         color: isActive 
           ? "bg-yellow-100 text-yellow-800 border border-yellow-300" 
           : "bg-red-100 text-red-800 border border-red-300",
         details: isActive 
-          ? `Activo hasta ${expirationDate.toLocaleDateString('es-ES')} (no se renovará)`
-          : "Tu perfil está oculto",
+          ? t('myProfile.subscription.activeUntilNoRenew', { date: expirationDate.toLocaleDateString('es-ES') })
+          : t('myProfile.subscription.profileHidden'),
         isActive: isActive,
         showUpgrade: false,
         showReactivate: true
@@ -632,12 +632,12 @@ export default function MyProfilePage() {
     }
     
     return {
-      text: isActive ? "Suscripción activa" : "Suscripción inactiva",
+      text: isActive ? t('myProfile.subscription.active') : t('myProfile.subscription.inactive'),
       badge: isActive ? "🟢" : "🔴",
       color: isActive 
         ? "bg-green-100 text-green-800 border border-green-300"
         : "bg-red-100 text-red-800 border border-red-300",
-      details: isActive ? `Válido hasta ${expirationDate.toLocaleDateString('es-ES')}` : "Reactiva tu plan para aparecer en búsquedas",
+      details: isActive ? t('myProfile.subscription.validUntil', { date: expirationDate.toLocaleDateString('es-ES') }) : t('myProfile.subscription.reactivateHint'),
       isActive: isActive,
       showUpgrade: false,
       showReactivate: !isActive
@@ -645,6 +645,14 @@ export default function MyProfilePage() {
   };
 
   const subscriptionStatus = getSubscriptionStatus();
+
+  // Mapa explícito valor BD → etiqueta traducida (el valor guardado no cambia).
+  const paymentLabels = {
+    Tarjeta: t('card'),
+    Transferencia: t('bankTransfer'),
+    Efectivo: t('cash'),
+    Bizum: t('onboarding.location.bizum'),
+  };
   const isProfileVisible = profile?.visible_en_busqueda === true && 
                            subscriptionStatus?.isActive && 
                            profile?.onboarding_completed === true;
@@ -669,11 +677,11 @@ export default function MyProfilePage() {
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
                 <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Verificando tu suscripción</h2>
-              <p className="text-gray-600">Estamos confirmando tu pago y activando tu cuenta...</p>
+              <h2 className="text-2xl font-bold text-gray-900">{t('myProfile.verifying.title')}</h2>
+              <p className="text-gray-600">{t('myProfile.verifying.body')}</p>
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-900 font-medium">Esto tardará solo unos segundos</p>
-                <p className="text-xs text-blue-700 mt-2">Por favor, no cierres esta ventana mientras procesamos tu pago.</p>
+                <p className="text-sm text-blue-900 font-medium">{t('myProfile.verifying.seconds')}</p>
+                <p className="text-xs text-blue-700 mt-2">{t('myProfile.verifying.dontClose')}</p>
               </div>
             </div>
           </CardContent>
@@ -689,8 +697,8 @@ export default function MyProfilePage() {
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 py-5 flex items-center justify-between gap-3 flex-wrap">
           <div className="min-w-0">
-            <h1 className="text-xl font-semibold text-gray-900">{t('myProfileTitle') || 'Mi Perfil'}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{isProfessional ? (t('manageYourProfile') || 'Gestiona tu perfil público') : (t('manageYourInformation') || 'Gestiona tu información')}</p>
+            <h1 className="text-xl font-semibold text-gray-900">{t('myProfileTitle')}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{isProfessional ? t('manageYourProfile') : t('myProfile.header.manageYourInformation')}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {profile && isProfessional && (
@@ -702,7 +710,7 @@ export default function MyProfilePage() {
                 }}
               >
                 {isProfileVisible ? <Eye className="w-3.5 h-3.5"/> : <EyeOff className="w-3.5 h-3.5"/>}
-                {isProfileVisible ? (t('publishedProfile') || 'Perfil publicado') : (t('hiddenProfile') || 'Perfil oculto')}
+                {isProfileVisible ? t('publishedProfile') : t('hiddenProfile')}
               </span>
             )}
             {profile?.slug_publico && isProfessional && (
@@ -713,7 +721,7 @@ export default function MyProfilePage() {
                 className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
               >
                 <Eye className="w-3.5 h-3.5"/>
-                Ver perfil público
+                {t('myProfile.header.viewPublicProfile')}
               </a>
             )}
             <button
@@ -723,7 +731,7 @@ export default function MyProfilePage() {
               style={{ background: '#00255C' }}
             >
               {updateProfileMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <Save className="w-3.5 h-3.5"/>}
-              <span className="hidden sm:inline">{t('saveChanges') || 'Guardar cambios'}</span>
+              <span className="hidden sm:inline">{t('myProfile.header.saveChanges')}</span>
             </button>
           </div>
         </div>
@@ -734,7 +742,7 @@ export default function MyProfilePage() {
           <Alert className="mb-4 bg-green-50 border-green-200">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800">
-              {t('profileUpdatedSuccess')}
+              {t('myProfile.alerts.profileUpdated')}
             </AlertDescription>
           </Alert>
         )}
@@ -749,12 +757,12 @@ export default function MyProfilePage() {
                     <Briefcase className="w-5 h-5 md:w-6 md:h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-base md:text-lg text-gray-900">{t('wantOfferServices')}</h3>
+                    <h3 className="font-bold text-base md:text-lg text-gray-900">{t('myProfile.cta.wantOfferServices')}</h3>
                     <p className="text-xs md:text-sm text-gray-600 mt-1">
-                      {t('becomeProfessionalAppear')}
+                      {t('myProfile.cta.becomeProfessionalAppear')}
                     </p>
                     <Link to={createPageUrl("DashboardProInfo")} className="text-blue-600 hover:text-blue-700 text-xs md:text-sm font-medium mt-2 inline-block">
-                      Ver todo lo que incluye el Dashboard Pro →
+                      {t('myProfile.cta.dashboardProLink')}
                     </Link>
                   </div>
                 </div>
@@ -764,7 +772,7 @@ export default function MyProfilePage() {
                   size="sm"
                 >
                   <Briefcase className="w-4 h-4 mr-2" />
-                  {t('viewPlans')}
+                  {t('nav.view_plans')}
                 </Button>
               </div>
             </CardContent>
@@ -783,16 +791,18 @@ export default function MyProfilePage() {
           <div className="mb-4 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-4 flex items-start gap-3">
             <span className="text-2xl flex-shrink-0">📸</span>
             <div className="flex-1">
-              <p className="font-bold text-gray-900 text-sm">Añade una foto principal a tu perfil</p>
+              <p className="font-bold text-gray-900 text-sm">{t('myProfile.photoBanner.title')}</p>
               <p className="text-xs text-gray-600 mt-0.5">
-                Los perfiles con foto reciben <strong>3× más contactos</strong>. Sube una foto en la pestaña <strong>Trabajos</strong> para activarla.
+                <Trans i18nKey="myProfile.photoBanner.body">
+                  Los perfiles con foto reciben <strong>3× más contactos</strong>. Sube una foto en la pestaña <strong>Trabajos</strong> para activarla.
+                </Trans>
               </p>
             </div>
             <button
               onClick={() => setActiveTab("portfolio")}
               className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0 transition-colors"
             >
-              Añadir foto
+              {t('myProfile.photoBanner.cta')}
             </button>
           </div>
         )}
@@ -807,16 +817,16 @@ export default function MyProfilePage() {
         {/* SECCIONES — sidebar vertical (desktop) + select (mobile) */}
         {(() => {
           const tabsConfig = [
-            { value: 'personal', icon: User, label: t('tabPersonal') || 'Información' },
-            ...(!isProfessional ? [{ value: 'reviews', icon: Star, label: 'Mis reseñas', badge: myReviewsAsClient.length > 0 ? myReviewsAsClient.length : null }] : []),
+            { value: 'personal', icon: User, label: t('tabPersonal') },
+            ...(!isProfessional ? [{ value: 'reviews', icon: Star, label: t('myProfile.tabs.myReviews'), badge: myReviewsAsClient.length > 0 ? myReviewsAsClient.length : null }] : []),
             ...(isProfessional ? [
-              { value: 'business', icon: Building2, label: t('tabProfile') || 'Perfil público' },
-              { value: 'skills', icon: Award, label: t('tabSkills') || 'Especialidades' },
-              { value: 'services', icon: Briefcase, label: t('tabServices') || 'Servicios' },
-              { value: 'portfolio', icon: Camera, label: t('tabPortfolio') || 'Trabajos' },
-              { value: 'availability', icon: Clock, label: t('tabAvailability') || 'Disponibilidad' },
-              { value: 'faq', icon: BarChart3, label: t('tabFAQ') || 'FAQ' },
-              { value: 'invoicing', icon: Euro, label: t('tabInvoicing') || 'Facturación' },
+              { value: 'business', icon: Building2, label: t('tabProfile') },
+              { value: 'skills', icon: Award, label: t('tabSkills') },
+              { value: 'services', icon: Briefcase, label: t('tabServices') },
+              { value: 'portfolio', icon: Camera, label: t('tabPortfolio') },
+              { value: 'availability', icon: Clock, label: t('tabAvailability') },
+              { value: 'faq', icon: BarChart3, label: t('tabFAQ') },
+              { value: 'invoicing', icon: Euro, label: t('tabInvoicing') },
             ] : [])
           ];
           return (
@@ -826,7 +836,7 @@ export default function MyProfilePage() {
                 {/* Móvil: <select> */}
                 <div className="md:hidden">
                   <label htmlFor="profile-section-select" className="block text-[10px] uppercase tracking-[0.1em] font-bold text-slate-500 mb-1.5">
-                    Sección
+                    {t('myProfile.sections.label')}
                   </label>
                   <select
                     id="profile-section-select"
@@ -886,7 +896,7 @@ export default function MyProfilePage() {
                 </div>
 
                 <div>
-                  <Label className="text-sm">{t('email')}</Label>
+                  <Label className="text-sm">{t('emailField')}</Label>
                   <Input value={user.email} disabled className="bg-gray-50 mt-1 text-gray-700 disabled:opacity-100 disabled:cursor-default" />
                 </div>
 
@@ -902,7 +912,7 @@ export default function MyProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm">Teléfono</Label>
+                    <Label className="text-sm">{t('phoneLabel')}</Label>
                     <Input
                       value={userData.phone || ""}
                       onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
@@ -912,14 +922,14 @@ export default function MyProfilePage() {
                     />
                   </div>
                   <div>
-                    <Label className="text-sm">Ciudad</Label>
+                    <Label className="text-sm">{t('cityLabel')}</Label>
                     <div className="mt-1">
                       <MobileSelect
                         value={userData.city || ""}
                         onValueChange={(value) => setUserData({ ...userData, city: value })}
-                        placeholder="Selecciona tu ciudad"
+                        placeholder={t('myProfile.personal.selectYourCity')}
                         disabled={!isEditing}
-                        label="Ciudad"
+                        label={t('cityLabel')}
                       >
                         {Object.values(ciudadesPorProvincia).flat().sort().map((ciudad) => (
                           <SelectItem key={ciudad} value={ciudad}>{ciudad}</SelectItem>
@@ -933,7 +943,7 @@ export default function MyProfilePage() {
                   <Label className="text-sm">{t('accountType')}</Label>
                   <div className="mt-1">
                     <Badge className="bg-blue-100 text-blue-900">
-                      {isProfessional ? 'Profesional' : 'Cliente'}
+                      {isProfessional ? t('professionalLabel') : t('clientLabel')}
                     </Badge>
                   </div>
                 </div>
@@ -946,12 +956,12 @@ export default function MyProfilePage() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
                             <Label className="text-base font-bold text-gray-900 mb-2 block">
-                              Disponibilidad
+                              {t('availability')}
                             </Label>
                             <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                               {profile.visible_en_busqueda 
-                                ? 'Perfil activo y visible para clientes'
-                                : t('profilePausedHidden')}
+                                ? t('myProfile.visibility.activeVisible')
+                                : t('myProfile.visibility.pausedHidden')}
                             </p>
                           </div>
                           <Switch
@@ -968,10 +978,10 @@ export default function MyProfilePage() {
                               <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-green-600 mt-0.5 flex-shrink-0" />
                               <div>
                                 <p className="text-xs md:text-sm font-semibold text-green-900 mb-1">
-                                  Activo y visible
+                                  {t('myProfile.visibility.activeAndVisible')}
                                 </p>
                                 <p className="text-xs text-green-800">
-                                  Los clientes pueden ver tu perfil
+                                  {t('myProfile.visibility.clientsCanSee')}
                                 </p>
                               </div>
                             </div>
@@ -982,10 +992,10 @@ export default function MyProfilePage() {
                               <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                               <div>
                                 <p className="text-xs md:text-sm font-semibold text-amber-900 mb-1">
-                                  {t('profilePaused')}
+                                  {t('myProfile.visibility.paused')}
                                 </p>
                                 <p className="text-xs text-amber-800">
-                                  {t('usefulIfBusy')}
+                                  {t('myProfile.visibility.usefulIfBusy')}
                                 </p>
                               </div>
                             </div>
@@ -999,7 +1009,7 @@ export default function MyProfilePage() {
                 {/* VERIFICACIÓN DE IDENTIDAD */}
                 <div className="pt-4 border-t border-gray-200">
                   <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <span>🛡️</span> Verificación de identidad
+                    <span>🛡️</span> {t('myProfile.personal.identityVerification')}
                   </p>
                   <IdentityVerificationWidget user={user} />
                 </div>
@@ -1008,7 +1018,7 @@ export default function MyProfilePage() {
                 <div className="pt-6 border-t border-gray-200 flex flex-col items-center gap-2">
                   <DeleteAccountButton className="w-full justify-center" redirectTo="/" />
                   <p className="text-xs text-gray-500 mt-1 text-center">
-                    Esta acción es irreversible y eliminará todos tus datos.
+                    {t('myProfile.deleteAccount.irreversibleNote')}
                   </p>
                 </div>
               </CardContent>
@@ -1022,15 +1032,15 @@ export default function MyProfilePage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base md:text-lg flex items-center gap-2 text-gray-900 font-semibold">
                     <Star className="w-5 h-5 text-amber-500" />
-                    Reseñas que he dejado
+                    {t('myProfile.reviews.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {myReviewsAsClient.length === 0 ? (
                     <div className="text-center py-10">
                       <Star className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                      <p className="text-gray-500 text-sm">Aún no has dejado ninguna valoración.</p>
-                      <p className="text-gray-400 text-xs mt-1">Cuando tengas conversaciones con autónomos, podrás valorar su trabajo aquí.</p>
+                      <p className="text-gray-500 text-sm">{t('myProfile.reviews.empty')}</p>
+                      <p className="text-gray-400 text-xs mt-1">{t('myProfile.reviews.emptyHint')}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -1053,7 +1063,7 @@ export default function MyProfilePage() {
                           </div>
                           {review.professional_response && (
                             <div className="mt-3 ml-4 bg-blue-50 border border-blue-100 rounded-lg p-3">
-                              <p className="text-xs font-semibold text-blue-700 mb-1">Respuesta del profesional</p>
+                              <p className="text-xs font-semibold text-blue-700 mb-1">{t('myProfile.reviews.professionalResponse')}</p>
                               <p className="text-sm text-gray-700">{review.professional_response}</p>
                             </div>
                           )}
@@ -1085,7 +1095,7 @@ export default function MyProfilePage() {
                         value={profileData.business_name}
                         onChange={(e) => setProfileData({ ...profileData, business_name: e.target.value })}
                         disabled={!isEditing}
-                        placeholder="Tu Empresa S.L."
+                        placeholder={t('myProfile.business.companyPlaceholder')}
                         className="mt-1"
                       />
                     </div>
@@ -1094,7 +1104,7 @@ export default function MyProfilePage() {
                       <div>
                         <Label className="flex items-center gap-2 text-sm">
                           {profileData.cif_nif ? <CheckCircle className="w-4 h-4 text-green-600" /> : null}
-                          NIF / CIF / NIE *
+                          {t('nifCifNie')}
                         </Label>
                         <Input
                           value={profileData.cif_nif || ""}
@@ -1108,7 +1118,7 @@ export default function MyProfilePage() {
                           className="mt-1"
                         />
                         {isEditing && profileData.cif_nif && profileData.cif_nif.length > 0 && profileData.cif_nif.length < 8 && (
-                          <p className="text-xs text-amber-600 mt-1">Mínimo 8 caracteres</p>
+                          <p className="text-xs text-amber-600 mt-1">{t('myProfile.business.minEightChars')}</p>
                         )}
                       </div>
                       <div>
@@ -1183,7 +1193,7 @@ export default function MyProfilePage() {
                           onClick={() => {
                             if (!isEditing) return;
                             if (!profileData.telefono_contacto) {
-                              toast.error(t('addPhoneFirstWhatsApp'));
+                              toast.error(t('myProfile.contact.addPhoneFirstWhatsApp'));
                               return;
                             }
                             const methods = profileData.metodos_contacto || ['chat_interno'];
@@ -1214,8 +1224,8 @@ export default function MyProfilePage() {
                               </svg>
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900 text-xs md:text-sm">WhatsApp</p>
-                              <p className="text-xs text-gray-500">{t('requiresPhone')}</p>
+                              <p className="font-medium text-gray-900 text-xs md:text-sm">{t('profile_page.whatsapp')}</p>
+                              <p className="text-xs text-gray-500">{t('myProfile.contact.requiresPhone')}</p>
                             </div>
                           </div>
                           {profileData.metodos_contacto?.includes('whatsapp') ? (
@@ -1230,7 +1240,7 @@ export default function MyProfilePage() {
                           onClick={() => {
                             if (!isEditing) return;
                             if (!profileData.telefono_contacto) {
-                              toast.error(t('addPhoneFirstCall'));
+                              toast.error(t('myProfile.contact.addPhoneFirstCall'));
                               return;
                             }
                             const methods = profileData.metodos_contacto || ['chat_interno'];
@@ -1259,8 +1269,8 @@ export default function MyProfilePage() {
                               <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" />
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900 text-xs md:text-sm">{t('phoneCall')}</p>
-                              <p className="text-xs text-gray-500">{t('requiresPhone')}</p>
+                              <p className="font-medium text-gray-900 text-xs md:text-sm">{t('myProfile.contact.phoneCall')}</p>
+                              <p className="text-xs text-gray-500">{t('myProfile.contact.requiresPhone')}</p>
                             </div>
                           </div>
                           {profileData.metodos_contacto?.includes('telefono') ? (
@@ -1275,17 +1285,17 @@ export default function MyProfilePage() {
                     <div>
                       <Label className="flex items-center gap-2 text-sm">
                         {profileData.iban ? <CheckCircle className="w-4 h-4 text-green-600" /> : null}
-                        {t('ibanForInvoices')}
+                        {t('myProfile.business.ibanForInvoices')}
                       </Label>
                       <Input
                         value={profileData.iban || ""}
                         onChange={(e) => setProfileData({ ...profileData, iban: e.target.value.toUpperCase() })}
                         disabled={!isEditing}
-                        placeholder="ES91 2100 0418 4502 0005 1332"
+                        placeholder={t('myProfile.business.ibanPlaceholder')}
                         maxLength={34}
                         className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">{t('ibanHelp')}</p>
+                      <p className="text-xs text-gray-500 mt-1">{t('myProfile.business.ibanHelp')}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1293,16 +1303,16 @@ export default function MyProfilePage() {
                 {/* Servicios y descripción */}
                 <Card className="shadow-sm border-0 bg-white">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base md:text-lg text-gray-900 font-semibold">{t('servicesAndDescription')}</CardTitle>
+                    <CardTitle className="text-base md:text-lg text-gray-900 font-semibold">{t('myProfile.services.title')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label className="text-sm">{t('serviceCategory')}</Label>
+                      <Label className="text-sm">{t('myProfile.services.category')}</Label>
                       {!isEditing ? (
                         <div className="mt-2 flex items-center gap-2">
                           <CheckCircle className="w-5 h-5 text-green-600" />
                           <Badge className="bg-blue-100 text-blue-900 text-sm">
-                            {profileData.categories[0] ? t(profileData.categories[0]) : t('noCategory')}
+                            {profileData.categories[0] || t('myProfile.services.noCategory')}
                           </Badge>
                         </div>
                       ) : (
@@ -1322,7 +1332,7 @@ export default function MyProfilePage() {
                               ) : (
                                 <div className="w-5 h-5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                               )}
-                              <span className="text-xs md:text-sm">{t(cat.name) || cat.name}</span>
+                              <span className="text-xs md:text-sm">{cat.name}</span>
                             </div>
                           ))}
                         </div>
@@ -1331,19 +1341,19 @@ export default function MyProfilePage() {
 
                     {profileData.categories.includes("Otro tipo de servicio profesional") && (
                       <div>
-                        <Label className="text-sm">{t('specifyYourService')}</Label>
+                        <Label className="text-sm">{t('onboarding.activity.otherServiceLabel')}</Label>
                         <Input
                           value={profileData.activity_other}
                           onChange={(e) => setProfileData({ ...profileData, activity_other: e.target.value })}
                           disabled={!isEditing}
-                          placeholder={t('specifyServicePlaceholder')}
+                          placeholder={t('myProfile.services.specifyServicePlaceholder')}
                           className="mt-1"
                         />
                       </div>
                     )}
 
                     <div>
-                      <Label className="text-sm">{t('servicesDescription')}</Label>
+                      <Label className="text-sm">{t('myProfile.services.description')}</Label>
                       {!isEditing && profileData.descripcion_corta ? (
                         <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                           <div className="flex items-start gap-2">
@@ -1358,7 +1368,7 @@ export default function MyProfilePage() {
                             onChange={(e) => setProfileData({ ...profileData, descripcion_corta: e.target.value.slice(0, 220) })}
                             disabled={!isEditing}
                             className="h-24 mt-2"
-                            placeholder="Describe brevemente tus servicios..."
+                            placeholder={t('onboarding.activity.descriptionPlaceholder')}
                           />
                           <p className="text-xs text-gray-500 mt-1">{profileData.descripcion_corta.length}/220</p>
                           
@@ -1388,7 +1398,7 @@ export default function MyProfilePage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base md:text-lg flex items-center gap-2 text-gray-900 font-semibold">
                       <MapPin className="w-5 h-5 text-blue-700" />
-                      {t('locationLabel')}
+                      {t('myProfile.location.title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -1402,9 +1412,9 @@ export default function MyProfilePage() {
                           <MobileSelect
                             value={profileData.provincia}
                             onValueChange={(value) => setProfileData({ ...profileData, provincia: value, ciudad: "" })}
-                            placeholder={t('selectProvincePlaceholder')}
+                            placeholder={t('onboarding.location.selectProvince')}
                             disabled={!isEditing}
-                            label="Provincia"
+                            label={t('province')}
                           >
                             {provincias.map((prov) => (
                               <SelectItem key={prov} value={prov}>{prov}</SelectItem>
@@ -1422,9 +1432,9 @@ export default function MyProfilePage() {
                           <MobileSelect
                             value={profileData.ciudad}
                             onValueChange={(value) => setProfileData({ ...profileData, ciudad: value })}
-                            placeholder={profileData.provincia ? t('selectCityPlaceholder') : t('firstChooseProvince')}
+                            placeholder={profileData.provincia ? t('onboarding.location.selectCity') : t('myProfile.location.firstChooseProvince')}
                             disabled={!isEditing || !profileData.provincia}
-                            label="Ciudad"
+                            label={t('cityLabel')}
                           >
                             {(profileData.provincia ? ciudadesPorProvincia[profileData.provincia] || [] : []).map((ciudad) => (
                               <SelectItem key={ciudad} value={ciudad}>{ciudad}</SelectItem>
@@ -1441,14 +1451,14 @@ export default function MyProfilePage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base md:text-lg flex items-center gap-2 text-gray-900 font-semibold">
                       <Euro className="w-5 h-5 text-blue-700" />
-                      {t('ratesAndPayments')}
+                      {t('myProfile.rates.title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
                       <Label className="flex items-center gap-2 text-sm">
                         {profileData.tarifa_base ? <CheckCircle className="w-4 h-4 text-green-600" /> : null}
-                        {t('baseRateOptionalLabel')}
+                        {t('myProfile.rates.baseRateOptional')}
                       </Label>
                       <Input
                         type="number"
@@ -1479,14 +1489,14 @@ export default function MyProfilePage() {
                     <div>
                       <Label className="flex items-center gap-2 text-sm">
                         {profileData.formas_pago.length > 0 ? <CheckCircle className="w-4 h-4 text-green-600" /> : null}
-                        {t('acceptedPaymentMethodsLabel')}
+                        {t('myProfile.rates.acceptedPaymentMethods')}
                       </Label>
                       {!isEditing ? (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {profileData.formas_pago.map((forma) => (
                             <Badge key={forma} className="bg-purple-100 text-purple-900 flex items-center gap-1">
                               <CheckCircle className="w-3 h-3" />
-                              {t(forma.toLowerCase())}
+                              {paymentLabels[forma] || forma}
                             </Badge>
                           ))}
                         </div>
@@ -1507,7 +1517,7 @@ export default function MyProfilePage() {
                               ) : (
                                 <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-gray-300 rounded-full flex-shrink-0" />
                               )}
-                              <span className="text-xs md:text-sm">{t(forma.toLowerCase())}</span>
+                              <span className="text-xs md:text-sm">{paymentLabels[forma] || forma}</span>
                             </div>
                           ))}
                         </div>
@@ -1562,11 +1572,11 @@ export default function MyProfilePage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base md:text-lg flex items-center gap-2 text-gray-900 font-semibold">
                       <Camera className="w-5 h-5 text-blue-700" />
-                      {t('photoGalleryTitle')} ({profileData.photos.length}/10)
+                      {t('myProfile.portfolio.galleryTitle')} ({profileData.photos.length}/10)
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-xs md:text-sm text-gray-600">{t('additionalWorkPhotos')}</p>
+                    <p className="text-xs md:text-sm text-gray-600">{t('myProfile.portfolio.additionalPhotos')}</p>
 
                     {isEditing && profileData.photos.length < 10 && (
                       <label className="cursor-pointer block">
@@ -1584,8 +1594,8 @@ export default function MyProfilePage() {
                           ) : (
                             <>
                               <Upload className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-gray-400" />
-                              <p className="text-xs md:text-sm text-gray-600">{t('clickToAddPhotos').replace('{count}', profileData.photos.length)}</p>
-                              <p className="text-xs text-gray-500 mt-1">{t('selectMultiple')}</p>
+                              <p className="text-xs md:text-sm text-gray-600">{t('myProfile.portfolio.clickToAddPhotos', { current: profileData.photos.length })}</p>
+                              <p className="text-xs text-gray-500 mt-1">{t('myProfile.portfolio.selectMultiple')}</p>
                             </>
                           )}
                         </div>
@@ -1597,7 +1607,7 @@ export default function MyProfilePage() {
                         <div key={idx} className="relative group">
                           <img
                             src={photo}
-                            alt={t('photoNumber').replace('{number}', idx + 1)}
+                            alt={t('onboarding.portfolio.photoAlt', { number: idx + 1 })}
                             className="w-full h-24 md:h-32 object-cover rounded-lg shadow-md"
                           />
                           {isEditing && (
@@ -1610,7 +1620,7 @@ export default function MyProfilePage() {
                           )}
                           {idx === 0 && (
                             <div className="absolute bottom-1 left-1 md:bottom-2 md:left-2 bg-blue-600 text-white text-xs px-2 py-0.5 md:py-1 rounded font-semibold">
-                              {t('mainPhotoLabel')}
+                              {t('onboarding.portfolio.main')}
                             </div>
                           )}
                         </div>
@@ -1624,7 +1634,7 @@ export default function MyProfilePage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base md:text-lg flex items-center gap-2 text-gray-900 font-semibold">
                       <Globe className="w-5 h-5 text-blue-700" />
-                      {t('socialNetworksLabel')}
+                      {t('myProfile.social.title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -1638,7 +1648,7 @@ export default function MyProfilePage() {
                           value={profileData.website}
                           onChange={(e) => setProfileData({ ...profileData, website: e.target.value })}
                           disabled={!isEditing}
-                          placeholder="https://tuweb.com"
+                          placeholder={t('onboarding.social.websitePlaceholder')}
                           className="h-10 mt-1"
                         />
                       </div>
@@ -1646,7 +1656,7 @@ export default function MyProfilePage() {
                       <div>
                         <Label className="flex items-center gap-2 text-xs text-gray-600">
                           {profileData.social_links?.instagram ? <CheckCircle className="w-3 h-3 text-green-600" /> : <div className="w-3 h-3" />}
-                          Instagram
+                          {t('myProfile.social.instagram')}
                         </Label>
                         <Input
                           value={profileData.social_links.instagram}
@@ -1655,7 +1665,7 @@ export default function MyProfilePage() {
                             social_links: { ...profileData.social_links, instagram: e.target.value }
                           })}
                           disabled={!isEditing}
-                          placeholder="@tuperfil"
+                          placeholder={t('myProfile.social.handlePlaceholder')}
                           className="h-10 mt-1"
                         />
                       </div>
@@ -1663,7 +1673,7 @@ export default function MyProfilePage() {
                       <div>
                         <Label className="flex items-center gap-2 text-xs text-gray-600">
                           {profileData.social_links?.facebook ? <CheckCircle className="w-3 h-3 text-green-600" /> : <div className="w-3 h-3" />}
-                          Facebook
+                          {t('myProfile.social.facebook')}
                         </Label>
                         <Input
                           value={profileData.social_links.facebook}
@@ -1672,7 +1682,7 @@ export default function MyProfilePage() {
                             social_links: { ...profileData.social_links, facebook: e.target.value }
                           })}
                           disabled={!isEditing}
-                          placeholder="tupagina"
+                          placeholder={t('myProfile.social.facebookPlaceholder')}
                           className="h-10 mt-1"
                         />
                       </div>
@@ -1680,7 +1690,7 @@ export default function MyProfilePage() {
                       <div>
                         <Label className="flex items-center gap-2 text-xs text-gray-600">
                           {profileData.social_links?.tiktok ? <CheckCircle className="w-3 h-3 text-green-600" /> : <div className="w-3 h-3" />}
-                          TikTok
+                          {t('myProfile.social.tiktok')}
                         </Label>
                         <Input
                           value={profileData.social_links.tiktok}
@@ -1689,7 +1699,7 @@ export default function MyProfilePage() {
                             social_links: { ...profileData.social_links, tiktok: e.target.value }
                           })}
                           disabled={!isEditing}
-                          placeholder="@tuperfil"
+                          placeholder={t('myProfile.social.handlePlaceholder')}
                           className="h-10 mt-1"
                         />
                       </div>
@@ -1749,7 +1759,7 @@ export default function MyProfilePage() {
             style={{ background: '#00255C' }}
           >
             {updateProfileMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
-            {t('saveChanges') || 'Guardar cambios'}
+            {t('myProfile.header.saveChanges')}
           </button>
         </div>
       </div>
@@ -1758,21 +1768,21 @@ export default function MyProfilePage() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar tu cuenta?</AlertDialogTitle>
+            <AlertDialogTitle>{t('myProfile.deleteAccount.title')}</AlertDialogTitle>
             <AlertDialogDescription className="text-sm">
-              Esta acción es permanente e irreversible. Se eliminarán:
+              {t('myProfile.deleteAccount.body')}
               <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
-                <li>Tu perfil profesional completo</li>
-                <li>Todos tus mensajes y conversaciones</li>
-                <li>Tu historial de clientes y trabajos</li>
-                <li>Facturas y presupuestos</li>
-                <li>Valoraciones recibidas</li>
+                <li>{t('myProfile.deleteAccount.items.profile')}</li>
+                <li>{t('myProfile.deleteAccount.items.messages')}</li>
+                <li>{t('myProfile.deleteAccount.items.history')}</li>
+                <li>{t('myProfile.deleteAccount.items.invoices')}</li>
+                <li>{t('myProfile.deleteAccount.items.reviews')}</li>
               </ul>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deletingAccount}>
-              Cancelar
+              {t('common.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
@@ -1782,10 +1792,10 @@ export default function MyProfilePage() {
               {deletingAccount ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Eliminando...
+                  {t('myProfile.deleteAccount.deleting')}
                 </>
               ) : (
-                'Sí, eliminar mi cuenta'
+                t('myProfile.deleteAccount.confirm')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

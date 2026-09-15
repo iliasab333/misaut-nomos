@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import i18n from '@/i18n';
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +13,7 @@ import { Link } from "react-router-dom";
 import SEOHead from "../components/seo/SEOHead";
 
 export default function ClientOnboardingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
@@ -67,8 +69,8 @@ export default function ClientOnboardingPage() {
       // Email de bienvenida (no bloqueante)
       base44.integrations.Core.SendEmail({
         to: data.email,
-        subject: "¡Bienvenido a MisAutónomos!",
-        body: `<p>Hola ${data.nombre}, tu cuenta ha sido creada. ¡Ya puedes buscar profesionales!</p>`,
+        subject: t('onboarding.client.welcomeEmailSubject'),
+        body: `<p>${t('onboarding.client.welcomeEmailBody', { name: data.nombre })}</p>`,
         from_name: "MisAutónomos"
       }).catch(() => {});
 
@@ -78,11 +80,11 @@ export default function ClientOnboardingPage() {
       return data;
     },
     onSuccess: () => {
-      toast.success("¡Bienvenido! Ya puedes contactar autónomos 🎉");
+      toast.success(t('auth.welcome_toast'));
       navigate(createPageUrl("Search"));
     },
     onError: (error) => {
-      setFieldErrors({ general: "Error al crear la cuenta: " + error.message });
+      setFieldErrors({ general: t('onboarding.client.errors.createFailed', { message: error.message }) });
     }
   });
 
@@ -131,16 +133,16 @@ export default function ClientOnboardingPage() {
   const validate = () => {
     const errors = {};
     if (!formData.nombre.trim() || formData.nombre.trim().length < 2) {
-      errors.nombre = "Introduce tu nombre";
+      errors.nombre = t('onboarding.client.validation.nameRequired');
     }
     if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = "Email no válido";
+      errors.email = t('onboarding.validation.invalidEmail');
     }
     if (!user && formData.password.length < 6) {
-      errors.password = "La contraseña debe tener al menos 6 caracteres";
+      errors.password = t('onboarding.client.validation.passwordMinLength');
     }
     if (!formData.acepta_terminos) {
-      errors.terminos = "Debes aceptar los términos";
+      errors.terminos = t('onboarding.client.validation.termsRequired');
     }
     return errors;
   };
@@ -176,8 +178,8 @@ export default function ClientOnboardingPage() {
   return (
     <>
       <SEOHead
-        title="Crea tu cuenta gratis - MisAutónomos"
-        description="Encuentra y contacta autónomos en segundos. Registro gratuito."
+        title={t('onboarding.client.seoTitle')}
+        description={t('onboarding.client.seoDescription')}
         keywords="crear cuenta cliente, buscar autónomos, servicios profesionales España"
         noindex={true}
       />
@@ -191,10 +193,10 @@ export default function ClientOnboardingPage() {
               className="font-semibold tracking-tight"
               style={{ color: '#00255C', fontSize: '24px', letterSpacing: '-0.02em', margin: 0 }}
             >
-              Crea tu cuenta
+              {t('onboarding.client.title')}
             </h1>
             <p style={{ color: '#6B7280', fontSize: '14px', marginTop: '6px' }}>
-              Contacta con autónomos verificados en segundos.
+              {t('onboarding.client.subtitle')}
             </p>
           </div>
 
@@ -209,11 +211,11 @@ export default function ClientOnboardingPage() {
             {/* Nombre */}
             <div>
               <label style={{ display: 'block', color: '#374151', fontWeight: 600, fontSize: '14px', marginBottom: '6px' }}>
-                Nombre
+                {t('auth.name')}
               </label>
               <Input
                 type="text"
-                placeholder="Tu nombre"
+                placeholder={t('auth.name_placeholder')}
                 value={formData.nombre}
                 onChange={(e) => {
                   setFormData({ ...formData, nombre: e.target.value });
@@ -242,11 +244,11 @@ export default function ClientOnboardingPage() {
             {/* Email */}
             <div>
               <label style={{ display: 'block', color: '#374151', fontWeight: 600, fontSize: '14px', marginBottom: '6px' }}>
-                Email
+                {t('auth.email')}
               </label>
               <Input
                 type="email"
-                placeholder="tu@email.com"
+                placeholder={t('auth.email_placeholder')}
                 value={formData.email}
                 onChange={(e) => {
                   setFormData({ ...formData, email: e.target.value });
@@ -279,12 +281,12 @@ export default function ClientOnboardingPage() {
             {!user && (
               <div>
                 <label style={{ display: 'block', color: '#374151', fontWeight: 600, fontSize: '14px', marginBottom: '6px' }}>
-                  Contraseña
+                  {t('auth.password')}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder={t('onboarding.client.passwordPlaceholder')}
                     value={formData.password}
                     onChange={(e) => {
                       setFormData({ ...formData, password: e.target.value });
@@ -312,7 +314,7 @@ export default function ClientOnboardingPage() {
                       background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: '4px',
                     }}
                     tabIndex={-1}
-                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    aria-label={showPassword ? t('onboarding.client.hidePassword') : t('onboarding.client.showPassword')}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -336,10 +338,9 @@ export default function ClientOnboardingPage() {
                 style={{ width: '16px', height: '16px', marginTop: '2px', flexShrink: 0, accentColor: '#2563EB' }}
               />
               <label htmlFor="acepta_terminos_client" style={{ fontSize: '13px', color: '#6B7280', lineHeight: '1.5', cursor: 'pointer' }}>
-                Acepto los{' '}
-                <Link to="/terminos" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }}>Términos</Link>
-                {' '}y la{' '}
-                <Link to="/privacidad" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }}>Política de Privacidad</Link>
+                <Trans i18nKey="onboarding.client.acceptTerms">
+                  Acepto los <Link to="/terminos" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }}>Términos</Link> y la <Link to="/privacidad" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }}>Política de Privacidad</Link>
+                </Trans>
               </label>
             </div>
             {fieldErrors.terminos && (
@@ -348,8 +349,7 @@ export default function ClientOnboardingPage() {
             
             {/* Microcopy newsletter */}
             <p style={{ fontSize: '10px', color: '#9CA3AF', textAlign: 'center', marginTop: '12px', lineHeight: '1.4' }}>
-              Al crear tu cuenta aceptarás recibir nuestra newsletter (1-2 emails al mes). 
-              Puedes darte de baja en cualquier momento.
+              {t('onboarding.client.newsletterNotice')}
             </p>
 
             {/* Botón principal */}
@@ -370,22 +370,21 @@ export default function ClientOnboardingPage() {
               }}
             >
               {completeOnboardingMutation.isPending ? (
-                <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Creando cuenta...</>
+                <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> {t('onboarding.client.creating')}</>
               ) : (
-                'Crear cuenta'
+                t('onboarding.client.createAccount')
               )}
             </Button>
           </form>
 
           {/* Link a login */}
           <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px', color: '#6B7280' }}>
-            ¿Ya tienes cuenta?{' '}
-            <button
-              onClick={() => base44.auth.redirectToLogin(createPageUrl("Search"))}
-              style={{ color: '#00255C', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', padding: 0 }}
-            >
-              Inicia sesión
-            </button>
+            <Trans i18nKey="onboarding.client.alreadyHaveAccount">
+              ¿Ya tienes cuenta? <button
+                onClick={() => base44.auth.redirectToLogin(createPageUrl("Search"))}
+                style={{ color: '#00255C', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', padding: 0 }}
+              >Inicia sesión</button>
+            </Trans>
           </p>
         </div>
       </div>

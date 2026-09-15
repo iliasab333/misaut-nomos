@@ -13,61 +13,10 @@ import {
   Loader2, CheckCircle, Info, ExternalLink 
 } from "lucide-react";
 import { toast } from "sonner";
-
-const SOFTWARE_OPTIONS = [
-  { 
-    id: 'generic', 
-    name: 'Genérico', 
-    description: 'Formato universal compatible con Excel y la mayoría de programas',
-    formats: ['csv', 'xml', 'json'],
-    icon: FileSpreadsheet,
-    color: 'blue'
-  },
-  { 
-    id: 'contasimple', 
-    name: 'Contasimple', 
-    description: 'Optimizado para importar en Contasimple',
-    formats: ['csv'],
-    icon: FileSpreadsheet,
-    color: 'green',
-    helpUrl: 'https://www.contasimple.com/ayuda/importar-facturas'
-  },
-  { 
-    id: 'holded', 
-    name: 'Holded', 
-    description: 'Compatible con el importador de Holded',
-    formats: ['csv', 'json'],
-    icon: FileSpreadsheet,
-    color: 'purple',
-    helpUrl: 'https://support.holded.com/es/articles/1709055-importar-facturas'
-  },
-  { 
-    id: 'sage', 
-    name: 'Sage 50', 
-    description: 'Formato para importar en Sage 50 / ContaPlus',
-    formats: ['csv', 'xml'],
-    icon: FileCode,
-    color: 'orange',
-    helpUrl: 'https://www.sage.com/es-es/sage-50/'
-  },
-  { 
-    id: 'facturae', 
-    name: 'FacturaE', 
-    description: 'Formato oficial español para factura electrónica',
-    formats: ['xml'],
-    icon: FileCode,
-    color: 'red',
-    helpUrl: 'https://www.facturae.gob.es/'
-  }
-];
-
-const FORMAT_INFO = {
-  csv: { name: 'CSV', icon: FileSpreadsheet, description: 'Abre con Excel, Google Sheets, etc.' },
-  xml: { name: 'XML', icon: FileCode, description: 'Importación automática en software contable' },
-  json: { name: 'JSON', icon: FileJson, description: 'Para integraciones y desarrolladores' }
-};
+import { useTranslation } from "react-i18next";
 
 export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] }) {
+  const { t } = useTranslation();
   const [selectedSoftware, setSelectedSoftware] = useState('generic');
   const [selectedFormat, setSelectedFormat] = useState('csv');
   const [dateFrom, setDateFrom] = useState('');
@@ -75,6 +24,59 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState([]);
   const [selectAll, setSelectAll] = useState(true);
   const [exporting, setExporting] = useState(false);
+
+  const SOFTWARE_OPTIONS = [
+    { 
+      id: 'generic', 
+      name: t('invoices.export.software.genericName'), 
+      description: t('invoices.export.software.generic'),
+      formats: ['csv', 'xml', 'json'],
+      icon: FileSpreadsheet,
+      color: 'blue'
+    },
+    { 
+      id: 'contasimple', 
+      name: 'Contasimple', 
+      description: t('invoices.export.software.contasimple'),
+      formats: ['csv'],
+      icon: FileSpreadsheet,
+      color: 'green',
+      helpUrl: 'https://www.contasimple.com/ayuda/importar-facturas'
+    },
+    { 
+      id: 'holded', 
+      name: 'Holded', 
+      description: t('invoices.export.software.holded'),
+      formats: ['csv', 'json'],
+      icon: FileSpreadsheet,
+      color: 'purple',
+      helpUrl: 'https://support.holded.com/es/articles/1709055-importar-facturas'
+    },
+    { 
+      id: 'sage', 
+      name: 'Sage 50', 
+      description: t('invoices.export.software.sage'),
+      formats: ['csv', 'xml'],
+      icon: FileCode,
+      color: 'orange',
+      helpUrl: 'https://www.sage.com/es-es/sage-50/'
+    },
+    { 
+      id: 'facturae', 
+      name: 'FacturaE', 
+      description: t('invoices.export.software.facturae'),
+      formats: ['xml'],
+      icon: FileCode,
+      color: 'red',
+      helpUrl: 'https://www.facturae.gob.es/'
+    }
+  ];
+
+  const FORMAT_INFO = {
+    csv: { name: 'CSV', icon: FileSpreadsheet, description: t('invoices.export.format.csv') },
+    xml: { name: 'XML', icon: FileCode, description: t('invoices.export.format.xml') },
+    json: { name: 'JSON', icon: FileJson, description: t('invoices.export.format.json') }
+  };
 
   const software = SOFTWARE_OPTIONS.find(s => s.id === selectedSoftware);
   const availableFormats = software?.formats || ['csv'];
@@ -101,7 +103,7 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
 
   const handleExport = async () => {
     if (invoicesToExport.length === 0) {
-      toast.error('No hay facturas para exportar');
+      toast.error(t('invoices.export.nothingToExport'));
       return;
     }
 
@@ -133,11 +135,11 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      toast.success(`✅ ${invoicesToExport.length} facturas exportadas en formato ${selectedFormat.toUpperCase()}`);
+      toast.success(t('invoices.export.exported', { count: invoicesToExport.length, format: selectedFormat.toUpperCase() }));
       onOpenChange(false);
     } catch (error) {
       console.error('Export error:', error);
-      toast.error(error.response?.data?.error || 'Error al exportar');
+      toast.error(error.response?.data?.error || t('invoices.export.error'));
     } finally {
       setExporting(false);
     }
@@ -157,17 +159,17 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Download className="w-5 h-5 text-blue-600" />
-            Exportar Facturas
+            {t('invoices.export.title')}
           </DialogTitle>
           <DialogDescription>
-            Exporta tus facturas en formatos compatibles con software contable
+            {t('invoices.export.description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Selección de software */}
           <div>
-            <Label className="text-sm font-medium mb-3 block">Software destino</Label>
+            <Label className="text-sm font-medium mb-3 block">{t('invoices.export.targetSoftware')}</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {SOFTWARE_OPTIONS.map(sw => (
                 <button
@@ -195,7 +197,7 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
                 className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2"
               >
                 <Info className="w-3 h-3" />
-                Ver guía de importación de {software.name}
+                {t('invoices.export.importGuide', { software: software.name })}
                 <ExternalLink className="w-3 h-3" />
               </a>
             )}
@@ -203,7 +205,7 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
 
           {/* Formato de archivo */}
           <div>
-            <Label className="text-sm font-medium mb-3 block">Formato de archivo</Label>
+            <Label className="text-sm font-medium mb-3 block">{t('invoices.export.fileFormat')}</Label>
             <RadioGroup 
               value={selectedFormat} 
               onValueChange={setSelectedFormat}
@@ -229,10 +231,10 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
 
           {/* Filtro de fechas */}
           <div>
-            <Label className="text-sm font-medium mb-3 block">Rango de fechas (opcional)</Label>
+            <Label className="text-sm font-medium mb-3 block">{t('invoices.export.dateRange')}</Label>
             <div className="flex gap-3">
               <div className="flex-1">
-                <Label className="text-xs text-gray-500">Desde</Label>
+                <Label className="text-xs text-gray-500">{t('invoices.period.from')}</Label>
                 <Input 
                   type="date" 
                   value={dateFrom} 
@@ -240,7 +242,7 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-xs text-gray-500">Hasta</Label>
+                <Label className="text-xs text-gray-500">{t('invoices.period.to')}</Label>
                 <Input 
                   type="date" 
                   value={dateTo} 
@@ -253,7 +255,7 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
           {/* Selección de facturas */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <Label className="text-sm font-medium">Facturas a exportar</Label>
+              <Label className="text-sm font-medium">{t('invoices.export.invoicesToExport')}</Label>
               <div className="flex items-center gap-2">
                 <Checkbox 
                   checked={selectAll}
@@ -261,7 +263,7 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
                   id="selectAll"
                 />
                 <Label htmlFor="selectAll" className="text-sm cursor-pointer">
-                  Todas ({filteredInvoices.length})
+                  {t('invoices.export.selectAll', { count: filteredInvoices.length })}
                 </Label>
               </div>
             </div>
@@ -296,10 +298,10 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold text-blue-900">
-                    {invoicesToExport.length} facturas seleccionadas
+                    {t('invoices.export.selectedCount', { count: invoicesToExport.length })}
                   </p>
                   <p className="text-sm text-blue-700">
-                    Total: {invoicesToExport.reduce((s, i) => s + (i.total || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}€
+                    {t('invoices.export.total', { amount: invoicesToExport.reduce((s, i) => s + (i.total || 0), 0).toLocaleString('es-ES', { minimumFractionDigits: 2 }) })}
                   </p>
                 </div>
                 <Badge className="bg-blue-100 text-blue-800">
@@ -312,7 +314,7 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
           {/* Botones */}
           <div className="flex gap-3 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button 
               onClick={handleExport} 
@@ -322,12 +324,12 @@ export default function InvoiceExportDialog({ open, onOpenChange, invoices = [] 
               {exporting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Exportando...
+                  {t('invoices.export.exporting')}
                 </>
               ) : (
                 <>
                   <Download className="w-4 h-4 mr-2" />
-                  Exportar {invoicesToExport.length} facturas
+                  {t('invoices.export.exportButton', { count: invoicesToExport.length })}
                 </>
               )}
             </Button>

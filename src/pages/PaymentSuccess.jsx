@@ -5,12 +5,14 @@ import { createPageUrl } from "@/utils";
 import { CheckCircle, Loader2, ArrowRight, Eye, MessageSquare, FileText, CreditCard, Users, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentSuccessPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("processing");
-  const [message, setMessage] = useState("Activando tu cuenta profesional...");
+  const [message, setMessage] = useState(t('payments.success.activating'));
   const hasProcessed = useRef(false);
 
   const sessionId = searchParams.get("session_id");
@@ -31,12 +33,12 @@ export default function PaymentSuccessPage() {
       const user = await base44.auth.me();
       if (!user) {
         setStatus("error");
-        setMessage("No se encontró tu sesión. Por favor inicia sesión.");
+        setMessage(t('payments.success.noSession'));
         return;
       }
 
       console.log('👤 Usuario:', user.email);
-      setMessage("Verificando pago con Stripe...");
+      setMessage(t('payments.success.verifyingPayment'));
 
       // ✅ LLAMAR A LA FUNCIÓN QUE SINCRONIZA CON STRIPE Y CREA LA SUSCRIPCIÓN
       let syncResult = null;
@@ -60,13 +62,13 @@ export default function PaymentSuccessPage() {
         
         attempts++;
         if (attempts < maxAttempts) {
-          setMessage(`Esperando confirmación de Stripe... (${attempts}/${maxAttempts})`);
+          setMessage(t('payments.success.waitingStripe', { attempt: attempts, max: maxAttempts }));
           await new Promise(r => setTimeout(r, 2000));
         }
       }
 
       // ✅ VERIFICAR SUSCRIPCIÓN EN BD
-      setMessage("Verificando suscripción...");
+      setMessage(t('payments.success.verifyingSubscription'));
       const subs = await base44.entities.Subscription.filter({ user_id: user.id });
       
       let hasSubscription = false;
@@ -106,7 +108,7 @@ export default function PaymentSuccessPage() {
       if (!hasSubscription) {
         // Sin suscripción activa - mostrar error pero permitir continuar
         setStatus("warning");
-        setMessage("El pago está siendo procesado. Por favor completa tu perfil.");
+        setMessage(t('payments.success.processingCompleteProfile'));
         
         setTimeout(() => {
           if (!onboardingDone) {
@@ -122,12 +124,12 @@ export default function PaymentSuccessPage() {
       setStatus("success");
       
       if (onboardingDone) {
-        setMessage("¡Todo listo! Redirigiendo a tu dashboard...");
+        setMessage(t('payments.success.allSetRedirecting'));
         setTimeout(() => {
           navigate(createPageUrl("ProfessionalDashboard"));
         }, 1500);
       } else {
-        setMessage("¡Pago confirmado! Ahora completa tu perfil profesional...");
+        setMessage(t('payments.success.confirmedCompleteProfile'));
         setTimeout(() => {
           navigate(createPageUrl("ProfileOnboarding"));
         }, 1500);
@@ -136,7 +138,7 @@ export default function PaymentSuccessPage() {
     } catch (error) {
       console.error("Error:", error);
       setStatus("error");
-      setMessage("Error al procesar. Por favor contacta con soporte.");
+      setMessage(t('payments.success.processingError'));
     }
   };
 
@@ -155,41 +157,41 @@ export default function PaymentSuccessPage() {
                 <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-3">
-                Procesando tu pago
+                {t('payments.success.processingTitle')}
               </h1>
               <p className="text-gray-600 mb-6">{message}</p>
               
               {/* What you get section */}
               <div className="bg-blue-50 rounded-xl p-4 text-left">
-                <h3 className="font-semibold text-gray-900 mb-3 text-sm">¿Qué obtienes con tu suscripción?</h3>
+                <h3 className="font-semibold text-gray-900 mb-3 text-sm">{t('payments.success.benefitsTitle')}</h3>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="flex items-center gap-2">
                     <Eye className="w-4 h-4 text-blue-600" />
-                    <span className="text-gray-700">Perfil visible</span>
+                    <span className="text-gray-700">{t('payments.success.benefitVisibleProfile')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-green-600" />
-                    <span className="text-gray-700">Contactos directos</span>
+                    <span className="text-gray-700">{t('payments.success.benefitDirectContacts')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <FileText className="w-4 h-4 text-purple-600" />
-                    <span className="text-gray-700">Facturas pro</span>
+                    <span className="text-gray-700">{t('payments.success.benefitProInvoices')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-orange-600" />
-                    <span className="text-gray-700">Cobros fáciles</span>
+                    <span className="text-gray-700">{t('payments.success.benefitEasyPayments')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-teal-600" />
-                    <span className="text-gray-700">Gestión clientes</span>
+                    <span className="text-gray-700">{t('payments.success.benefitClientManagement')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <LayoutDashboard className="w-4 h-4 text-indigo-600" />
-                    <span className="text-gray-700">Panel Pro</span>
+                    <span className="text-gray-700">{t('payments.success.benefitProDashboard')}</span>
                   </div>
                 </div>
                 <Link to={createPageUrl("DashboardProInfo")} className="text-blue-600 hover:text-blue-700 text-xs font-medium mt-3 inline-flex items-center">
-                  Saber más <ArrowRight className="w-3 h-3 ml-1" />
+                  {t('payments.success.learnMore')} <ArrowRight className="w-3 h-3 ml-1" />
                 </Link>
               </div>
             </>
@@ -201,23 +203,23 @@ export default function PaymentSuccessPage() {
                 <CheckCircle className="w-12 h-12 text-green-600" />
               </div>
               <h1 className="text-2xl font-bold text-green-800 mb-3">
-                ¡Pago confirmado!
+                {t('payments.success.confirmedTitle')}
               </h1>
               <p className="text-gray-600 mb-4">{message}</p>
               {/* CTA Referidos */}
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-left">
-                <p className="text-sm font-bold text-gray-900 mb-1">🎁 ¿Conoces a otro autónomo?</p>
-                <p className="text-xs text-gray-600">Invítale con tu código personal y os lleváis 1 mes gratis los dos.</p>
+                <p className="text-sm font-bold text-gray-900 mb-1">{t('payments.success.referralTitle')}</p>
+                <p className="text-xs text-gray-600">{t('payments.success.referralDescription')}</p>
                 <button
                   onClick={() => navigate("/referidos")}
                   className="mt-2 text-xs font-semibold text-amber-700 hover:text-amber-900"
                 >
-                  Ver mi código de referido →
+                  {t('payments.success.referralCta')}
                 </button>
               </div>
               <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Redirigiendo...
+                {t('payments.success.redirecting')}
               </div>
             </>
           )}
@@ -228,12 +230,12 @@ export default function PaymentSuccessPage() {
                 <ArrowRight className="w-12 h-12 text-amber-600" />
               </div>
               <h1 className="text-2xl font-bold text-amber-800 mb-3">
-                Procesando...
+                {t('payments.success.processing')}
               </h1>
               <p className="text-gray-600 mb-4">{message}</p>
               <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Redirigiendo...
+                {t('payments.success.redirecting')}
               </div>
             </>
           )}
@@ -244,7 +246,7 @@ export default function PaymentSuccessPage() {
                 <span className="text-4xl">⚠️</span>
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-3">
-                Hubo un problema
+                {t('payments.success.errorTitle')}
               </h1>
               <p className="text-gray-600 mb-6">{message}</p>
               <div className="space-y-3">
@@ -252,14 +254,14 @@ export default function PaymentSuccessPage() {
                   onClick={() => navigate(createPageUrl("ProfileOnboarding"))} 
                   className="w-full bg-blue-600 hover:bg-blue-700"
                 >
-                  Completar mi perfil
+                  {t('dashboard.complete_profile')}
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => navigate(createPageUrl("SubscriptionManagement"))}
                   className="w-full"
                 >
-                  Ver mi suscripción
+                  {t('payments.success.viewSubscription')}
                 </Button>
               </div>
             </>

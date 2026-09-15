@@ -4,22 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Calendar, CheckCircle } from "lucide-react";
-
-const DAYS = [
-  { id: "lunes", label: "Lunes", short: "L" },
-  { id: "martes", label: "Martes", short: "M" },
-  { id: "miercoles", label: "Miércoles", short: "X" },
-  { id: "jueves", label: "Jueves", short: "J" },
-  { id: "viernes", label: "Viernes", short: "V" },
-  { id: "sabado", label: "Sábado", short: "S" },
-  { id: "domingo", label: "Domingo", short: "D" }
-];
-
-const AVAILABILITY_TYPES = [
-  { value: "laborables", label: "Días laborables (L-V)", icon: "📅" },
-  { value: "festivos", label: "Fines de semana y festivos", icon: "🎉" },
-  { value: "ambos", label: "Todos los días", icon: "🗓️" }
-];
+import { useTranslation } from "react-i18next";
 
 export default function AvailabilityCalendar({ 
   disponibilidadTipo = "laborables",
@@ -29,6 +14,26 @@ export default function AvailabilityCalendar({
   isEditing,
   onChange
 }) {
+  const { t } = useTranslation();
+
+  // Los `id` son los valores que se guardan en la BD (horario_dias); las
+  // etiquetas viven dentro del componente para seguir al idioma activo.
+  const DAYS = [
+    { id: "lunes", label: t("proProfile.availability.days.monday.label"), short: t("proProfile.availability.days.monday.short"), abbr: t("proProfile.availability.days.monday.abbr") },
+    { id: "martes", label: t("proProfile.availability.days.tuesday.label"), short: t("proProfile.availability.days.tuesday.short"), abbr: t("proProfile.availability.days.tuesday.abbr") },
+    { id: "miercoles", label: t("proProfile.availability.days.wednesday.label"), short: t("proProfile.availability.days.wednesday.short"), abbr: t("proProfile.availability.days.wednesday.abbr") },
+    { id: "jueves", label: t("proProfile.availability.days.thursday.label"), short: t("proProfile.availability.days.thursday.short"), abbr: t("proProfile.availability.days.thursday.abbr") },
+    { id: "viernes", label: t("proProfile.availability.days.friday.label"), short: t("proProfile.availability.days.friday.short"), abbr: t("proProfile.availability.days.friday.abbr") },
+    { id: "sabado", label: t("proProfile.availability.days.saturday.label"), short: t("proProfile.availability.days.saturday.short"), abbr: t("proProfile.availability.days.saturday.abbr") },
+    { id: "domingo", label: t("proProfile.availability.days.sunday.label"), short: t("proProfile.availability.days.sunday.short"), abbr: t("proProfile.availability.days.sunday.abbr") }
+  ];
+
+  const AVAILABILITY_TYPES = [
+    { value: "laborables", label: t("proProfile.availability.typeWeekdays"), icon: "📅" },
+    { value: "festivos", label: t("proProfile.availability.weekends"), icon: "🎉" },
+    { value: "ambos", label: t("proProfile.availability.typeEveryDay"), icon: "🗓️" }
+  ];
+
   const handleDayToggle = (dayId) => {
     if (!isEditing) return;
     
@@ -67,17 +72,17 @@ export default function AvailabilityCalendar({
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <Calendar className="w-5 h-5 text-blue-700" />
-          Disponibilidad y horarios
+          {t("proProfile.availability.title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-gray-600">
-          Indica tu disponibilidad para que los clientes sepan cuándo pueden contactarte
+          {t("proProfile.availability.intro")}
         </p>
 
         {/* Tipo de disponibilidad */}
         <div>
-          <Label className="mb-3 block">Tipo de disponibilidad</Label>
+          <Label className="mb-3 block">{t("proProfile.availability.typeLabel")}</Label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {AVAILABILITY_TYPES.map((type) => (
               <div
@@ -105,7 +110,7 @@ export default function AvailabilityCalendar({
 
         {/* Selector de días (visual) */}
         <div>
-          <Label className="mb-3 block">Días de trabajo</Label>
+          <Label className="mb-3 block">{t("proProfile.availability.workDays")}</Label>
           <div className="grid grid-cols-7 gap-2">
             {DAYS.map((day) => {
               const isActive = activeDays.includes(day.id);
@@ -119,15 +124,15 @@ export default function AvailabilityCalendar({
                   }`}
                 >
                   <span className="text-xs font-bold mb-1">{day.short}</span>
-                  <span className="text-[10px]">{day.label.slice(0, 3)}</span>
+                  <span className="text-[10px]">{day.abbr}</span>
                 </div>
               );
             })}
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            {disponibilidadTipo === "laborables" && "Trabajas de lunes a viernes"}
-            {disponibilidadTipo === "festivos" && "Trabajas sábados y domingos"}
-            {disponibilidadTipo === "ambos" && "Trabajas todos los días de la semana"}
+            {disponibilidadTipo === "laborables" && t("proProfile.availability.hintWeekdays")}
+            {disponibilidadTipo === "festivos" && t("proProfile.availability.hintWeekends")}
+            {disponibilidadTipo === "ambos" && t("proProfile.availability.hintEveryDay")}
           </p>
         </div>
 
@@ -136,7 +141,7 @@ export default function AvailabilityCalendar({
           <div>
             <Label className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-blue-600" />
-              Hora de apertura
+              {t("proProfile.availability.openingTime")}
             </Label>
             <Input
               type="time"
@@ -149,7 +154,7 @@ export default function AvailabilityCalendar({
           <div>
             <Label className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-blue-600" />
-              Hora de cierre
+              {t("proProfile.availability.closingTime")}
             </Label>
             <Input
               type="time"
@@ -168,12 +173,12 @@ export default function AvailabilityCalendar({
               <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-blue-900 mb-1">
-                  Disponible {disponibilidadTipo === "ambos" ? "todos los días" : 
-                             disponibilidadTipo === "laborables" ? "de lunes a viernes" :
-                             "fines de semana y festivos"}
+                  {disponibilidadTipo === "ambos" ? t("availableEveryDay") :
+                   disponibilidadTipo === "laborables" ? t("proProfile.availability.summaryWeekdays") :
+                   t("proProfile.availability.summaryWeekends")}
                 </p>
                 <p className="text-xs text-blue-800">
-                  Horario: {horarioApertura} - {horarioCierre}
+                  {t("proProfile.availability.scheduleRange", { from: horarioApertura, to: horarioCierre })}
                 </p>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +38,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+// Icono y color por estado. La etiqueta visible sale de `statusLabels` (t())
+// dentro del componente; `text` se conserva sólo para la descripción del
+// TicketEvent que se persiste en la BD, que sigue en español como hasta ahora.
 const statusConfig = {
   abierto: { icon: Clock, color: "bg-blue-500", text: "Abierto" },
   en_progreso: { icon: AlertCircle, color: "bg-amber-500", text: "En progreso" },
@@ -44,16 +48,8 @@ const statusConfig = {
   cerrado: { icon: XCircle, color: "bg-gray-500", text: "Cerrado" }
 };
 
-const typeLabels = {
-  soporte_cliente: "Soporte Cliente",
-  soporte_autonomo: "Soporte Autónomo",
-  reclamo: "Reclamo",
-  problema_trabajo: "Problema con trabajo",
-  problema_pago: "Problema de pago",
-  consulta_general: "Consulta general"
-};
-
 export default function AdminTicketsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [filterStatus, setFilterStatus] = useState("all");
@@ -64,6 +60,22 @@ export default function AdminTicketsPage() {
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [internalNote, setInternalNote] = useState("");
   const [assignToEmail, setAssignToEmail] = useState("");
+
+  const statusLabels = {
+    abierto: t('admin.tickets.status.open'),
+    en_progreso: t('admin.tickets.status.inProgress'),
+    resuelto: t('admin.tickets.status.resolved'),
+    cerrado: t('admin.tickets.status.closed'),
+  };
+
+  const typeLabels = {
+    soporte_cliente: t('admin.tickets.types.clientSupport'),
+    soporte_autonomo: t('admin.tickets.types.proSupport'),
+    reclamo: t('admin.tickets.types.complaint'),
+    problema_trabajo: t('admin.tickets.types.jobIssue'),
+    problema_pago: t('admin.tickets.types.paymentIssue'),
+    consulta_general: t('admin.tickets.types.generalQuery'),
+  };
 
   const { data: user, isLoading: loadingUser } = useQuery({
     queryKey: ['currentUser'],
@@ -115,7 +127,7 @@ export default function AdminTicketsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminTickets'] });
-      toast.success('Nota añadida correctamente');
+      toast.success(t('admin.tickets.noteAdded'));
       setShowNoteDialog(false);
       setInternalNote("");
     },
@@ -153,7 +165,7 @@ export default function AdminTicketsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminTickets'] });
-      toast.success('Estado actualizado');
+      toast.success(t('statusUpdated'));
     },
   });
 
@@ -162,7 +174,7 @@ export default function AdminTicketsPage() {
       const admins = await base44.entities.User.filter({ email: adminEmail, role: 'admin' });
       
       if (admins.length === 0) {
-        throw new Error('Admin no encontrado');
+        throw new Error(t('admin.tickets.assign.adminNotFound'));
       }
 
       const admin = admins[0];
@@ -183,7 +195,7 @@ export default function AdminTicketsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminTickets'] });
-      toast.success('Ticket asignado correctamente');
+      toast.success(t('admin.tickets.assign.success'));
       setShowAssignDialog(false);
       setAssignToEmail("");
     },
@@ -224,10 +236,10 @@ export default function AdminTicketsPage() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-md p-8 text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Acceso denegado</h2>
-          <p className="text-gray-600 mb-4">Solo los administradores pueden acceder a esta página</p>
+          <h2 className="text-2xl font-bold mb-2">{t('admin.tickets.accessDenied.title')}</h2>
+          <p className="text-gray-600 mb-4">{t('admin.tickets.accessDenied.text')}</p>
           <Button onClick={() => navigate(createPageUrl("Tickets"))}>
-            Volver a mis tickets
+            {t('admin.tickets.accessDenied.backToTickets')}
           </Button>
         </Card>
       </div>
@@ -240,47 +252,47 @@ export default function AdminTicketsPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Panel de Administración de Tickets
+              {t('admin.tickets.title')}
             </h1>
-            <p className="text-gray-600">Gestiona todos los tickets de soporte · Total: {tickets.length}</p>
+            <p className="text-gray-600">{t('admin.tickets.subtitle', { total: tickets.length })}</p>
           </div>
           <Button
             variant="outline"
             onClick={() => queryClient.invalidateQueries({ queryKey: ['adminTickets'] })}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            Actualizar
+            {t('admin.tickets.refresh')}
           </Button>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">Total</p>
+              <p className="text-sm text-gray-600 mb-1">{t('total')}</p>
               <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">Abiertos</p>
+              <p className="text-sm text-gray-600 mb-1">{t('admin.tickets.stats.open')}</p>
               <p className="text-2xl font-bold text-blue-600">{stats.abiertos}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">En progreso</p>
+              <p className="text-sm text-gray-600 mb-1">{t('admin.tickets.status.inProgress')}</p>
               <p className="text-2xl font-bold text-amber-600">{stats.en_progreso}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">Resueltos</p>
+              <p className="text-sm text-gray-600 mb-1">{t('admin.tickets.stats.resolved')}</p>
               <p className="text-2xl font-bold text-green-600">{stats.resueltos}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">Cerrados</p>
+              <p className="text-sm text-gray-600 mb-1">{t('admin.tickets.stats.closed')}</p>
               <p className="text-2xl font-bold text-gray-600">{stats.cerrados}</p>
             </CardContent>
           </Card>
@@ -292,7 +304,7 @@ export default function AdminTicketsPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
-                  placeholder="Buscar tickets..."
+                  placeholder={t('admin.tickets.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -301,23 +313,23 @@ export default function AdminTicketsPage() {
 
               <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Estado" />
+                  <SelectValue placeholder={t('admin.tickets.filters.statusPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los estados</SelectItem>
-                  <SelectItem value="abierto">Abierto</SelectItem>
-                  <SelectItem value="en_progreso">En progreso</SelectItem>
-                  <SelectItem value="resuelto">Resuelto</SelectItem>
-                  <SelectItem value="cerrado">Cerrado</SelectItem>
+                  <SelectItem value="all">{t('admin.tickets.filters.allStatuses')}</SelectItem>
+                  <SelectItem value="abierto">{statusLabels.abierto}</SelectItem>
+                  <SelectItem value="en_progreso">{statusLabels.en_progreso}</SelectItem>
+                  <SelectItem value="resuelto">{statusLabels.resuelto}</SelectItem>
+                  <SelectItem value="cerrado">{statusLabels.cerrado}</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={filterType} onValueChange={setFilterType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Tipo" />
+                  <SelectValue placeholder={t('admin.tickets.filters.typePlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los tipos</SelectItem>
+                  <SelectItem value="all">{t('admin.tickets.filters.allTypes')}</SelectItem>
                   {Object.entries(typeLabels).map(([key, label]) => (
                     <SelectItem key={key} value={key}>{label}</SelectItem>
                   ))}
@@ -348,7 +360,7 @@ export default function AdminTicketsPage() {
                           </Badge>
                           <Badge className={`${statusConfig[ticket.status]?.color} text-white`}>
                             {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
-                            {statusConfig[ticket.status]?.text}
+                            {statusLabels[ticket.status]}
                           </Badge>
                           <Badge variant="outline">{typeLabels[ticket.type]}</Badge>
                         </div>
@@ -365,7 +377,7 @@ export default function AdminTicketsPage() {
                         </p>
                         
                         <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span>Por: {ticket.creator_name}</span>
+                          <span>{t('admin.tickets.card.by', { name: ticket.creator_name })}</span>
                           <div className="flex items-center gap-1">
                             <MessageSquare className="w-4 h-4" />
                             <span>{messageCount}</span>
@@ -386,7 +398,7 @@ export default function AdminTicketsPage() {
                           }}
                         >
                           <StickyNote className="w-4 h-4 mr-1" />
-                          Nota
+                          {t('admin.tickets.actions.note')}
                         </Button>
                         <Button
                           size="sm"
@@ -397,21 +409,21 @@ export default function AdminTicketsPage() {
                           }}
                         >
                           <UserCog className="w-4 h-4 mr-1" />
-                          Asignar
+                          {t('admin.tickets.actions.assign')}
                         </Button>
                         <Button
                           size="sm"
                           onClick={() => navigate(createPageUrl("TicketDetail") + `?id=${ticket.id}`)}
                           className="bg-blue-600 hover:bg-blue-700"
                         >
-                          Ver
+                          {t('view')}
                         </Button>
                       </div>
                     </div>
                     
                     {ticket.internal_notes && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 mb-1">Nota interna:</p>
+                        <p className="text-xs text-gray-500 mb-1">{t('admin.tickets.card.internalNote')}</p>
                         <p className="text-sm text-gray-700 bg-amber-50 p-2 rounded">
                           {ticket.internal_notes}
                         </p>
@@ -428,11 +440,11 @@ export default function AdminTicketsPage() {
       <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Añadir Nota Interna</DialogTitle>
+            <DialogTitle>{t('admin.tickets.noteDialog.title')}</DialogTitle>
           </DialogHeader>
           <div>
             <Textarea
-              placeholder="Escribe una nota solo visible para administradores..."
+              placeholder={t('admin.tickets.noteDialog.placeholder')}
               value={internalNote}
               onChange={(e) => setInternalNote(e.target.value)}
               rows={4}
@@ -440,7 +452,7 @@ export default function AdminTicketsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowNoteDialog(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={() => {
@@ -450,7 +462,7 @@ export default function AdminTicketsPage() {
               }}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              Guardar Nota
+              {t('admin.tickets.noteDialog.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -459,21 +471,21 @@ export default function AdminTicketsPage() {
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Asignar Ticket</DialogTitle>
+            <DialogTitle>{t('admin.tickets.assign.dialogTitle')}</DialogTitle>
           </DialogHeader>
           <div>
             <label className="text-sm font-medium mb-2 block">
-              Email del administrador
+              {t('admin.tickets.assign.emailLabel')}
             </label>
             <Input
-              placeholder="admin@misautonomos.es"
+              placeholder={t('admin.tickets.assign.emailPlaceholder')}
               value={assignToEmail}
               onChange={(e) => setAssignToEmail(e.target.value)}
             />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAssignDialog(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={() => {
@@ -483,7 +495,7 @@ export default function AdminTicketsPage() {
               }}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              Asignar
+              {t('admin.tickets.actions.assign')}
             </Button>
           </DialogFooter>
         </DialogContent>

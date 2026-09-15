@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,11 +17,6 @@ const STATUS_COLORS = {
   completed: "bg-gray-100 text-gray-500",
 };
 
-const STATUS_LABELS = {
-  draft: "Borrador", submitted: "Enviado", in_progress: "En revisión",
-  approved: "Aprobado", live: "Activo", completed: "Finalizado",
-};
-
 const CAMPAIGN_STATUS_COLORS = {
   pending: "bg-gray-100 text-gray-500",
   in_review: "bg-blue-100 text-blue-700",
@@ -30,19 +26,33 @@ const CAMPAIGN_STATUS_COLORS = {
   finished: "bg-gray-100 text-gray-400",
 };
 
-const CAMPAIGN_STATUS_LABELS = {
-  pending: "Pendiente", in_review: "En revisión", creating: "Creando material",
-  live: "En directo", paused: "Pausada", finished: "Finalizada",
-};
-
 const PLATFORM_LABELS = {
   instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok",
   google_search: "Google Search", linkedin: "LinkedIn",
 };
 
 export default function AdminAdsBriefings({ users = [] }) {
+  const { t } = useTranslation();
   const [selectedBriefing, setSelectedBriefing] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
+
+  // Antes constantes de módulo (STATUS_LABELS / CAMPAIGN_STATUS_LABELS); dentro para que sigan al idioma
+  const statusLabels = {
+    draft: t("admin.adsBriefings.status.draft"),
+    submitted: t("admin.adsBriefings.status.submitted"),
+    in_progress: t("admin.adsBriefings.status.inProgress"),
+    approved: t("admin.adsBriefings.status.approved"),
+    live: t("admin.adsBriefings.status.live"),
+    completed: t("admin.adsBriefings.status.completed"),
+  };
+  const campaignStatusLabels = {
+    pending: t("admin.adsBriefings.campaignStatus.pending"),
+    in_review: t("admin.adsBriefings.campaignStatus.inReview"),
+    creating: t("admin.adsBriefings.campaignStatus.creating"),
+    live: t("admin.adsBriefings.campaignStatus.live"),
+    paused: t("admin.adsBriefings.campaignStatus.paused"),
+    finished: t("admin.adsBriefings.campaignStatus.finished"),
+  };
 
   const { data: briefings = [], isLoading, refetch } = useQuery({
     queryKey: ["adsBriefings"],
@@ -76,8 +86,8 @@ export default function AdminAdsBriefings({ users = [] }) {
           <Megaphone className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-gray-900">Campañas Ads+</h2>
-          <p className="text-xs text-gray-500">{briefings.length} briefings totales · mes actual: {currentMonthYear}</p>
+          <h2 className="text-lg font-bold text-gray-900">{t("admin.adsBriefings.title")}</h2>
+          <p className="text-xs text-gray-500">{t("admin.adsBriefings.subtitle", { count: briefings.length, month: currentMonthYear })}</p>
         </div>
       </div>
 
@@ -93,7 +103,7 @@ export default function AdminAdsBriefings({ users = [] }) {
                 : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
             }`}
           >
-            {s === "all" ? "Todos" : STATUS_LABELS[s]}
+            {s === "all" ? t("admin.adsBriefings.filterAll") : statusLabels[s]}
             {s !== "all" && (
               <span className="ml-1 opacity-60">
                 ({briefings.filter(b => b.status === s).length})
@@ -107,7 +117,7 @@ export default function AdminAdsBriefings({ users = [] }) {
       {filtered.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardContent className="py-12 text-center text-gray-400 text-sm">
-            No hay briefings con este filtro.
+            {t("admin.adsBriefings.empty")}
           </CardContent>
         </Card>
       ) : (
@@ -129,13 +139,13 @@ export default function AdminAdsBriefings({ users = [] }) {
                   </div>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[b.status]}`}>
-                      {STATUS_LABELS[b.status]}
+                      {statusLabels[b.status]}
                     </span>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CAMPAIGN_STATUS_COLORS[b.campaign_status]}`}>
-                      {CAMPAIGN_STATUS_LABELS[b.campaign_status]}
+                      {campaignStatusLabels[b.campaign_status]}
                     </span>
                     {b.ads_content_approved && (
-                      <span className="text-xs text-green-600 font-medium">✅ Aprobado cliente</span>
+                      <span className="text-xs text-green-600 font-medium">{t("admin.adsBriefings.clientApproved")}</span>
                     )}
                   </div>
                 </div>

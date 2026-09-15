@@ -1,8 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Gift, Users, Trophy } from "lucide-react";
 
 export default function AdminReferralWidget() {
+  const { t } = useTranslation();
   const { data: profiles = [], isLoading } = useQuery({
     queryKey: ["adminReferralLeaderboard"],
     queryFn: () => base44.entities.ProfessionalProfile.list(),
@@ -31,7 +33,7 @@ export default function AdminReferralWidget() {
   const totalQualified = referrals.filter(r => ["qualified", "rewarded"].includes(r.status)).length;
   const totalPending = referrals.filter(r => r.status === "pending").length;
 
-  const medals = ["🥇", "🥈", "🥉", "4º", "5º"];
+  const medals = ["🥇", "🥈", "🥉", t("admin.referralWidget.fourth"), t("admin.referralWidget.fifth")];
 
   if (isLoading) {
     return (
@@ -48,35 +50,35 @@ export default function AdminReferralWidget() {
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
         <Gift className="w-4 h-4 text-amber-500" />
-        Programa de referidos
+        {t("admin.referralWidget.title")}
       </h3>
 
       {/* KPIs */}
       <div className="grid grid-cols-3 gap-3 mb-4 mt-3">
         <div className="bg-green-50 rounded-xl p-3 text-center">
           <p className="text-xl font-bold text-green-800">{qualifiedThisMonth}</p>
-          <p className="text-xs text-green-700">Cualificados este mes</p>
+          <p className="text-xs text-green-700">{t("admin.referralWidget.qualifiedThisMonth")}</p>
         </div>
         <div className="bg-blue-50 rounded-xl p-3 text-center">
           <p className="text-xl font-bold text-blue-800">{totalQualified}</p>
-          <p className="text-xs text-blue-700">Total cualificados</p>
+          <p className="text-xs text-blue-700">{t("admin.referralWidget.totalQualified")}</p>
         </div>
         <div className="bg-amber-50 rounded-xl p-3 text-center">
           <p className="text-xl font-bold text-amber-800">{totalPending}</p>
-          <p className="text-xs text-amber-700">Pendientes</p>
+          <p className="text-xs text-amber-700">{t("admin.referralWidget.pending")}</p>
         </div>
       </div>
 
       {/* Top 5 referidores */}
       <div className="flex items-center gap-1.5 mb-2">
         <Trophy className="w-3.5 h-3.5 text-amber-500" />
-        <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Top referidores</p>
+        <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t("admin.referralWidget.topReferrers")}</p>
       </div>
 
       {top5.length === 0 ? (
         <div className="text-center py-4">
           <Users className="w-8 h-8 text-gray-200 mx-auto mb-1" />
-          <p className="text-xs text-gray-400">Aún no hay referidos cualificados</p>
+          <p className="text-xs text-gray-400">{t("admin.referralWidget.empty")}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -85,13 +87,13 @@ export default function AdminReferralWidget() {
               <span className="text-base w-6 text-center flex-shrink-0">{medals[idx]}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
-                  {p.business_name || "Profesional"}
+                  {p.business_name || t("professionalLabel")}
                 </p>
-                <p className="text-xs text-gray-500">{p.ciudad || p.provincia || "España"}</p>
+                <p className="text-xs text-gray-500">{p.ciudad || p.provincia || t("admin.referralWidget.defaultLocation")}</p>
               </div>
               <div className="text-right flex-shrink-0">
                 <p className="text-sm font-bold text-gray-900">{p.referral_count}</p>
-                <p className="text-xs text-gray-500">referidos</p>
+                <p className="text-xs text-gray-500">{t("admin.referralWidget.referralsLabel")}</p>
               </div>
             </div>
           ))}

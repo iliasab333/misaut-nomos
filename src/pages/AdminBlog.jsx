@@ -1,26 +1,13 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { Plus, Search, Edit, Trash2, Copy, BookOpen, Eye, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const BlogPostEditor = lazy(() => import('@/components/blog/BlogPostEditor'));
 
-const STATUS_LABELS = {
-  draft: { label: 'Borrador', cls: 'bg-gray-100 text-gray-700' },
-  scheduled: { label: 'Programado', cls: 'bg-blue-50 text-blue-700' },
-  published: { label: 'Publicado', cls: 'bg-green-50 text-green-700' },
-  archived: { label: 'Archivado', cls: 'bg-red-50 text-red-700' }
-};
-
-const CAT_LABELS = {
-  autonomos: 'Para autónomos',
-  clientes: 'Para clientes',
-  legal_fiscal: 'Legal y fiscal',
-  herramientas: 'Herramientas',
-  actualidad: 'Actualidad'
-};
-
 export default function AdminBlogPage() {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -28,6 +15,22 @@ export default function AdminBlogPage() {
   const [filterCat, setFilterCat] = useState('all');
   const [editing, setEditing] = useState(null); // null=list, false=new, obj=edit
   const [user, setUser] = useState(null);
+
+  // Dentro del componente para que se retraduzcan al cambiar de idioma.
+  const STATUS_LABELS = {
+    draft: { label: t('draft'), cls: 'bg-gray-100 text-gray-700' },
+    scheduled: { label: t('admin.blog.status.scheduled'), cls: 'bg-blue-50 text-blue-700' },
+    published: { label: t('admin.blog.status.published'), cls: 'bg-green-50 text-green-700' },
+    archived: { label: t('admin.blog.status.archived'), cls: 'bg-red-50 text-red-700' }
+  };
+
+  const CAT_LABELS = {
+    autonomos: t('footer.for_pros'),
+    clientes: t('footer.for_clients'),
+    legal_fiscal: t('admin.blog.categories.legalFiscal'),
+    herramientas: t('admin.blog.categories.tools'),
+    actualidad: t('admin.blog.categories.news')
+  };
 
   useEffect(() => {
     base44.auth.me()
@@ -54,7 +57,7 @@ export default function AdminBlogPage() {
   });
 
   const handleDelete = async (post) => {
-    if (!confirm(`¿Eliminar "${post.title_es}"?`)) return;
+    if (!confirm(t('admin.blog.deleteConfirm', { title: post.title_es }))) return;
     await base44.entities.BlogPost.delete(post.id);
     setPosts(prev => prev.filter(p => p.id !== post.id));
   };
@@ -69,7 +72,7 @@ export default function AdminBlogPage() {
   if (!user) return null;
   if (editing !== null) {
     return (
-      <Suspense fallback={<div className="p-8 text-center text-gray-500">Cargando editor...</div>}>
+      <Suspense fallback={<div className="p-8 text-center text-gray-500">{t('admin.blog.loadingEditor')}</div>}>
       <BlogPostEditor
         post={editing || null}
         allPosts={posts}
@@ -96,16 +99,16 @@ export default function AdminBlogPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <BookOpen className="w-6 h-6" /> Gestión del Blog
+              <BookOpen className="w-6 h-6" /> {t('admin.blog.title')}
             </h1>
-            <p className="text-sm text-gray-500 mt-0.5">{posts.length} artículos en total</p>
+            <p className="text-sm text-gray-500 mt-0.5">{t('admin.blog.totalCount', { count: posts.length })}</p>
           </div>
           <Button
             onClick={() => setEditing(false)}
             className="text-white font-semibold"
             style={{ background: '#00255C' }}
           >
-            <Plus className="w-4 h-4 mr-1" /> Nuevo artículo
+            <Plus className="w-4 h-4 mr-1" /> {t('admin.blog.newPost')}
           </Button>
         </div>
 
@@ -115,7 +118,7 @@ export default function AdminBlogPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por título..."
+              placeholder={t('admin.blog.searchPlaceholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
@@ -126,18 +129,18 @@ export default function AdminBlogPage() {
             onChange={e => setFilterStatus(e.target.value)}
             className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none"
           >
-            <option value="all">Todos los estados</option>
-            <option value="draft">Borrador</option>
-            <option value="scheduled">Programado</option>
-            <option value="published">Publicado</option>
-            <option value="archived">Archivado</option>
+            <option value="all">{t('admin.blog.filters.allStatuses')}</option>
+            <option value="draft">{STATUS_LABELS.draft.label}</option>
+            <option value="scheduled">{STATUS_LABELS.scheduled.label}</option>
+            <option value="published">{STATUS_LABELS.published.label}</option>
+            <option value="archived">{STATUS_LABELS.archived.label}</option>
           </select>
           <select
             value={filterCat}
             onChange={e => setFilterCat(e.target.value)}
             className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none"
           >
-            <option value="all">Todas las categorías</option>
+            <option value="all">{t('allCategories')}</option>
             {Object.entries(CAT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
         </div>
@@ -145,19 +148,19 @@ export default function AdminBlogPage() {
         {/* Table */}
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Cargando artículos...</div>
+            <div className="p-8 text-center text-gray-500">{t('admin.blog.loadingPosts')}</div>
           ) : filtered.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No hay artículos que coincidan.</div>
+            <div className="p-8 text-center text-gray-500">{t('admin.blog.emptyState')}</div>
           ) : (
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-700">Título</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-700 hidden md:table-cell">Categoría</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-700">Estado</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-700 hidden lg:table-cell">Fecha</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-700 hidden lg:table-cell">Vistas</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-700">Acciones</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-700">{t('admin.blog.table.title')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-700 hidden md:table-cell">{t('admin.blog.table.category')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-700">{t('admin.blog.table.status')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-700 hidden lg:table-cell">{t('admin.blog.table.date')}</th>
+                  <th className="text-right px-4 py-3 font-medium text-gray-700 hidden lg:table-cell">{t('admin.blog.table.views')}</th>
+                  <th className="text-right px-4 py-3 font-medium text-gray-700">{t('admin.blog.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -167,7 +170,7 @@ export default function AdminBlogPage() {
                     <tr key={post.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900 line-clamp-1">{post.title_es}</div>
-                        <div className="text-xs text-gray-400 mt-0.5">/blog/{post.slug}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">{`/blog/${post.slug}`}</div>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell text-gray-600">{CAT_LABELS[post.category] || post.category}</td>
                       <td className="px-4 py-3">
@@ -183,17 +186,17 @@ export default function AdminBlogPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           {post.status === 'published' && (
-                            <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500" title="Ver">
+                            <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500" title={t('view')}>
                               <TrendingUp className="w-3.5 h-3.5" />
                             </a>
                           )}
-                          <button onClick={() => setEditing(post)} className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500" title="Editar">
+                          <button onClick={() => setEditing(post)} className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500" title={t('common.edit')}>
                             <Edit className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDuplicate(post)} className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500" title="Duplicar">
+                          <button onClick={() => handleDuplicate(post)} className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500" title={t('admin.blog.actions.duplicate')}>
                             <Copy className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDelete(post)} className="w-8 h-8 flex items-center justify-center rounded hover:bg-red-50 text-red-500" title="Eliminar">
+                          <button onClick={() => handleDelete(post)} className="w-8 h-8 flex items-center justify-center rounded hover:bg-red-50 text-red-500" title={t('common.delete')}>
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>

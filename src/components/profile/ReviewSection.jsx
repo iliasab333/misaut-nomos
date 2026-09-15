@@ -20,7 +20,7 @@ import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { useLanguage } from "@/components/ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 // ── Sub-componente: Formulario de valoración ──────────────────────────────────
@@ -34,12 +34,13 @@ function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) 
   const [comment, setComment] = useState(existingReview?.comment || "");
   const [submitting, setSubmitting] = useState(false);
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const LABELS = {
-    rapidez: "Rapidez",
-    comunicacion: "Comunicación",
-    calidad: "Calidad del trabajo",
-    precio_satisfaccion: "Relación calidad/precio",
+    rapidez: t("reviews.criteria.speed"),
+    comunicacion: t("reviews.criteria.communication"),
+    calidad: t("reviews.form.qualityOfWork"),
+    precio_satisfaccion: t("reviews.form.valueForMoney"),
   };
 
   const avgRating = Math.round(
@@ -67,7 +68,7 @@ function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) 
 
   const handleSubmit = async () => {
     if (Object.values(ratings).some((r) => r === 0)) {
-      toast.error("Por favor valora todos los aspectos");
+      toast.error(t("reviews.form.rateAllAspects"));
       return;
     }
     setSubmitting(true);
@@ -109,10 +110,10 @@ function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) 
         }
       }
       queryClient.invalidateQueries({ queryKey: ["reviews", professionalId] });
-      toast.success("¡Valoración enviada! Gracias por tu opinión.");
+      toast.success(t("reviews.form.submitted"));
       onSuccess?.();
     } catch (err) {
-      toast.error("Error al enviar la valoración. Inténtalo de nuevo.");
+      toast.error(t("reviews.form.submitError"));
     } finally {
       setSubmitting(false);
     }
@@ -121,7 +122,7 @@ function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) 
   return (
     <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-4">
       <p className="font-semibold text-gray-900 text-sm">
-        {existingReview ? "Editar tu valoración" : "Dejar una valoración"}
+        {existingReview ? t("reviews.form.editTitle") : t("reviews.form.newTitle")}
       </p>
       <div className="space-y-3">
         {Object.entries(LABELS).map(([field, label]) => (
@@ -132,7 +133,7 @@ function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) 
         ))}
       </div>
       <Textarea
-        placeholder="Describe tu experiencia (opcional)..."
+        placeholder={t("reviews.form.commentPlaceholder")}
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         className="h-24 text-sm bg-white"
@@ -144,7 +145,7 @@ function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) 
         disabled={submitting}
         className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold"
       >
-        {submitting ? "Enviando..." : existingReview ? "Actualizar valoración" : "Enviar valoración"}
+        {submitting ? t("reviews.form.sending") : existingReview ? t("reviews.form.update") : t("reviews.form.submit")}
       </Button>
     </div>
   );
@@ -156,6 +157,7 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
   const [response, setResponse] = useState(review.professional_response || "");
   const [saving, setSaving] = useState(false);
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const handleSave = async () => {
     if (!response.trim()) return;
@@ -164,9 +166,9 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
       await base44.entities.Review.update(review.id, { professional_response: response.trim() });
       queryClient.invalidateQueries({ queryKey: ["reviews", professionalId] });
       setEditing(false);
-      toast.success("Respuesta guardada");
+      toast.success(t("reviews.card.responseSaved"));
     } catch {
-      toast.error("Error al guardar la respuesta");
+      toast.error(t("reviews.card.responseError"));
     } finally {
       setSaving(false);
     }
@@ -176,7 +178,7 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
     return (
       <div className="mt-3 ml-8 bg-blue-50 border border-blue-100 rounded-lg p-3">
         <p className="text-xs font-semibold text-blue-700 mb-1 flex items-center gap-1">
-          <Reply className="w-3 h-3" /> Respuesta del profesional
+          <Reply className="w-3 h-3" /> {t("reviews.card.professionalResponse")}
         </p>
         <p className="text-sm text-gray-700">{review.professional_response}</p>
         {isOwner && (
@@ -184,7 +186,7 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
             onClick={() => setEditing(true)}
             className="text-xs text-blue-600 mt-1 hover:underline"
           >
-            Editar respuesta
+            {t("reviews.card.editResponse")}
           </button>
         )}
       </div>
@@ -202,7 +204,7 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
             className="text-xs h-8"
           >
             <Reply className="w-3 h-3 mr-1" />
-            Responder a esta valoración
+            {t("reviews.card.reply")}
           </Button>
         )}
         {editing && (
@@ -210,16 +212,16 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
             <Textarea
               value={response}
               onChange={(e) => setResponse(e.target.value)}
-              placeholder="Escribe tu respuesta pública..."
+              placeholder={t("reviews.card.replyPlaceholder")}
               className="text-sm h-20"
               maxLength={400}
             />
             <div className="flex gap-2">
               <Button size="sm" onClick={handleSave} disabled={saving} className="h-8 text-xs">
-                {saving ? "Guardando..." : "Publicar respuesta"}
+                {saving ? t("reviews.card.saving") : t("reviews.card.publishResponse")}
               </Button>
               <Button size="sm" variant="outline" onClick={() => setEditing(false)} className="h-8 text-xs">
-                Cancelar
+                {t("common.cancel")}
               </Button>
             </div>
           </>
@@ -233,6 +235,7 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
 
 // ── Botón de valorar con gate de verificación ────────────────────────────────
 function ReviewButton({ currentUser, myReview, showForm, setShowForm }) {
+  const { t } = useTranslation();
   const { data: verification } = useIdentityVerification(currentUser?.id);
   const isVerified = verification?.status === "approved";
 
@@ -240,7 +243,7 @@ function ReviewButton({ currentUser, myReview, showForm, setShowForm }) {
     return (
       <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs text-amber-700">
         <ShieldCheck className="w-3.5 h-3.5" />
-        <span>Verifica tu identidad para valorar</span>
+        <span>{t("reviews.gate.verifyToReview")}</span>
         <a href="/mi-perfil" className="font-semibold underline hover:no-underline ml-1">→</a>
       </div>
     );
@@ -254,7 +257,7 @@ function ReviewButton({ currentUser, myReview, showForm, setShowForm }) {
       onClick={() => setShowForm((v) => !v)}
     >
       <Star className="w-3 h-3 mr-1" />
-      {myReview ? "Mi valoración" : "Valorar"}
+      {myReview ? t("reviews.gate.myReview") : t("messages.rate")}
     </Button>
   );
 }
@@ -264,7 +267,7 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
   const [reportingReviewId, setReportingReviewId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const queryClient = useQueryClient();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   const isOwner = currentUser?.id === professionalId;
   const isClient = currentUser?.user_type === "client";
@@ -300,7 +303,7 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
     onSuccess: () => {
       setReportingReviewId(null);
       queryClient.invalidateQueries({ queryKey: ["reviews", professionalId] });
-      toast.success("Reseña reportada. La revisaremos pronto.");
+      toast.success(t("reviews.report.success"));
     },
   });
 
@@ -359,14 +362,14 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
                     />
                   ))}
                 </div>
-                <p className="text-sm text-gray-600 mt-1">{visibleReviews.length} valoraciones</p>
+                <p className="text-sm text-gray-600 mt-1">{t("reviews.summary.count", { count: visibleReviews.length })}</p>
               </div>
             </div>
             <div className="space-y-2">
-              <StatBar label="Rapidez" value={stats.rapidez} color="bg-blue-500" />
-              <StatBar label="Comunicación" value={stats.comunicacion} color="bg-green-500" />
-              <StatBar label="Calidad" value={stats.calidad} color="bg-purple-500" />
-              <StatBar label="Precio/satisfacción" value={stats.precio} color="bg-orange-500" />
+              <StatBar label={t("reviews.criteria.speed")} value={stats.rapidez} color="bg-blue-500" />
+              <StatBar label={t("reviews.criteria.communication")} value={stats.comunicacion} color="bg-green-500" />
+              <StatBar label={t("reviews.criteria.quality")} value={stats.calidad} color="bg-purple-500" />
+              <StatBar label={t("reviews.summary.priceSatisfaction")} value={stats.precio} color="bg-orange-500" />
             </div>
           </div>
         )}
@@ -387,7 +390,7 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
                     <p className="font-semibold text-sm text-gray-900 flex items-center gap-1.5">
                       {review.client_name}
                       {review.client_verified && (
-                        <span title="Identidad verificada" className="inline-flex items-center">
+                        <span title={t("proProfile.badges.identityVerified")} className="inline-flex items-center">
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
                         </span>
                       )}
@@ -411,14 +414,14 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
                   <div className="flex items-center gap-1">
                     {review.is_verified && (
                       <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                        Verificada
+                        {t("reviews.card.verifiedReview")}
                       </Badge>
                     )}
                     {currentUser && review.client_id !== currentUser.id && !review.is_reported && (
                       <button
                         onClick={() => setReportingReviewId(review.id)}
                         className="p-1 rounded hover:bg-red-50"
-                        title="Reportar reseña inapropiada"
+                        title={t("reviews.card.reportTitle")}
                       >
                         <Flag className="w-3.5 h-3.5 text-gray-300 hover:text-red-500" />
                       </button>
@@ -429,10 +432,10 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
                 {/* Sub-ratings */}
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mb-2">
                   {[
-                    { label: "Rapidez", val: review.rapidez },
-                    { label: "Comunicación", val: review.comunicacion },
-                    { label: "Calidad", val: review.calidad },
-                    { label: "Precio", val: review.precio_satisfaccion },
+                    { label: t("reviews.criteria.speed"), val: review.rapidez },
+                    { label: t("reviews.criteria.communication"), val: review.comunicacion },
+                    { label: t("reviews.criteria.quality"), val: review.calidad },
+                    { label: t("reviews.card.price"), val: review.precio_satisfaccion },
                   ].map(({ label, val }) =>
                     val ? (
                       <span key={label} className="text-xs text-gray-500">
@@ -458,8 +461,8 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
         ) : (
           <div className="text-center py-8">
             <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-base font-semibold text-gray-900 mb-1">Sin valoraciones aún</h3>
-            <p className="text-sm text-gray-500">Sé el primero en valorar a este profesional</p>
+            <h3 className="text-base font-semibold text-gray-900 mb-1">{t("noReviewsYet")}</h3>
+            <p className="text-sm text-gray-500">{t("beFirstToReview")}</p>
           </div>
         )}
       </div>
@@ -467,18 +470,18 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
       <AlertDialog open={!!reportingReviewId} onOpenChange={() => setReportingReviewId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Reportar esta reseña?</AlertDialogTitle>
+            <AlertDialogTitle>{t("reviews.report.confirmTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Si crees que esta reseña contiene contenido inapropiado, nuestro equipo la revisará.
+              {t("reviews.report.confirmDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => reportReviewMutation.mutate(reportingReviewId)}
               className="bg-red-600 hover:bg-red-700"
             >
-              Reportar
+              {t("reviews.report.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

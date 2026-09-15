@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { Gift, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function GiftUpgradeModal({ subscriber, onClose, onSuccess }) {
+  const { t } = useTranslation();
   const [giftPlan, setGiftPlan] = useState('plan_adsplus');
   const [duration, setDuration] = useState(30);
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Nombres de plan: se envían al backend (giftedPlanName / originalPlanName)
+  // y se persisten, por eso se mantienen como identificadores y no pasan por t().
   const plans = {
     'plan_trial': { name: 'Plan Trial', price: 0 },
     'plan_visibility': { name: 'Plan Visibilidad', price: 13 },
@@ -25,7 +29,7 @@ export default function GiftUpgradeModal({ subscriber, onClose, onSuccess }) {
 
   const handleGift = async () => {
     if (!reason.trim()) {
-      setError('Añade un motivo interno para el regalo');
+      setError(t('admin.giftUpgrade.errors.reasonRequired'));
       return;
     }
     setError('');
@@ -58,11 +62,11 @@ export default function GiftUpgradeModal({ subscriber, onClose, onSuccess }) {
         console.error('Error sending notification:', e);
       }
 
-      toast.success('Upgrade regalado correctamente');
+      toast.success(t('admin.giftUpgrade.toast.success'));
       onSuccess?.();
       onClose();
     } catch (err) {
-      setError('Error al aplicar regalo: ' + err.message);
+      setError(t('admin.giftUpgrade.errors.applyFailed', { message: err.message }));
     } finally {
       setLoading(false);
     }
@@ -74,7 +78,7 @@ export default function GiftUpgradeModal({ subscriber, onClose, onSuccess }) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Gift className="w-5 h-5 text-amber-600"/>
-            <h2 className="text-lg font-semibold text-gray-900">Regalar upgrade</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('admin.giftUpgrade.title')}</h2>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
@@ -82,55 +86,57 @@ export default function GiftUpgradeModal({ subscriber, onClose, onSuccess }) {
         </div>
         
         <div className="bg-gray-50 rounded-lg p-3 mb-4 text-xs">
-          <p className="mb-1"><strong>Usuario:</strong> {subscriber.name || subscriber.email}</p>
-          <p className="mb-1"><strong>Email:</strong> {subscriber.email}</p>
-          <p><strong>Plan actual:</strong> {currentPlan.name}</p>
+          <p className="mb-1"><strong>{t('admin.giftUpgrade.userLabel')}</strong> {subscriber.name || subscriber.email}</p>
+          <p className="mb-1"><strong>{t('admin.giftUpgrade.emailLabel')}</strong> {subscriber.email}</p>
+          <p><strong>{t('admin.giftUpgrade.currentPlanLabel')}</strong> {currentPlan.name}</p>
         </div>
 
-        <label className="block text-sm font-medium text-gray-700 mb-1">Plan a regalar</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.giftUpgrade.planToGift')}</label>
         <select 
           value={giftPlan} 
           onChange={e => setGiftPlan(e.target.value)} 
           className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3"
         >
-          <option value="plan_adsplus">Plan Ads+ (33€/mes)</option>
-          <option value="plan_visibility">Plan Visibilidad (13€/mes)</option>
+          <option value="plan_adsplus">{t('admin.giftUpgrade.planOptions.adsPlus')}</option>
+          <option value="plan_visibility">{t('admin.giftUpgrade.planOptions.visibility')}</option>
         </select>
 
-        <label className="block text-sm font-medium text-gray-700 mb-1">Duración del regalo</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.giftUpgrade.duration')}</label>
         <select 
           value={duration} 
           onChange={e => setDuration(parseInt(e.target.value))} 
           className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3"
         >
-          <option value={7}>7 días</option>
-          <option value={15}>15 días</option>
-          <option value={30}>1 mes (30 días)</option>
-          <option value={60}>2 meses (60 días)</option>
-          <option value={90}>3 meses (90 días)</option>
-          <option value={180}>6 meses (180 días)</option>
-          <option value={365}>1 año</option>
+          <option value={7}>{t('admin.giftUpgrade.durations.days', { count: 7 })}</option>
+          <option value={15}>{t('admin.giftUpgrade.durations.days', { count: 15 })}</option>
+          <option value={30}>{t('admin.giftUpgrade.durations.oneMonth')}</option>
+          <option value={60}>{t('admin.giftUpgrade.durations.twoMonths')}</option>
+          <option value={90}>{t('admin.giftUpgrade.durations.threeMonths')}</option>
+          <option value={180}>{t('admin.giftUpgrade.durations.sixMonths')}</option>
+          <option value={365}>{t('admin.giftUpgrade.durations.oneYear')}</option>
         </select>
 
-        <label className="block text-sm font-medium text-gray-700 mb-1">Motivo interno <span className="text-red-500">*</span></label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.giftUpgrade.internalReason')} <span className="text-red-500">*</span></label>
         <textarea 
           value={reason} 
           onChange={e => { setReason(e.target.value); setError(''); }}
-          placeholder="Ej: Cortesía por problema técnico, campaña marketing, cliente VIP..."
+          placeholder={t('admin.giftUpgrade.reasonPlaceholder')}
           rows={2}
           className={`w-full border rounded-lg px-3 py-2 text-sm mb-2 ${error ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
         />
         {error && <p className="text-red-600 text-xs mb-3 font-medium">⚠️ {error}</p>}
 
         <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-900 mb-4">
-          <strong>ℹ️ Importante:</strong><br/>
-          • El usuario verá beneficios de {targetPlan?.name} durante {duration} días<br/>
+          <strong>{t('admin.giftUpgrade.info.title')}</strong><br/>
+          {t('admin.giftUpgrade.info.benefits', { plan: targetPlan?.name, days: duration })}<br/>
           {hasSubscription
-            ? <>• Stripe NO cambiará — se le sigue cobrando {currentPlan.name}<br/></>
-            : <>• Se creará una suscripción manual (sin cobro en Stripe)<br/></>
+            ? <>{t('admin.giftUpgrade.info.stripeUnchanged', { plan: currentPlan.name })}<br/></>
+            : <>{t('admin.giftUpgrade.info.manualSubscription')}<br/></>
           }
-          • Recibirá email y notificación push del regalo<br/>
-          • Al expirar, {hasSubscription ? `volverá automáticamente a ${currentPlan.name}` : 'su suscripción quedará inactiva'}
+          {t('admin.giftUpgrade.info.notification')}<br/>
+          {hasSubscription
+            ? t('admin.giftUpgrade.info.expiryRevert', { plan: currentPlan.name })
+            : t('admin.giftUpgrade.info.expiryInactive')}
         </div>
 
         <div className="flex gap-2">
@@ -139,14 +145,14 @@ export default function GiftUpgradeModal({ subscriber, onClose, onSuccess }) {
             disabled={loading} 
             className="flex-1 bg-gray-100 text-gray-700 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200"
           >
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button 
             onClick={handleGift} 
             disabled={loading} 
             className="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50"
           >
-            {loading ? 'Aplicando...' : 'Regalar upgrade'}
+            {loading ? t('admin.giftUpgrade.applying') : t('admin.giftUpgrade.submit')}
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -9,78 +10,56 @@ import {
 } from "lucide-react";
 import SEOHead from "../components/seo/SEOHead";
 
-const HOW_IT_WORKS = [
-  {
-    icon: Target,
-    title: "Configuración única (5 min)",
-    desc: "Breve cuestionario sobre tu cliente ideal. Solo se hace una vez."
-  },
-  {
-    icon: Clock,
-    title: "Briefing mensual (2 min)",
-    desc: "Eliges red social y objetivo cada mes. Deadline día 5."
-  },
-  {
-    icon: Sparkles,
-    title: "Creamos y lanzamos",
-    desc: "Creatividades profesionales + copy publicitario gestionado por nuestro equipo."
-  },
-  {
-    icon: BarChart3,
-    title: "Ves resultados",
-    desc: "Métricas en tiempo real: alcance, clics, leads, presupuesto gastado."
-  }
-];
-
-const COMPARISON = [
-  { feature: "Perfil visible en búsquedas", visibility: true, adsplus: true },
-  { feature: "Contacto directo (WhatsApp, llamada)", visibility: true, adsplus: true },
-  { feature: "Mensajes ilimitados", visibility: true, adsplus: true },
-  { feature: "Estadísticas de visitas", visibility: true, adsplus: true },
-  { feature: "30€ de presupuesto publicitario REAL", visibility: false, adsplus: true },
-  { feature: "Campaña gestionada en redes", visibility: false, adsplus: true },
-  { feature: "Creatividades profesionales", visibility: false, adsplus: true },
-  { feature: "Copy publicitario optimizado", visibility: false, adsplus: true },
-  { feature: "Reporte semanal de resultados", visibility: false, adsplus: true },
-  { feature: "Soporte prioritario", visibility: false, adsplus: true },
-];
-
-const FAQS = [
-  {
-    q: "¿Qué incluye exactamente el Plan Ads+?",
-    a: "Incluye todo lo del Plan Visibility + 30€ de inversión publicitaria real cada mes + gestión completa de tu campaña (creatividades, copy, segmentación, optimización) + reporte semanal de métricas."
-  },
-  {
-    q: "¿Puedo elegir la red social donde anunciarme?",
-    a: "Sí, cada mes eliges UNA red entre Instagram, Facebook, TikTok, LinkedIn o Google Search. El siguiente mes puedes cambiar si quieres."
-  },
-  {
-    q: "¿Qué pasa si no relleno el briefing mensual?",
-    a: "Te enviamos recordatorios los días 1, 3 y 5. Si el día 6 no lo has rellenado, duplicamos la configuración del mes anterior para que no pierdas el mes."
-  },
-  {
-    q: "¿Los 30€ son de inversión real o incluyen gestión?",
-    a: "Los 30€ se invierten íntegramente en tu campaña (presupuesto publicitario puro). La gestión, creatividades y copy ya están cubiertos por los 33€ del plan."
-  },
-  {
-    q: "¿Puedo cancelar cuando quiera?",
-    a: "Sí, sin permanencia. Cancelas desde tu panel y tu campaña termina al final del mes en curso."
-  },
-  {
-    q: "¿Cuánto tarda en lanzarse mi campaña?",
-    a: "Una vez apruebas el briefing y las creatividades (normalmente 24-48h), tu campaña está en vivo en 24-48h más."
-  }
-];
-
 export default function PlanAdsPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  // Antes eran constantes de módulo: se evaluaban una vez al importar y no se
+  // retraducían al cambiar de idioma. Dentro del componente pasan por t().
+  const HOW_IT_WORKS = [
+    { icon: Target, title: t('ads.plan.steps.setupTitle'), desc: t('ads.plan.steps.setupDesc') },
+    { icon: Clock, title: t('ads.plan.steps.briefingTitle'), desc: t('ads.plan.steps.briefingDesc') },
+    { icon: Sparkles, title: t('ads.plan.steps.launchTitle'), desc: t('ads.plan.steps.launchDesc') },
+    { icon: BarChart3, title: t('ads.plan.steps.resultsTitle'), desc: t('ads.plan.steps.resultsDesc') },
+  ];
+
+  const COMPARISON = [
+    { feature: t('ads.plan.comparison.profileVisible'), visibility: true, adsplus: true },
+    { feature: t('ads.plan.comparison.directContact'), visibility: true, adsplus: true },
+    { feature: t('ads.plan.comparison.unlimitedMessages'), visibility: true, adsplus: true },
+    { feature: t('ads.plan.comparison.visitStats'), visibility: true, adsplus: true },
+    { feature: t('ads.plan.comparison.realBudget'), visibility: false, adsplus: true },
+    { feature: t('ads.plan.comparison.managedCampaign'), visibility: false, adsplus: true },
+    { feature: t('ads.plan.comparison.proCreatives'), visibility: false, adsplus: true },
+    { feature: t('ads.plan.comparison.optimizedCopy'), visibility: false, adsplus: true },
+    { feature: t('ads.plan.comparison.weeklyReport'), visibility: false, adsplus: true },
+    { feature: t('ads.plan.comparison.prioritySupport'), visibility: false, adsplus: true },
+  ];
+
+  const FAQS = [
+    { q: t('ads.plan.faq.includesQ'), a: t('ads.plan.faq.includesA') },
+    { q: t('ads.plan.faq.platformQ'), a: t('ads.plan.faq.platformA') },
+    { q: t('ads.plan.faq.noBriefingQ'), a: t('ads.plan.faq.noBriefingA') },
+    { q: t('ads.plan.faq.budgetQ'), a: t('ads.plan.faq.budgetA') },
+    { q: t('ads.plan.faq.cancelQ'), a: t('ads.plan.faq.cancelA') },
+    { q: t('ads.plan.faq.launchTimeQ'), a: t('ads.plan.faq.launchTimeA') },
+  ];
+
+  // Los nombres de las redes son marcas: van literales.
+  const PLATFORMS = [
+    { name: 'Instagram', desc: t('ads.plan.platforms.instagramDesc'), users: t('ads.plan.platforms.usersInSpain', { millions: 18 }) },
+    { name: 'Facebook', desc: t('ads.plan.platforms.facebookDesc'), users: t('ads.plan.platforms.usersInSpain', { millions: 20 }) },
+    { name: 'TikTok', desc: t('ads.plan.platforms.tiktokDesc'), users: t('ads.plan.platforms.usersInSpain', { millions: 13 }) },
+    { name: 'LinkedIn', desc: t('ads.plan.platforms.linkedinDesc'), users: t('ads.plan.platforms.usersInSpain', { millions: 11 }) },
+    { name: 'Google', desc: t('ads.plan.platforms.googleDesc'), users: t('ads.plan.platforms.usersInSpain', { millions: 35 }) },
+  ];
 
   return (
     <>
       <SEOHead
-        title="Plan Ads+ — Clientes nuevos cada mes | MisAutónomos"
-        description="Campañas publicitarias gestionadas en Instagram, Facebook, TikTok, LinkedIn o Google. 30€ de presupuesto incluido. 33€/mes."
-        keywords="publicidad autónomos, campañas instagram, facebook ads, google ads, marketing digital, plan ads"
+        title={t('ads.plan.seoTitle')}
+        description={t('ads.plan.seoDescription')}
+        keywords={t('ads.plan.seoKeywords')}
       />
       
       <div className="min-h-screen bg-white">
@@ -90,14 +69,15 @@ export default function PlanAdsPage() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <Megaphone className="w-4 h-4" />
-              Campañas gestionadas en redes sociales
+              {t('ads.plan.heroBadge')}
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
-              Clientes nuevos cada mes,<br className="hidden md:block" /> sin pensar en marketing
+              <Trans i18nKey="ads.plan.heroTitle">
+                Clientes nuevos cada mes,<br className="hidden md:block" /> sin pensar en marketing
+              </Trans>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Gestionamos tu publicidad en Instagram, Facebook, TikTok, LinkedIn o Google. 
-              Tú solo apruebas y ves resultados.
+              {t('ads.plan.heroSubtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button 
@@ -105,7 +85,7 @@ export default function PlanAdsPage() {
                 className="bg-white text-blue-700 hover:bg-blue-50 font-bold px-8 h-14 text-lg"
                 onClick={() => navigate("/precios")}
               >
-                Empezar prueba de 7 días →
+                {t('ads.plan.heroCta')}
               </Button>
               <Button 
                 size="lg" 
@@ -113,11 +93,11 @@ export default function PlanAdsPage() {
                 className="border-white text-white hover:bg-white/10 font-semibold px-8 h-14 text-lg"
                 onClick={() => navigate("/precios")}
               >
-                Ver precios
+                {t('ads.plan.heroSecondaryCta')}
               </Button>
             </div>
             <p className="text-sm text-blue-200 mt-4">
-              33€/mes · 30€ de inversión publicitaria incluida · Cancela cuando quieras
+              {t('ads.plan.heroFootnote')}
             </p>
           </div>
         </section>
@@ -127,10 +107,10 @@ export default function PlanAdsPage() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
-                Así trabajamos contigo cada mes
+                {t('ads.plan.howTitle')}
               </h2>
               <p className="text-lg text-gray-500">
-                Proceso simple y rápido. Solo 2 minutos al mes de tu tiempo.
+                {t('ads.plan.howSubtitle')}
               </p>
             </div>
 
@@ -153,10 +133,10 @@ export default function PlanAdsPage() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
-                Visibility vs Ads+
+                {t('ads.plan.comparisonTitle')}
               </h2>
               <p className="text-lg text-gray-500">
-                ¿Qué plan es para ti?
+                {t('ads.plan.comparisonSubtitle')}
               </p>
             </div>
 
@@ -164,9 +144,9 @@ export default function PlanAdsPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b-2 border-gray-100">
-                    <th className="text-left py-4 px-4 font-bold text-gray-900">Característica</th>
-                    <th className="text-center py-4 px-4 font-bold text-gray-600">Visibility<br/><span className="text-sm font-normal">13€/mes</span></th>
-                    <th className="text-center py-4 px-4 font-bold text-blue-700 bg-blue-50 rounded-t-lg">Ads+<br/><span className="text-sm font-normal">33€/mes</span></th>
+                    <th className="text-left py-4 px-4 font-bold text-gray-900">{t('ads.plan.comparison.featureHeader')}</th>
+                    <th className="text-center py-4 px-4 font-bold text-gray-600">{t('ads.plan.visibilityPlanName')}<br/><span className="text-sm font-normal">{t('ads.plan.pricePerMonth', { price: 13 })}</span></th>
+                    <th className="text-center py-4 px-4 font-bold text-blue-700 bg-blue-50 rounded-t-lg">{t('ads.plan.adsPlusPlanName')}<br/><span className="text-sm font-normal">{t('ads.plan.pricePerMonth', { price: 33 })}</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -195,7 +175,7 @@ export default function PlanAdsPage() {
 
             <div className="mt-8 text-center">
               <p className="text-sm font-semibold text-blue-700 bg-blue-50 rounded-lg p-4 inline-block">
-                💡 Visibility te hace aparecer. Ads+ te trae clientes activamente.
+                {t('ads.plan.comparisonNote')}
               </p>
             </div>
           </div>
@@ -205,20 +185,14 @@ export default function PlanAdsPage() {
         <section className="py-16 md:py-20 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
-              Elige la red donde están tus clientes
+              {t('ads.plan.platformsTitle')}
             </h2>
             <p className="text-lg text-gray-500 mb-10">
-              Cada mes puedes elegir una plataforma diferente según tu objetivo.
+              {t('ads.plan.platformsSubtitle')}
             </p>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {[
-                { name: 'Instagram', desc: '25-45 años, visual', users: '18M en España' },
-                { name: 'Facebook', desc: '35-65 años, local', users: '20M en España' },
-                { name: 'TikTok', desc: '18-30 años, vídeo', users: '13M en España' },
-                { name: 'LinkedIn', desc: 'B2B, profesionales', users: '11M en España' },
-                { name: 'Google', desc: 'Intención de compra', users: '35M en España' },
-              ].map((platform, i) => (
+              {PLATFORMS.map((platform, i) => (
                 <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                   <h3 className="font-bold text-gray-900 mb-1">{platform.name}</h3>
                   <p className="text-xs text-gray-500 mb-2">{platform.desc}</p>
@@ -233,7 +207,7 @@ export default function PlanAdsPage() {
         <section className="py-16 md:py-20 px-4 bg-white">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 text-center mb-12">
-              Preguntas frecuentes
+              {t('nav.faq')}
             </h2>
             <div className="space-y-4">
               {FAQS.map((faq, i) => (
@@ -255,20 +229,20 @@ export default function PlanAdsPage() {
         <section className="py-16 md:py-20 px-4 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
-              Empieza a conseguir clientes nuevos
+              {t('ads.plan.ctaTitle')}
             </h2>
             <p className="text-xl text-blue-100 mb-8">
-              7 días gratis · 30€ de presupuesto incluido · Cancela cuando quieras
+              {t('ads.plan.ctaSubtitle')}
             </p>
             <Button 
               size="lg" 
               className="bg-white text-blue-700 hover:bg-blue-50 font-bold px-10 h-14 text-lg shadow-xl"
               onClick={() => navigate("/precios")}
             >
-              Empezar prueba gratis →
+              {t('ads.plan.ctaButton')}
             </Button>
             <p className="text-sm text-blue-200 mt-4">
-              Sin tarjeta de crédito requerida
+              {t('ads.plan.ctaNoCard')}
             </p>
           </div>
         </section>

@@ -26,10 +26,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import SEOHead from "../components/seo/SEOHead";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export default function ProjectsPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
@@ -73,11 +73,11 @@ export default function ProjectsPage() {
 
   const getStatusConfig = (status) => {
     const configs = {
-      planning: { color: 'bg-gray-100 text-gray-800', icon: Calendar, label: 'Planificación' },
-      in_progress: { color: 'bg-blue-100 text-blue-800', icon: TrendingUp, label: 'En progreso' },
-      on_hold: { color: 'bg-yellow-100 text-yellow-800', icon: Pause, label: 'En pausa' },
-      completed: { color: 'bg-green-100 text-green-800', icon: CheckCircle2, label: 'Completado' },
-      cancelled: { color: 'bg-red-100 text-red-800', icon: AlertCircle, label: 'Cancelado' }
+      planning: { color: 'bg-gray-100 text-gray-800', icon: Calendar, label: t('projects.status.planning') },
+      in_progress: { color: 'bg-blue-100 text-blue-800', icon: TrendingUp, label: t('projects.status.inProgress') },
+      on_hold: { color: 'bg-yellow-100 text-yellow-800', icon: Pause, label: t('projects.status.onHold') },
+      completed: { color: 'bg-green-100 text-green-800', icon: CheckCircle2, label: t('projects.status.completed') },
+      cancelled: { color: 'bg-red-100 text-red-800', icon: AlertCircle, label: t('projects.status.cancelled') }
     };
     return configs[status] || configs.planning;
   };
@@ -90,6 +90,16 @@ export default function ProjectsPage() {
       urgent: 'bg-red-500'
     };
     return colors[priority] || colors.medium;
+  };
+
+  const getPriorityLabel = (priority) => {
+    const labels = {
+      low: t('projects.priority.low'),
+      medium: t('projects.priority.medium'),
+      high: t('projects.priority.high'),
+      urgent: t('projects.priority.urgent')
+    };
+    return labels[priority] || priority;
   };
 
   const stats = {
@@ -112,8 +122,8 @@ export default function ProjectsPage() {
   return (
     <>
       <SEOHead 
-        title="Gestión de Proyectos - MisAutónomos"
-        description="Gestiona tus proyectos, fases y tareas"
+        title={t('projects.seo.title')}
+        description={t('projects.seo.description')}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-4 md:py-8 px-3 md:px-4 pb-24 md:pb-8">
@@ -123,8 +133,8 @@ export default function ProjectsPage() {
             <div className="flex items-center gap-3">
               <FolderKanban className="w-7 h-7 md:w-8 md:h-8 text-blue-600" />
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Proyectos</h1>
-                <p className="text-xs md:text-sm text-gray-600">Gestiona tus proyectos de principio a fin</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('projects.title')}</h1>
+                <p className="text-xs md:text-sm text-gray-600">{t('projects.subtitle')}</p>
               </div>
             </div>
             <div className="flex gap-2">
@@ -135,7 +145,7 @@ export default function ProjectsPage() {
                 className="bg-white border-blue-300 text-blue-700 hover:bg-blue-50"
               >
                 <Users className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Ir a CRM</span>
+                <span className="hidden sm:inline">{t('projects.goToCrm')}</span>
                 <span className="sm:hidden">CRM</span>
               </Button>
               <Button 
@@ -144,8 +154,8 @@ export default function ProjectsPage() {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Nuevo Proyecto</span>
-                <span className="sm:hidden">Nuevo</span>
+                <span className="hidden sm:inline">{t('projects.newProject')}</span>
+                <span className="sm:hidden">{t('profile_card.new_tag')}</span>
               </Button>
             </div>
           </div>
@@ -160,7 +170,7 @@ export default function ProjectsPage() {
                   </div>
                   <div>
                     <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.active}</p>
-                    <p className="text-xs text-gray-500">En progreso</p>
+                    <p className="text-xs text-gray-500">{t('projects.status.inProgress')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -173,7 +183,7 @@ export default function ProjectsPage() {
                   </div>
                   <div>
                     <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.planning}</p>
-                    <p className="text-xs text-gray-500">Planificación</p>
+                    <p className="text-xs text-gray-500">{t('projects.status.planning')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -186,7 +196,7 @@ export default function ProjectsPage() {
                   </div>
                   <div>
                     <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.completed}</p>
-                    <p className="text-xs text-gray-500">Completados</p>
+                    <p className="text-xs text-gray-500">{t('projects.stats.completed')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -199,7 +209,7 @@ export default function ProjectsPage() {
                   </div>
                   <div>
                     <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalHours}</p>
-                    <p className="text-xs text-gray-500">Horas totales</p>
+                    <p className="text-xs text-gray-500">{t('projects.stats.totalHours')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -209,7 +219,7 @@ export default function ProjectsPage() {
           {/* Quick Actions */}
           <Card className="border-0 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50 mb-6">
             <CardContent className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-3 text-sm md:text-base">Acciones rápidas</h3>
+              <h3 className="font-semibold text-gray-900 mb-3 text-sm md:text-base">{t('projects.quickActions.title')}</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Button 
                   onClick={() => navigate(createPageUrl("CRM"))}
@@ -218,7 +228,7 @@ export default function ProjectsPage() {
                   className="bg-white hover:bg-gray-50 justify-start"
                 >
                   <Users className="w-4 h-4 mr-2" />
-                  <span className="truncate">Ver clientes</span>
+                  <span className="truncate">{t('projects.quickActions.viewClients')}</span>
                 </Button>
                 <Button 
                   onClick={() => navigate(createPageUrl("Calendar"))}
@@ -227,7 +237,7 @@ export default function ProjectsPage() {
                   className="bg-white hover:bg-gray-50 justify-start"
                 >
                   <Calendar className="w-4 h-4 mr-2" />
-                  <span className="truncate">Calendario</span>
+                  <span className="truncate">{t('calendar.title')}</span>
                 </Button>
                 <Button 
                   onClick={() => navigate(createPageUrl("Presupuestos"))}
@@ -236,7 +246,7 @@ export default function ProjectsPage() {
                   className="bg-white hover:bg-gray-50 justify-start"
                 >
                   <FileText className="w-4 h-4 mr-2" />
-                  <span className="truncate">Presupuestos</span>
+                  <span className="truncate">{t('nav.quotes')}</span>
                 </Button>
                 <Button 
                   onClick={() => navigate(createPageUrl("Invoices"))}
@@ -245,7 +255,7 @@ export default function ProjectsPage() {
                   className="bg-white hover:bg-gray-50 justify-start"
                 >
                   <Euro className="w-4 h-4 mr-2" />
-                  <span className="truncate">Facturas</span>
+                  <span className="truncate">{t('nav.invoices')}</span>
                 </Button>
               </div>
             </CardContent>
@@ -256,7 +266,7 @@ export default function ProjectsPage() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="Buscar proyectos o clientes..."
+                placeholder={t('projects.list.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-white"
@@ -267,12 +277,12 @@ export default function ProjectsPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">Todos los estados</option>
-              <option value="planning">Planificación</option>
-              <option value="in_progress">En progreso</option>
-              <option value="on_hold">En pausa</option>
-              <option value="completed">Completado</option>
-              <option value="cancelled">Cancelado</option>
+              <option value="all">{t('projects.status.all')}</option>
+              <option value="planning">{t('projects.status.planning')}</option>
+              <option value="in_progress">{t('projects.status.inProgress')}</option>
+              <option value="on_hold">{t('projects.status.onHold')}</option>
+              <option value="completed">{t('projects.status.completed')}</option>
+              <option value="cancelled">{t('projects.status.cancelled')}</option>
             </select>
           </div>
 
@@ -281,12 +291,12 @@ export default function ProjectsPage() {
               <CardContent className="py-16 text-center">
                 <FolderKanban className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {projects.length === 0 ? "No tienes proyectos aún" : "No se encontraron proyectos"}
+                  {projects.length === 0 ? t('projects.list.emptyTitle') : t('projects.list.noResultsTitle')}
                 </h3>
                 <p className="text-gray-600 mb-6">
                   {projects.length === 0 
-                    ? "Crea tu primer proyecto y gestiona el trabajo con tus clientes"
-                    : "Intenta ajustar los filtros de búsqueda"}
+                    ? t('projects.list.emptyDescription')
+                    : t('projects.list.noResultsDescription')}
                 </p>
                 {projects.length === 0 && (
                   <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
@@ -296,14 +306,14 @@ export default function ProjectsPage() {
                       className="border-blue-300 text-blue-700 hover:bg-blue-50"
                     >
                       <Users className="w-4 h-4 mr-2" />
-                      Primero añade clientes
+                      {t('projects.list.addClientsFirst')}
                     </Button>
                     <Button 
                       onClick={() => navigate(createPageUrl("ProjectDetail") + "?new=true")}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Crear primer proyecto
+                      {t('projects.list.createFirst')}
                     </Button>
                   </div>
                 )}
@@ -345,7 +355,7 @@ export default function ProjectsPage() {
                         </div>
                         <div 
                           className={`w-2 h-2 rounded-full ${getPriorityColor(project.priority)} flex-shrink-0`}
-                          title={`Prioridad: ${project.priority}`}
+                          title={t('projects.list.priorityTooltip', { priority: getPriorityLabel(project.priority) })}
                         />
                       </div>
                       <Badge className={statusConfig.color}>
@@ -357,7 +367,7 @@ export default function ProjectsPage() {
                       <div className="space-y-3">
                         <div>
                           <div className="flex justify-between text-xs md:text-sm mb-1">
-                            <span className="text-gray-600">Progreso</span>
+                            <span className="text-gray-600">{t('projects.progress')}</span>
                             <span className="font-semibold">{project.progress_percentage || 0}%</span>
                           </div>
                           <Progress value={project.progress_percentage || 0} className="h-2" />

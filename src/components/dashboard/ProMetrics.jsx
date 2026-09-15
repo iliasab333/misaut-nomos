@@ -1,33 +1,35 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Eye, MessageSquare, Star, TrendingUp } from "lucide-react";
 
+// Mapa explícito tipo → clave de traducción (se resuelve con t() en render).
 const METRIC_STYLES = {
   views: {
     icon: Eye,
-    label: "Vistas al perfil",
+    labelKey: "dashboard.metrics.views",
     gradient: "from-blue-500 to-cyan-500",
     soft: "bg-blue-50",
     text: "text-blue-700",
   },
   contacts: {
     icon: MessageSquare,
-    label: "Contactos recibidos",
+    labelKey: "dashboard.metrics.contacts",
     gradient: "from-emerald-500 to-green-500",
     soft: "bg-emerald-50",
     text: "text-emerald-700",
   },
   rating: {
     icon: Star,
-    label: "Valoración media",
+    labelKey: "dashboard.metrics.rating",
     gradient: "from-amber-500 to-orange-500",
     soft: "bg-amber-50",
     text: "text-amber-700",
   },
   conversion: {
     icon: TrendingUp,
-    label: "Tasa conversión",
+    labelKey: "dashboard.metrics.conversion",
     gradient: "from-purple-500 to-pink-500",
     soft: "bg-purple-50",
     text: "text-purple-700",
@@ -35,6 +37,7 @@ const METRIC_STYLES = {
 };
 
 function MetricCard({ type, value, suffix = "", trend, index = 0 }) {
+  const { t } = useTranslation();
   const style = METRIC_STYLES[type];
   const Icon = style.icon;
 
@@ -65,24 +68,25 @@ function MetricCard({ type, value, suffix = "", trend, index = 0 }) {
             </p>
             {suffix && <span className="text-lg font-bold text-gray-500">{suffix}</span>}
           </div>
-          <p className="text-sm text-gray-500 mt-1 font-medium">{style.label}</p>
+          <p className="text-sm text-gray-500 mt-1 font-medium">{t(style.labelKey)}</p>
         </CardContent>
       </Card>
     </motion.div>
   );
 }
 
-// Fix #13: motivational tips when metrics are zero
-const TIPS = [
-  "Añade fotos de tus trabajos para destacar",
-  "Completa tu descripción con palabras clave",
-  "Activa WhatsApp para más contactos",
-  "Comparte tu perfil en redes sociales",
-];
-
 export default function ProMetrics({ views = 0, contacts = 0, rating = 0, totalReviews = 0, conversion = 0 }) {
+  const { t } = useTranslation();
   const conversionPct = views > 0 ? Math.round((contacts / views) * 100) : 0;
   const allZero = views === 0 && contacts === 0 && rating === 0;
+
+  // Fix #13: motivational tips when metrics are zero
+  const tips = [
+    t('dashboard.metrics.tips.photos'),
+    t('dashboard.metrics.tips.description'),
+    t('dashboard.metrics.tips.whatsapp'),
+    t('dashboard.metrics.tips.share'),
+  ];
 
   return (
     <div>
@@ -99,9 +103,9 @@ export default function ProMetrics({ views = 0, contacts = 0, rating = 0, totalR
       </div>
       {allZero && (
         <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl p-4">
-          <p className="text-sm font-semibold text-blue-800 mb-2">🚀 Tips para mejorar tu visibilidad:</p>
+          <p className="text-sm font-semibold text-blue-800 mb-2">{t('dashboard.metrics.tipsTitle')}</p>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-            {TIPS.map((tip, i) => (
+            {tips.map((tip, i) => (
               <li key={i} className="flex items-center gap-2 text-xs text-blue-700">
                 <span className="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0" />
                 {tip}

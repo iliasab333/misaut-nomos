@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, FileText, Calendar, Euro, Loader2, CreditCard, Shield, Lock, Building, User } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation, Trans } from "react-i18next";
 import SEOHead from "../components/seo/SEOHead";
 
 export default function PayInvoicePage() {
+  const { t } = useTranslation();
   const urlParams = new URLSearchParams(window.location.search);
   const invoiceId = urlParams.get("invoice");
   const success = urlParams.get("success");
@@ -26,10 +28,10 @@ export default function PayInvoicePage() {
 
   useEffect(() => {
     if (success) {
-      toast.success("¡Pago completado con éxito!");
+      toast.success(t('payments.portal.paymentCompleted'));
     }
     if (canceled) {
-      toast.error("Pago cancelado");
+      toast.error(t('payments.portal.paymentCanceled'));
     }
   }, [success, canceled]);
 
@@ -45,7 +47,7 @@ export default function PayInvoicePage() {
         window.location.href = response.data.url;
       }
     } catch (error) {
-      toast.error("Error al procesar el pago");
+      toast.error(t('payments.portal.paymentError'));
       setProcessing(false);
     }
   };
@@ -63,8 +65,8 @@ export default function PayInvoicePage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <Card className="max-w-md w-full p-8 text-center">
           <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Factura no encontrada</h2>
-          <p className="text-gray-600">La factura que buscas no existe o ha sido eliminada.</p>
+          <h2 className="text-2xl font-bold mb-2">{t('payments.portal.notFoundTitle')}</h2>
+          <p className="text-gray-600">{t('payments.portal.notFoundDescription')}</p>
         </Card>
       </div>
     );
@@ -74,17 +76,17 @@ export default function PayInvoicePage() {
     return (
       <>
         <SEOHead 
-          title="Factura Pagada - MisAutónomos"
-          description="Confirmación de pago de factura"
+          title={t('payments.portal.paidSeoTitle')}
+          description={t('payments.portal.paidSeoDescription')}
           noindex={true}
         />
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <Card className="max-w-md w-full p-8 text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Factura ya pagada</h2>
-            <p className="text-gray-600 mb-4">Esta factura ya ha sido pagada.</p>
+            <h2 className="text-2xl font-bold mb-2">{t('payments.portal.alreadyPaidTitle')}</h2>
+            <p className="text-gray-600 mb-4">{t('payments.portal.alreadyPaidDescription')}</p>
             <div className="bg-gray-50 p-4 rounded-lg text-left">
-              <p className="text-sm text-gray-600">Fecha de pago:</p>
+              <p className="text-sm text-gray-600">{t('payments.portal.paymentDateLabel')}</p>
               <p className="font-semibold">{new Date(invoice.payment_date).toLocaleDateString('es-ES')}</p>
             </div>
           </Card>
@@ -98,8 +100,8 @@ export default function PayInvoicePage() {
   return (
     <>
       <SEOHead 
-        title={`Pagar Factura ${invoice.invoice_number} - MisAutónomos`}
-        description="Paga tu factura de forma segura online"
+        title={t('payments.portal.seoTitle', { number: invoice.invoice_number })}
+        description={t('payments.portal.seoDescription')}
         noindex={true}
       />
 
@@ -107,8 +109,8 @@ export default function PayInvoicePage() {
         <div className="max-w-3xl mx-auto">
           {/* Header con info del emisor */}
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Portal de Pago</h1>
-            <p className="text-gray-600">Paga tu factura de forma segura</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">{t('payments.portal.title')}</h1>
+            <p className="text-gray-600">{t('payments.portal.subtitle')}</p>
           </div>
 
           {/* Información del emisor */}
@@ -121,7 +123,7 @@ export default function PayInvoicePage() {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">{invoice.emisor_razon_social}</p>
-                    <p className="text-sm text-gray-500">NIF: {invoice.emisor_nif}</p>
+                    <p className="text-sm text-gray-500">{t('payments.portal.issuerNif', { nif: invoice.emisor_nif })}</p>
                   </div>
                 </div>
               </CardContent>
@@ -134,7 +136,7 @@ export default function PayInvoicePage() {
                 <div className="flex items-center gap-3">
                   <FileText className="w-8 h-8 text-blue-600" />
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Factura {invoice.invoice_number}</h2>
+                    <h2 className="text-xl font-bold text-gray-900">{t('payments.portal.invoiceHeading', { number: invoice.invoice_number })}</h2>
                     <div className="flex items-center gap-2 text-gray-600">
                       <User className="w-4 h-4" />
                       <span>{invoice.client_name}</span>
@@ -146,46 +148,46 @@ export default function PayInvoicePage() {
                   invoice.status === 'sent' ? 'bg-amber-500' :
                   'bg-blue-500'
                 } text-white`}>
-                  {invoice.status === 'overdue' || isOverdue ? '⚠️ Vencida' :
-                   invoice.status === 'sent' ? 'Pendiente' :
-                   invoice.status === 'draft' ? 'Borrador' : invoice.status}
+                  {invoice.status === 'overdue' || isOverdue ? t('payments.portal.status.overdue') :
+                   invoice.status === 'sent' ? t('payments.portal.status.pending') :
+                   invoice.status === 'draft' ? t('draft') : invoice.status}
                 </Badge>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-gray-50 rounded-lg">
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">Emisión</label>
+                  <label className="text-xs text-gray-500 block mb-1">{t('payments.portal.issueDate')}</label>
                   <p className="font-semibold text-sm">
                     {new Date(invoice.issue_date).toLocaleDateString('es-ES')}
                   </p>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">Vencimiento</label>
+                  <label className="text-xs text-gray-500 block mb-1">{t('payments.portal.dueDate')}</label>
                   <p className={`font-semibold text-sm ${isOverdue ? 'text-red-600' : ''}`}>
                     {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('es-ES') : '-'}
                   </p>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">Subtotal</label>
+                  <label className="text-xs text-gray-500 block mb-1">{t('payments.portal.subtotal')}</label>
                   <p className="font-semibold text-sm">{invoice.subtotal?.toFixed(2) || '0.00'}€</p>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">IVA</label>
+                  <label className="text-xs text-gray-500 block mb-1">{t('payments.portal.vat')}</label>
                   <p className="font-semibold text-sm">{invoice.total_iva?.toFixed(2) || '0.00'}€</p>
                 </div>
               </div>
 
               {invoice.items && invoice.items.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Detalle de conceptos</h3>
+                  <h3 className="font-semibold text-gray-900 mb-3">{t('payments.portal.itemsTitle')}</h3>
                   <div className="border rounded-lg overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Descripción</th>
-                          <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 hidden md:table-cell">Cant.</th>
-                          <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 hidden md:table-cell">Precio</th>
-                          <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Total</th>
+                          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">{t('description')}</th>
+                          <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 hidden md:table-cell">{t('qty')}</th>
+                          <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 hidden md:table-cell">{t('payments.portal.price')}</th>
+                          <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">{t('total')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
@@ -210,13 +212,13 @@ export default function PayInvoicePage() {
 
               {/* Total destacado */}
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-6 text-center">
-                <p className="text-blue-100 text-sm mb-1">Total a pagar</p>
+                <p className="text-blue-100 text-sm mb-1">{t('payments.portal.totalDue')}</p>
                 <p className="text-4xl font-bold">{invoice.total?.toFixed(2)}€</p>
               </div>
 
               {invoice.notes && (
                 <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <p className="text-sm text-amber-800 font-semibold mb-1">📝 Notas:</p>
+                  <p className="text-sm text-amber-800 font-semibold mb-1">{t('payments.portal.notesLabel')}</p>
                   <p className="text-sm text-amber-700">{invoice.notes}</p>
                 </div>
               )}
@@ -230,9 +232,9 @@ export default function PayInvoicePage() {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CreditCard className="w-8 h-8 text-green-600" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Pago seguro con tarjeta</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">{t('payments.portal.securePaymentTitle')}</h2>
                 <p className="text-gray-600">
-                  Paga con Visa, Mastercard, American Express o cualquier tarjeta
+                  {t('payments.portal.securePaymentDescription')}
                 </p>
               </div>
 
@@ -245,12 +247,12 @@ export default function PayInvoicePage() {
                 {processing ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Conectando con pasarela de pago...
+                    {t('payments.portal.connecting')}
                   </>
                 ) : (
                   <>
                     <Lock className="w-5 h-5 mr-2" />
-                    Pagar {invoice.total?.toFixed(2)}€ ahora
+                    {t('payments.portal.payNow', { amount: invoice.total?.toFixed(2) })}
                   </>
                 )}
               </Button>
@@ -258,17 +260,20 @@ export default function PayInvoicePage() {
               <div className="flex items-center justify-center gap-6 mt-6 text-xs text-gray-500">
                 <div className="flex items-center gap-1">
                   <Shield className="w-4 h-4 text-green-600" />
-                  <span>Pago 100% seguro</span>
+                  <span>{t('payments.portal.secureBadge')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Lock className="w-4 h-4 text-green-600" />
-                  <span>Cifrado SSL</span>
+                  <span>{t('payments.portal.sslBadge')}</span>
                 </div>
               </div>
 
               <div className="mt-4 text-center">
                 <p className="text-xs text-gray-400">
-                  Procesado de forma segura por <span className="font-semibold">Stripe</span>
+                  <Trans
+                    i18nKey="payments.portal.processedBy"
+                    components={{ brand: <span className="font-semibold" /> }}
+                  />
                 </p>
               </div>
             </CardContent>
@@ -276,8 +281,8 @@ export default function PayInvoicePage() {
 
           {/* Info adicional */}
           <p className="text-center text-xs text-gray-500 mt-6">
-            Al realizar el pago recibirás un email de confirmación.<br/>
-            ¿Problemas? Contacta con {invoice.emisor_email || 'el emisor de la factura'}
+            {t('payments.portal.confirmationEmailNote')}<br/>
+            {t('payments.portal.problemsContact', { contact: invoice.emisor_email || t('payments.portal.issuerFallback') })}
           </p>
         </div>
       </div>

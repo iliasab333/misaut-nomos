@@ -1,5 +1,6 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, lazy, Suspense, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,54 +14,48 @@ const TestimonialsSection = lazy(() => import("../components/home/TestimonialsSe
 const FinalCTASection = lazy(() => import("../components/home/FinalCTASection"));
 const WhyTrustSlider = lazy(() => import("../components/home/WhyTrustSlider"));
 
-const HOW_IT_WORKS = [
-  {
-    step: "01",
-    title: "Crea tu perfil",
-    desc: "Regístrate en menos de 5 minutos. Añade tus servicios, fotos y zona de trabajo.",
-    color: "from-blue-500 to-cyan-500",
-    soft: "bg-blue-50 text-blue-700",
-  },
-  {
-    step: "02",
-    title: "Clientes te encuentran",
-    desc: "Tu perfil aparece en búsquedas de clientes de tu zona que necesitan tu servicio.",
-    color: "from-emerald-500 to-green-500",
-    soft: "bg-emerald-50 text-emerald-700",
-  },
-  {
-    step: "03",
-    title: "Conecta y trabaja",
-    desc: "Recibe solicitudes directamente por chat, teléfono o WhatsApp sin intermediarios.",
-    color: "from-amber-500 to-orange-500",
-    soft: "bg-amber-50 text-amber-700",
-  },
-];
-
-const FAQS = [
-  {
-    q: "¿Cuánto cuesta para los autónomos?",
-    a: "Nada. MisAutónomos es completamente gratuito para autónomos. Sin tarjeta, sin permanencia, sin sorpresas. Tu perfil estará activo para siempre sin coste.",
-  },
-  {
-    q: "¿Los clientes pagan algo?",
-    a: "No. Los clientes usan MisAutónomos totalmente gratis. Esto atrae más clientes a la plataforma y más trabajo para ti.",
-  },
-  {
-    q: "¿Cuándo empieza a funcionar mi perfil?",
-    a: "En menos de 10 minutos. Una vez completes tu perfil, apareces en los resultados de búsqueda de tu zona.",
-  },
-];
-
-const WHY_US = [
-  { icon: Shield, title: "Sin comisiones", desc: "Tú y el cliente negociáis directamente. Nosotros no cobramos nada por cada trabajo.", gradient: "from-blue-500 to-cyan-500" },
-  { icon: Clock, title: "Perfil en 10 minutos", desc: "Regístrate, completa tu perfil y empieza a recibir contactos de clientes el mismo día.", gradient: "from-emerald-500 to-green-500" },
-  { icon: CheckCircle, title: "Clientes verificados", desc: "Todos los clientes se registran con email real. No hay consultas de bots ni spam.", gradient: "from-purple-500 to-violet-500" },
-];
-
 export default function Home() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [openFaq, setOpenFaq] = React.useState(null);
+
+  // Antes constantes de módulo (HOW_IT_WORKS, FAQS, WHY_US): viven aquí para
+  // que se retraduzcan al cambiar de idioma.
+  const howItWorks = useMemo(() => [
+    {
+      step: "01",
+      title: t('home.howItWorks.createProfile.title'),
+      desc: t('home.howItWorks.createProfile.desc'),
+      color: "from-blue-500 to-cyan-500",
+      soft: "bg-blue-50 text-blue-700",
+    },
+    {
+      step: "02",
+      title: t('home.howItWorks.getFound.title'),
+      desc: t('home.howItWorks.getFound.desc'),
+      color: "from-emerald-500 to-green-500",
+      soft: "bg-emerald-50 text-emerald-700",
+    },
+    {
+      step: "03",
+      title: t('home.howItWorks.connect.title'),
+      desc: t('home.howItWorks.connect.desc'),
+      color: "from-amber-500 to-orange-500",
+      soft: "bg-amber-50 text-amber-700",
+    },
+  ], [t]);
+
+  const faqs = useMemo(() => [
+    { q: t('home.faq.cost.q'), a: t('home.faq.cost.a') },
+    { q: t('home.faq.clientsPay.q'), a: t('home.faq.clientsPay.a') },
+    { q: t('home.faq.whenActive.q'), a: t('home.faq.whenActive.a') },
+  ], [t]);
+
+  const whyUs = useMemo(() => [
+    { icon: Shield, title: t('landing.feature_no_fees'), desc: t('home.whyUs.noFees.desc'), gradient: "from-blue-500 to-cyan-500" },
+    { icon: Clock, title: t('home.whyUs.profileTime.title'), desc: t('home.whyUs.profileTime.desc'), gradient: "from-emerald-500 to-green-500" },
+    { icon: CheckCircle, title: t('home.whyUs.verifiedClients.title'), desc: t('home.whyUs.verifiedClients.desc'), gradient: "from-purple-500 to-violet-500" },
+  ], [t]);
 
   return (
     <div className="bg-white" style={{overflowX:'hidden', width:'100%', maxWidth:'100vw'}}>
@@ -71,16 +66,16 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <Badge className="mb-3 bg-blue-100 text-blue-700 border-0 font-semibold">
-              Proceso simple
+              {t('home.howItWorks.badge')}
             </Badge>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-              Empieza a recibir clientes en 3 pasos
+              {t('home.howItWorks.title')}
             </h2>
-            <p className="text-gray-600 mt-3 text-lg">Sin configuraciones complicadas</p>
+            <p className="text-gray-600 mt-3 text-lg">{t('home.howItWorks.subtitle')}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {HOW_IT_WORKS.map((step, i) => (
+            {howItWorks.map((step, i) => (
               <div
                 key={i}
                 className="relative group"
@@ -92,7 +87,7 @@ export default function Home() {
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{step.desc}</p>
                 </div>
-                {i < HOW_IT_WORKS.length - 1 && (
+                {i < howItWorks.length - 1 && (
                   <div className="hidden md:block absolute top-12 -right-4 z-10 text-gray-300">
                     <ArrowRight className="w-6 h-6" />
                   </div>
@@ -106,7 +101,7 @@ export default function Home() {
               onClick={() => navigate('/completar-perfil')}
               className="bg-blue-700 hover:bg-blue-600 text-white h-12 px-8 text-base font-semibold rounded-xl transition-all hover:scale-[1.02]"
             >
-              Crear mi perfil gratis <ArrowRight className="w-4 h-4 ml-2" />
+              {t('home.finalCta.createProfile')} <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
         </div>
@@ -122,11 +117,11 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-              ¿Por qué MisAutónomos?
+              {t('home.whyUs.title')}
             </h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-6 md:gap-8">
-            {WHY_US.map((item, i) => (
+            {whyUs.map((item, i) => (
               <div
                 key={i}
                 className="group text-center p-6 rounded-2xl border border-gray-100 hover:border-transparent hover:shadow-xl transition-all bg-white hover:bg-gradient-to-br hover:from-white hover:to-gray-50"
@@ -149,15 +144,15 @@ export default function Home() {
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-10">
             <Badge className="mb-3 bg-gray-100 text-gray-700 border-0 font-semibold">
-              Preguntas frecuentes
+              {t('nav.faq')}
             </Badge>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-              Resolvemos tus dudas
+              {t('home.faq.title')}
             </h2>
           </div>
 
           <div className="space-y-3">
-            {FAQS.map((faq, i) => (
+            {faqs.map((faq, i) => (
               <div key={i}>
                 <div
                   className={`rounded-2xl border cursor-pointer transition-all duration-200 overflow-hidden ${openFaq === i ? "border-blue-200 bg-blue-50/50 shadow-sm" : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"}`}
@@ -183,7 +178,7 @@ export default function Home() {
 
           <div className="text-center mt-8">
             <Link to="/preguntas-frecuentes" className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800 transition-colors text-sm">
-              Ver todas las preguntas frecuentes <ArrowRight className="w-4 h-4" />
+              {t('home.faq.viewAll')} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>

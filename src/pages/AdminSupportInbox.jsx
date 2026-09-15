@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Send, Headphones, Search as SearchIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function AdminSupportInbox() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [conversations, setConversations] = useState([]);
@@ -72,12 +74,12 @@ export default function AdminSupportInbox() {
             conv.userEmail = userProfile.email;
             conv.userType = userProfile.user_type;
           } else {
-            conv.userName = conv.lastMessage.client_name || "Usuario";
-            conv.userEmail = "N/A";
+            conv.userName = conv.lastMessage.client_name || t('admin.supportInbox.userFallback');
+            conv.userEmail = t('admin.supportInbox.notAvailable');
           }
         } catch (e) {
-          conv.userName = conv.lastMessage.client_name || "Usuario";
-          conv.userEmail = "N/A";
+          conv.userName = conv.lastMessage.client_name || t('admin.supportInbox.userFallback');
+          conv.userEmail = t('admin.supportInbox.notAvailable');
         }
       }
 
@@ -154,12 +156,12 @@ export default function AdminSupportInbox() {
       {/* Sidebar izquierda */}
       <div className="w-80 border-r border-gray-100 bg-white flex flex-col">
         <div className="p-4 border-b border-gray-100 space-y-3">
-          <h1 className="text-lg font-semibold text-gray-900">Bandeja de Soporte</h1>
-          <p className="text-xs text-gray-500">{conversations.length} conversaciones activas</p>
+          <h1 className="text-lg font-semibold text-gray-900">{t('supportChat.supportInbox')}</h1>
+          <p className="text-xs text-gray-500">{t('admin.supportInbox.activeConversations', { count: conversations.length })}</p>
           <div className="relative">
             <SearchIcon className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
             <Input
-              placeholder="Buscar por nombre..."
+              placeholder={t('admin.supportInbox.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9 h-9 text-sm"
@@ -169,10 +171,10 @@ export default function AdminSupportInbox() {
 
         <div className="flex-1 overflow-y-auto">
           {conversationsLoading ? (
-            <div className="p-4 text-sm text-gray-500">Cargando...</div>
+            <div className="p-4 text-sm text-gray-500">{t('common.loading')}</div>
           ) : filteredConvs.length === 0 ? (
             <div className="p-4 text-center text-sm text-gray-400">
-              {search ? "No hay conversaciones que coincidan" : "No hay conversaciones de soporte"}
+              {search ? t('admin.supportInbox.noMatches') : t('admin.supportInbox.emptyState')}
             </div>
           ) : (
             filteredConvs.map((conv) => (
@@ -187,7 +189,7 @@ export default function AdminSupportInbox() {
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 text-sm truncate">{conv.userName}</p>
                     <p className="text-xs text-gray-500 truncate mt-0.5">
-                      {conv.lastMessage.sender_id === "support_team" ? "Tú: " : ""}
+                      {conv.lastMessage.sender_id === "support_team" ? `${t('admin.supportInbox.youPrefix')} ` : ""}
                       {conv.lastMessage.content}
                     </p>
                   </div>
@@ -213,7 +215,7 @@ export default function AdminSupportInbox() {
                         : "bg-green-50 text-green-700"
                     }`}
                   >
-                    {conv.userType === "professionnel" ? "Autónomo" : "Cliente"}
+                    {conv.userType === "professionnel" ? t('admin.supportInbox.professionalType') : t('clientLabel')}
                   </span>
                 </div>
               </button>
@@ -227,7 +229,7 @@ export default function AdminSupportInbox() {
         {!selectedConv ? (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
             <Headphones className="w-12 h-12 mb-3" />
-            <p className="text-sm">Selecciona una conversación para responder</p>
+            <p className="text-sm">{t('supportChat.selectConversation')}</p>
           </div>
         ) : (
           <>
@@ -239,7 +241,7 @@ export default function AdminSupportInbox() {
               <div>
                 <p className="font-semibold text-gray-900">{selectedConv.userName}</p>
                 <p className="text-xs text-gray-500">
-                  {selectedConv.userEmail} · {selectedConv.userType === "professionnel" ? "Autónomo" : "Cliente"}
+                  {selectedConv.userEmail} · {selectedConv.userType === "professionnel" ? t('admin.supportInbox.professionalType') : t('clientLabel')}
                 </p>
               </div>
             </div>
@@ -285,7 +287,7 @@ export default function AdminSupportInbox() {
                   type="text"
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  placeholder="Escribe como Soporte MisAutónomos..."
+                  placeholder={t('admin.supportInbox.replyPlaceholder')}
                   className="flex-1 rounded-full bg-gray-50 border-gray-200"
                   disabled={sendMutation.isPending}
                 />

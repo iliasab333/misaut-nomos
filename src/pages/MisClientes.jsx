@@ -24,16 +24,8 @@ import {
   Eye, FileText, MessageSquare, StickyNote
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation, Trans } from "react-i18next";
 import SEOHead from "../components/seo/SEOHead";
-
-const STATUS_MAP = {
-  lead: { label: "Lead", color: "bg-yellow-100 text-yellow-800" },
-  contacted: { label: "Contactado", color: "bg-blue-100 text-blue-800" },
-  negotiating: { label: "Negociando", color: "bg-purple-100 text-purple-800" },
-  client: { label: "Cliente", color: "bg-green-100 text-green-800" },
-  inactive: { label: "Inactivo", color: "bg-gray-100 text-gray-600" },
-  vip: { label: "VIP", color: "bg-amber-100 text-amber-800" },
-};
 
 const EMPTY_FORM = {
   client_name: "", client_email: "", client_phone: "",
@@ -42,6 +34,7 @@ const EMPTY_FORM = {
 };
 
 export default function MisClientesPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
@@ -54,6 +47,16 @@ export default function MisClientesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [formData, setFormData] = useState(EMPTY_FORM);
+
+  // Dentro del componente: las etiquetas pasan por t() y se retraducen al cambiar de idioma.
+  const STATUS_MAP = {
+    lead: { label: t('crm.status.lead'), color: "bg-yellow-100 text-yellow-800" },
+    contacted: { label: t('crm.status.contacted'), color: "bg-blue-100 text-blue-800" },
+    negotiating: { label: t('crm.status.negotiating'), color: "bg-purple-100 text-purple-800" },
+    client: { label: t('clientLabel'), color: "bg-green-100 text-green-800" },
+    inactive: { label: t('crm.status.inactive'), color: "bg-gray-100 text-gray-600" },
+    vip: { label: t('crm.status.vip'), color: "bg-amber-100 text-amber-800" },
+  };
 
   useEffect(() => { loadUser(); }, []);
 
@@ -75,17 +78,17 @@ export default function MisClientesPage() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.ClientContact.create({ ...data, professional_id: user.id }),
-    onSuccess: () => { queryClient.invalidateQueries(['clientContacts']); closeDialog(); toast.success("Cliente añadido"); },
+    onSuccess: () => { queryClient.invalidateQueries(['clientContacts']); closeDialog(); toast.success(t('crm.toast.clientAdded')); },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.ClientContact.update(id, data),
-    onSuccess: () => { queryClient.invalidateQueries(['clientContacts']); closeDialog(); toast.success("Cliente actualizado"); },
+    onSuccess: () => { queryClient.invalidateQueries(['clientContacts']); closeDialog(); toast.success(t('crm.toast.clientUpdated')); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.ClientContact.delete(id),
-    onSuccess: () => { queryClient.invalidateQueries(['clientContacts']); setDeleteDialog(null); toast.success("Cliente eliminado"); },
+    onSuccess: () => { queryClient.invalidateQueries(['clientContacts']); setDeleteDialog(null); toast.success(t('crm.toast.clientDeleted')); },
   });
 
   const closeDialog = () => { setShowDialog(false); setEditingContact(null); setFormData(EMPTY_FORM); };
@@ -115,7 +118,7 @@ export default function MisClientesPage() {
     await base44.entities.ClientContact.update(noteDialog.id, { notes: noteText });
     queryClient.invalidateQueries(['clientContacts']);
     setNoteDialog(null);
-    toast.success("Nota guardada");
+    toast.success(t('crm.toast.noteSaved'));
   };
 
   const handleNewInvoice = (c) => {
@@ -139,21 +142,21 @@ export default function MisClientesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <SEOHead title="Mis Clientes — MisAutónomos" noindex />
+      <SEOHead title={t('crm.myClients.seoTitle')} noindex />
       <div className="max-w-4xl mx-auto space-y-5">
 
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900">Mis Clientes</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{contacts.length} contactos guardados</p>
+            <h1 className="text-2xl font-extrabold text-gray-900">{t('crm.myClients.title')}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{t('crm.myClients.savedCount', { count: contacts.length })}</p>
           </div>
           <Button
             onClick={() => { setFormData(EMPTY_FORM); setEditingContact(null); setShowDialog(true); }}
             className="bg-blue-600 hover:bg-blue-700 rounded-xl"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Nuevo cliente
+            {t('crm.actions.newClient')}
           </Button>
         </div>
 
@@ -162,7 +165,7 @@ export default function MisClientesPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
-              placeholder="Buscar por nombre, email, teléfono..."
+              placeholder={t('crm.myClients.searchPlaceholder')}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="pl-10 h-10 rounded-xl"
@@ -170,10 +173,10 @@ export default function MisClientesPage() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-44 h-10 rounded-xl">
-              <SelectValue placeholder="Estado" />
+              <SelectValue placeholder={t('crm.form.status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos los estados</SelectItem>
+              <SelectItem value="all">{t('crm.myClients.allStatuses')}</SelectItem>
               {Object.entries(STATUS_MAP).map(([k, v]) => (
                 <SelectItem key={k} value={k}>{v.label}</SelectItem>
               ))}
@@ -193,19 +196,19 @@ export default function MisClientesPage() {
                 <Users className="w-10 h-10 text-blue-300" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
-                {searchTerm || statusFilter !== "all" ? "Sin resultados" : "Aún no tienes clientes"}
+                {searchTerm || statusFilter !== "all" ? t('crm.myClients.noResultsTitle') : t('crm.myClients.emptyTitle')}
               </h3>
               <p className="text-gray-500 text-sm mb-5">
                 {searchTerm || statusFilter !== "all"
-                  ? "Prueba con otra búsqueda"
-                  : "Añade tu primer cliente para llevar el control de tus contactos."}
+                  ? t('crm.myClients.noResultsHint')
+                  : t('crm.myClients.emptyDescription')}
               </p>
               {!searchTerm && statusFilter === "all" && (
                 <Button
                   onClick={() => { setFormData(EMPTY_FORM); setShowDialog(true); }}
                   className="bg-blue-600 hover:bg-blue-700 rounded-xl"
                 >
-                  <Plus className="w-4 h-4 mr-2" /> Añadir primer cliente
+                  <Plus className="w-4 h-4 mr-2" /> {t('crm.actions.addFirstClient')}
                 </Button>
               )}
             </CardContent>
@@ -258,35 +261,35 @@ export default function MisClientesPage() {
                       <button
                         onClick={() => { setNoteDialog(c); setNoteText(c.notes || ""); }}
                         className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-yellow-100 hover:text-yellow-700 transition-colors flex items-center justify-center"
-                        title="Añadir nota"
+                        title={t('crm.actions.addNote')}
                       >
                         <StickyNote className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleNewInvoice(c)}
                         className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-amber-100 hover:text-amber-700 transition-colors flex items-center justify-center"
-                        title="Nueva factura"
+                        title={t('newInvoice')}
                       >
                         <FileText className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => navigate(createPageUrl("ClientDetail") + `?id=${c.id}`)}
                         className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-blue-100 hover:text-blue-700 transition-colors flex items-center justify-center"
-                        title="Ver detalle"
+                        title={t('crm.actions.viewDetails')}
                       >
                         <Eye className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleEdit(c)}
                         className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-blue-100 hover:text-blue-700 transition-colors flex items-center justify-center"
-                        title="Editar"
+                        title={t('common.edit')}
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => setDeleteDialog(c)}
                         className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-red-100 hover:text-red-600 transition-colors flex items-center justify-center"
-                        title="Eliminar"
+                        title={t('common.delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -304,23 +307,23 @@ export default function MisClientesPage() {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">
-              {editingContact ? "Editar cliente" : "Nuevo cliente"}
+              {editingContact ? t('crm.actions.editClient') : t('crm.actions.newClient')}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-semibold">Nombre *</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.nameRequired')}</Label>
                 <Input
                   value={formData.client_name}
                   onChange={e => setFormData({ ...formData, client_name: e.target.value })}
-                  placeholder="Juan Pérez"
+                  placeholder={t('crm.form.namePlaceholder')}
                   required
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Estado</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.status')}</Label>
                 <Select value={formData.status} onValueChange={v => setFormData({ ...formData, status: v })}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -331,17 +334,17 @@ export default function MisClientesPage() {
                 </Select>
               </div>
               <div>
-                <Label className="text-sm font-semibold">Email</Label>
+                <Label className="text-sm font-semibold">{t('emailField')}</Label>
                 <Input
                   type="email"
                   value={formData.client_email}
                   onChange={e => setFormData({ ...formData, client_email: e.target.value })}
-                  placeholder="juan@ejemplo.com"
+                  placeholder={t('crm.form.emailPlaceholder')}
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Teléfono</Label>
+                <Label className="text-sm font-semibold">{t('phoneField')}</Label>
                 <Input
                   value={formData.client_phone}
                   onChange={e => setFormData({ ...formData, client_phone: e.target.value })}
@@ -350,16 +353,16 @@ export default function MisClientesPage() {
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Empresa</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.company')}</Label>
                 <Input
                   value={formData.company}
                   onChange={e => setFormData({ ...formData, company: e.target.value })}
-                  placeholder="Nombre empresa (opcional)"
+                  placeholder={t('crm.myClients.companyPlaceholder')}
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">NIF / CIF</Label>
+                <Label className="text-sm font-semibold">{t('nifCif')}</Label>
                 <Input
                   value={formData.client_nif}
                   onChange={e => setFormData({ ...formData, client_nif: e.target.value })}
@@ -368,29 +371,29 @@ export default function MisClientesPage() {
                 />
               </div>
               <div className="sm:col-span-2">
-                <Label className="text-sm font-semibold">Dirección</Label>
+                <Label className="text-sm font-semibold">{t('clientAddress')}</Label>
                 <Input
                   value={formData.address}
                   onChange={e => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="Calle, número, código postal..."
+                  placeholder={t('crm.myClients.addressPlaceholder')}
                   className="mt-1"
                 />
               </div>
             </div>
             <div>
-              <Label className="text-sm font-semibold">Notas</Label>
+              <Label className="text-sm font-semibold">{t('crm.form.notes')}</Label>
               <Textarea
                 value={formData.notes}
                 onChange={e => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
-                placeholder="Información adicional sobre este cliente..."
+                placeholder={t('crm.myClients.notesPlaceholder')}
                 className="mt-1"
               />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={closeDialog}>Cancelar</Button>
+              <Button type="button" variant="outline" onClick={closeDialog}>{t('common.cancel')}</Button>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                {editingContact ? "Guardar cambios" : "Añadir cliente"}
+                {editingContact ? t('crm.actions.saveChanges') : t('crm.myClients.addClient')}
               </Button>
             </DialogFooter>
           </form>
@@ -401,18 +404,18 @@ export default function MisClientesPage() {
       <Dialog open={!!noteDialog} onOpenChange={v => { if (!v) setNoteDialog(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Nota para {noteDialog?.client_name}</DialogTitle>
+            <DialogTitle>{t('crm.myClients.noteFor', { name: noteDialog?.client_name })}</DialogTitle>
           </DialogHeader>
           <Textarea
             value={noteText}
             onChange={e => setNoteText(e.target.value)}
             rows={4}
-            placeholder="Escribe una nota sobre este cliente..."
+            placeholder={t('crm.myClients.quickNotePlaceholder')}
             className="mt-2"
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setNoteDialog(null)}>Cancelar</Button>
-            <Button onClick={handleSaveNote} className="bg-blue-600 hover:bg-blue-700">Guardar nota</Button>
+            <Button variant="outline" onClick={() => setNoteDialog(null)}>{t('common.cancel')}</Button>
+            <Button onClick={handleSaveNote} className="bg-blue-600 hover:bg-blue-700">{t('crm.myClients.saveNote')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -421,15 +424,19 @@ export default function MisClientesPage() {
       <AlertDialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
+            <AlertDialogTitle>{t('crm.deleteClient.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Eliminarás a <strong>{deleteDialog?.client_name}</strong>. Esta acción no se puede deshacer.
+              <Trans
+                i18nKey="crm.myClients.deleteClientDescription"
+                values={{ name: deleteDialog?.client_name }}
+                components={{ 1: <strong /> }}
+              />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={() => deleteMutation.mutate(deleteDialog.id)} className="bg-red-600 hover:bg-red-700">
-              Eliminar
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

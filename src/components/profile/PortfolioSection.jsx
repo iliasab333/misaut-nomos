@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Camera, Plus, X, Upload, Loader2, Edit2, Trash2, Image, Calendar } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function PortfolioSection({ 
   portfolioItems = [], 
@@ -15,6 +16,7 @@ export default function PortfolioSection({
   onPortfolioChange,
   categories = []
 }) {
+  const { t } = useTranslation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -64,7 +66,7 @@ export default function PortfolioSection({
     try {
       for (const file of files) {
         if (file.size > 5 * 1024 * 1024) {
-          toast.error(`${file.name} supera los 5MB`);
+          toast.error(t("proProfile.portfolio.fileTooLarge", { name: file.name }));
           continue;
         }
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -76,7 +78,7 @@ export default function PortfolioSection({
         images: [...prev.images, ...uploadedUrls].slice(0, 5)
       }));
     } catch (error) {
-      toast.error("Error al subir imágenes");
+      toast.error(t("proProfile.portfolio.uploadError"));
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -92,12 +94,12 @@ export default function PortfolioSection({
 
   const saveItem = () => {
     if (!formData.title.trim()) {
-      toast.error("El título es obligatorio");
+      toast.error(t("proProfile.portfolio.requiredTitle"));
       return;
     }
 
     if (formData.images.length === 0) {
-      toast.error("Añade al menos una imagen");
+      toast.error(t("proProfile.portfolio.requiredImage"));
       return;
     }
 
@@ -118,12 +120,12 @@ export default function PortfolioSection({
     onPortfolioChange(updatedItems);
     setShowAddDialog(false);
     resetForm();
-    toast.success(editingItem ? "Trabajo actualizado" : "Trabajo añadido al portfolio");
+    toast.success(editingItem ? t("proProfile.portfolio.updated") : t("proProfile.portfolio.added"));
   };
 
   const deleteItem = (itemId) => {
     onPortfolioChange(portfolioItems.filter(item => item.id !== itemId));
-    toast.success("Trabajo eliminado del portfolio");
+    toast.success(t("proProfile.portfolio.deleted"));
   };
 
   return (
@@ -132,29 +134,29 @@ export default function PortfolioSection({
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <Camera className="w-5 h-5 text-blue-700" />
-            Portfolio de Trabajos ({portfolioItems.length})
+            {t("proProfile.portfolio.title")} ({portfolioItems.length})
           </CardTitle>
           {isEditing && (
             <Button onClick={openAddDialog} size="sm" className="bg-blue-600 hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-1" />
-              Añadir trabajo
+              {t("proProfile.portfolio.add")}
             </Button>
           )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-gray-600">
-          Muestra tus mejores trabajos con fotos y descripciones detalladas
+          {t("proProfile.portfolio.intro")}
         </p>
 
         {portfolioItems.length === 0 ? (
           <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
             <Image className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500">No hay trabajos en el portfolio</p>
+            <p className="text-gray-500">{t("proProfile.portfolio.empty")}</p>
             {isEditing && (
               <Button onClick={openAddDialog} variant="outline" className="mt-3">
                 <Plus className="w-4 h-4 mr-1" />
-                Añadir primer trabajo
+                {t("proProfile.portfolio.addFirst")}
               </Button>
             )}
           </div>
@@ -176,7 +178,7 @@ export default function PortfolioSection({
                   )}
                   {item.images?.length > 1 && (
                     <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                      +{item.images.length - 1} fotos
+                      {t("proProfile.portfolio.morePhotos", { count: item.images.length - 1 })}
                     </div>
                   )}
                   {isEditing && (
@@ -227,51 +229,51 @@ export default function PortfolioSection({
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>
-                {editingItem ? "Editar trabajo" : "Añadir trabajo al portfolio"}
+                {editingItem ? t("proProfile.portfolio.edit") : t("proProfile.portfolio.addToPortfolio")}
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
               <div>
-                <Label>Título del trabajo *</Label>
+                <Label>{t("proProfile.portfolio.titleLabel")}</Label>
                 <Input
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Ej: Reforma completa de baño"
+                  placeholder={t("proProfile.portfolio.titlePlaceholder")}
                 />
               </div>
 
               <div>
-                <Label>Descripción</Label>
+                <Label>{t("description")}</Label>
                 <Textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Describe el trabajo realizado, materiales usados, tiempo de ejecución..."
+                  placeholder={t("proProfile.portfolio.descriptionPlaceholder")}
                   className="h-24"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Fecha (mes/año)</Label>
+                  <Label>{t("proProfile.portfolio.dateLabel")}</Label>
                   <Input
                     value={formData.date}
                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                    placeholder="Ej: Marzo 2024"
+                    placeholder={t("proProfile.portfolio.datePlaceholder")}
                   />
                 </div>
                 <div>
-                  <Label>Categoría</Label>
+                  <Label>{t("proProfile.portfolio.categoryLabel")}</Label>
                   <Input
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    placeholder="Ej: Reformas"
+                    placeholder={t("proProfile.portfolio.categoryPlaceholder")}
                   />
                 </div>
               </div>
 
               <div>
-                <Label>Imágenes ({formData.images.length}/5) *</Label>
+                <Label>{t("proProfile.portfolio.imagesLabel", { count: formData.images.length, max: 5 })}</Label>
                 
                 {formData.images.length < 5 && (
                   <label className="cursor-pointer block mt-2">
@@ -289,7 +291,7 @@ export default function PortfolioSection({
                       ) : (
                         <>
                           <Upload className="w-6 h-6 mx-auto text-gray-400 mb-1" />
-                          <p className="text-sm text-gray-500">Haz clic para añadir fotos</p>
+                          <p className="text-sm text-gray-500">{t("proProfile.portfolio.clickToAddPhotos")}</p>
                         </>
                       )}
                     </div>
@@ -302,7 +304,7 @@ export default function PortfolioSection({
                       <div key={idx} className="relative">
                         <img 
                           src={img} 
-                          alt={`Foto ${idx + 1}`}
+                          alt={t("proProfile.portfolio.photoAlt", { number: idx + 1 })}
                           className="w-full h-16 object-cover rounded"
                         />
                         <button
@@ -320,10 +322,10 @@ export default function PortfolioSection({
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                Cancelar
+                {t("common.cancel")}
               </Button>
               <Button onClick={saveItem} className="bg-blue-600 hover:bg-blue-700">
-                {editingItem ? "Guardar cambios" : "Añadir trabajo"}
+                {editingItem ? t("proProfile.form.saveChanges") : t("proProfile.portfolio.add")}
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Play, Pause, Reply, FileText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
@@ -51,6 +52,7 @@ export default function EnhancedMessageBubble({
   onQuoteAccepted,
   onQuoteRejected,
 }) {
+  const { t } = useTranslation();
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
   const audioRef = useRef(null);
@@ -109,20 +111,20 @@ export default function EnhancedMessageBubble({
           conversation_id: message.conversation_id,
           sender_id: currentUser.id,
           recipient_id: message.sender_id,
-          content: `✅ He aceptado tu presupuesto ${quotes[0].quote_number || ''}`,
+          content: t('messages.bubble.acceptedContent', { number: quotes[0].quote_number || '' }),
           is_read: false,
         });
         // Push al profesional
         base44.functions.invoke('sendPushNotification', {
           userIds: [message.sender_id],
-          title: '✅ Presupuesto aceptado',
-          message: `${currentUser.full_name || 'El cliente'} ha aceptado tu presupuesto de ${parseFloat(quotes[0].total || 0).toFixed(2)}€`
+          title: t('messages.bubble.acceptedPushTitle'),
+          message: t('messages.bubble.acceptedPushBody', { name: currentUser.full_name || t('messages.bubble.clientFallback'), amount: parseFloat(quotes[0].total || 0).toFixed(2) })
         }).catch(() => {});
-        toast.success("Presupuesto aceptado");
+        toast.success(t('quotesPage.quoteAccepted'));
         onQuoteAccepted?.(message, quotes[0]);
       }
     } catch (err) {
-      toast.error("Error: " + err.message);
+      toast.error(t('messages.bubble.error', { message: err.message }));
     } finally {
       setQuoteLoading(false);
     }
@@ -142,19 +144,19 @@ export default function EnhancedMessageBubble({
           conversation_id: message.conversation_id,
           sender_id: currentUser.id,
           recipient_id: message.sender_id,
-          content: `❌ He rechazado el presupuesto ${quotes[0].quote_number || ''}`,
+          content: t('messages.bubble.rejectedContent', { number: quotes[0].quote_number || '' }),
           is_read: false,
         });
         base44.functions.invoke('sendPushNotification', {
           userIds: [message.sender_id],
-          title: '❌ Presupuesto rechazado',
-          message: `${currentUser.full_name || 'El cliente'} ha rechazado tu presupuesto`
+          title: t('messages.bubble.rejectedPushTitle'),
+          message: t('messages.bubble.rejectedPushBody', { name: currentUser.full_name || t('messages.bubble.clientFallback') })
         }).catch(() => {});
-        toast.info("Presupuesto rechazado");
+        toast.info(t('quotesPage.quoteRejected'));
         onQuoteRejected?.(message, quotes[0]);
       }
     } catch (err) {
-      toast.error("Error: " + err.message);
+      toast.error(t('messages.bubble.error', { message: err.message }));
     } finally {
       setQuoteLoading(false);
     }
@@ -167,7 +169,7 @@ export default function EnhancedMessageBubble({
       onMouseLeave={() => setShowActions(false)}
     >
       {showActions && !isOwn && (
-        <Button size="icon" variant="ghost" className="h-8 w-8 mr-1 text-gray-600 hover:bg-gray-100" onClick={() => onReply?.(message)} title="Responder">
+        <Button size="icon" variant="ghost" className="h-8 w-8 mr-1 text-gray-600 hover:bg-gray-100" onClick={() => onReply?.(message)} title={t('messages.bubble.reply')}>
           <Reply className="w-4 h-4" />
         </Button>
       )}
@@ -182,7 +184,7 @@ export default function EnhancedMessageBubble({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{message.attachments[0].name}</p>
-                <p className="text-xs text-gray-500">Presupuesto PDF</p>
+                <p className="text-xs text-gray-500">{t('messages.bubble.quotePdf')}</p>
               </div>
             </div>
             {message.content && (
@@ -194,7 +196,7 @@ export default function EnhancedMessageBubble({
                 download={message.attachments[0].name}
                 className="flex-1 bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-lg text-center flex items-center justify-center gap-1 hover:bg-gray-800 transition-colors"
               >
-                <Download className="w-3 h-3" />Descargar
+                <Download className="w-3 h-3" />{t('messages.bubble.download')}
               </a>
               {isClientUser && quoteIsPending && !isOwn && (
                 <>
@@ -203,14 +205,14 @@ export default function EnhancedMessageBubble({
                     disabled={quoteLoading}
                     className="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
                   >
-                    ✓ Aceptar
+                    {t('messages.bubble.accept')}
                   </button>
                   <button
                     onClick={handleRejectQuote}
                     disabled={quoteLoading}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
                   >
-                    Rechazar
+                    {t('common.reject')}
                   </button>
                 </>
               )}
@@ -222,7 +224,7 @@ export default function EnhancedMessageBubble({
           <div className={`px-4 py-2 rounded-2xl ${isOwn ? 'bg-blue-600 text-white rounded-br-none' : 'bg-gray-200 text-gray-900 rounded-bl-none'}`}>
             {message.replyTo && (
               <div className={`text-xs mb-2 pb-2 border-b ${isOwn ? 'border-blue-400' : 'border-gray-300'}`}>
-                <p className={`font-medium ${isOwn ? 'text-blue-100' : 'text-gray-600'}`}>Respondiendo a:</p>
+                <p className={`font-medium ${isOwn ? 'text-blue-100' : 'text-gray-600'}`}>{t('messages.chatInput.replyingTo')}</p>
                 <p className={`italic ${isOwn ? 'text-blue-50' : 'text-gray-700'}`}>{message.replyTo.content}</p>
               </div>
             )}
@@ -234,7 +236,7 @@ export default function EnhancedMessageBubble({
             )}
 
             {message.type === 'image' && message.imageData && (
-              <img src={message.imageData} alt="Imagen" className="rounded-lg max-w-xs max-h-64 object-cover" />
+              <img src={message.imageData} alt={t('messages.bubble.imageAlt')} className="rounded-lg max-w-xs max-h-64 object-cover" />
             )}
 
             {message.type === 'audio' && message.audioData && (

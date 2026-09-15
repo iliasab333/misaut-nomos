@@ -50,20 +50,13 @@ import {
   Image as ImageIcon
 } from "lucide-react";
 import { toast } from "sonner";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import SEOHead from "../components/seo/SEOHead";
 
-const STATUS_CONFIG = {
-  pending: { label: "Pendiente", labelEn: "Pending", color: "bg-yellow-100 text-yellow-800", icon: AlertCircle },
-  in_progress: { label: "En progreso", labelEn: "In Progress", color: "bg-blue-100 text-blue-800", icon: Clock },
-  completed: { label: "Completado", labelEn: "Completed", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
-  cancelled: { label: "Cancelado", labelEn: "Cancelled", color: "bg-red-100 text-red-800", icon: XCircle }
-};
-
 export default function JobsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { t, language } = useLanguage();
   
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -142,12 +135,12 @@ export default function JobsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      toast.success(language === 'es' ? "Trabajo creado" : "Job created");
+      toast.success(t('projects.jobs.created'));
       resetForm();
       setShowJobDialog(false);
     },
     onError: (error) => {
-      toast.error(language === 'es' ? "Error al crear trabajo" : "Error creating job");
+      toast.error(t('projects.jobs.createError'));
     }
   });
 
@@ -164,13 +157,13 @@ export default function JobsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      toast.success(language === 'es' ? "Trabajo actualizado" : "Job updated");
+      toast.success(t('projects.jobs.updated'));
       resetForm();
       setShowJobDialog(false);
       setEditingJob(null);
     },
     onError: (error) => {
-      toast.error(language === 'es' ? "Error al actualizar" : "Error updating");
+      toast.error(t('projects.jobs.updateError'));
     }
   });
 
@@ -180,12 +173,12 @@ export default function JobsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      toast.success(language === 'es' ? "Trabajo eliminado" : "Job deleted");
+      toast.success(t('projects.jobs.deleted'));
       setShowDeleteDialog(false);
       setJobToDelete(null);
     },
     onError: (error) => {
-      toast.error(language === 'es' ? "Error al eliminar" : "Error deleting");
+      toast.error(t('projects.jobs.deleteError'));
     }
   });
 
@@ -233,7 +226,7 @@ export default function JobsPage() {
     e.preventDefault();
     
     if (!formData.title.trim()) {
-      toast.error(language === 'es' ? "El título es obligatorio" : "Title is required");
+      toast.error(t('projects.jobs.titleRequired'));
       return;
     }
 
@@ -263,7 +256,7 @@ export default function JobsPage() {
 
     for (const file of files) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error(`${file.name} supera 5MB`);
+        toast.error(t('projects.jobs.photoTooLarge', { name: file.name }));
         continue;
       }
 
@@ -274,7 +267,7 @@ export default function JobsPage() {
           photos: [...prev.photos, file_url]
         }));
       } catch (error) {
-        toast.error(language === 'es' ? "Error al subir foto" : "Error uploading photo");
+        toast.error(t('projects.jobs.photoUploadError'));
       }
     }
   };
@@ -302,6 +295,14 @@ export default function JobsPage() {
     totalRevenue: jobs.filter(j => j.status === "completed").reduce((sum, j) => sum + (j.final_cost || j.estimated_cost || 0), 0)
   };
 
+  // Dentro del componente: las etiquetas se retraducen al cambiar de idioma.
+  const STATUS_CONFIG = {
+    pending: { label: t('projects.status.pending'), color: "bg-yellow-100 text-yellow-800", icon: AlertCircle },
+    in_progress: { label: t('projects.status.inProgress'), color: "bg-blue-100 text-blue-800", icon: Clock },
+    completed: { label: t('projects.status.completed'), color: "bg-green-100 text-green-800", icon: CheckCircle2 },
+    cancelled: { label: t('projects.status.cancelled'), color: "bg-red-100 text-red-800", icon: XCircle }
+  };
+
   if (loadingUser) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -313,8 +314,8 @@ export default function JobsPage() {
   return (
     <>
       <SEOHead 
-        title={`${language === 'es' ? 'Gestión de Trabajos' : 'Job Management'} - MisAutónomos`}
-        description="Gestiona tus trabajos y proyectos con clientes"
+        title={t('projects.jobs.seo.title')}
+        description={t('projects.jobs.seo.description')}
         noindex={true}
       />
       
@@ -332,10 +333,10 @@ export default function JobsPage() {
               </Button>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {language === 'es' ? 'Gestión de Trabajos' : 'Job Management'}
+                  {t('projects.jobs.title')}
                 </h1>
                 <p className="text-sm text-gray-500">
-                  {language === 'es' ? 'Administra tus proyectos y trabajos' : 'Manage your projects and jobs'}
+                  {t('projects.jobs.subtitle')}
                 </p>
               </div>
             </div>
@@ -348,7 +349,7 @@ export default function JobsPage() {
               className="bg-blue-600 hover:bg-blue-700"
             >
               <Plus className="w-4 h-4 mr-2" />
-              {language === 'es' ? 'Nuevo trabajo' : 'New job'}
+              {t('projects.jobs.new')}
             </Button>
           </div>
 
@@ -362,7 +363,7 @@ export default function JobsPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.total}</p>
-                    <p className="text-xs text-gray-500">{language === 'es' ? 'Total' : 'Total'}</p>
+                    <p className="text-xs text-gray-500">{t('total')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -375,7 +376,7 @@ export default function JobsPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.pending}</p>
-                    <p className="text-xs text-gray-500">{language === 'es' ? 'Pendientes' : 'Pending'}</p>
+                    <p className="text-xs text-gray-500">{t('projects.jobs.stats.pending')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -388,7 +389,7 @@ export default function JobsPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.in_progress}</p>
-                    <p className="text-xs text-gray-500">{language === 'es' ? 'En curso' : 'In Progress'}</p>
+                    <p className="text-xs text-gray-500">{t('projects.jobs.stats.inProgress')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -401,7 +402,7 @@ export default function JobsPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.completed}</p>
-                    <p className="text-xs text-gray-500">{language === 'es' ? 'Completados' : 'Completed'}</p>
+                    <p className="text-xs text-gray-500">{t('projects.stats.completed')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -414,7 +415,7 @@ export default function JobsPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{stats.totalRevenue.toLocaleString()}€</p>
-                    <p className="text-xs text-gray-500">{language === 'es' ? 'Facturado' : 'Revenue'}</p>
+                    <p className="text-xs text-gray-500">{t('projects.jobs.stats.revenue')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -426,7 +427,7 @@ export default function JobsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder={language === 'es' ? 'Buscar trabajos...' : 'Search jobs...'}
+                placeholder={t('projects.jobs.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -438,11 +439,11 @@ export default function JobsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{language === 'es' ? 'Todos los estados' : 'All statuses'}</SelectItem>
-                <SelectItem value="pending">{language === 'es' ? 'Pendiente' : 'Pending'}</SelectItem>
-                <SelectItem value="in_progress">{language === 'es' ? 'En progreso' : 'In Progress'}</SelectItem>
-                <SelectItem value="completed">{language === 'es' ? 'Completado' : 'Completed'}</SelectItem>
-                <SelectItem value="cancelled">{language === 'es' ? 'Cancelado' : 'Cancelled'}</SelectItem>
+                <SelectItem value="all">{t('projects.status.all')}</SelectItem>
+                <SelectItem value="pending">{t('projects.status.pending')}</SelectItem>
+                <SelectItem value="in_progress">{t('projects.status.inProgress')}</SelectItem>
+                <SelectItem value="completed">{t('projects.status.completed')}</SelectItem>
+                <SelectItem value="cancelled">{t('projects.status.cancelled')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -457,16 +458,14 @@ export default function JobsPage() {
               <CardContent className="p-12 text-center">
                 <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {language === 'es' ? 'No hay trabajos' : 'No jobs'}
+                  {t('projects.jobs.emptyTitle')}
                 </h3>
                 <p className="text-gray-500 mb-4">
-                  {language === 'es' 
-                    ? 'Crea tu primer trabajo para empezar a gestionar tus proyectos'
-                    : 'Create your first job to start managing your projects'}
+                  {t('projects.jobs.emptyDescription')}
                 </p>
                 <Button onClick={() => setShowJobDialog(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
                   <Plus className="w-4 h-4 mr-2" />
-                  {language === 'es' ? 'Crear trabajo' : 'Create job'}
+                  {t('projects.jobs.create')}
                 </Button>
               </CardContent>
             </Card>
@@ -487,7 +486,7 @@ export default function JobsPage() {
                                 <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
                                 <Badge className={statusConfig.color}>
                                   <StatusIcon className="w-3 h-3 mr-1" />
-                                  {language === 'es' ? statusConfig.label : statusConfig.labelEn}
+                                  {statusConfig.label}
                                 </Badge>
                               </div>
                               
@@ -525,7 +524,7 @@ export default function JobsPage() {
                                 {job.photos?.length > 0 && (
                                   <div className="flex items-center gap-1">
                                     <ImageIcon className="w-4 h-4" />
-                                    {job.photos.length} {language === 'es' ? 'fotos' : 'photos'}
+                                    {t('projects.jobs.photoCount', { count: job.photos.length })}
                                   </div>
                                 )}
                               </div>
@@ -542,7 +541,7 @@ export default function JobsPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEditJob(job)}>
                               <Edit className="w-4 h-4 mr-2" />
-                              {language === 'es' ? 'Editar' : 'Edit'}
+                              {t('common.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => {
@@ -552,7 +551,7 @@ export default function JobsPage() {
                               className="text-red-600"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
-                              {language === 'es' ? 'Eliminar' : 'Delete'}
+                              {t('common.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -578,34 +577,34 @@ export default function JobsPage() {
           <DialogHeader>
             <DialogTitle>
               {editingJob 
-                ? (language === 'es' ? 'Editar trabajo' : 'Edit job')
-                : (language === 'es' ? 'Nuevo trabajo' : 'New job')}
+                ? t('projects.jobs.edit')
+                : t('projects.jobs.new')}
             </DialogTitle>
           </DialogHeader>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="title">{language === 'es' ? 'Título *' : 'Title *'}</Label>
+              <Label htmlFor="title">{t('projects.jobs.form.title')}</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder={language === 'es' ? 'Ej: Instalación eléctrica cocina' : 'E.g.: Kitchen electrical installation'}
+                placeholder={t('projects.jobs.form.titlePlaceholder')}
                 required
               />
             </div>
 
             <div>
-              <Label>{language === 'es' ? 'Cliente' : 'Client'}</Label>
+              <Label>{t('clientLabel')}</Label>
               <Select
                 value={formData.client_contact_id || "manual"}
                 onValueChange={handleClientSelect}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={language === 'es' ? 'Seleccionar cliente' : 'Select client'} />
+                  <SelectValue placeholder={t('projects.jobs.form.selectClient')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="manual">{language === 'es' ? 'Introducir manualmente' : 'Enter manually'}</SelectItem>
+                  <SelectItem value="manual">{t('projects.jobs.form.manualClient')}</SelectItem>
                   {clients.map((client) => (
                     <SelectItem key={client.id} value={client.id}>
                       {client.client_name}
@@ -618,25 +617,25 @@ export default function JobsPage() {
                   className="mt-2"
                   value={formData.client_name}
                   onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
-                  placeholder={language === 'es' ? 'Nombre del cliente' : 'Client name'}
+                  placeholder={t('projects.jobs.form.clientNamePlaceholder')}
                 />
               )}
             </div>
 
             <div>
-              <Label htmlFor="description">{language === 'es' ? 'Descripción' : 'Description'}</Label>
+              <Label htmlFor="description">{t('description')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder={language === 'es' ? 'Describe el trabajo a realizar...' : 'Describe the work to be done...'}
+                placeholder={t('projects.jobs.form.descriptionPlaceholder')}
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>{language === 'es' ? 'Estado' : 'Status'}</Label>
+                <Label>{t('projects.status.label')}</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value) => setFormData({ ...formData, status: value })}
@@ -645,27 +644,27 @@ export default function JobsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">{language === 'es' ? 'Pendiente' : 'Pending'}</SelectItem>
-                    <SelectItem value="in_progress">{language === 'es' ? 'En progreso' : 'In Progress'}</SelectItem>
-                    <SelectItem value="completed">{language === 'es' ? 'Completado' : 'Completed'}</SelectItem>
-                    <SelectItem value="cancelled">{language === 'es' ? 'Cancelado' : 'Cancelled'}</SelectItem>
+                    <SelectItem value="pending">{t('projects.status.pending')}</SelectItem>
+                    <SelectItem value="in_progress">{t('projects.status.inProgress')}</SelectItem>
+                    <SelectItem value="completed">{t('projects.status.completed')}</SelectItem>
+                    <SelectItem value="cancelled">{t('projects.status.cancelled')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="location">{language === 'es' ? 'Ubicación' : 'Location'}</Label>
+                <Label htmlFor="location">{t('projects.jobs.form.location')}</Label>
                 <Input
                   id="location"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder={language === 'es' ? 'Dirección del trabajo' : 'Job address'}
+                  placeholder={t('projects.jobs.form.locationPlaceholder')}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="start_date">{language === 'es' ? 'Fecha inicio' : 'Start date'}</Label>
+                <Label htmlFor="start_date">{t('projects.jobs.form.startDate')}</Label>
                 <Input
                   id="start_date"
                   type="date"
@@ -674,7 +673,7 @@ export default function JobsPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="end_date">{language === 'es' ? 'Fecha fin' : 'End date'}</Label>
+                <Label htmlFor="end_date">{t('projects.jobs.form.endDate')}</Label>
                 <Input
                   id="end_date"
                   type="date"
@@ -686,7 +685,7 @@ export default function JobsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="estimated_hours">{language === 'es' ? 'Horas estimadas' : 'Estimated hours'}</Label>
+                <Label htmlFor="estimated_hours">{t('projects.jobs.form.estimatedHours')}</Label>
                 <Input
                   id="estimated_hours"
                   type="number"
@@ -697,7 +696,7 @@ export default function JobsPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="actual_hours">{language === 'es' ? 'Horas reales' : 'Actual hours'}</Label>
+                <Label htmlFor="actual_hours">{t('projects.jobs.form.actualHours')}</Label>
                 <Input
                   id="actual_hours"
                   type="number"
@@ -711,7 +710,7 @@ export default function JobsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="estimated_cost">{language === 'es' ? 'Coste estimado (€)' : 'Estimated cost (€)'}</Label>
+                <Label htmlFor="estimated_cost">{t('projects.jobs.form.estimatedCost')}</Label>
                 <Input
                   id="estimated_cost"
                   type="number"
@@ -722,7 +721,7 @@ export default function JobsPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="final_cost">{language === 'es' ? 'Coste final (€)' : 'Final cost (€)'}</Label>
+                <Label htmlFor="final_cost">{t('projects.jobs.form.finalCost')}</Label>
                 <Input
                   id="final_cost"
                   type="number"
@@ -735,18 +734,18 @@ export default function JobsPage() {
             </div>
 
             <div>
-              <Label htmlFor="notes">{language === 'es' ? 'Notas' : 'Notes'}</Label>
+              <Label htmlFor="notes">{t('projects.jobs.form.notes')}</Label>
               <Textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder={language === 'es' ? 'Notas adicionales...' : 'Additional notes...'}
+                placeholder={t('projects.jobs.form.notesPlaceholder')}
                 rows={2}
               />
             </div>
 
             <div>
-              <Label>{language === 'es' ? 'Fotos del trabajo' : 'Job photos'}</Label>
+              <Label>{t('projects.jobs.form.photos')}</Label>
               <div className="mt-2">
                 <input
                   type="file"
@@ -763,7 +762,7 @@ export default function JobsPage() {
                   <div className="text-center">
                     <ImageIcon className="w-6 h-6 text-gray-400 mx-auto mb-1" />
                     <p className="text-sm text-gray-500">
-                      {language === 'es' ? 'Añadir fotos' : 'Add photos'}
+                      {t('projects.jobs.form.addPhotos')}
                     </p>
                   </div>
                 </label>
@@ -774,7 +773,7 @@ export default function JobsPage() {
                     <div key={index} className="relative group">
                       <img
                         src={photo}
-                        alt={`Photo ${index + 1}`}
+                        alt={t('projects.jobs.form.photoAlt', { index: index + 1 })}
                         className="w-20 h-20 object-cover rounded-lg"
                       />
                       <button
@@ -792,7 +791,7 @@ export default function JobsPage() {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowJobDialog(false)}>
-                {language === 'es' ? 'Cancelar' : 'Cancel'}
+                {t('common.cancel')}
               </Button>
               <Button 
                 type="submit" 
@@ -803,8 +802,8 @@ export default function JobsPage() {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
                 {editingJob 
-                  ? (language === 'es' ? 'Guardar cambios' : 'Save changes')
-                  : (language === 'es' ? 'Crear trabajo' : 'Create job')}
+                  ? t('projects.jobs.saveChanges')
+                  : t('projects.jobs.create')}
               </Button>
             </DialogFooter>
           </form>
@@ -816,17 +815,15 @@ export default function JobsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {language === 'es' ? '¿Eliminar trabajo?' : 'Delete job?'}
+              {t('projects.jobs.deleteTitle')}
             </DialogTitle>
           </DialogHeader>
           <p className="text-gray-600">
-            {language === 'es' 
-              ? `¿Estás seguro de que quieres eliminar "${jobToDelete?.title}"? Esta acción no se puede deshacer.`
-              : `Are you sure you want to delete "${jobToDelete?.title}"? This action cannot be undone.`}
+            {t('projects.jobs.deleteConfirm', { title: jobToDelete?.title })}
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-              {language === 'es' ? 'Cancelar' : 'Cancel'}
+              {t('common.cancel')}
             </Button>
             <Button 
               variant="destructive" 
@@ -834,7 +831,7 @@ export default function JobsPage() {
               disabled={deleteJobMutation.isPending}
             >
               {deleteJobMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {language === 'es' ? 'Eliminar' : 'Delete'}
+              {t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

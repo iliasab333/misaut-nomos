@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Eye, Search as SearchIcon, MessageSquare, MousePointerClick, TrendingUp, ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/api/supabaseClient';
 import { base44 } from '@/api/base44Client';
@@ -8,12 +9,9 @@ import SEOHead from '@/components/seo/SEOHead';
 const NAVY = '#00255C';
 const GOLD = '#F5C13D';
 
-const METRICS = [
-  { key: 'profile_views', label: 'Vistas al perfil', icon: Eye, accent: NAVY },
-  { key: 'search_appearances', label: 'Apariciones en búsquedas', icon: SearchIcon, accent: '#0B5394' },
-  { key: 'contact_clicks', label: 'Clics en "Contactar"', icon: MousePointerClick, accent: GOLD },
-  { key: 'messages_received', label: 'Mensajes recibidos', icon: MessageSquare, accent: '#1E8A3D' },
-];
+// Sólo las claves de la BD viven fuera del componente; las etiquetas visibles
+// se construyen dentro con t() (ver METRICS en el componente).
+const METRIC_KEYS = ['profile_views', 'search_appearances', 'contact_clicks', 'messages_received'];
 
 function sumByKey(rows, key) {
   return (rows || []).reduce((acc, r) => acc + Number(r?.[key] || 0), 0);
@@ -28,6 +26,7 @@ function dateNDaysAgo(n) {
 
 export default function MisEstadisticasPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [profileId, setProfileId] = useState(null);
   const [rows7, setRows7] = useState([]);
@@ -55,7 +54,7 @@ export default function MisEstadisticasPage() {
         const profiles = await base44.entities.ProfessionalProfile.filter({ user_id: me.id });
         const profile = profiles?.[0] || null;
         if (!profile) {
-          setErr('Aún no tienes un perfil profesional creado.');
+          setErr(t('stats.overview.noProfileError'));
           setLoading(false);
           return;
         }
@@ -83,7 +82,7 @@ export default function MisEstadisticasPage() {
         setRows30(all30);
         setRows7(all7);
       } catch (e) {
-        if (!cancelled) setErr(e?.message || 'No se han podido cargar las estadísticas.');
+        if (!cancelled) setErr(e?.message || t('stats.overview.loadError'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -94,11 +93,11 @@ export default function MisEstadisticasPage() {
   }, [navigate]);
 
   const totals7 = useMemo(
-    () => Object.fromEntries(METRICS.map((m) => [m.key, sumByKey(rows7, m.key)])),
+    () => Object.fromEntries(METRIC_KEYS.map((k) => [k, sumByKey(rows7, k)])),
     [rows7]
   );
   const totals30 = useMemo(
-    () => Object.fromEntries(METRICS.map((m) => [m.key, sumByKey(rows30, m.key)])),
+    () => Object.fromEntries(METRIC_KEYS.map((k) => [k, sumByKey(rows30, k)])),
     [rows30]
   );
 
@@ -127,9 +126,17 @@ export default function MisEstadisticasPage() {
 
   const maxDaily = Math.max(1, ...daily.map((d) => d.total));
 
+  // Antes constante de módulo: dentro del componente para que se retraduzca.
+  const METRICS = [
+    { key: 'profile_views', label: t('stats.metrics.profileViews'), icon: Eye, accent: NAVY },
+    { key: 'search_appearances', label: t('stats.overview.searchAppearances'), icon: SearchIcon, accent: '#0B5394' },
+    { key: 'contact_clicks', label: t('stats.overview.contactClicks'), icon: MousePointerClick, accent: GOLD },
+    { key: 'messages_received', label: t('stats.metrics.messagesReceived'), icon: MessageSquare, accent: '#1E8A3D' },
+  ];
+
   return (
     <>
-      <SEOHead title="Mis estadísticas — MisAutónomos" noindex />
+      <SEOHead title={t('stats.overview.seoTitle')} noindex />
       <div className="min-h-screen bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
           <button
@@ -138,12 +145,12 @@ export default function MisEstadisticasPage() {
             className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-3"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver al panel
+            {t('stats.overview.backToDashboard')}
           </button>
 
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">Estadísticas</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">{t('stats.overview.title')}</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Cómo se comporta tu perfil en MisAutónomos en los últimos 7 y 30 días.
+            {t('stats.overview.subtitle')}
           </p>
 
           {loading ? (
@@ -158,7 +165,7 @@ export default function MisEstadisticasPage() {
             <>
               <section className="mt-6">
                 <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-2">
-                  Últimos 7 días
+                  {t('stats.periods.last7Days')}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {METRICS.map((m) => (
@@ -169,7 +176,7 @@ export default function MisEstadisticasPage() {
 
               <section className="mt-6">
                 <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-2">
-                  Últimos 30 días
+                  {t('stats.periods.last30Days')}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {METRICS.map((m) => (
@@ -181,7 +188,7 @@ export default function MisEstadisticasPage() {
               <section className="mt-6 rounded-2xl bg-white border border-slate-200 p-4 sm:p-5">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-slate-900">
-                    Actividad diaria (30 días)
+                    {t('stats.overview.dailyActivity')}
                   </h3>
                   <TrendingUp className="w-4 h-4 text-slate-400" />
                 </div>
@@ -203,8 +210,8 @@ export default function MisEstadisticasPage() {
                   })}
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-400 mt-2">
-                  <span>hace 30d</span>
-                  <span>hoy</span>
+                  <span>{t('stats.overview.axisStart')}</span>
+                  <span>{t('stats.overview.axisEnd')}</span>
                 </div>
               </section>
 
@@ -213,8 +220,7 @@ export default function MisEstadisticasPage() {
                 totals30.contact_clicks === 0 &&
                 totals30.messages_received === 0 && (
                   <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600">
-                    Aún no hay datos. En cuanto tu perfil empiece a recibir vistas y
-                    apariciones en búsquedas verás aquí su evolución.
+                    {t('stats.overview.noData')}
                   </div>
                 )}
             </>

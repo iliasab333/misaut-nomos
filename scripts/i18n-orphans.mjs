@@ -1,0 +1,97 @@
+#!/usr/bin/env node
+// Claves huérfanas: llamadas t('clave') en el código cuya clave no existe
+// ni en src/i18n/locales/es.json ni en ninguna parte de src/i18n/parts/.
+//
+// Herramienta de la migración. Una clave huérfana pinta la clave cruda en
+// pantalla ("myProfile.toasts.saved" en vez de "Guardado"). Aparecen cuando
+// el JSX se convierte a t() pero la parte JSON no llega a escribirse — es
+// exactamente lo que dejó la primera oleada de agentes al cortarse la
+// cuota. Este script las lista para poder reconstruirlas.
+//
+// Consciente de plurales: si el código llama t('x.count', { count }) y el
+// JSON tiene x.count_one / x.count_other, NO es huérfana.
+// Ignora claves dinámicas (con ${…}) y categories.* (vienen de la BD).
+//
+// Uso:
+//   node scripts/i18n-orphans.mjs                      # todo src/
+//   node scripts/i18n-orphans.mjs --files a.jsx b.jsx  # sólo esos
+//   node scripts/i18n-orphans.mjs --json                # salida JSON
+// Sale con 1 si hay alguna huérfana.
+
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { join, relative, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const args = process.argv.slice(2);
+const asJson = args.includes('--json');
+const filesIdx = args.indexOf('--files');
+const only = filesIdx >= 0
+  ? args.slice(filesIdx + 1).filter((a) => !a.startsWith('--')).map((f) => join(ROOT, f.replace(/^\.\//, '')))
+  : null;
+
+function flatten(obj, prefix = '', out = new Set()) {
+  for (const [k, v] of Object.entries(obj || {})) {
+    const p = prefix ? `${prefix}.${k}` : k;
+    if (v && typeof v === 'object' && !Array.isArray(v)) flatten(v, p, out);
+    else out.add(p);
+  }
+  return out;
+}
+
+const known = flatten(JSON.parse(readFileSync(join(ROOT, 'src/i18n/locales/es.json'), 'utf8')));
+const partsDir = join(ROOT, 'src/i18n/parts');
+if (existsSync(partsDir)) {
+  for (const f of readdirSync(partsDir).filter((f) => f.endsWith('.json'))) {
+    try {
+      const j = JSON.parse(readFileSync(join(partsDir, f), 'utf8'));
+      for (const k of flatten(j.es)) known.add(k);
+    } catch (e) {
+      console.error(`(parte ${f} no parsea: ${e.message})`);
+    }
+  }
+}
+const isKnown = (k) => known.has(k) || known.has(`${k}_one`) || known.has(`${k}_other`) || known.has(`${k}_zero`);
+
+function walk(dir, out = []) {
+  for (const n of readdirSync(dir)) {
+    const p = join(dir, n);
+    if (statSync(p).isDirectory()) walk(p, out);
+    else if (/\.(jsx?|tsx?)$/.test(n)) out.push(p);
+  }
+  return out;
+}
+
+// t('clave') / t("clave") / t(`clave`) — sin interpolación dentro.
+// También i18n.t('clave').
+const KEY_RE = /\b(?:i18n\.)?t\(\s*(['"`])([^'"`$\n]+)\1/g;
+
+const result = {};
+let total = 0;
+for (const file of only || walk(join(ROOT, 'src'))) {
+  if (!existsSync(file)) { console.error(`(no existe: ${relative(ROOT, file)})`); continue; }
+  const src = readFileSync(file, 'utf8');
+  const lines = src.split('\n');
+  const found = [];
+  lines.forEach((line, i) => {
+    for (const m of line.matchAll(KEY_RE)) {
+      const key = m[2];
+      if (key.startsWith('categories.') || isKnown(key)) continue;
+      found.push({ key, line: i + 1 });
+    }
+  });
+  if (found.length) { result[relative(ROOT, file)] = found; total += found.length; }
+}
+
+if (asJson) {
+  console.log(JSON.stringify({ total, files: result }, null, 2));
+} else if (!total) {
+  console.log(`OK: 0 claves huérfanas${only ? ` en ${only.length} fichero(s)` : ''}.`);
+} else {
+  console.log(`${total} clave(s) huérfana(s) en ${Object.keys(result).length} fichero(s):`);
+  for (const [f, list] of Object.entries(result)) {
+    console.log(`\n  ${f} (${list.length})`);
+    for (const { key, line } of list) console.log(`    L${line}  ${key}`);
+  }
+}
+process.exit(total ? 1 : 0);

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const NAVY = '#00255C';
 const GOLD = '#F5C13D';
@@ -8,10 +9,11 @@ const GOLD = '#F5C13D';
 // Muestra una tarjeta con CTA grande "⭐ Dejar una reseña" que abre /valorar/{token}.
 // Nunca muestra la URL en crudo.
 export default function ReviewRequestBubble({ data, isMe }) {
+  const { t } = useTranslation();
   if (!data) return null;
   const token = data.token;
   const url = token ? `/valorar/${token}` : data.url || null;
-  const professionalName = data.professional_name || 'el profesional';
+  const professionalName = data.professional_name || t('messages.professionalFallback');
 
   return (
     <div
@@ -24,14 +26,14 @@ export default function ReviewRequestBubble({ data, isMe }) {
       >
         <Star className="w-4 h-4" style={{ color: GOLD }} fill={GOLD} />
         <span className="text-xs font-bold uppercase tracking-[0.08em]">
-          Solicitud de valoración
+          {t('messages.reviewRequest.title')}
         </span>
       </div>
       <div className="px-4 py-3">
         <p className="text-sm text-slate-700 leading-relaxed">
           {isMe
-            ? 'Has pedido una valoración. El cliente puede dejarla con un solo toque.'
-            : `${professionalName} te pide que valores su servicio. Tarda menos de 1 minuto.`}
+            ? t('messages.reviewRequest.sentByMe')
+            : t('messages.reviewRequest.received', { name: professionalName })}
         </p>
         {!isMe && url && (
           <a
@@ -42,13 +44,12 @@ export default function ReviewRequestBubble({ data, isMe }) {
             style={{ background: NAVY }}
           >
             <Star className="w-4 h-4" fill={GOLD} style={{ color: GOLD }} />
-            Dejar una reseña
+            {t('messages.reviewRequest.leaveReview')}
           </a>
         )}
         {isMe && (
           <div className="mt-3 text-[11px] text-slate-500">
-            Le has enviado un botón de un solo uso. No comparta el enlace con
-            terceros.
+            {t('messages.reviewRequest.singleUseNote')}
           </div>
         )}
       </div>

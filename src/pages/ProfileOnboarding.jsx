@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import i18n from '@/i18n';
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -23,6 +24,7 @@ import { pickPhoto, isNative, hapticSuccess, haptic, kv } from "@/lib/native";
 // Categorías se cargan dinámicamente desde BD
 
 export default function ProfileOnboardingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -89,11 +91,11 @@ export default function ProfileOnboardingPage() {
   useEffect(() => {
     if (loading || !user?.id) return;
     const key = `mn:profile-onboarding:v1:${user.id}`;
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       const snapshot = { formData, currentStep, savedAt: Date.now() };
       kv.set(key, JSON.stringify(snapshot));
     }, 800);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [formData, currentStep, loading, user?.id]);
 
   const loadUser = async () => {
@@ -111,8 +113,8 @@ export default function ProfileOnboardingPage() {
       // Convertimos el user_type a 'professionnel' al entrar para que el resto
       // de la app (Layout, guards, caché) lo trate como pro sin redirecciones
       // raras al cuestionario.
-      const t = currentUser?.user_type;
-      const isPro = t === 'professionnel' || t === 'profesional' || t === 'professional';
+      const userType = currentUser?.user_type;
+      const isPro = userType === 'professionnel' || userType === 'profesional' || userType === 'professional';
       if (!isPro && currentUser) {
         try {
           await base44.auth.updateMe({ user_type: 'professionnel' });
@@ -180,7 +182,7 @@ export default function ProfileOnboardingPage() {
           if (Number.isFinite(restored.currentStep) && restored.currentStep >= 1 && restored.currentStep <= 3) {
             setCurrentStep(restored.currentStep);
           }
-          toast.success('Hemos recuperado lo que tenías a medias', { duration: 3500 });
+          toast.success(t('onboarding.toasts.draftRestored'), { duration: 3500 });
         } else {
           setFormData(prev => ({
             ...prev,
@@ -201,7 +203,7 @@ export default function ProfileOnboardingPage() {
     const errors = {};
     
     if (!formData.business_name || formData.business_name.trim().length < 2) {
-      errors.business_name = "El nombre profesional debe tener al menos 2 caracteres";
+      errors.business_name = t('onboarding.validation.nameMinLength');
     }
 
     // NIF/CIF ya no se pide en el onboarding: se pide en /mi-perfil
@@ -209,15 +211,15 @@ export default function ProfileOnboardingPage() {
     // Si el usuario ya lo tenía guardado se conserva; si no, se omite.
 
     if (!formData.email_contacto || !formData.email_contacto.includes("@")) {
-      errors.email_contacto = "El email no es válido";
+      errors.email_contacto = t('onboarding.validation.emailInvalid');
     }
 
     if (!formData.telefono_contacto || formData.telefono_contacto.replace(/\D/g, '').length < 9) {
-      errors.telefono_contacto = "El teléfono debe tener al menos 9 dígitos";
+      errors.telefono_contacto = t('onboarding.validation.phoneMinDigits');
     }
 
     if (formData.metodos_contacto.length === 0) {
-      errors.metodos_contacto = "Selecciona al menos un método de contacto";
+      errors.metodos_contacto = t('onboarding.validation.contactMethodRequired');
     }
 
     setFieldErrors(errors);
@@ -236,19 +238,19 @@ export default function ProfileOnboardingPage() {
     const errors = {};
     
     if (formData.categories.length === 0) {
-      errors.categories = "Selecciona una categoría de servicio";
+      errors.categories = t('onboarding.validation.categoryRequired');
     }
 
     if (formData.categories.includes("Otro tipo de servicio profesional") && !formData.activity_other) {
-      errors.activity_other = "Especifica tu servicio cuando seleccionas 'Otro tipo de servicio'";
+      errors.activity_other = t('onboarding.validation.otherServiceRequired');
     }
 
     if (!formData.descripcion_corta || formData.descripcion_corta.trim().length < 20) {
-      errors.descripcion_corta = "La descripción debe tener al menos 20 caracteres";
+      errors.descripcion_corta = t('onboarding.validation.descriptionMinLength');
     }
 
     if (!formData.years_experience || formData.years_experience === "" || parseInt(formData.years_experience) < 0) {
-      errors.years_experience = "Indica tus años de experiencia (mínimo 0)";
+      errors.years_experience = t('onboarding.validation.yearsRequired');
     }
 
     setFieldErrors(errors);
@@ -267,15 +269,15 @@ export default function ProfileOnboardingPage() {
     const errors = {};
     
     if (!formData.provincia) {
-      errors.provincia = "Selecciona una provincia";
+      errors.provincia = t('onboarding.validation.provinceRequired');
     }
 
     if (!formData.ciudad) {
-      errors.ciudad = "Selecciona una ciudad";
+      errors.ciudad = t('onboarding.validation.cityRequired');
     }
 
     if (formData.formas_pago.length === 0) {
-      errors.formas_pago = "Selecciona al menos una forma de pago";
+      errors.formas_pago = t('onboarding.validation.paymentRequired');
     }
 
     // Las fotos ya no bloquean la publicación: se mantiene el CTA para subirlas
@@ -283,15 +285,15 @@ export default function ProfileOnboardingPage() {
     // banner "Añade una foto y multiplica x3 tus contactos".
 
     if (!formData.acepta_terminos) {
-      errors.acepta_terminos = "Debes aceptar los Términos y Condiciones";
+      errors.acepta_terminos = t('onboarding.validation.termsRequired');
     }
 
     if (!formData.acepta_politica_privacidad) {
-      errors.acepta_politica_privacidad = "Debes aceptar la Política de Privacidad";
+      errors.acepta_politica_privacidad = t('onboarding.validation.privacyRequired');
     }
 
     if (!formData.consiente_contacto_clientes) {
-      errors.consiente_contacto_clientes = "Debes consentir ser contactado por clientes";
+      errors.consiente_contacto_clientes = t('onboarding.validation.contactConsentRequired');
     }
 
     setFieldErrors(errors);
@@ -456,7 +458,7 @@ export default function ProfileOnboardingPage() {
             localStorage.removeItem('referral_code');
             localStorage.removeItem('referral_referrer_name');
             localStorage.removeItem('referral_expires');
-            toast.success('🎁 30 días extra de prueba añadidos gracias a tu código de referido');
+            toast.success(t('onboarding.toasts.referralBonus'));
           }
         }
       } catch (refErr) {
@@ -497,7 +499,7 @@ export default function ProfileOnboardingPage() {
         });
       }).catch(() => {});
 
-      toast.success("Perfil publicado. Ya apareces en búsquedas.", { duration: 5000 });
+      toast.success(t('onboarding.toasts.published'), { duration: 5000 });
       hapticSuccess();
       // Autosave: limpiar el borrador porque ya está publicado en BD.
       kv.remove(`mn:profile-onboarding:v1:${user.id}`);
@@ -507,7 +509,7 @@ export default function ProfileOnboardingPage() {
       }, 1500);
     } catch (error) {
       console.error("Error saving profile:", error);
-      toast.error("Error al guardar el perfil: " + error.message);
+      toast.error(t('onboarding.toasts.saveError', { message: error.message }));
       setSaving(false);
     }
   };
@@ -567,7 +569,7 @@ export default function ProfileOnboardingPage() {
 
   const uploadFileToBackend = async (file) => {
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen no puede superar los 5MB");
+      toast.error(t('onboarding.toasts.imageTooLarge'));
       return null;
     }
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -583,10 +585,10 @@ export default function ProfileOnboardingPage() {
       const url = await uploadFileToBackend(file);
       if (!url) return;
       setFormData({ ...formData, photos: [...formData.photos, url] });
-      toast.success("✅ Foto añadida");
+      toast.success(t('onboarding.toasts.photoAdded'));
       hapticSuccess();
     } catch (error) {
-      toast.error("Error al subir la foto");
+      toast.error(t('onboarding.toasts.photoUploadError'));
     } finally {
       setUploadingPhoto(false);
     }
@@ -602,10 +604,10 @@ export default function ProfileOnboardingPage() {
       const url = await uploadFileToBackend(file);
       if (!url) return;
       setFormData({ ...formData, photos: [...formData.photos, url] });
-      toast.success("✅ Foto añadida");
+      toast.success(t('onboarding.toasts.photoAdded'));
       hapticSuccess();
     } catch (error) {
-      toast.error("Error al subir la foto");
+      toast.error(t('onboarding.toasts.photoUploadError'));
     } finally {
       setUploadingPhoto(false);
     }
@@ -663,6 +665,14 @@ export default function ProfileOnboardingPage() {
 
   const progress = (currentStep / 3) * 100;
 
+  // Mapa explícito valor BD → etiqueta traducida (el valor guardado no cambia).
+  const paymentLabels = {
+    Tarjeta: t('card'),
+    Transferencia: t('bankTransfer'),
+    Efectivo: t('cash'),
+    Bizum: t('onboarding.location.bizum'),
+  };
+
   return (
     <>
       <OnboardingTutorial open={showTutorial} onClose={() => setShowTutorial(false)} />
@@ -678,7 +688,7 @@ export default function ProfileOnboardingPage() {
               className="bg-white border-2 border-blue-200 hover:bg-blue-50 gap-2"
             >
               <Lightbulb className="w-4 h-4 text-amber-500" />
-              ¿Cómo funciona el sistema?
+              {t('onboarding.header.howItWorks')}
             </Button>
           </div>
 
@@ -691,8 +701,8 @@ export default function ProfileOnboardingPage() {
           <Card className="shadow-xl border-0 bg-white rounded-2xl overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pb-8">
             <div className="text-center mb-4">
-              <h1 className="text-3xl font-bold mb-2">Completa tu perfil profesional</h1>
-              <p className="text-blue-100">Paso {currentStep} de 3</p>
+              <h1 className="text-3xl font-bold mb-2">{t('onboarding.header.title')}</h1>
+              <p className="text-blue-100">{t('onboarding.header.step', { current: currentStep, total: 3 })}</p>
             </div>
             <div className="w-full bg-blue-400/30 rounded-full h-2">
               <div 
@@ -706,22 +716,22 @@ export default function ProfileOnboardingPage() {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Identidad profesional</h2>
-                  <p className="text-sm text-gray-600">Información básica de tu negocio</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('professionalIdentity')}</h2>
+                  <p className="text-sm text-gray-600">{t('onboarding.identity.subtitle')}</p>
                 </div>
 
                 <div id="business_name">
-                  <OnboardingTooltip content="Tu nombre profesional es lo primero que ven los clientes. Usa tu nombre real o el de tu negocio. Ejemplos: 'Juan Pérez - Fontanero', 'Electricidad Rodríguez', etc.">
-                    <Label>Nombre profesional *</Label>
+                  <OnboardingTooltip content={t('onboarding.identity.nameTooltip')}>
+                    <Label>{t('professionalNameRequired')}</Label>
                   </OnboardingTooltip>
-                  <p className="text-xs text-gray-500 mb-2">Se mostrará así a los clientes</p>
+                  <p className="text-xs text-gray-500 mb-2">{t('onboarding.identity.nameHint')}</p>
                   <Input
                     value={formData.business_name}
                     onChange={(e) => {
                       setFormData({ ...formData, business_name: e.target.value });
                       setFieldErrors({ ...fieldErrors, business_name: null });
                     }}
-                    placeholder="Ej: Juan Pérez - Electricista"
+                    placeholder={t('onboarding.identity.namePlaceholder')}
                     autoCapitalize="words"
                     autoComplete="organization"
                     enterKeyHint="next"
@@ -731,17 +741,17 @@ export default function ProfileOnboardingPage() {
                     <p className="text-xs text-red-500 mt-1 font-semibold">{fieldErrors.business_name}</p>
                   )}
                   {!fieldErrors.business_name && formData.business_name.length > 0 && formData.business_name.length < 2 && (
-                    <p className="text-xs text-red-500 mt-1">Mínimo 2 caracteres</p>
+                    <p className="text-xs text-red-500 mt-1">{t('onboarding.validation.minTwoChars')}</p>
                   )}
                   {formData.business_name.length >= 2 && (
                     <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <Check className="w-3 h-3" /> Correcto
+                      <Check className="w-3 h-3" /> {t('onboarding.validation.correct')}
                     </p>
                   )}
                 </div>
 
                 <div id="email_contacto">
-                  <Label>Email profesional *</Label>
+                  <Label>{t('onboarding.identity.emailLabel')}</Label>
                   <Input
                     type="email"
                     value={formData.email_contacto}
@@ -749,7 +759,7 @@ export default function ProfileOnboardingPage() {
                       setFormData({ ...formData, email_contacto: e.target.value });
                       setFieldErrors({ ...fieldErrors, email_contacto: null });
                     }}
-                    placeholder="tu@email.com"
+                    placeholder={t('auth.email_placeholder')}
                     inputMode="email"
                     autoComplete="email"
                     autoCapitalize="none"
@@ -761,17 +771,17 @@ export default function ProfileOnboardingPage() {
                     <p className="text-xs text-red-500 mt-1 font-semibold">{fieldErrors.email_contacto}</p>
                   )}
                   {!fieldErrors.email_contacto && formData.email_contacto.length > 0 && !formData.email_contacto.includes('@') && (
-                    <p className="text-xs text-red-500 mt-1">Email no válido</p>
+                    <p className="text-xs text-red-500 mt-1">{t('onboarding.validation.invalidEmail')}</p>
                   )}
                   {formData.email_contacto.includes('@') && formData.email_contacto.includes('.') && (
                     <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <Check className="w-3 h-3" /> Correcto
+                      <Check className="w-3 h-3" /> {t('onboarding.validation.correct')}
                     </p>
                   )}
                 </div>
 
                 <div id="telefono_contacto">
-                  <Label>Teléfono *</Label>
+                  <Label>{t('onboarding.identity.phoneLabel')}</Label>
                   <Input
                     type="tel"
                     value={formData.telefono_contacto}
@@ -789,18 +799,18 @@ export default function ProfileOnboardingPage() {
                     <p className="text-xs text-red-500 mt-1 font-semibold">{fieldErrors.telefono_contacto}</p>
                   )}
                   {!fieldErrors.telefono_contacto && formData.telefono_contacto.length > 0 && formData.telefono_contacto.replace(/\D/g, '').length < 9 && (
-                    <p className="text-xs text-red-500 mt-1">Mínimo 9 dígitos</p>
+                    <p className="text-xs text-red-500 mt-1">{t('onboarding.validation.minNineDigits')}</p>
                   )}
                   {formData.telefono_contacto.replace(/\D/g, '').length >= 9 && (
                     <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <Check className="w-3 h-3" /> Correcto
+                      <Check className="w-3 h-3" /> {t('onboarding.validation.correct')}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <OnboardingTooltip content="Elige cómo quieres que los clientes te contacten. El chat interno es obligatorio y seguro. WhatsApp y teléfono son opcionales pero aumentan tus contactos.">
-                    <Label className="mb-3 block">Métodos de contacto visibles</Label>
+                  <OnboardingTooltip content={t('onboarding.identity.contactTooltip')}>
+                    <Label className="mb-3 block">{t('visibleContactMethods')}</Label>
                   </OnboardingTooltip>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -811,7 +821,7 @@ export default function ProfileOnboardingPage() {
                         className="w-5 h-5 text-blue-600 rounded border-gray-300 pointer-events-none"
                         onChange={() => {}}
                       />
-                      <span className="text-sm font-medium text-gray-700">Chat directo (siempre activo)</span>
+                      <span className="text-sm font-medium text-gray-700">{t('onboarding.identity.directChatAlwaysOn')}</span>
                     </div>
 
                     <div 
@@ -828,7 +838,7 @@ export default function ProfileOnboardingPage() {
                         onChange={() => {}}
                         className="w-5 h-5 text-blue-600 rounded border-gray-300 pointer-events-none"
                       />
-                      <span className="text-sm font-medium text-gray-700">Teléfono</span>
+                      <span className="text-sm font-medium text-gray-700">{t('phoneLabel')}</span>
                     </div>
 
                     <div 
@@ -845,7 +855,7 @@ export default function ProfileOnboardingPage() {
                         onChange={() => {}}
                         className="w-5 h-5 text-blue-600 rounded border-gray-300 pointer-events-none"
                       />
-                      <span className="text-sm font-medium text-gray-700">WhatsApp</span>
+                      <span className="text-sm font-medium text-gray-700">{t('profile_page.whatsapp')}</span>
                     </div>
                   </div>
                 </div>
@@ -855,13 +865,13 @@ export default function ProfileOnboardingPage() {
             {currentStep === 2 && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Actividad y servicios</h2>
-                  <p className="text-sm text-gray-600">¿Qué servicios ofreces?</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('onboarding.activity.title')}</h2>
+                  <p className="text-sm text-gray-600">{t('onboarding.activity.subtitle')}</p>
                 </div>
 
                 <div id="categories">
-                  <OnboardingTooltip content="Elige la categoría que mejor describa tu actividad principal. Los clientes buscan por categorías, así que elige la más relevante para aparecer en búsquedas correctas.">
-                    <Label className="mb-3 block">Categoría de servicio * (elige solo una)</Label>
+                  <OnboardingTooltip content={t('onboarding.activity.categoryTooltip')}>
+                    <Label className="mb-3 block">{t('onboarding.activity.categoryLabel')}</Label>
                   </OnboardingTooltip>
                   {fieldErrors.categories && (
                     <p className="text-sm text-red-500 mb-2 font-semibold">{fieldErrors.categories}</p>
@@ -897,14 +907,14 @@ export default function ProfileOnboardingPage() {
 
                 {formData.categories.includes("Otro tipo de servicio profesional") && (
                   <div id="activity_other">
-                    <Label>Especifica tu servicio *</Label>
+                    <Label>{t('onboarding.activity.otherServiceLabel')}</Label>
                     <Input
                       value={formData.activity_other}
                       onChange={(e) => {
                         setFormData({ ...formData, activity_other: e.target.value });
                         setFieldErrors({ ...fieldErrors, activity_other: null });
                       }}
-                      placeholder="Ej: Instalador de paneles solares..."
+                      placeholder={t('onboarding.activity.otherServicePlaceholder')}
                       autoCapitalize="sentences"
                       enterKeyHint="next"
                       className={`h-12 ${fieldErrors.activity_other ? 'border-red-500' : ''}`}
@@ -916,7 +926,7 @@ export default function ProfileOnboardingPage() {
                 )}
 
                 <div id="years_experience">
-                  <Label>Años de experiencia *</Label>
+                  <Label>{t('onboarding.activity.yearsLabel')}</Label>
                   <Input
                     type="number"
                     value={formData.years_experience}
@@ -936,27 +946,27 @@ export default function ProfileOnboardingPage() {
                     <p className="text-xs text-red-500 mt-1 font-semibold">{fieldErrors.years_experience}</p>
                   )}
                   {!fieldErrors.years_experience && formData.years_experience === '' && (
-                    <p className="text-xs text-red-500 mt-1">Campo obligatorio</p>
+                    <p className="text-xs text-red-500 mt-1">{t('onboarding.validation.required')}</p>
                   )}
                   {formData.years_experience !== '' && parseInt(formData.years_experience) >= 0 && (
                     <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <Check className="w-3 h-3" /> Correcto
+                      <Check className="w-3 h-3" /> {t('onboarding.validation.correct')}
                     </p>
                   )}
                 </div>
 
                 <div id="descripcion_corta">
-                  <OnboardingTooltip content="Esta descripción aparecerá en las búsquedas. Sé claro, profesional y menciona tus servicios clave. Buenos ejemplos: 'Electricista con 15 años de experiencia en instalaciones residenciales y comerciales' o 'Fontanero especializado en reparaciones urgentes 24/7'.">
-                    <Label>Descripción corta *</Label>
+                  <OnboardingTooltip content={t('onboarding.activity.descriptionTooltip')}>
+                    <Label>{t('onboarding.activity.descriptionLabel')}</Label>
                   </OnboardingTooltip>
-                  <p className="text-xs text-gray-500 mb-2">Describe brevemente tus servicios (mínimo 20 caracteres)</p>
+                  <p className="text-xs text-gray-500 mb-2">{t('onboarding.activity.descriptionHint')}</p>
                   <Textarea
                     value={formData.descripcion_corta}
                     onChange={(e) => {
                       setFormData({ ...formData, descripcion_corta: e.target.value });
                       setFieldErrors({ ...fieldErrors, descripcion_corta: null });
                     }}
-                    placeholder="Describe brevemente tus servicios..."
+                    placeholder={t('onboarding.activity.descriptionPlaceholder')}
                     autoCapitalize="sentences"
                     enterKeyHint="enter"
                     className={`h-32 resize-none ${fieldErrors.descripcion_corta ? 'border-red-500' : ''}`}
@@ -966,7 +976,7 @@ export default function ProfileOnboardingPage() {
                   )}
                   <div className="flex justify-between items-center mt-1">
                     <p className={`text-xs ${formData.descripcion_corta.length < 20 ? 'text-red-500' : 'text-green-600'}`}>
-                      {formData.descripcion_corta.length}/20 caracteres mínimos
+                      {t('onboarding.activity.minCharsCounter', { current: formData.descripcion_corta.length, min: 20 })}
                     </p>
                     {formData.descripcion_corta.length >= 20 && (
                       <Check className="w-4 h-4 text-green-600" />
@@ -979,13 +989,13 @@ export default function ProfileOnboardingPage() {
             {currentStep === 3 && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Ubicación y portfolio</h2>
-                  <p className="text-sm text-gray-600">Completa tu ubicación y añade fotos de tus trabajos</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('onboarding.location.title')}</h2>
+                  <p className="text-sm text-gray-600">{t('onboarding.location.subtitle')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div id="provincia">
-                    <Label>Provincia *</Label>
+                    <Label>{t('onboarding.location.provinceLabel')}</Label>
                     <Select
                       value={formData.provincia}
                       onValueChange={(value) => {
@@ -994,7 +1004,7 @@ export default function ProfileOnboardingPage() {
                       }}
                     >
                       <SelectTrigger className={`h-12 ${fieldErrors.provincia ? 'border-red-500' : ''}`}>
-                        <SelectValue placeholder="Selecciona provincia" />
+                        <SelectValue placeholder={t('onboarding.location.selectProvince')} />
                       </SelectTrigger>
                       <SelectContent className="max-h-[300px]">
                         {PROVINCIAS.map((prov) => (
@@ -1008,7 +1018,7 @@ export default function ProfileOnboardingPage() {
                   </div>
 
                   <div id="ciudad">
-                    <Label>Ciudad *</Label>
+                    <Label>{t('onboarding.location.cityLabel')}</Label>
                     <Select
                       value={formData.ciudad}
                       onValueChange={(value) => {
@@ -1018,7 +1028,7 @@ export default function ProfileOnboardingPage() {
                       disabled={!formData.provincia}
                     >
                       <SelectTrigger className={`h-12 ${fieldErrors.ciudad ? 'border-red-500' : formData.ciudad ? 'border-green-500' : ''}`}>
-                        <SelectValue placeholder={formData.provincia ? "Selecciona ciudad" : "Primero selecciona provincia"} />
+                        <SelectValue placeholder={formData.provincia ? t('onboarding.location.selectCity') : t('onboarding.location.selectProvinceFirst')} />
                       </SelectTrigger>
                       <SelectContent className="max-h-[300px]">
                         {formData.provincia && CIUDADES_POR_PROVINCIA[formData.provincia]?.map((ciudad) => (
@@ -1031,14 +1041,14 @@ export default function ProfileOnboardingPage() {
                     )}
                     {!fieldErrors.ciudad && formData.ciudad && (
                       <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Correcto
+                        <Check className="w-3 h-3" /> {t('onboarding.validation.correct')}
                       </p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <Label>Tarifa base €/hora (opcional)</Label>
+                  <Label>{t('onboarding.location.baseRateLabel')}</Label>
                   <Input
                     type="number"
                     value={formData.tarifa_base}
@@ -1052,8 +1062,8 @@ export default function ProfileOnboardingPage() {
                 </div>
 
                 <div id="formas_pago">
-                  <OnboardingTooltip content="Indica qué formas de pago aceptas. Cuantas más opciones ofrezcas, más fácil será para los clientes contratarte. Bizum y transferencia son las más populares en España.">
-                    <Label className="mb-3 block">Formas de pago aceptadas * (mínimo una)</Label>
+                  <OnboardingTooltip content={t('onboarding.location.paymentTooltip')}>
+                    <Label className="mb-3 block">{t('onboarding.location.paymentMethodsLabel')}</Label>
                   </OnboardingTooltip>
                   {fieldErrors.formas_pago && (
                     <p className="text-sm text-red-500 mb-2 font-semibold">{fieldErrors.formas_pago}</p>
@@ -1075,15 +1085,15 @@ export default function ProfileOnboardingPage() {
                           onChange={() => {}}
                           className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-2 focus:ring-purple-500 pointer-events-none"
                         />
-                        <span className="text-sm font-medium text-gray-700">{forma}</span>
+                        <span className="text-sm font-medium text-gray-700">{paymentLabels[forma] || forma}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 <div id="photos">
-                  <OnboardingTooltip content="Las fotos de tus trabajos son CLAVE. Los perfiles con más fotos reciben 3x más contactos. Puedes publicar sin foto y añadirla después desde tu perfil.">
-                    <Label className="mb-3 block">Portfolio de trabajos <span className="text-slate-500 font-normal">(recomendado — x3 contactos)</span></Label>
+                  <OnboardingTooltip content={t('onboarding.portfolio.tooltip')}>
+                    <Label className="mb-3 block">{t('onboarding.portfolio.title')} <span className="text-slate-500 font-normal">{t('onboarding.portfolio.recommended')}</span></Label>
                   </OnboardingTooltip>
                   {fieldErrors.photos && (
                     <p className="text-sm text-red-500 mb-2 font-semibold">{fieldErrors.photos}</p>
@@ -1102,7 +1112,7 @@ export default function ProfileOnboardingPage() {
                         ) : (
                           <>
                             <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                            <p className="text-sm text-gray-600">Añadir foto ({formData.photos.length}/10)</p>
+                            <p className="text-sm text-gray-600">{t('onboarding.portfolio.addPhoto', { current: formData.photos.length, max: 10 })}</p>
                           </>
                         )}
                       </button>
@@ -1122,7 +1132,7 @@ export default function ProfileOnboardingPage() {
                           ) : (
                             <>
                               <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                              <p className="text-sm text-gray-600">Haz clic para añadir foto ({formData.photos.length}/10)</p>
+                              <p className="text-sm text-gray-600">{t('onboarding.portfolio.clickToAddPhoto', { current: formData.photos.length, max: 10 })}</p>
                             </>
                           )}
                         </div>
@@ -1136,7 +1146,7 @@ export default function ProfileOnboardingPage() {
                         <div key={idx} className="relative group">
                           <img
                             src={photo}
-                            alt={`Foto ${idx + 1}`}
+                            alt={t('onboarding.portfolio.photoAlt', { number: idx + 1 })}
                             className="w-full h-24 object-cover rounded-lg border-2 border-green-200"
                           />
                           <button
@@ -1150,7 +1160,7 @@ export default function ProfileOnboardingPage() {
                           </button>
                           {idx === 0 && (
                             <div className="absolute bottom-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded font-semibold">
-                              Principal
+                              {t('onboarding.portfolio.main')}
                             </div>
                           )}
                           <div className="absolute top-1 left-1 bg-green-500 text-white p-1 rounded-full">
@@ -1162,13 +1172,13 @@ export default function ProfileOnboardingPage() {
                   )}
                   {formData.photos.length > 0 && (
                     <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                      <Check className="w-3 h-3" /> {formData.photos.length} foto(s) añadida(s)
+                      <Check className="w-3 h-3" /> {t('onboarding.portfolio.photosAdded', { number: formData.photos.length })}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="mb-3 block">Redes sociales (opcional)</Label>
+                  <Label className="mb-3 block">{t('onboarding.social.title')}</Label>
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <Instagram className="w-5 h-5 text-pink-600" />
@@ -1179,7 +1189,7 @@ export default function ProfileOnboardingPage() {
                           ...formData,
                           social_links: { ...formData.social_links, instagram: e.target.value }
                         })}
-                        placeholder="https://instagram.com/tuperfil"
+                        placeholder={t('onboarding.social.instagramPlaceholder')}
                         inputMode="url"
                         autoComplete="url"
                         autoCapitalize="none"
@@ -1198,7 +1208,7 @@ export default function ProfileOnboardingPage() {
                           ...formData,
                           social_links: { ...formData.social_links, facebook: e.target.value }
                         })}
-                        placeholder="https://facebook.com/tupagina"
+                        placeholder={t('onboarding.social.facebookPlaceholder')}
                         inputMode="url"
                         autoComplete="url"
                         autoCapitalize="none"
@@ -1214,7 +1224,7 @@ export default function ProfileOnboardingPage() {
                         type="url"
                         value={formData.website}
                         onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        placeholder="https://tuweb.com"
+                        placeholder={t('onboarding.social.websitePlaceholder')}
                         inputMode="url"
                         autoComplete="url"
                         autoCapitalize="none"
@@ -1233,7 +1243,7 @@ export default function ProfileOnboardingPage() {
                           ...formData,
                           social_links: { ...formData.social_links, tiktok: e.target.value }
                         })}
-                        placeholder="https://tiktok.com/@tuperfil"
+                        placeholder={t('onboarding.social.tiktokPlaceholder')}
                         inputMode="url"
                         autoComplete="url"
                         autoCapitalize="none"
@@ -1247,7 +1257,7 @@ export default function ProfileOnboardingPage() {
 
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-3" id="acepta_terminos">
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-semibold text-gray-900">Consentimientos legales</h3>
+                    <h3 className="font-semibold text-gray-900">{t('onboarding.consents.title')}</h3>
                     <Button
                       variant="outline"
                       size="sm"
@@ -1260,7 +1270,7 @@ export default function ProfileOnboardingPage() {
                       className="h-8 text-xs"
                     >
                       <Check className="w-3 h-3 mr-1" />
-                      Aceptar todo
+                      {t('onboarding.consents.acceptAll')}
                     </Button>
                   </div>
                   
@@ -1282,7 +1292,9 @@ export default function ProfileOnboardingPage() {
                       className="w-5 h-5 mt-0.5 text-green-600 rounded border-gray-300 focus:ring-2 focus:ring-green-500 pointer-events-none"
                     />
                     <span className="text-sm text-gray-700 flex-1">
-                      Acepto los <a href="/terminos" target="_blank" className="text-blue-600 underline font-medium" onClick={(e) => e.stopPropagation()}>Términos y Condiciones</a> de uso de la plataforma
+                      <Trans i18nKey="onboarding.consents.acceptTerms">
+                        Acepto los <a href="/terminos" target="_blank" className="text-blue-600 underline font-medium" onClick={(e) => e.stopPropagation()}>Términos y Condiciones</a> de uso de la plataforma
+                      </Trans>
                       {fieldErrors.acepta_terminos && (
                         <span className="block text-red-500 font-semibold mt-1">{fieldErrors.acepta_terminos}</span>
                       )}
@@ -1304,7 +1316,9 @@ export default function ProfileOnboardingPage() {
                       className="w-5 h-5 mt-0.5 text-green-600 rounded border-gray-300 focus:ring-2 focus:ring-green-500 pointer-events-none"
                     />
                     <span className="text-sm text-gray-700 flex-1">
-                      Acepto la <a href="/privacidad" target="_blank" className="text-blue-600 underline font-medium" onClick={(e) => e.stopPropagation()}>Política de Privacidad</a> y tratamiento de datos
+                      <Trans i18nKey="onboarding.consents.acceptPrivacy">
+                        Acepto la <a href="/privacidad" target="_blank" className="text-blue-600 underline font-medium" onClick={(e) => e.stopPropagation()}>Política de Privacidad</a> y tratamiento de datos
+                      </Trans>
                     </span>
                   </div>
 
@@ -1323,7 +1337,7 @@ export default function ProfileOnboardingPage() {
                       className="w-5 h-5 mt-0.5 text-green-600 rounded border-gray-300 focus:ring-2 focus:ring-green-500 pointer-events-none"
                     />
                     <span className="text-sm text-gray-700 flex-1">
-                      Consiento en que los clientes puedan contactarme a través de la plataforma
+                      {t('onboarding.consents.allowContact')}
                     </span>
                   </div>
                 </div>
@@ -1339,7 +1353,7 @@ export default function ProfileOnboardingPage() {
                   disabled={saving}
                 >
                   <ChevronLeft className="w-5 h-5 mr-2" />
-                  Anterior
+                  {t('onboarding.nav.previous')}
                 </Button>
               )}
 
@@ -1348,7 +1362,7 @@ export default function ProfileOnboardingPage() {
                   onClick={handleNext}
                   className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 font-bold text-base shadow-lg"
                 >
-                  Siguiente
+                  {t('common.next')}
                   <ChevronRight className="w-5 h-5 ml-2" />
                 </Button>
               ) : (
@@ -1360,12 +1374,12 @@ export default function ProfileOnboardingPage() {
                   {saving ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Publicando...
+                      {t('onboarding.nav.publishing')}
                     </>
                   ) : (
                     <>
                       <CheckCircle className="w-5 h-5 mr-2" />
-                      Publicar perfil
+                      {t('onboarding.nav.publish')}
                     </>
                   )}
                 </Button>

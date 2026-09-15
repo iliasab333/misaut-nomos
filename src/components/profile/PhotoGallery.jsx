@@ -3,11 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import OptimizedImage from "../ui/OptimizedImage";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export default function PhotoGallery({ photos = [] }) {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   if (!photos || photos.length === 0) {
     return (
@@ -15,13 +15,13 @@ export default function PhotoGallery({ photos = [] }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Camera className="w-5 h-5 text-blue-700" />
-            {t('workGallery')}
+            {t('proProfile.gallery.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12">
             <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">{t('noPhotosAdded')}</p>
+            <p className="text-gray-500">{t('proProfile.gallery.empty')}</p>
           </div>
         </CardContent>
       </Card>
@@ -34,11 +34,11 @@ export default function PhotoGallery({ photos = [] }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Camera className="w-5 h-5 text-blue-700" />
-            {t('workGallery')} ({photos.length})
+            {t('proProfile.gallery.title')} ({photos.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4" role="list" aria-label="Galería de trabajos">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4" role="list" aria-label={t('proProfile.gallery.listAria')}>
             {photos.map((photo, idx) => (
               <div
                 key={idx}
@@ -52,11 +52,11 @@ export default function PhotoGallery({ photos = [] }) {
                     setSelectedPhoto(photo);
                   }
                 }}
-                aria-label={`Ver foto ${idx + 1} ampliada`}
+                aria-label={t('proProfile.gallery.viewPhotoAria', { number: idx + 1 })}
               >
                 <OptimizedImage
                   src={photo}
-                  alt={`Trabajo realizado - Foto ${idx + 1}`}
+                  alt={t('proProfile.gallery.photoAlt', { number: idx + 1 })}
                   className="w-full h-40 transition-transform group-hover:scale-110 duration-300"
                   objectFit="cover"
                   width={300}
@@ -64,12 +64,12 @@ export default function PhotoGallery({ photos = [] }) {
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <p className="text-white font-semibold text-sm">
-                    {t('clickToAddPhoto')}
+                    {t('proProfile.gallery.hoverHint')}
                   </p>
                 </div>
                 {idx === 0 && (
                   <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded font-semibold">
-                    {t('mainPhoto')}
+                    {t('proProfile.gallery.mainPhoto')}
                   </div>
                 )}
               </div>
@@ -84,14 +84,14 @@ export default function PhotoGallery({ photos = [] }) {
             <button
               onClick={() => setSelectedPhoto(null)}
               className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full z-10 transition-colors"
-              aria-label={t('close')}
+              aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />
             </button>
             {selectedPhoto && (
               <OptimizedImage
                 src={selectedPhoto}
-                alt="Trabajo realizado - Vista ampliada"
+                alt={t('proProfile.gallery.enlargedPhotoAlt')}
                 className="w-full max-h-[80vh] rounded-lg"
                 objectFit="contain"
                 priority={true}

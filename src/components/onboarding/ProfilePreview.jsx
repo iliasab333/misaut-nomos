@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, MapPin, Phone, Mail, Globe } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 
 export default function ProfilePreview({ formData, currentUser }) {
+  const { t } = useTranslation();
   const hasContent = formData.business_name || formData.descripcion_corta || formData.photos?.length > 0;
 
   if (!hasContent) return null;
@@ -13,9 +15,9 @@ export default function ProfilePreview({ formData, currentUser }) {
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-sm text-purple-900">
-            👁️ Vista previa de tu perfil
+            {t('onboarding.preview.title')}
           </h3>
-          <Badge className="bg-purple-600 text-white text-xs">Live Preview</Badge>
+          <Badge className="bg-purple-600 text-white text-xs">{t('onboarding.preview.liveBadge')}</Badge>
         </div>
 
         <div className="bg-white rounded-lg p-4 shadow-sm border border-purple-100">
@@ -25,7 +27,7 @@ export default function ProfilePreview({ formData, currentUser }) {
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="font-semibold text-gray-900 text-sm truncate">
-                {formData.business_name || "Tu nombre profesional"}
+                {formData.business_name || t('onboarding.preview.namePlaceholder')}
               </h4>
               {formData.categories?.length > 0 && (
                 <p className="text-xs text-gray-600">{formData.categories[0]}</p>
@@ -52,7 +54,7 @@ export default function ProfilePreview({ formData, currentUser }) {
                 <img
                   key={idx}
                   src={photo}
-                  alt={`Foto ${idx + 1}`}
+                  alt={t('onboarding.portfolio.photoAlt', { number: idx + 1 })}
                   className="w-full h-16 object-cover rounded"
                   loading="lazy"
                 />
@@ -63,18 +65,18 @@ export default function ProfilePreview({ formData, currentUser }) {
           <div className="flex gap-1 mt-3">
             <Badge variant="outline" className="text-xs">
               <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-              Nuevo
+              {t('profile_card.new_tag')}
             </Badge>
             {formData.years_experience > 0 && (
               <Badge variant="outline" className="text-xs">
-                {formData.years_experience} años exp.
+                {t('onboarding.preview.yearsExp', { years: formData.years_experience })}
               </Badge>
             )}
           </div>
         </div>
 
         <p className="text-xs text-purple-700 mt-2 text-center">
-          Así verán los clientes tu perfil 👆
+          {t('onboarding.preview.footer')}
         </p>
       </CardContent>
     </Card>

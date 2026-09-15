@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { format, subMonths, subYears, startOfMonth, endOfMonth, startOfYear, endOfYear, parseISO, isWithinInterval } from "date-fns";
 import { es } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
@@ -27,19 +28,20 @@ const STATUS_COLORS = {
   cancelled: '#6b7280'
 };
 
-const STATUS_LABELS = {
-  paid: 'Pagadas',
-  sent: 'Emitidas',
-  draft: 'Borrador',
-  overdue: 'Vencidas',
-  cancelled: 'Anuladas'
-};
-
 export default function InvoicingStats({ invoices = [], loading = false }) {
+  const { t } = useTranslation();
   const [dateRange, setDateRange] = useState('year');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+
+  const STATUS_LABELS = {
+    paid: t('invoices.stats.status.paid'),
+    sent: t('invoices.stats.status.sent'),
+    draft: t('draft'),
+    overdue: t('invoices.stats.status.overdue'),
+    cancelled: t('invoices.stats.status.cancelled')
+  };
 
   // Calcular rango de fechas
   const dateFilter = useMemo(() => {
@@ -160,14 +162,14 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
       name: STATUS_LABELS[s.status] || s.status,
       color: STATUS_COLORS[s.status] || '#9ca3af'
     }));
-  }, [filteredInvoices]);
+  }, [filteredInvoices, t]);
 
   // Datos por cliente
   const clientData = useMemo(() => {
     const clients = {};
     
     filteredInvoices.forEach(inv => {
-      const clientName = inv.client_name || 'Sin nombre';
+      const clientName = inv.client_name || t('invoices.stats.unnamedClient');
       if (!clients[clientName]) {
         clients[clientName] = { name: clientName, total: 0, count: 0 };
       }
@@ -178,7 +180,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
     return Object.values(clients)
       .sort((a, b) => b.total - a.total)
       .slice(0, 10);
-  }, [filteredInvoices]);
+  }, [filteredInvoices, t]);
 
   // Años disponibles para filtro
   const availableYears = useMemo(() => {
@@ -206,18 +208,18 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
         <CardContent className="p-4">
           <div className="flex flex-wrap items-end gap-4">
             <div>
-              <Label className="text-xs text-gray-500">Periodo</Label>
+              <Label className="text-xs text-gray-500">{t('invoices.stats.period')}</Label>
               <Select value={dateRange} onValueChange={setDateRange}>
                 <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="month">Este mes</SelectItem>
-                  <SelectItem value="3months">Últimos 3 meses</SelectItem>
-                  <SelectItem value="6months">Últimos 6 meses</SelectItem>
-                  <SelectItem value="year">Este año</SelectItem>
-                  <SelectItem value="all">Todo</SelectItem>
-                  <SelectItem value="custom">Personalizado</SelectItem>
+                  <SelectItem value="month">{t('invoices.period.thisMonth')}</SelectItem>
+                  <SelectItem value="3months">{t('invoices.period.lastThreeMonths')}</SelectItem>
+                  <SelectItem value="6months">{t('invoices.period.lastSixMonths')}</SelectItem>
+                  <SelectItem value="year">{t('invoices.period.thisYear')}</SelectItem>
+                  <SelectItem value="all">{t('invoices.period.all')}</SelectItem>
+                  <SelectItem value="custom">{t('invoices.period.custom')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -225,7 +227,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
             {dateRange === 'custom' && (
               <>
                 <div>
-                  <Label className="text-xs text-gray-500">Desde</Label>
+                  <Label className="text-xs text-gray-500">{t('invoices.period.from')}</Label>
                   <Input
                     type="date"
                     value={customStartDate}
@@ -234,7 +236,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-500">Hasta</Label>
+                  <Label className="text-xs text-gray-500">{t('invoices.period.to')}</Label>
                   <Input
                     type="date"
                     value={customEndDate}
@@ -259,11 +261,11 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-blue-600 font-medium">Facturación Total</p>
+                <p className="text-sm text-blue-600 font-medium">{t('invoices.stats.totalBilled')}</p>
                 <p className="text-3xl font-bold text-blue-900 mt-1">
                   {stats.total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}€
                 </p>
-                <p className="text-xs text-blue-600 mt-1">{stats.invoiceCount} facturas</p>
+                <p className="text-xs text-blue-600 mt-1">{t('invoices.stats.invoiceCount', { count: stats.invoiceCount })}</p>
               </div>
               <div className={`flex items-center gap-1 text-sm font-medium ${stats.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {stats.growth >= 0 ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
@@ -277,11 +279,11 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-green-600 font-medium">Cobrado</p>
+                <p className="text-sm text-green-600 font-medium">{t('invoices.stats.collected')}</p>
                 <p className="text-3xl font-bold text-green-900 mt-1">
                   {stats.paidTotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })}€
                 </p>
-                <p className="text-xs text-green-600 mt-1">{stats.paidCount} facturas pagadas</p>
+                <p className="text-xs text-green-600 mt-1">{t('invoices.stats.paidCount', { count: stats.paidCount })}</p>
               </div>
               <div className="p-2 bg-green-200 rounded-lg">
                 <Euro className="w-5 h-5 text-green-700" />
@@ -294,11 +296,11 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-yellow-600 font-medium">Pendiente</p>
+                <p className="text-sm text-yellow-600 font-medium">{t('invoices.stats.pending')}</p>
                 <p className="text-3xl font-bold text-yellow-900 mt-1">
                   {stats.pendingTotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })}€
                 </p>
-                <p className="text-xs text-yellow-600 mt-1">{stats.pendingCount} facturas pendientes</p>
+                <p className="text-xs text-yellow-600 mt-1">{t('invoices.stats.pendingCount', { count: stats.pendingCount })}</p>
               </div>
               <div className="p-2 bg-yellow-200 rounded-lg">
                 <FileText className="w-5 h-5 text-yellow-700" />
@@ -311,11 +313,11 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-purple-600 font-medium">Media por Factura</p>
+                <p className="text-sm text-purple-600 font-medium">{t('invoices.stats.averagePerInvoice')}</p>
                 <p className="text-3xl font-bold text-purple-900 mt-1">
                   {stats.avgInvoice.toLocaleString('es-ES', { minimumFractionDigits: 2 })}€
                 </p>
-                <p className="text-xs text-purple-600 mt-1">Importe medio</p>
+                <p className="text-xs text-purple-600 mt-1">{t('invoices.stats.averageAmount')}</p>
               </div>
               <div className="p-2 bg-purple-200 rounded-lg">
                 <TrendingUp className="w-5 h-5 text-purple-700" />
@@ -332,7 +334,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-blue-600" />
-              Evolución de Ingresos
+              {t('invoices.stats.revenueChart')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -350,7 +352,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
                   <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}€`} />
                   <Tooltip 
                     formatter={(value) => [`${value.toFixed(2)}€`, '']}
-                    labelFormatter={(label) => `Mes: ${label}`}
+                    labelFormatter={(label) => t('invoices.stats.monthTooltip', { month: label })}
                   />
                   <Area 
                     type="monotone" 
@@ -359,13 +361,13 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
                     strokeWidth={2}
                     fillOpacity={1} 
                     fill="url(#colorTotal)" 
-                    name="Total"
+                    name={t('total')}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-gray-500">
-                No hay datos para mostrar
+                {t('invoices.stats.noData')}
               </div>
             )}
           </CardContent>
@@ -376,7 +378,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="w-5 h-5 text-green-600" />
-              Pagadas vs Pendientes
+              {t('invoices.stats.paidVsPending')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -388,13 +390,13 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
                   <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}€`} />
                   <Tooltip formatter={(value) => [`${value.toFixed(2)}€`, '']} />
                   <Legend />
-                  <Bar dataKey="paid" name="Pagadas" fill="#10b981" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="pending" name="Pendientes" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="paid" name={t('invoices.stats.status.paid')} fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="pending" name={t('invoices.stats.status.pending')} fill="#f59e0b" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-gray-500">
-                No hay datos para mostrar
+                {t('invoices.stats.noData')}
               </div>
             )}
           </CardContent>
@@ -403,7 +405,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
         {/* Estado de facturas (Pie) */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Estado de Facturas</CardTitle>
+            <CardTitle className="text-base">{t('invoices.stats.statusChart')}</CardTitle>
           </CardHeader>
           <CardContent>
             {statusData.length > 0 ? (
@@ -441,7 +443,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
               </div>
             ) : (
               <div className="h-[250px] flex items-center justify-center text-gray-500">
-                No hay datos para mostrar
+                {t('invoices.stats.noData')}
               </div>
             )}
           </CardContent>
@@ -452,7 +454,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Users className="w-5 h-5 text-purple-600" />
-              Top 10 Clientes
+              {t('invoices.stats.topClients')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -465,7 +467,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{client.name}</p>
-                      <p className="text-xs text-gray-500">{client.count} facturas</p>
+                      <p className="text-xs text-gray-500">{t('invoices.stats.invoiceCount', { count: client.count })}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold text-gray-900">
@@ -483,7 +485,7 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
               </div>
             ) : (
               <div className="h-[280px] flex items-center justify-center text-gray-500">
-                No hay datos para mostrar
+                {t('invoices.stats.noData')}
               </div>
             )}
           </CardContent>
@@ -500,14 +502,14 @@ export default function InvoicingStats({ invoices = [], loading = false }) {
               </div>
               <div>
                 <p className="font-semibold text-red-800">
-                  {stats.overdueCount} facturas vencidas
+                  {t('invoices.stats.overdueCount', { count: stats.overdueCount })}
                 </p>
                 <p className="text-sm text-red-600">
-                  Importe pendiente: {stats.overdueTotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })}€
+                  {t('invoices.stats.overdueAmount', { amount: stats.overdueTotal.toLocaleString('es-ES', { minimumFractionDigits: 2 }) })}
                 </p>
               </div>
               <Badge className="ml-auto bg-red-100 text-red-800 hover:bg-red-100">
-                Requiere atención
+                {t('invoices.stats.needsAttention')}
               </Badge>
             </div>
           </CardContent>

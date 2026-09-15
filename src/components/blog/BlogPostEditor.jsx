@@ -3,20 +3,13 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RefreshCw, Eye, Upload, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { slugify } from '@/lib/slugify';
 
 const NAVY = '#00255C';
 const NAVY_INK = '#001A45';
-
-const CATEGORIES = [
-  { id: 'autonomos', label: 'Para autónomos' },
-  { id: 'clientes', label: 'Para clientes' },
-  { id: 'legal_fiscal', label: 'Legal y fiscal' },
-  { id: 'herramientas', label: 'Herramientas' },
-  { id: 'actualidad', label: 'Actualidad' },
-];
 
 const generateSlug = (title) => slugify(title).substring(0, 60);
 
@@ -62,20 +55,21 @@ function Field({ label, hint, children }) {
 }
 
 function ImageUploader({ value, onChange, label, ratio = 'aspect-[16/9]' }) {
+  const { t } = useTranslation();
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
 
   const upload = async (file) => {
     if (!file) return;
-    if (!/^image\//.test(file.type)) { toast.error('El archivo debe ser una imagen'); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error('Imagen demasiado grande (máx. 5 MB)'); return; }
+    if (!/^image\//.test(file.type)) { toast.error(t('blog.editor.upload.notImage')); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error(t('blog.editor.upload.tooLarge')); return; }
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       onChange(file_url);
-      toast.success('Imagen subida');
+      toast.success(t('blog.editor.upload.success'));
     } catch (err) {
-      toast.error('Error al subir: ' + (err?.message || 'desconocido'));
+      toast.error(t('blog.editor.upload.error', { message: err?.message || t('blog.editor.unknownError') }));
     } finally {
       setUploading(false);
     }
@@ -91,7 +85,7 @@ function ImageUploader({ value, onChange, label, ratio = 'aspect-[16/9]' }) {
               type="button"
               onClick={() => onChange('')}
               className="absolute top-2 right-2 inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/90 shadow border border-slate-200 hover:bg-white"
-              aria-label="Quitar imagen"
+              aria-label={t('blog.editor.upload.remove')}
             >
               <X className="w-3.5 h-3.5 text-slate-600" />
             </button>
@@ -104,7 +98,7 @@ function ImageUploader({ value, onChange, label, ratio = 'aspect-[16/9]' }) {
             disabled={uploading}
           >
             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            {uploading ? 'Subiendo…' : 'Subir imagen'}
+            {uploading ? t('blog.editor.upload.uploading') : t('blog.editor.upload.button')}
           </button>
         )}
       </div>
@@ -120,7 +114,7 @@ function ImageUploader({ value, onChange, label, ratio = 'aspect-[16/9]' }) {
           type="text"
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="…o pega una URL"
+          placeholder={t('blog.editor.upload.urlPlaceholder')}
           className="flex-1 input-base"
         />
         <Button
@@ -138,11 +132,21 @@ function ImageUploader({ value, onChange, label, ratio = 'aspect-[16/9]' }) {
 }
 
 export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }) {
+  const { t } = useTranslation();
   const [data, setData] = useState(post ? { ...INITIAL, ...post } : INITIAL);
   const [tagInput, setTagInput] = useState((post?.tags || []).join(', '));
   const [contentLang, setContentLang] = useState('es');
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
+
+  // Dentro del componente para que las etiquetas se retraduzcan al cambiar de idioma.
+  const CATEGORIES = [
+    { id: 'autonomos', label: t('footer.for_pros') },
+    { id: 'clientes', label: t('footer.for_clients') },
+    { id: 'legal_fiscal', label: t('blog.editor.category.legalFiscal') },
+    { id: 'herramientas', label: t('blog.editor.category.tools') },
+    { id: 'actualidad', label: t('blog.editor.category.news') },
+  ];
 
   const set = (key, val) => setData((d) => ({ ...d, [key]: val }));
 
@@ -161,13 +165,13 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
   };
 
   const validate = () => {
-    if (!data.title_es?.trim()) return 'Falta el título en español.';
-    if (!data.slug?.trim()) return 'Falta el slug.';
-    if (!/^[a-z0-9-]+$/.test(data.slug)) return 'El slug solo puede tener minúsculas, números y guiones.';
+    if (!data.title_es?.trim()) return t('blog.editor.validation.titleRequired');
+    if (!data.slug?.trim()) return t('blog.editor.validation.slugRequired');
+    if (!/^[a-z0-9-]+$/.test(data.slug)) return t('blog.editor.validation.slugFormat');
     const collision = allPosts.find((p) => p.slug === data.slug && p.id !== post?.id);
-    if (collision) return `El slug ya existe en "${collision.title_es}".`;
+    if (collision) return t('blog.editor.validation.slugExists', { title: collision.title_es });
     if (!data.content_es || data.content_es.replace(/<[^>]+>/g, '').trim().length < 50) {
-      return 'El contenido en español es demasiado corto (mínimo 50 caracteres).';
+      return t('blog.editor.validation.contentTooShort');
     }
     return null;
   };
@@ -185,12 +189,12 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
       const payload = { ...data, tags, status: finalStatus };
       await onSave(payload);
       toast.success(
-        finalStatus === 'published' ? 'Artículo publicado' :
-        finalStatus === 'scheduled' ? 'Programado para ' + new Date(data.publish_date).toLocaleString('es-ES') :
-        'Borrador guardado'
+        finalStatus === 'published' ? t('blog.editor.saved.published') :
+        finalStatus === 'scheduled' ? t('blog.editor.saved.scheduled', { date: new Date(data.publish_date).toLocaleString('es-ES') }) :
+        t('blog.editor.saved.draft')
       );
     } catch (err) {
-      toast.error('Error al guardar: ' + (err?.message || 'desconocido'));
+      toast.error(t('blog.editor.saveError', { message: err?.message || t('blog.editor.unknownError') }));
     } finally {
       setSaving(false);
     }
@@ -199,7 +203,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
   const otherPosts = (allPosts || []).filter((p) => p.id !== post?.id);
 
   const TABS = ['content', 'meta', 'seo', 'author', 'publish', 'related'];
-  const TAB_LABELS = { content: 'Contenido', meta: 'Metadatos', seo: 'SEO', author: 'Autor', publish: 'Publicación', related: 'Relacionados' };
+  const TAB_LABELS = { content: t('blog.editor.tabs.content'), meta: t('blog.editor.tabs.meta'), seo: t('blog.editor.tabs.seo'), author: t('blog.editor.tabs.author'), publish: t('blog.editor.tabs.publish'), related: t('blog.editor.tabs.related') };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -207,18 +211,18 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
       <div className="bg-white border-b border-slate-200 sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <button onClick={onCancel} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900">
-            <ArrowLeft className="w-4 h-4" /> Volver
+            <ArrowLeft className="w-4 h-4" /> {t('common.back')}
           </button>
           <h2 className="font-semibold text-slate-900 text-sm truncate flex-1 text-center">
-            {post ? 'Editar artículo' : 'Nuevo artículo'}
+            {post ? t('blog.editor.editArticle') : t('blog.editor.newArticle')}
           </h2>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => handleSave('draft')} disabled={saving}>
-              Guardar borrador
+              {t('blog.editor.saveDraft')}
             </Button>
             {data.slug && data.status !== 'draft' && (
               <a href={`/blog/${data.slug}`} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="sm"><Eye className="w-3.5 h-3.5 mr-1" /> Ver</Button>
+                <Button variant="outline" size="sm"><Eye className="w-3.5 h-3.5 mr-1" /> {t('view')}</Button>
               </a>
             )}
             <Button
@@ -230,7 +234,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
               onMouseEnter={(e) => (e.currentTarget.style.background = NAVY_INK)}
               onMouseLeave={(e) => (e.currentTarget.style.background = NAVY)}
             >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Publicar'}
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('blog.editor.publishButton')}
             </Button>
           </div>
         </div>
@@ -256,26 +260,26 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-5">
         {activeTab === 'content' && (
           <>
-            <Field label="Título (ES) *">
-              <input className="input-base" value={data.title_es} onChange={(e) => handleTitleChange(e.target.value)} placeholder="Título del artículo en español" />
+            <Field label={t('blog.editor.content.titleEs')}>
+              <input className="input-base" value={data.title_es} onChange={(e) => handleTitleChange(e.target.value)} placeholder={t('blog.editor.content.titleEsPlaceholder')} />
             </Field>
-            <Field label="Título (EN)">
-              <input className="input-base" value={data.title_en || ''} onChange={(e) => set('title_en', e.target.value)} placeholder="Article title in English" />
+            <Field label={t('blog.editor.content.titleEn')}>
+              <input className="input-base" value={data.title_en || ''} onChange={(e) => set('title_en', e.target.value)} placeholder={t('blog.editor.content.titleEnPlaceholder')} />
             </Field>
 
-            <Field label="Extracto (ES)">
-              <textarea className="input-base resize-none" rows={3} value={data.excerpt_es || ''} onChange={(e) => set('excerpt_es', e.target.value)} placeholder="Breve descripción (≤160 caracteres)" maxLength={200} />
+            <Field label={t('blog.editor.content.excerptEs')}>
+              <textarea className="input-base resize-none" rows={3} value={data.excerpt_es || ''} onChange={(e) => set('excerpt_es', e.target.value)} placeholder={t('blog.editor.content.excerptEsPlaceholder')} maxLength={200} />
               <p className="text-xs text-slate-400 mt-1">{(data.excerpt_es || '').length}/200</p>
             </Field>
-            <Field label="Extracto (EN)">
-              <textarea className="input-base resize-none" rows={3} value={data.excerpt_en || ''} onChange={(e) => set('excerpt_en', e.target.value)} placeholder="Short description in English" maxLength={200} />
+            <Field label={t('blog.editor.content.excerptEn')}>
+              <textarea className="input-base resize-none" rows={3} value={data.excerpt_en || ''} onChange={(e) => set('excerpt_en', e.target.value)} placeholder={t('blog.editor.content.excerptEnPlaceholder')} maxLength={200} />
               <p className="text-xs text-slate-400 mt-1">{(data.excerpt_en || '').length}/200</p>
             </Field>
 
             <div className="bg-white rounded-xl border border-slate-200 p-5">
               <div className="flex items-center justify-between mb-3">
                 <label className="text-sm font-semibold text-slate-800">
-                  Contenido ({contentLang === 'es' ? 'ES *' : 'EN'})
+                  {t('blog.editor.content.bodyLabel', { lang: contentLang === 'es' ? 'ES *' : 'EN' })}
                 </label>
                 <div className="inline-flex p-1 rounded-lg bg-slate-100">
                   <button
@@ -298,10 +302,10 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
                   onChange={handleContentChange}
                   style={{ minHeight: 400 }}
                   modules={QUILL_MODULES}
-                  placeholder={contentLang === 'es' ? 'Escribe el cuerpo del artículo en español…' : 'Write the body in English…'}
+                  placeholder={contentLang === 'es' ? t('blog.editor.content.bodyEsPlaceholder') : t('blog.editor.content.bodyEnPlaceholder')}
                 />
               </div>
-              <p className="text-xs text-slate-400 mt-2">Tiempo de lectura estimado: ~{data.read_time_minutes} min</p>
+              <p className="text-xs text-slate-400 mt-2">{t('blog.editor.content.readTimeEstimate', { minutes: data.read_time_minutes })}</p>
             </div>
           </>
         )}
@@ -309,30 +313,30 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
         {activeTab === 'meta' && (
           <>
             <Field
-              label="Slug (URL) *"
+              label={t('blog.editor.meta.slug')}
               hint={`misautonomos.es/blog/${data.slug || '…'}`}
             >
               <div className="flex gap-2">
-                <input className="input-base flex-1" value={data.slug} onChange={(e) => set('slug', e.target.value)} placeholder="mi-articulo-ejemplo" />
+                <input className="input-base flex-1" value={data.slug} onChange={(e) => set('slug', e.target.value)} placeholder={t('blog.editor.meta.slugPlaceholder')} />
                 <button
                   type="button"
                   onClick={() => set('slug', generateSlug(data.title_es))}
                   className="px-3 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600"
-                  title="Regenerar desde el título"
+                  title={t('blog.editor.meta.regenerateSlug')}
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
             </Field>
-            <Field label="Categoría">
+            <Field label={t('blog.editor.meta.category')}>
               <select className="input-base" value={data.category} onChange={(e) => set('category', e.target.value)}>
                 {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             </Field>
-            <Field label="Tags (separados por coma)" hint="Ej. autónomos, fiscal, irpf">
-              <input className="input-base" value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder="autónomos, fiscal, irpf" />
+            <Field label={t('blog.editor.meta.tags')} hint={t('blog.editor.meta.tagsHint')}>
+              <input className="input-base" value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder={t('blog.editor.meta.tagsPlaceholder')} />
             </Field>
-            <Field label="Tiempo de lectura (minutos)">
+            <Field label={t('blog.editor.meta.readTime')}>
               <input type="number" className="input-base w-24" min={1} max={60} value={data.read_time_minutes} onChange={(e) => set('read_time_minutes', parseInt(e.target.value || '1'))} />
             </Field>
           </>
@@ -340,33 +344,33 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
 
         {activeTab === 'seo' && (
           <>
-            <Field label="Meta título (ES)" hint={`${(data.meta_title_es || '').length}/70 caracteres`}>
-              <input className="input-base" value={data.meta_title_es || ''} onChange={(e) => set('meta_title_es', e.target.value)} placeholder={`${data.title_es} | Blog MisAutónomos`} maxLength={70} />
+            <Field label={t('blog.editor.seo.metaTitleEs')} hint={t('blog.editor.seo.charCount', { length: (data.meta_title_es || '').length, max: 70 })}>
+              <input className="input-base" value={data.meta_title_es || ''} onChange={(e) => set('meta_title_es', e.target.value)} placeholder={t('blog.editor.seo.metaTitleEsPlaceholder', { title: data.title_es })} maxLength={70} />
             </Field>
-            <Field label="Meta descripción (ES)" hint={`${(data.meta_description_es || '').length}/160 caracteres`}>
-              <textarea className="input-base resize-none" rows={3} value={data.meta_description_es || ''} onChange={(e) => set('meta_description_es', e.target.value)} placeholder="Descripción para buscadores (máx. 160)" maxLength={160} />
+            <Field label={t('blog.editor.seo.metaDescriptionEs')} hint={t('blog.editor.seo.charCount', { length: (data.meta_description_es || '').length, max: 160 })}>
+              <textarea className="input-base resize-none" rows={3} value={data.meta_description_es || ''} onChange={(e) => set('meta_description_es', e.target.value)} placeholder={t('blog.editor.seo.metaDescriptionEsPlaceholder')} maxLength={160} />
             </Field>
-            <Field label="Meta título (EN)" hint={`${(data.meta_title_en || '').length}/70 caracteres`}>
-              <input className="input-base" value={data.meta_title_en || ''} onChange={(e) => set('meta_title_en', e.target.value)} placeholder={`${data.title_en || data.title_es} | MisAutónomos Blog`} maxLength={70} />
+            <Field label={t('blog.editor.seo.metaTitleEn')} hint={t('blog.editor.seo.charCount', { length: (data.meta_title_en || '').length, max: 70 })}>
+              <input className="input-base" value={data.meta_title_en || ''} onChange={(e) => set('meta_title_en', e.target.value)} placeholder={t('blog.editor.seo.metaTitleEnPlaceholder', { title: data.title_en || data.title_es })} maxLength={70} />
             </Field>
-            <Field label="Meta descripción (EN)" hint={`${(data.meta_description_en || '').length}/160 caracteres`}>
-              <textarea className="input-base resize-none" rows={3} value={data.meta_description_en || ''} onChange={(e) => set('meta_description_en', e.target.value)} placeholder="SEO description in English (max 160)" maxLength={160} />
+            <Field label={t('blog.editor.seo.metaDescriptionEn')} hint={t('blog.editor.seo.charCount', { length: (data.meta_description_en || '').length, max: 160 })}>
+              <textarea className="input-base resize-none" rows={3} value={data.meta_description_en || ''} onChange={(e) => set('meta_description_en', e.target.value)} placeholder={t('blog.editor.seo.metaDescriptionEnPlaceholder')} maxLength={160} />
             </Field>
-            <Field label="Imagen Open Graph (1200×630 recomendado)">
-              <ImageUploader value={data.og_image} onChange={(v) => set('og_image', v)} label="og_image" ratio="aspect-[1200/630]" />
+            <Field label={t('blog.editor.seo.ogImage')}>
+              <ImageUploader value={data.og_image} onChange={(v) => set('og_image', v)} label={t('blog.editor.seo.ogImageAlt')} ratio="aspect-[1200/630]" />
             </Field>
           </>
         )}
 
         {activeTab === 'author' && (
           <>
-            <Field label="Nombre del autor">
+            <Field label={t('blog.editor.author.name')}>
               <input className="input-base" value={data.author_name || ''} onChange={(e) => set('author_name', e.target.value)} />
             </Field>
-            <Field label="Avatar">
-              <ImageUploader value={data.author_avatar} onChange={(v) => set('author_avatar', v)} label="author_avatar" ratio="aspect-square w-32 mx-auto rounded-full overflow-hidden" />
+            <Field label={t('blog.editor.author.avatar')}>
+              <ImageUploader value={data.author_avatar} onChange={(v) => set('author_avatar', v)} label={t('blog.editor.author.avatar')} ratio="aspect-square w-32 mx-auto rounded-full overflow-hidden" />
             </Field>
-            <Field label="Bio del autor">
+            <Field label={t('blog.editor.author.bio')}>
               <textarea className="input-base resize-none" rows={3} value={data.author_bio || ''} onChange={(e) => set('author_bio', e.target.value)} />
             </Field>
           </>
@@ -374,18 +378,18 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
 
         {activeTab === 'publish' && (
           <>
-            <Field label="Imagen destacada" hint="Aparece en la cabecera del artículo y en el listado del blog.">
-              <ImageUploader value={data.featured_image} onChange={(v) => set('featured_image', v)} label="featured_image" />
+            <Field label={t('blog.editor.publish.featuredImage')} hint={t('blog.editor.publish.featuredImageHint')}>
+              <ImageUploader value={data.featured_image} onChange={(v) => set('featured_image', v)} label={t('blog.editor.publish.featuredImage')} />
             </Field>
-            <Field label="Estado">
+            <Field label={t('blog.editor.publish.status')}>
               <select className="input-base" value={data.status} onChange={(e) => set('status', e.target.value)}>
-                <option value="draft">Borrador</option>
-                <option value="scheduled">Programado</option>
-                <option value="published">Publicado</option>
-                <option value="archived">Archivado</option>
+                <option value="draft">{t('draft')}</option>
+                <option value="scheduled">{t('blog.editor.status.scheduled')}</option>
+                <option value="published">{t('blog.editor.status.published')}</option>
+                <option value="archived">{t('blog.editor.status.archived')}</option>
               </select>
             </Field>
-            <Field label="Fecha de publicación" hint="Si la fecha es futura, el estado pasa a 'Programado' al pulsar Publicar.">
+            <Field label={t('blog.editor.publish.date')} hint={t('blog.editor.publish.dateHint')}>
               <input type="datetime-local" className="input-base" value={(data.publish_date || '').slice(0, 16)} onChange={(e) => set('publish_date', e.target.value)} />
             </Field>
             <div className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-4">
@@ -396,13 +400,13 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
                 onChange={(e) => set('featured', e.target.checked)}
                 className="w-4 h-4 accent-[#00255C]"
               />
-              <label htmlFor="featured" className="text-sm font-medium text-slate-800">Artículo destacado (aparece en primer plano)</label>
+              <label htmlFor="featured" className="text-sm font-medium text-slate-800">{t('blog.editor.publish.featured')}</label>
             </div>
           </>
         )}
 
         {activeTab === 'related' && (
-          <Field label="Artículos relacionados (máx. 3)">
+          <Field label={t('blog.editor.related.title')}>
             <div className="space-y-2">
               {otherPosts.slice(0, 30).map((p) => {
                 const isSelected = (data.related_articles || []).includes(p.id);
@@ -416,7 +420,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
                         const curr = data.related_articles || [];
                         if (e.target.checked) {
                           if (curr.length < 3) set('related_articles', [...curr, p.id]);
-                          else toast.info('Máximo 3 relacionados');
+                          else toast.info(t('blog.editor.related.maxReached'));
                         } else {
                           set('related_articles', curr.filter((id) => id !== p.id));
                         }
@@ -427,7 +431,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
                   </label>
                 );
               })}
-              {otherPosts.length === 0 && <p className="text-xs text-slate-400">Aún no hay otros artículos.</p>}
+              {otherPosts.length === 0 && <p className="text-xs text-slate-400">{t('blog.editor.related.empty')}</p>}
             </div>
           </Field>
         )}

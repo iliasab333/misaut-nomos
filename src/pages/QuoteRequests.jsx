@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,16 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import SEOHead from "../components/seo/SEOHead";
 
+// Mapa explícito urgencia (valor de BD) → clave i18n.
+const URGENCY_KEYS = {
+  baja: 'quotes.urgency.low',
+  media: 'quotes.urgency.medium',
+  alta: 'quotes.urgency.high',
+  urgente: 'quotes.urgency.urgent',
+};
+
 export default function QuoteRequestsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -148,10 +158,10 @@ export default function QuoteRequestsPage() {
       queryClient.invalidateQueries({ queryKey: ['quoteRequests'] });
       setShowResponseDialog(false);
       setSelectedRequest(null);
-      toast.success("Presupuesto enviado correctamente");
+      toast.success(t('quotes.requests.sentToast'));
     },
     onError: () => {
-      toast.error("Error al enviar presupuesto");
+      toast.error(t('quotes.requests.sendError'));
     }
   });
 
@@ -159,7 +169,7 @@ export default function QuoteRequestsPage() {
     mutationFn: ({ requestId, status }) => base44.entities.QuoteRequest.update(requestId, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quoteRequests'] });
-      toast.success("Estado actualizado");
+      toast.success(t('statusUpdated'));
     }
   });
 
@@ -172,7 +182,7 @@ export default function QuoteRequestsPage() {
 
   const handleRespond = () => {
     if (!responseData.quote_amount || !responseData.response_message) {
-      toast.error("Completa al menos el precio y mensaje");
+      toast.error(t('quotes.requests.validationError'));
       return;
     }
 
@@ -184,11 +194,11 @@ export default function QuoteRequestsPage() {
 
   const getStatusBadge = (status) => {
     const config = {
-      pending: { color: "bg-yellow-100 text-yellow-800", text: "Pendiente", icon: Clock },
-      quoted: { color: "bg-blue-100 text-blue-800", text: "Presupuestado", icon: FileText },
-      accepted: { color: "bg-green-100 text-green-800", text: "Aceptado", icon: CheckCircle },
-      rejected: { color: "bg-red-100 text-red-800", text: "Rechazado", icon: XCircle },
-      expired: { color: "bg-gray-100 text-gray-800", text: "Expirado", icon: Clock }
+      pending: { color: "bg-yellow-100 text-yellow-800", text: t('quotes.status.pending'), icon: Clock },
+      quoted: { color: "bg-blue-100 text-blue-800", text: t('quotes.status.quoted'), icon: FileText },
+      accepted: { color: "bg-green-100 text-green-800", text: t('quotes.status.accepted'), icon: CheckCircle },
+      rejected: { color: "bg-red-100 text-red-800", text: t('quotes.status.rejected'), icon: XCircle },
+      expired: { color: "bg-gray-100 text-gray-800", text: t('quotes.status.expired'), icon: Clock }
     };
     const { color, text, icon: Icon } = config[status] || config.pending;
     return (
@@ -206,7 +216,9 @@ export default function QuoteRequestsPage() {
       alta: "bg-orange-100 text-orange-700",
       urgente: "bg-red-100 text-red-700"
     };
-    return <Badge className={config[urgency]}>{urgency.toUpperCase()}</Badge>;
+    const labelKey = URGENCY_KEYS[urgency];
+    const label = labelKey ? t(labelKey) : (urgency || "");
+    return <Badge className={config[urgency]}>{label.toUpperCase()}</Badge>;
   };
 
   if (loadingUser) {
@@ -222,8 +234,8 @@ export default function QuoteRequestsPage() {
   return (
     <>
       <SEOHead 
-        title="Solicitudes de Presupuesto - MisAutónomos"
-        description="Gestiona tus solicitudes de presupuesto"
+        title={t('quotes.requests.seoTitle')}
+        description={t('quotes.requests.seoDescription')}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
@@ -231,11 +243,11 @@ export default function QuoteRequestsPage() {
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
               <FileText className="w-8 h-8 text-blue-600" />
-              Presupuestos
+              {t('quotesPage.title')}
             </h1>
             {!isProfessional && (
               <Button onClick={() => navigate(createPageUrl("Search"))} className="bg-blue-600 hover:bg-blue-700">
-                Solicitar presupuesto
+                {t('quotes.requests.requestButton')}
               </Button>
             )}
           </div>
@@ -244,11 +256,13 @@ export default function QuoteRequestsPage() {
             <TabsList className="grid w-full grid-cols-2">
               {isProfessional && (
                 <TabsTrigger value="received">
-                  Recibidas ({receivedRequests.length})
+                  {t('quotes.requests.tabReceived', { count: receivedRequests.length })}
                 </TabsTrigger>
               )}
               <TabsTrigger value="sent">
-                {isProfessional ? "Enviadas" : "Mis solicitudes"} ({sentRequests.length})
+                {isProfessional
+                  ? t('quotes.requests.tabSent', { count: sentRequests.length })
+                  : t('quotes.requests.tabMine', { count: sentRequests.length })}
               </TabsTrigger>
             </TabsList>
 
@@ -262,7 +276,7 @@ export default function QuoteRequestsPage() {
                   <Card>
                     <CardContent className="py-12 text-center">
                       <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-600">No has recibido solicitudes aún</p>
+                      <p className="text-gray-600">{t('quotes.requests.emptyReceived')}</p>
                     </CardContent>
                   </Card>
                 ) : (
@@ -273,7 +287,7 @@ export default function QuoteRequestsPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <h3 className="font-bold text-lg">{request.title}</h3>
-                              {!request.is_read && <Badge className="bg-blue-600">Nuevo</Badge>}
+                              {!request.is_read && <Badge className="bg-blue-600">{t('profile_card.new_tag')}</Badge>}
                             </div>
                             <p className="text-sm text-gray-600 mb-2">{request.description.substring(0, 150)}...</p>
                             <div className="flex flex-wrap gap-2 text-xs">
@@ -308,9 +322,9 @@ export default function QuoteRequestsPage() {
                 <Card>
                   <CardContent className="py-12 text-center">
                     <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">No has enviado solicitudes aún</p>
+                    <p className="text-gray-600 mb-4">{t('quotes.requests.emptySent')}</p>
                     <Button onClick={() => navigate(createPageUrl("Search"))} className="bg-blue-600 hover:bg-blue-700">
-                      Buscar profesionales
+                      {t('quotes.requests.findProfessionals')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -321,7 +335,7 @@ export default function QuoteRequestsPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h3 className="font-bold text-lg mb-2">{request.title}</h3>
-                          <p className="text-sm text-gray-600 mb-2">Para: {request.professional_name}</p>
+                          <p className="text-sm text-gray-600 mb-2">{t('quotes.requests.forProfessional', { name: request.professional_name })}</p>
                           <div className="flex flex-wrap gap-2 text-xs">
                             {getStatusBadge(request.status)}
                             {getUrgencyBadge(request.urgency)}
@@ -365,14 +379,14 @@ export default function QuoteRequestsPage() {
                   {selectedRequest.deadline && (
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-gray-500" />
-                      <span>Límite: {format(new Date(selectedRequest.deadline), "dd/MM/yyyy")}</span>
+                      <span>{t('quotes.requests.deadline', { date: format(new Date(selectedRequest.deadline), "dd/MM/yyyy") })}</span>
                     </div>
                   )}
                 </div>
 
                 {isProfessional && (
                   <div className="bg-blue-50 p-4 rounded-lg space-y-2">
-                    <p className="font-semibold text-sm">Datos del cliente:</p>
+                    <p className="font-semibold text-sm">{t('quotes.requests.clientData')}</p>
                     <div className="space-y-1 text-sm">
                       <p className="flex items-center gap-2">
                         <Mail className="w-4 h-4" />
@@ -389,7 +403,7 @@ export default function QuoteRequestsPage() {
                 )}
 
                 <div>
-                  <h4 className="font-semibold mb-2">Descripción:</h4>
+                  <h4 className="font-semibold mb-2">{t('quotes.requests.description')}</h4>
                   <p className="text-gray-700 whitespace-pre-wrap">{selectedRequest.description}</p>
                 </div>
 
@@ -397,7 +411,7 @@ export default function QuoteRequestsPage() {
                   <div>
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      Ubicación:
+                      {t('quotes.requests.location')}
                     </h4>
                     <p className="text-gray-700">
                       {[selectedRequest.location, selectedRequest.ciudad, selectedRequest.provincia].filter(Boolean).join(', ')}
@@ -409,7 +423,7 @@ export default function QuoteRequestsPage() {
                   <div>
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
                       <Euro className="w-4 h-4" />
-                      Presupuesto estimado:
+                      {t('quotes.fields.estimatedBudget')}
                     </h4>
                     <p className="text-gray-700">{selectedRequest.budget_range}€</p>
                   </div>
@@ -417,15 +431,15 @@ export default function QuoteRequestsPage() {
 
                 {selectedRequest.professional_response && (
                   <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h4 className="font-semibold mb-3 text-green-800">Presupuesto del profesional:</h4>
+                    <h4 className="font-semibold mb-3 text-green-800">{t('quotes.requests.professionalQuote')}</h4>
                     <div className="space-y-2 text-sm">
-                      <p><strong>Precio:</strong> {selectedRequest.professional_response.quote_amount}€</p>
+                      <p><strong>{t('quotes.requests.price')}</strong> {selectedRequest.professional_response.quote_amount}€</p>
                       {selectedRequest.professional_response.estimated_days && (
-                        <p><strong>Tiempo estimado:</strong> {selectedRequest.professional_response.estimated_days} días</p>
+                        <p><strong>{t('quotes.requests.estimatedTime')}</strong> {t('quotes.fields.daysCount', { count: Number(selectedRequest.professional_response.estimated_days) })}</p>
                       )}
-                      <p><strong>Mensaje:</strong> {selectedRequest.professional_response.response_message}</p>
+                      <p><strong>{t('quotes.requests.message')}</strong> {selectedRequest.professional_response.response_message}</p>
                       {selectedRequest.professional_response.response_date && (
-                        <p className="text-gray-500">Respondido: {format(new Date(selectedRequest.professional_response.response_date), "dd/MM/yyyy HH:mm")}</p>
+                        <p className="text-gray-500">{t('quotes.requests.respondedOn', { date: format(new Date(selectedRequest.professional_response.response_date), "dd/MM/yyyy HH:mm") })}</p>
                       )}
                     </div>
                   </div>
@@ -438,7 +452,7 @@ export default function QuoteRequestsPage() {
                       className="w-full bg-green-600 hover:bg-green-700"
                     >
                       <Send className="w-4 h-4 mr-2" />
-                      Enviar presupuesto
+                      {t('quotes.actions.sendQuote')}
                     </Button>
                   </div>
                 )}
@@ -450,7 +464,7 @@ export default function QuoteRequestsPage() {
                       className="flex-1 bg-green-600 hover:bg-green-700"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
-                      Aceptar
+                      {t('common.accept')}
                     </Button>
                     <Button
                       onClick={() => updateStatusMutation.mutate({ requestId: selectedRequest.id, status: "rejected" })}
@@ -458,7 +472,7 @@ export default function QuoteRequestsPage() {
                       className="flex-1"
                     >
                       <XCircle className="w-4 h-4 mr-2" />
-                      Rechazar
+                      {t('common.reject')}
                     </Button>
                   </div>
                 )}
@@ -471,36 +485,36 @@ export default function QuoteRequestsPage() {
       <Dialog open={showResponseDialog} onOpenChange={setShowResponseDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Enviar presupuesto</DialogTitle>
+            <DialogTitle>{t('quotes.actions.sendQuote')}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <Label>Precio total (€) *</Label>
+              <Label>{t('quotes.requests.totalPriceLabel')}</Label>
               <Input
                 type="number"
                 value={responseData.quote_amount}
                 onChange={(e) => setResponseData({ ...responseData, quote_amount: e.target.value })}
-                placeholder="Ej: 850"
+                placeholder={t('quotes.requests.totalPricePlaceholder')}
               />
             </div>
 
             <div>
-              <Label>Tiempo estimado (días)</Label>
+              <Label>{t('quotes.requests.estimatedDaysLabel')}</Label>
               <Input
                 type="number"
                 value={responseData.estimated_days}
                 onChange={(e) => setResponseData({ ...responseData, estimated_days: e.target.value })}
-                placeholder="Ej: 5"
+                placeholder={t('quotes.requests.estimatedDaysPlaceholder')}
               />
             </div>
 
             <div>
-              <Label>Mensaje para el cliente *</Label>
+              <Label>{t('quotes.requests.messageLabel')}</Label>
               <Textarea
                 value={responseData.response_message}
                 onChange={(e) => setResponseData({ ...responseData, response_message: e.target.value })}
-                placeholder="Describe tu propuesta, condiciones, forma de pago..."
+                placeholder={t('quotes.requests.messagePlaceholder')}
                 rows={5}
               />
             </div>
@@ -508,7 +522,7 @@ export default function QuoteRequestsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowResponseDialog(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleRespond}
@@ -518,12 +532,12 @@ export default function QuoteRequestsPage() {
               {respondQuoteMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Enviando...
+                  {t('quotes.actions.sending')}
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  Enviar presupuesto
+                  {t('quotes.actions.sendQuote')}
                 </>
               )}
             </Button>

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search as SearchIcon, ShieldCheck, Star, ToggleLeft, ToggleRight, ChevronLeft, ChevronRight, Users as UsersIcon, Briefcase } from 'lucide-react';
@@ -37,10 +38,11 @@ function Th({ children, sortKey, sort, setSort, align = 'left' }) {
 }
 
 function Pagination({ page, total, perPage, onPage }) {
+  const { t } = useTranslation();
   const pages = Math.max(1, Math.ceil(total / perPage));
   return (
     <div className="flex items-center justify-between text-xs text-slate-500 px-3 py-3">
-      <span>{total.toLocaleString('es-ES')} resultados</span>
+      <span>{t('admin.users.pagination.results', { total: total.toLocaleString('es-ES') })}</span>
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -48,7 +50,7 @@ function Pagination({ page, total, perPage, onPage }) {
           disabled={page <= 1}
           onClick={() => onPage(page - 1)}
         ><ChevronLeft className="w-4 h-4" /></button>
-        <span>Página {page} de {pages}</span>
+        <span>{t('admin.users.pagination.page', { page, pages })}</span>
         <button
           type="button"
           className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-slate-200 disabled:opacity-50 hover:bg-slate-50"
@@ -61,6 +63,7 @@ function Pagination({ page, total, perPage, onPage }) {
 }
 
 function UsersTable() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['admin:users:list'],
@@ -105,9 +108,9 @@ function UsersTable() {
   const toggleDisabled = async (u) => {
     try {
       await base44.entities.User.update(u.id, { disabled: !u.disabled });
-      toast.success(u.disabled ? 'Usuario activado' : 'Usuario desactivado');
+      toast.success(u.disabled ? t('admin.users.userEnabled') : t('admin.users.userDisabled'));
       qc.invalidateQueries({ queryKey: ['admin:users:list'] });
-    } catch (e) { toast.error('Error: ' + (e.message || e)); }
+    } catch (e) { toast.error(t('admin.users.errorWithMessage', { message: e.message || e })); }
   };
 
   return (
@@ -119,34 +122,38 @@ function UsersTable() {
             type="text"
             value={q}
             onChange={(e) => { setQ(e.target.value); setPage(1); }}
-            placeholder="Email o nombre…"
+            placeholder={t('admin.users.searchPlaceholder')}
             className="w-full pl-9 pr-3 h-9 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
           />
         </div>
         <select value={role} onChange={(e) => { setRole(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
-          <option value="all">Todos los roles</option>
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
+          <option value="all">{t('admin.users.filters.allRoles')}</option>
+          <option value="admin">{t('admin.users.filters.roleAdmin')}</option>
+          <option value="user">{t('admin.users.filters.roleUser')}</option>
         </select>
         <select value={userType} onChange={(e) => { setUserType(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
-          <option value="all">Tipo: todos</option>
-          <option value="professionnel">Profesional</option>
-          <option value="client">Cliente</option>
-          <option value="">Sin tipo</option>
+          <option value="all">{t('admin.users.filters.allTypes')}</option>
+          <option value="professionnel">{t('professionalLabel')}</option>
+          <option value="client">{t('clientLabel')}</option>
+          <option value="">{t('admin.users.filters.typeNone')}</option>
         </select>
-        <span className="ml-auto text-xs text-slate-500">{isLoading ? 'Cargando…' : `${filtered.length.toLocaleString('es-ES')} de ${users.length.toLocaleString('es-ES')}`}</span>
+        <span className="ml-auto text-xs text-slate-500">
+          {isLoading
+            ? t('admin.users.loading')
+            : t('admin.users.shownOfTotal', { shown: filtered.length.toLocaleString('es-ES'), total: users.length.toLocaleString('es-ES') })}
+        </span>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50">
             <tr>
-              <Th sortKey="full_name" sort={sort} setSort={setSort}>Nombre</Th>
-              <Th sortKey="email" sort={sort} setSort={setSort}>Email</Th>
-              <Th>Rol</Th>
-              <Th>Tipo</Th>
-              <Th sortKey="created_date" sort={sort} setSort={setSort}>Alta</Th>
-              <Th align="right">Acciones</Th>
+              <Th sortKey="full_name" sort={sort} setSort={setSort}>{t('auth.name')}</Th>
+              <Th sortKey="email" sort={sort} setSort={setSort}>{t('auth.email')}</Th>
+              <Th>{t('admin.users.table.role')}</Th>
+              <Th>{t('admin.users.table.type')}</Th>
+              <Th sortKey="created_date" sort={sort} setSort={setSort}>{t('admin.users.table.signup')}</Th>
+              <Th align="right">{t('admin.users.table.actions')}</Th>
             </tr>
           </thead>
           <tbody>
@@ -168,16 +175,16 @@ function UsersTable() {
                     type="button"
                     onClick={() => toggleDisabled(u)}
                     className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-700 hover:text-slate-900"
-                    title={u.disabled ? 'Activar' : 'Desactivar'}
+                    title={u.disabled ? t('admin.users.actions.enable') : t('admin.users.actions.disable')}
                   >
                     {u.disabled ? <ToggleLeft className="w-4 h-4 text-rose-500" /> : <ToggleRight className="w-4 h-4 text-emerald-600" />}
-                    {u.disabled ? 'Desactivado' : 'Activo'}
+                    {u.disabled ? t('admin.users.status.disabled') : t('admin.users.status.active')}
                   </button>
                 </td>
               </tr>
             ))}
             {!isLoading && paged.length === 0 && (
-              <tr><td colSpan={6} className="px-3 py-8 text-center text-sm text-slate-400">Sin resultados.</td></tr>
+              <tr><td colSpan={6} className="px-3 py-8 text-center text-sm text-slate-400">{t('admin.users.emptyState')}</td></tr>
             )}
           </tbody>
         </table>
@@ -188,6 +195,7 @@ function UsersTable() {
 }
 
 function ProsTable() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: profiles = [], isLoading } = useQuery({
     queryKey: ['admin:profiles:list'],
@@ -245,16 +253,16 @@ function ProsTable() {
   const toggleVisible = async (p) => {
     try {
       await base44.entities.ProfessionalProfile.update(p.id, { visible_en_busqueda: !p.visible_en_busqueda });
-      toast.success(p.visible_en_busqueda ? 'Perfil oculto en búsqueda' : 'Perfil visible en búsqueda');
+      toast.success(p.visible_en_busqueda ? t('admin.users.profileHidden') : t('admin.users.profileVisible'));
       qc.invalidateQueries({ queryKey: ['admin:profiles:list'] });
-    } catch (e) { toast.error('Error: ' + (e.message || e)); }
+    } catch (e) { toast.error(t('admin.users.errorWithMessage', { message: e.message || e })); }
   };
   const toggleAdsPlus = async (p) => {
     try {
       await base44.entities.ProfessionalProfile.update(p.id, { is_ads_plus: !p.is_ads_plus });
-      toast.success(p.is_ads_plus ? 'Quitado destacado' : 'Marcado como destacado');
+      toast.success(p.is_ads_plus ? t('admin.users.featuredRemoved') : t('admin.users.featuredAdded'));
       qc.invalidateQueries({ queryKey: ['admin:profiles:list'] });
-    } catch (e) { toast.error('Error: ' + (e.message || e)); }
+    } catch (e) { toast.error(t('admin.users.errorWithMessage', { message: e.message || e })); }
   };
 
   return (
@@ -266,43 +274,47 @@ function ProsTable() {
             type="text"
             value={q}
             onChange={(e) => { setQ(e.target.value); setPage(1); }}
-            placeholder="Nombre profesional…"
+            placeholder={t('admin.users.searchProPlaceholder')}
             className="w-full pl-9 pr-3 h-9 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
           />
         </div>
         <select value={estado} onChange={(e) => { setEstado(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
-          <option value="all">Estado: todos</option>
-          <option value="activo">Activos</option>
-          <option value="inactivo">Inactivos</option>
+          <option value="all">{t('admin.users.filters.allStatuses')}</option>
+          <option value="activo">{t('admin.users.filters.statusActive')}</option>
+          <option value="inactivo">{t('admin.users.filters.statusInactive')}</option>
         </select>
         <select value={verified} onChange={(e) => { setVerified(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
-          <option value="all">Verificados: todos</option>
-          <option value="si">Sí</option>
-          <option value="no">No</option>
+          <option value="all">{t('admin.users.filters.allVerified')}</option>
+          <option value="si">{t('common.yes')}</option>
+          <option value="no">{t('common.no')}</option>
         </select>
         <select value={categoria} onChange={(e) => { setCategoria(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white max-w-[200px]">
-          <option value="all">Categoría: todas</option>
+          <option value="all">{t('admin.users.filters.allCategories')}</option>
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
         <select value={ciudad} onChange={(e) => { setCiudad(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white max-w-[160px]">
-          <option value="all">Ciudad: todas</option>
+          <option value="all">{t('admin.users.filters.allCities')}</option>
           {cities.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <span className="ml-auto text-xs text-slate-500">{isLoading ? 'Cargando…' : `${filtered.length.toLocaleString('es-ES')} de ${profiles.length.toLocaleString('es-ES')}`}</span>
+        <span className="ml-auto text-xs text-slate-500">
+          {isLoading
+            ? t('admin.users.loading')
+            : t('admin.users.shownOfTotal', { shown: filtered.length.toLocaleString('es-ES'), total: profiles.length.toLocaleString('es-ES') })}
+        </span>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50">
             <tr>
-              <Th sortKey="business_name" sort={sort} setSort={setSort}>Nombre</Th>
-              <Th>Categoría</Th>
-              <Th>Ciudad</Th>
-              <Th>Estado</Th>
-              <Th>Verificado</Th>
-              <Th>Destacado</Th>
-              <Th sortKey="created_date" sort={sort} setSort={setSort}>Alta</Th>
-              <Th align="right">Acciones</Th>
+              <Th sortKey="business_name" sort={sort} setSort={setSort}>{t('auth.name')}</Th>
+              <Th>{t('admin.users.table.category')}</Th>
+              <Th>{t('city')}</Th>
+              <Th>{t('admin.users.table.status')}</Th>
+              <Th>{t('admin.users.table.verified')}</Th>
+              <Th>{t('admin.users.table.featured')}</Th>
+              <Th sortKey="created_date" sort={sort} setSort={setSort}>{t('admin.users.table.signup')}</Th>
+              <Th align="right">{t('admin.users.table.actions')}</Th>
             </tr>
           </thead>
           <tbody>
@@ -315,7 +327,7 @@ function ProsTable() {
                   <td className="px-3 py-2 text-slate-700">{p.ciudad || <span className="text-slate-400">—</span>}</td>
                   <td className="px-3 py-2">
                     <span className={classNames('inline-flex text-[11px] font-semibold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full', active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600')}>
-                      {active ? 'Activo' : 'Inactivo'}
+                      {active ? t('admin.users.status.active') : t('admin.users.status.inactive')}
                     </span>
                   </td>
                   <td className="px-3 py-2">
@@ -329,11 +341,11 @@ function ProsTable() {
                   </td>
                   <td className="px-3 py-2 text-right">
                     <div className="inline-flex items-center gap-3">
-                      <button onClick={() => toggleVisible(p)} className="text-[12px] font-medium text-slate-700 hover:text-slate-900" title={p.visible_en_busqueda ? 'Ocultar' : 'Mostrar'}>
-                        {p.visible_en_busqueda ? 'Ocultar' : 'Mostrar'}
+                      <button onClick={() => toggleVisible(p)} className="text-[12px] font-medium text-slate-700 hover:text-slate-900" title={p.visible_en_busqueda ? t('admin.users.actions.hide') : t('admin.users.actions.show')}>
+                        {p.visible_en_busqueda ? t('admin.users.actions.hide') : t('admin.users.actions.show')}
                       </button>
-                      <button onClick={() => toggleAdsPlus(p)} className="text-[12px] font-medium text-slate-700 hover:text-slate-900" title="Toggle Ads+">
-                        {p.is_ads_plus ? 'Quitar Ads+' : 'Ads+'}
+                      <button onClick={() => toggleAdsPlus(p)} className="text-[12px] font-medium text-slate-700 hover:text-slate-900" title={t('admin.users.actions.toggleAdsPlus')}>
+                        {p.is_ads_plus ? t('admin.users.actions.removeAdsPlus') : t('admin.users.actions.adsPlus')}
                       </button>
                     </div>
                   </td>
@@ -341,7 +353,7 @@ function ProsTable() {
               );
             })}
             {!isLoading && paged.length === 0 && (
-              <tr><td colSpan={8} className="px-3 py-8 text-center text-sm text-slate-400">Sin resultados.</td></tr>
+              <tr><td colSpan={8} className="px-3 py-8 text-center text-sm text-slate-400">{t('admin.users.emptyState')}</td></tr>
             )}
           </tbody>
         </table>
@@ -352,23 +364,24 @@ function ProsTable() {
 }
 
 export default function AdminUsuariosPage() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState('users');
   return (
     <>
-      <SEOHead title="Usuarios · Admin" noindex />
+      <SEOHead title={t('admin.users.pageTitle')} noindex />
       <main className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
           <div className="flex items-end justify-between gap-3 mb-6">
             <div>
-              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em' }}>Usuarios</h1>
-              <p className="text-sm text-slate-500 mt-1">Cuentas registradas y fichas de profesionales.</p>
+              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em' }}>{t('admin.users.title')}</h1>
+              <p className="text-sm text-slate-500 mt-1">{t('admin.users.subtitle')}</p>
             </div>
             <div className="inline-flex p-1 rounded-xl bg-slate-100">
               <button onClick={() => setTab('users')} className={classNames('inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg', tab === 'users' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>
-                <UsersIcon className="w-3.5 h-3.5" /> Cuentas
+                <UsersIcon className="w-3.5 h-3.5" /> {t('admin.users.tabs.accounts')}
               </button>
               <button onClick={() => setTab('pros')} className={classNames('inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg', tab === 'pros' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>
-                <Briefcase className="w-3.5 h-3.5" /> Profesionales
+                <Briefcase className="w-3.5 h-3.5" /> {t('admin.users.tabs.professionals')}
               </button>
             </div>
           </div>

@@ -3,14 +3,8 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Gift, RefreshCw, Search, CheckCircle, AlertCircle, User, Users, UserX, Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import AdminLayout from '@/components/admin/AdminLayout';
-
-const CASE_LABELS = {
-  A: { label: 'No existe', color: 'bg-gray-100 text-gray-700', icon: UserX },
-  B: { label: 'Cliente', color: 'bg-blue-100 text-blue-700', icon: User },
-  C: { label: 'Autónomo sin sub', color: 'bg-amber-100 text-amber-700', icon: Users },
-  D: { label: 'Autónomo activo', color: 'bg-green-100 text-green-700', icon: CheckCircle }
-};
 
 const STATUS_COLORS = {
   active: 'bg-green-100 text-green-700',
@@ -19,6 +13,7 @@ const STATUS_COLORS = {
 };
 
 export default function AdminGiftsPage() {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState('');
   const [plan, setPlan] = useState('visibilidad');
@@ -26,6 +21,14 @@ export default function AdminGiftsPage() {
   const [previewing, setPreviewing] = useState(false);
   const [granting, setGranting] = useState(false);
   const [result, setResult] = useState(null);
+
+  // Dentro del componente para que las etiquetas se retraduzcan al cambiar de idioma.
+  const CASE_LABELS = {
+    A: { label: t('admin.gifts.case.noUser'), color: 'bg-gray-100 text-gray-700', icon: UserX },
+    B: { label: t('clientLabel'), color: 'bg-blue-100 text-blue-700', icon: User },
+    C: { label: t('admin.gifts.case.professionalNoSub'), color: 'bg-amber-100 text-amber-700', icon: Users },
+    D: { label: t('admin.gifts.case.professionalActive'), color: 'bg-green-100 text-green-700', icon: CheckCircle }
+  };
 
   useEffect(() => {
     base44.auth.me().then(u => {
@@ -55,7 +58,7 @@ export default function AdminGiftsPage() {
       const res = await base44.functions.invoke('previewGrant', { email: email.trim(), plan });
       setPreview(res.data);
     } catch (err) {
-      toast.error('Error en preview: ' + err.message);
+      toast.error(t('admin.gifts.previewError', { message: err.message }));
     } finally {
       setPreviewing(false);
     }
@@ -68,12 +71,12 @@ export default function AdminGiftsPage() {
     try {
       const res = await base44.functions.invoke('grantFreeMonth', { email: email.trim(), plan });
       setResult(res.data);
-      toast.success('¡Mes gratis concedido correctamente!');
+      toast.success(t('admin.gifts.grantSuccess'));
       refetch();
       setPreview(null);
       setEmail('');
     } catch (err) {
-      toast.error('Error: ' + err.message);
+      toast.error(t('admin.gifts.grantError', { message: err.message }));
     } finally {
       setGranting(false);
     }
@@ -81,7 +84,7 @@ export default function AdminGiftsPage() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    toast.success('Copiado al portapapeles');
+    toast.success(t('admin.gifts.copied'));
   };
 
   if (!user) {
@@ -101,21 +104,21 @@ export default function AdminGiftsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">🎁 Regalar mes gratis</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('admin.gifts.title')}</h1>
             <p className="text-sm text-gray-500 mt-1">
-              Funciona para cualquier usuario — cliente, autónomo o sin cuenta.
-              <span className="ml-2 font-semibold text-amber-600">{thisMonthGrants} regalos este mes</span>
+              {t('admin.gifts.subtitle')}
+              <span className="ml-2 font-semibold text-amber-600">{t('admin.gifts.thisMonth', { count: thisMonthGrants })}</span>
             </p>
           </div>
           <button onClick={refetch} className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            Actualizar
+            {t('admin.gifts.refresh')}
           </button>
         </div>
 
         {/* Formulario */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">Nuevo regalo</h2>
+          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">{t('admin.gifts.newGift')}</h2>
 
           <div className="flex gap-3 flex-wrap">
             <input
@@ -123,7 +126,7 @@ export default function AdminGiftsPage() {
               value={email}
               onChange={e => { setEmail(e.target.value); setPreview(null); setResult(null); }}
               onKeyDown={e => e.key === 'Enter' && handlePreview()}
-              placeholder="Email del destinatario"
+              placeholder={t('admin.gifts.emailPlaceholder')}
               className="flex-1 min-w-[240px] border border-gray-200 rounded-lg px-3 py-2 text-sm"
             />
             <select
@@ -131,8 +134,8 @@ export default function AdminGiftsPage() {
               onChange={e => { setPlan(e.target.value); setPreview(null); setResult(null); }}
               className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
             >
-              <option value="visibilidad">Plan Visibilidad (13€/mes)</option>
-              <option value="ads_plus">Plan Ads+ (33€/mes)</option>
+              <option value="visibilidad">{t('admin.gifts.planVisibility')}</option>
+              <option value="ads_plus">{t('admin.gifts.planAdsPlus')}</option>
             </select>
             <button
               onClick={handlePreview}
@@ -140,7 +143,7 @@ export default function AdminGiftsPage() {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
             >
               {previewing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              Verificar usuario
+              {t('admin.gifts.checkUser')}
             </button>
           </div>
 
@@ -149,7 +152,7 @@ export default function AdminGiftsPage() {
             <div className="border border-blue-200 bg-blue-50 rounded-xl p-4 space-y-3">
               <div className="flex items-start gap-3">
                 <div className={`px-2.5 py-1 rounded-full text-xs font-semibold ${CASE_LABELS[preview.case]?.color}`}>
-                  Caso {preview.case} — {CASE_LABELS[preview.case]?.label}
+                  {t('admin.gifts.caseBadge', { code: preview.case, label: CASE_LABELS[preview.case]?.label })}
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-gray-800">{preview.label}</p>
@@ -159,7 +162,7 @@ export default function AdminGiftsPage() {
 
               {preview.user && (
                 <div className="text-xs text-gray-600 bg-white rounded-lg px-3 py-2 border border-gray-100">
-                  <span className="font-medium">{preview.user.full_name || '(sin nombre)'}</span>
+                  <span className="font-medium">{preview.user.full_name || t('admin.gifts.noName')}</span>
                   <span className="mx-2 text-gray-400">·</span>
                   <span>{preview.email}</span>
                   <span className="mx-2 text-gray-400">·</span>
@@ -169,10 +172,10 @@ export default function AdminGiftsPage() {
 
               {preview.subscription && (
                 <div className="text-xs text-gray-600 bg-white rounded-lg px-3 py-2 border border-gray-100">
-                  <span className="font-medium">Sub activa:</span> {preview.subscription.plan_nombre}
+                  <span className="font-medium">{t('admin.gifts.activeSub')}</span> {preview.subscription.plan_nombre}
                   {preview.stripe_preview !== null && (
                     <span className="ml-2 text-green-700 font-medium">
-                      → Próxima factura con cupón: {(preview.stripe_preview?.amount_due / 100).toFixed(2)}€
+                      {t('admin.gifts.nextInvoiceWithCoupon', { amount: (preview.stripe_preview?.amount_due / 100).toFixed(2) })}
                     </span>
                   )}
                 </div>
@@ -185,13 +188,13 @@ export default function AdminGiftsPage() {
                   className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50"
                 >
                   {granting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4" />}
-                  Confirmar y regalar
+                  {t('admin.gifts.confirmGrant')}
                 </button>
                 <button
                   onClick={() => setPreview(null)}
                   className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>
@@ -202,7 +205,7 @@ export default function AdminGiftsPage() {
             <div className="border border-green-200 bg-green-50 rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2 text-green-700 font-semibold text-sm">
                 <CheckCircle className="w-5 h-5" />
-                Regalo concedido — Caso {result.case}
+                {t('admin.gifts.granted', { code: result.case })}
               </div>
 
               {result.promo_code && (
@@ -221,7 +224,7 @@ export default function AdminGiftsPage() {
                       <button
                         onClick={() => copyToClipboard(result.suggested_message)}
                         className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
-                        title="Copiar mensaje"
+                        title={t('admin.gifts.copyMessage')}
                       >
                         <Copy className="w-4 h-4" />
                       </button>
@@ -232,18 +235,18 @@ export default function AdminGiftsPage() {
 
               {result.stripe_subscription_id && (
                 <p className="text-xs text-gray-600">
-                  <span className="font-medium">Subscription ID:</span> <code className="bg-white px-1 rounded">{result.stripe_subscription_id}</code>
-                  {result.trial_end && <span className="ml-2">· Trial hasta: {new Date(result.trial_end).toLocaleDateString('es-ES')}</span>}
+                  <span className="font-medium">{t('admin.gifts.subscriptionId')}</span> <code className="bg-white px-1 rounded">{result.stripe_subscription_id}</code>
+                  {result.trial_end && <span className="ml-2">{t('admin.gifts.trialUntil', { date: new Date(result.trial_end).toLocaleDateString('es-ES') })}</span>}
                 </p>
               )}
 
               {result.amount_due_next !== undefined && result.amount_due_next !== null && (
                 <p className="text-xs text-gray-600">
-                  Próxima factura verificada: <span className="font-bold text-green-700">{(result.amount_due_next / 100).toFixed(2)}€</span>
+                  {t('admin.gifts.nextInvoiceVerified')} <span className="font-bold text-green-700">{(result.amount_due_next / 100).toFixed(2)}€</span>
                 </p>
               )}
 
-              <button onClick={() => setResult(null)} className="text-xs text-gray-500 underline">Hacer otro regalo</button>
+              <button onClick={() => setResult(null)} className="text-xs text-gray-500 underline">{t('admin.gifts.makeAnother')}</button>
             </div>
           )}
         </div>
@@ -251,8 +254,8 @@ export default function AdminGiftsPage() {
         {/* Tabla de historial */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-800">Últimos 50 regalos</h2>
-            <span className="text-sm text-gray-500">{grants.length} registros</span>
+            <h2 className="font-semibold text-gray-800">{t('admin.gifts.lastGrants')}</h2>
+            <span className="text-sm text-gray-500">{t('admin.gifts.records', { count: grants.length })}</span>
           </div>
 
           {isLoading ? (
@@ -262,14 +265,14 @@ export default function AdminGiftsPage() {
           ) : grants.length === 0 ? (
             <div className="py-12 text-center text-gray-400">
               <Gift className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p className="text-sm">Sin regalos todavía</p>
+              <p className="text-sm">{t('admin.gifts.emptyState')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    {['Email', 'Tipo', 'Caso', 'Plan', 'Stripe ID', 'Estado', 'Concedido', 'Expira'].map(h => (
+                    {[t('emailField'), t('admin.gifts.table.type'), t('admin.gifts.table.case'), t('admin.gifts.table.plan'), t('admin.gifts.table.stripeId'), t('admin.gifts.table.status'), t('admin.gifts.table.grantedAt'), t('admin.gifts.table.expiresAt')].map(h => (
                       <th key={h} className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">{h}</th>
                     ))}
                   </tr>

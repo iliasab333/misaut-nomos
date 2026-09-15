@@ -32,8 +32,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 export default function ProjectDetailPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
@@ -138,12 +140,12 @@ export default function ProjectDetailPage() {
     onSuccess: (savedProject) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
-      toast.success("Proyecto guardado");
+      toast.success(t('projects.detail.saved'));
       if (isNew) {
         navigate(createPageUrl("ProjectDetail") + "?id=" + savedProject.id);
       }
     },
-    onError: () => toast.error("Error al guardar proyecto")
+    onError: () => toast.error(t('projects.detail.saveError'))
   });
 
   const createPhaseMutation = useMutation({
@@ -151,7 +153,7 @@ export default function ProjectDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phases'] });
       setShowPhaseDialog(false);
-      toast.success("Fase creada");
+      toast.success(t('projects.phases.created'));
     }
   });
 
@@ -160,7 +162,7 @@ export default function ProjectDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       setShowTaskDialog(false);
-      toast.success("Tarea creada");
+      toast.success(t('projects.tasks.created'));
     }
   });
 
@@ -168,7 +170,7 @@ export default function ProjectDetailPage() {
     mutationFn: ({ id, data }) => base44.entities.ProjectTask.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success("Tarea actualizada");
+      toast.success(t('projects.tasks.updated'));
     }
   });
 
@@ -179,7 +181,7 @@ export default function ProjectDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       setShowTimeLogDialog(false);
       setSelectedTask(null);
-      toast.success("Tiempo registrado");
+      toast.success(t('projects.time.logged'));
     }
   });
 
@@ -206,9 +208,9 @@ export default function ProjectDetailPage() {
       });
       
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
-      toast.success("Archivo(s) subido(s)");
+      toast.success(t('projects.files.uploaded'));
     } catch (error) {
-      toast.error("Error al subir archivo");
+      toast.error(t('projects.files.uploadError'));
     } finally {
       setUploadingFile(false);
     }
@@ -216,7 +218,7 @@ export default function ProjectDetailPage() {
 
   const handleSave = () => {
     if (!formData.name.trim()) {
-      toast.error("El nombre del proyecto es obligatorio");
+      toast.error(t('projects.detail.nameRequired'));
       return;
     }
     saveProjectMutation.mutate(formData);
@@ -243,7 +245,7 @@ export default function ProjectDetailPage() {
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver
+            {t('common.back')}
           </Button>
           {canEdit && (
             <Button
@@ -256,29 +258,29 @@ export default function ProjectDetailPage() {
               ) : (
                 <Save className="w-4 h-4 mr-2" />
               )}
-              Guardar
+              {t('common.save')}
             </Button>
           )}
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="overview">Vista General</TabsTrigger>
-            {!isNew && <TabsTrigger value="phases">Fases</TabsTrigger>}
-            {!isNew && <TabsTrigger value="tasks">Tareas</TabsTrigger>}
-            {!isNew && <TabsTrigger value="time">Tiempo</TabsTrigger>}
-            {!isNew && <TabsTrigger value="files">Archivos</TabsTrigger>}
+            <TabsTrigger value="overview">{t('projects.detail.tabs.overview')}</TabsTrigger>
+            {!isNew && <TabsTrigger value="phases">{t('projects.phases.title')}</TabsTrigger>}
+            {!isNew && <TabsTrigger value="tasks">{t('projects.tasks.title')}</TabsTrigger>}
+            {!isNew && <TabsTrigger value="time">{t('projects.time.title')}</TabsTrigger>}
+            {!isNew && <TabsTrigger value="files">{t('projects.files.title')}</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Información del Proyecto</CardTitle>
+                <CardTitle>{t('projects.detail.infoTitle')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Nombre del Proyecto *</Label>
+                    <Label>{t('projects.detail.form.name')}</Label>
                     <Input
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -286,11 +288,11 @@ export default function ProjectDetailPage() {
                     />
                   </div>
                   <div>
-                    <Label>Cliente</Label>
+                    <Label>{t('clientLabel')}</Label>
                     {canEdit ? (
                       <Select value={formData.client_name} onValueChange={(v) => setFormData({ ...formData, client_name: v })}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecciona cliente" />
+                          <SelectValue placeholder={t('projects.detail.form.selectClient')} />
                         </SelectTrigger>
                         <SelectContent>
                           {clients.map(client => (
@@ -305,7 +307,7 @@ export default function ProjectDetailPage() {
                 </div>
 
                 <div>
-                  <Label>Descripción</Label>
+                  <Label>{t('description')}</Label>
                   <Textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -316,38 +318,38 @@ export default function ProjectDetailPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label>Estado</Label>
+                    <Label>{t('projects.status.label')}</Label>
                     <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })} disabled={!canEdit}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="planning">Planificación</SelectItem>
-                        <SelectItem value="in_progress">En progreso</SelectItem>
-                        <SelectItem value="on_hold">En pausa</SelectItem>
-                        <SelectItem value="completed">Completado</SelectItem>
-                        <SelectItem value="cancelled">Cancelado</SelectItem>
+                        <SelectItem value="planning">{t('projects.status.planning')}</SelectItem>
+                        <SelectItem value="in_progress">{t('projects.status.inProgress')}</SelectItem>
+                        <SelectItem value="on_hold">{t('projects.status.onHold')}</SelectItem>
+                        <SelectItem value="completed">{t('projects.status.completed')}</SelectItem>
+                        <SelectItem value="cancelled">{t('projects.status.cancelled')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
-                    <Label>Prioridad</Label>
+                    <Label>{t('projects.priority.label')}</Label>
                     <Select value={formData.priority} onValueChange={(v) => setFormData({ ...formData, priority: v })} disabled={!canEdit}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Baja</SelectItem>
-                        <SelectItem value="medium">Media</SelectItem>
-                        <SelectItem value="high">Alta</SelectItem>
-                        <SelectItem value="urgent">Urgente</SelectItem>
+                        <SelectItem value="low">{t('projects.priority.low')}</SelectItem>
+                        <SelectItem value="medium">{t('projects.priority.medium')}</SelectItem>
+                        <SelectItem value="high">{t('projects.priority.high')}</SelectItem>
+                        <SelectItem value="urgent">{t('projects.priority.urgent')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
-                    <Label>Color</Label>
+                    <Label>{t('projects.detail.form.color')}</Label>
                     <input
                       type="color"
                       value={formData.color}
@@ -360,7 +362,7 @@ export default function ProjectDetailPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label>Fecha de Inicio</Label>
+                    <Label>{t('projects.detail.form.startDate')}</Label>
                     <Input
                       type="date"
                       value={formData.start_date}
@@ -370,7 +372,7 @@ export default function ProjectDetailPage() {
                   </div>
 
                   <div>
-                    <Label>Fecha de Fin</Label>
+                    <Label>{t('projects.detail.form.endDate')}</Label>
                     <Input
                       type="date"
                       value={formData.end_date}
@@ -380,7 +382,7 @@ export default function ProjectDetailPage() {
                   </div>
 
                   <div>
-                    <Label>Presupuesto (€)</Label>
+                    <Label>{t('projects.detail.form.budget')}</Label>
                     <Input
                       type="number"
                       value={formData.budget}
@@ -393,26 +395,26 @@ export default function ProjectDetailPage() {
                 {!isNew && (
                   <div className="pt-4 border-t">
                     <div className="flex justify-between text-sm mb-2">
-                      <span>Progreso del Proyecto</span>
+                      <span>{t('projects.detail.progressTitle')}</span>
                       <span className="font-semibold">{project?.progress_percentage || 0}%</span>
                     </div>
                     <Progress value={project?.progress_percentage || 0} className="h-3" />
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                       <div className="text-center">
                         <p className="text-2xl font-bold text-blue-600">{tasks.length}</p>
-                        <p className="text-sm text-gray-600">Tareas</p>
+                        <p className="text-sm text-gray-600">{t('projects.tasks.title')}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-2xl font-bold text-green-600">{tasks.filter(t => t.status === 'completed').length}</p>
-                        <p className="text-sm text-gray-600">Completadas</p>
+                        <p className="text-2xl font-bold text-green-600">{tasks.filter(task => task.status === 'completed').length}</p>
+                        <p className="text-sm text-gray-600">{t('projects.detail.stats.completed')}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-2xl font-bold text-orange-600">{project?.total_hours_logged || 0}h</p>
-                        <p className="text-sm text-gray-600">Horas</p>
+                        <p className="text-sm text-gray-600">{t('projects.detail.stats.hours')}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-2xl font-bold text-purple-600">{phases.length}</p>
-                        <p className="text-sm text-gray-600">Fases</p>
+                        <p className="text-sm text-gray-600">{t('projects.phases.title')}</p>
                       </div>
                     </div>
                   </div>
@@ -425,11 +427,11 @@ export default function ProjectDetailPage() {
             <>
               <TabsContent value="phases" className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold">Fases del Proyecto</h2>
+                  <h2 className="text-xl font-bold">{t('projects.phases.heading')}</h2>
                   {canEdit && (
                     <Button onClick={() => setShowPhaseDialog(true)}>
                       <Plus className="w-4 h-4 mr-2" />
-                      Nueva Fase
+                      {t('projects.phases.new')}
                     </Button>
                   )}
                 </div>
@@ -437,7 +439,7 @@ export default function ProjectDetailPage() {
                 {phases.length === 0 ? (
                   <Card>
                     <CardContent className="py-12 text-center">
-                      <p className="text-gray-600">No hay fases creadas</p>
+                      <p className="text-gray-600">{t('projects.phases.empty')}</p>
                     </CardContent>
                   </Card>
                 ) : (
@@ -450,20 +452,20 @@ export default function ProjectDetailPage() {
                               <CardTitle className="text-lg">{phase.name}</CardTitle>
                               {phase.description && <p className="text-sm text-gray-600 mt-1">{phase.description}</p>}
                             </div>
-                            <Badge>{phase.status === 'completed' ? 'Completada' : phase.status === 'in_progress' ? 'En progreso' : 'Pendiente'}</Badge>
+                            <Badge>{phase.status === 'completed' ? t('projects.phases.status.completed') : phase.status === 'in_progress' ? t('projects.status.inProgress') : t('projects.status.pending')}</Badge>
                           </div>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span>Progreso</span>
+                              <span>{t('projects.progress')}</span>
                               <span>{phase.progress_percentage}%</span>
                             </div>
                             <Progress value={phase.progress_percentage} />
                             {(phase.start_date || phase.end_date) && (
                               <div className="flex gap-4 text-sm text-gray-600 mt-2">
-                                {phase.start_date && <span>Inicio: {format(new Date(phase.start_date), 'dd/MM/yyyy')}</span>}
-                                {phase.end_date && <span>Fin: {format(new Date(phase.end_date), 'dd/MM/yyyy')}</span>}
+                                {phase.start_date && <span>{t('projects.phases.startLabel', { date: format(new Date(phase.start_date), 'dd/MM/yyyy') })}</span>}
+                                {phase.end_date && <span>{t('projects.phases.endLabel', { date: format(new Date(phase.end_date), 'dd/MM/yyyy') })}</span>}
                               </div>
                             )}
                           </div>
@@ -476,11 +478,11 @@ export default function ProjectDetailPage() {
 
               <TabsContent value="tasks" className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold">Tareas</h2>
+                  <h2 className="text-xl font-bold">{t('projects.tasks.title')}</h2>
                   {canEdit && (
                     <Button onClick={() => setShowTaskDialog(true)}>
                       <Plus className="w-4 h-4 mr-2" />
-                      Nueva Tarea
+                      {t('projects.tasks.new')}
                     </Button>
                   )}
                 </div>
@@ -488,7 +490,7 @@ export default function ProjectDetailPage() {
                 {tasks.length === 0 ? (
                   <Card>
                     <CardContent className="py-12 text-center">
-                      <p className="text-gray-600">No hay tareas creadas</p>
+                      <p className="text-gray-600">{t('projects.tasks.empty')}</p>
                     </CardContent>
                   </Card>
                 ) : (
@@ -544,7 +546,7 @@ export default function ProjectDetailPage() {
                                 }}
                               >
                                 <Clock className="w-4 h-4 mr-1" />
-                                Registrar Tiempo
+                                {t('projects.time.log')}
                               </Button>
                             )}
                           </div>
@@ -556,13 +558,13 @@ export default function ProjectDetailPage() {
               </TabsContent>
 
               <TabsContent value="time" className="space-y-4">
-                <h2 className="text-xl font-bold">Registro de Tiempo</h2>
+                <h2 className="text-xl font-bold">{t('projects.time.heading')}</h2>
                 
                 {timeLogs.length === 0 ? (
                   <Card>
                     <CardContent className="py-12 text-center">
                       <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-600">No hay tiempo registrado</p>
+                      <p className="text-gray-600">{t('projects.time.empty')}</p>
                     </CardContent>
                   </Card>
                 ) : (
@@ -583,7 +585,7 @@ export default function ProjectDetailPage() {
                               )}
                             </div>
                             {log.billable && (
-                              <Badge variant="outline" className="bg-green-50">Facturable</Badge>
+                              <Badge variant="outline" className="bg-green-50">{t('projects.time.billable')}</Badge>
                             )}
                           </div>
                         </CardContent>
@@ -595,7 +597,7 @@ export default function ProjectDetailPage() {
 
               <TabsContent value="files" className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold">Archivos del Proyecto</h2>
+                  <h2 className="text-xl font-bold">{t('projects.files.heading')}</h2>
                   {canEdit && (
                     <>
                       <input
@@ -614,7 +616,7 @@ export default function ProjectDetailPage() {
                         ) : (
                           <Paperclip className="w-4 h-4 mr-2" />
                         )}
-                        Adjuntar Archivo
+                        {t('projects.files.attach')}
                       </Button>
                     </>
                   )}
@@ -624,7 +626,7 @@ export default function ProjectDetailPage() {
                   <Card>
                     <CardContent className="py-12 text-center">
                       <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-600">No hay archivos adjuntos</p>
+                      <p className="text-gray-600">{t('projects.files.empty')}</p>
                     </CardContent>
                   </Card>
                 ) : (
@@ -639,7 +641,7 @@ export default function ProjectDetailPage() {
                               <p className="text-xs text-gray-500">{format(new Date(file.uploaded_at), 'dd/MM/yyyy HH:mm')}</p>
                             </div>
                             <a href={file.url} target="_blank" rel="noopener noreferrer">
-                              <Button size="sm" variant="outline">Ver</Button>
+                              <Button size="sm" variant="outline">{t('view')}</Button>
                             </a>
                           </div>
                         </CardContent>
@@ -683,11 +685,12 @@ export default function ProjectDetailPage() {
 }
 
 function PhaseDialog({ open, onClose, onSave, saving }) {
+  const { t } = useTranslation();
   const [data, setData] = useState({ name: "", description: "", start_date: "", end_date: "", status: "pending" });
 
   const handleSave = () => {
     if (!data.name.trim()) {
-      toast.error("El nombre es obligatorio");
+      toast.error(t('projects.dialogs.nameRequired'));
       return;
     }
     onSave(data);
@@ -698,32 +701,32 @@ function PhaseDialog({ open, onClose, onSave, saving }) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nueva Fase</DialogTitle>
+          <DialogTitle>{t('projects.phases.new')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label>Nombre *</Label>
+            <Label>{t('projects.dialogs.name')}</Label>
             <Input value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} />
           </div>
           <div>
-            <Label>Descripción</Label>
+            <Label>{t('description')}</Label>
             <Textarea value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Fecha Inicio</Label>
+              <Label>{t('projects.phases.form.startDate')}</Label>
               <Input type="date" value={data.start_date} onChange={(e) => setData({ ...data, start_date: e.target.value })} />
             </div>
             <div>
-              <Label>Fecha Fin</Label>
+              <Label>{t('projects.phases.form.endDate')}</Label>
               <Input type="date" value={data.end_date} onChange={(e) => setData({ ...data, end_date: e.target.value })} />
             </div>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="outline" onClick={onClose}>{t('common.cancel')}</Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Crear Fase"}
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('projects.phases.create')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -732,6 +735,7 @@ function PhaseDialog({ open, onClose, onSave, saving }) {
 }
 
 function TaskDialog({ open, onClose, onSave, phases, saving }) {
+  const { t } = useTranslation();
   const [data, setData] = useState({ 
     name: "", 
     description: "", 
@@ -744,7 +748,7 @@ function TaskDialog({ open, onClose, onSave, phases, saving }) {
 
   const handleSave = () => {
     if (!data.name.trim()) {
-      toast.error("El nombre es obligatorio");
+      toast.error(t('projects.dialogs.nameRequired'));
       return;
     }
     onSave(data);
@@ -755,22 +759,22 @@ function TaskDialog({ open, onClose, onSave, phases, saving }) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nueva Tarea</DialogTitle>
+          <DialogTitle>{t('projects.tasks.new')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label>Nombre *</Label>
+            <Label>{t('projects.dialogs.name')}</Label>
             <Input value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} />
           </div>
           <div>
-            <Label>Descripción</Label>
+            <Label>{t('description')}</Label>
             <Textarea value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} />
           </div>
           <div>
-            <Label>Fase</Label>
+            <Label>{t('projects.tasks.form.phase')}</Label>
             <Select value={data.phase_id} onValueChange={(v) => setData({ ...data, phase_id: v })}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecciona fase (opcional)" />
+                <SelectValue placeholder={t('projects.tasks.form.selectPhase')} />
               </SelectTrigger>
               <SelectContent>
                 {phases.map(phase => (
@@ -781,33 +785,33 @@ function TaskDialog({ open, onClose, onSave, phases, saving }) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Prioridad</Label>
+              <Label>{t('projects.priority.label')}</Label>
               <Select value={data.priority} onValueChange={(v) => setData({ ...data, priority: v })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Baja</SelectItem>
-                  <SelectItem value="medium">Media</SelectItem>
-                  <SelectItem value="high">Alta</SelectItem>
-                  <SelectItem value="urgent">Urgente</SelectItem>
+                  <SelectItem value="low">{t('projects.priority.low')}</SelectItem>
+                  <SelectItem value="medium">{t('projects.priority.medium')}</SelectItem>
+                  <SelectItem value="high">{t('projects.priority.high')}</SelectItem>
+                  <SelectItem value="urgent">{t('projects.priority.urgent')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Fecha Límite</Label>
+              <Label>{t('projects.tasks.form.dueDate')}</Label>
               <Input type="date" value={data.due_date} onChange={(e) => setData({ ...data, due_date: e.target.value })} />
             </div>
           </div>
           <div>
-            <Label>Horas Estimadas</Label>
+            <Label>{t('projects.tasks.form.estimatedHours')}</Label>
             <Input type="number" value={data.estimated_hours} onChange={(e) => setData({ ...data, estimated_hours: e.target.value })} />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="outline" onClick={onClose}>{t('common.cancel')}</Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Crear Tarea"}
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('projects.tasks.create')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -816,6 +820,7 @@ function TaskDialog({ open, onClose, onSave, phases, saving }) {
 }
 
 function TimeLogDialog({ open, onClose, onSave, task, saving }) {
+  const { t } = useTranslation();
   const [data, setData] = useState({ 
     task_id: "", 
     description: "", 
@@ -832,7 +837,7 @@ function TimeLogDialog({ open, onClose, onSave, task, saving }) {
 
   const handleSave = () => {
     if (!data.hours || parseFloat(data.hours) <= 0) {
-      toast.error("Las horas son obligatorias");
+      toast.error(t('projects.time.hoursRequired'));
       return;
     }
     onSave(data);
@@ -843,7 +848,7 @@ function TimeLogDialog({ open, onClose, onSave, task, saving }) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Registrar Tiempo</DialogTitle>
+          <DialogTitle>{t('projects.time.log')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {task && (
@@ -853,20 +858,20 @@ function TimeLogDialog({ open, onClose, onSave, task, saving }) {
           )}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Fecha *</Label>
+              <Label>{t('projects.time.form.date')}</Label>
               <Input type="date" value={data.date} onChange={(e) => setData({ ...data, date: e.target.value })} />
             </div>
             <div>
-              <Label>Horas *</Label>
+              <Label>{t('projects.time.form.hours')}</Label>
               <Input type="number" step="0.5" value={data.hours} onChange={(e) => setData({ ...data, hours: e.target.value })} />
             </div>
           </div>
           <div>
-            <Label>Descripción</Label>
+            <Label>{t('description')}</Label>
             <Textarea 
               value={data.description} 
               onChange={(e) => setData({ ...data, description: e.target.value })}
-              placeholder="¿Qué has hecho?"
+              placeholder={t('projects.time.form.descriptionPlaceholder')}
               rows={3}
             />
           </div>
@@ -877,13 +882,13 @@ function TimeLogDialog({ open, onClose, onSave, task, saving }) {
               checked={data.billable}
               onChange={(e) => setData({ ...data, billable: e.target.checked })}
             />
-            <Label htmlFor="billable">Horas facturables</Label>
+            <Label htmlFor="billable">{t('projects.time.form.billable')}</Label>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="outline" onClick={onClose}>{t('common.cancel')}</Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Registrar"}
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('projects.time.submit')}
           </Button>
         </DialogFooter>
       </DialogContent>

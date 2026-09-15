@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation, Trans } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
@@ -17,16 +18,28 @@ const downloadQuotePDFWithLogo = async (q) => {
 };
 import { useNavigate } from "react-router-dom";
 
+// Sólo estilos: la etiqueta de cada estado sale de STATUS_LABEL_KEYS vía t(),
+// para que se retraduzca al cambiar de idioma.
 const STATUS_CONFIG = {
-  borrador: { label: "Borrador", className: "bg-gray-100 text-gray-700" },
-  enviado:  { label: "Enviado",  className: "bg-blue-50 text-blue-700" },
-  aceptado: { label: "Aceptado", className: "bg-green-50 text-green-700" },
-  rechazado:{ label: "Rechazado",className: "bg-red-50 text-red-700" },
+  borrador: { className: "bg-gray-100 text-gray-700" },
+  enviado:  { className: "bg-blue-50 text-blue-700" },
+  aceptado: { className: "bg-green-50 text-green-700" },
+  rechazado:{ className: "bg-red-50 text-red-700" },
+};
+
+// Mapa explícito estado → clave i18n.
+const STATUS_LABEL_KEYS = {
+  borrador: 'draft',
+  enviado: 'quotes.status.sent',
+  aceptado: 'quotes.status.accepted',
+  rechazado: 'quotes.status.rejected',
 };
 
 function StatusBadge({ status }) {
+  const { t } = useTranslation();
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.borrador;
-  return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cfg.className}`}>{cfg.label}</span>;
+  const labelKey = STATUS_LABEL_KEYS[status] || STATUS_LABEL_KEYS.borrador;
+  return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cfg.className}`}>{t(labelKey)}</span>;
 }
 
 function MetricCard({ label, value, icon: Icon, color = "gray" }) {
@@ -43,6 +56,7 @@ function MetricCard({ label, value, icon: Icon, color = "gray" }) {
 }
 
 export default function PresupuestosPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
@@ -85,7 +99,7 @@ export default function PresupuestosPage() {
     setDeleting(true);
     await base44.entities.Quote.delete(deleteTarget.id);
     queryClient.invalidateQueries({ queryKey: ['quotes'] });
-    toast.success("Presupuesto eliminado");
+    toast.success(t('quotes.list.deleted'));
     setDeleteTarget(null);
     setDeleting(false);
   };
@@ -128,9 +142,9 @@ export default function PresupuestosPage() {
       }).catch(() => {});
 
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
-      toast.success("Presupuesto enviado por chat");
+      toast.success(t('quotes.list.sentViaChat'));
     } catch (err) {
-      toast.error("Error al enviar: " + err.message);
+      toast.error(t('quotes.list.sendError', { message: err.message }));
     } finally {
       setSendingId(null);
     }
@@ -151,10 +165,10 @@ export default function PresupuestosPage() {
         progress_percentage: 0,
         color: '#3B82F6'
       });
-      toast.success("Proyecto creado");
+      toast.success(t('quotes.list.projectCreated'));
       navigate(`/proyectos/${project.id}`);
     } catch {
-      toast.error("Error al crear proyecto");
+      toast.error(t('quotes.list.projectError'));
     }
   };
 
@@ -167,12 +181,12 @@ export default function PresupuestosPage() {
         return;
       }
 
-      toast.success(`✅ Factura ${response.data.invoice.invoice_number} creada`);
+      toast.success(t('quotes.list.invoiceCreated', { number: response.data.invoice.invoice_number }));
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
     } catch (error) {
       console.error("Error converting to invoice:", error);
-      toast.error("Error al convertir en factura");
+      toast.error(t('quotes.list.invoiceError'));
     }
   };
 
@@ -185,7 +199,7 @@ export default function PresupuestosPage() {
     const url = `${window.location.origin}/presupuesto/${shareQuote.id}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
-    toast.success("Enlace copiado");
+    toast.success(t('quotes.share.linkCopied'));
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -196,19 +210,20 @@ export default function PresupuestosPage() {
   );
 
   const TABS = ['todos', 'borrador', 'enviado', 'aceptado', 'rechazado'];
-  const TAB_LABELS = { todos: 'Todos', borrador: 'Borrador', enviado: 'Enviado', aceptado: 'Aceptado', rechazado: 'Rechazado' };
+  const TAB_LABEL_KEYS = { todos: 'quotes.list.tabAll', borrador: 'draft', enviado: 'quotes.status.sent', aceptado: 'quotes.status.accepted', rechazado: 'quotes.status.rejected' };
+  const EMPTY_FILTER_KEYS = { borrador: 'quotes.list.emptyDrafts', enviado: 'quotes.list.emptySent', aceptado: 'quotes.list.emptyAccepted', rechazado: 'quotes.list.emptyRejected' };
 
   return (
     <>
-      <SEOHead title="Presupuestos — MisAutónomos" description="Crea, envía y gestiona tus presupuestos" />
+      <SEOHead title={t('quotes.list.seoTitle')} description={t('quotesPage.subtitle')} />
 
       <div className="max-w-5xl mx-auto p-4 pb-24 md:pb-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">Presupuestos</h1>
+            <h1 className="text-xl font-semibold text-gray-900">{t('quotesPage.title')}</h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              {isProfessional ? "Crea, envía y gestiona tus presupuestos" : "Presupuestos recibidos"}
+              {isProfessional ? t('quotesPage.subtitle') : t('quotes.list.receivedSubtitle')}
             </p>
           </div>
           {isProfessional && (
@@ -216,7 +231,7 @@ export default function PresupuestosPage() {
               onClick={() => { setEditingQuote(null); setShowForm(true); }}
               className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg inline-flex items-center gap-1.5 transition-colors"
             >
-              <Plus className="w-4 h-4" />Nuevo presupuesto
+              <Plus className="w-4 h-4" />{t('quotesPage.newQuote')}
             </button>
           )}
         </div>
@@ -224,10 +239,10 @@ export default function PresupuestosPage() {
         {/* Métricas */}
         {isProfessional && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <MetricCard label="Total" value={metrics.total} icon={FileText} />
-            <MetricCard label="Enviados" value={metrics.enviados} icon={Send} color="blue" />
-            <MetricCard label="Aceptados" value={metrics.aceptados} icon={CheckCircle} color="green" />
-            <MetricCard label="Importe aceptado" value={`${metrics.totalAceptado.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€`} icon={Euro} color="amber" />
+            <MetricCard label={t('total')} value={metrics.total} icon={FileText} />
+            <MetricCard label={t('quotes.list.metricSent')} value={metrics.enviados} icon={Send} color="blue" />
+            <MetricCard label={t('quotes.list.metricAccepted')} value={metrics.aceptados} icon={CheckCircle} color="green" />
+            <MetricCard label={t('quotes.list.metricAcceptedAmount')} value={`${metrics.totalAceptado.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€`} icon={Euro} color="amber" />
           </div>
         )}
 
@@ -239,7 +254,7 @@ export default function PresupuestosPage() {
               onClick={() => setFilter(s)}
               className={`px-3 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${filter === s ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
             >
-              {TAB_LABELS[s]}
+              {t(TAB_LABEL_KEYS[s])}
               {s !== 'todos' && quotes.filter(q => q.status === s).length > 0 && (
                 <span className="ml-1.5 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
                   {quotes.filter(q => q.status === s).length}
@@ -256,11 +271,13 @@ export default function PresupuestosPage() {
           <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
             <FileText className="w-12 h-12 text-gray-200 mx-auto mb-3" />
             <p className="text-gray-500 font-medium">
-              {filter === 'todos' ? (isProfessional ? 'No has creado presupuestos aún' : 'No has recibido presupuestos') : `Sin presupuestos ${TAB_LABELS[filter].toLowerCase()}s`}
+              {filter === 'todos'
+                ? (isProfessional ? t('quotes.list.emptyAll') : t('quotes.list.emptyReceived'))
+                : t(EMPTY_FILTER_KEYS[filter])}
             </p>
             {isProfessional && filter === 'todos' && (
               <button onClick={() => { setEditingQuote(null); setShowForm(true); }} className="mt-3 text-sm text-blue-600 hover:underline">
-                Crear el primer presupuesto →
+                {t('quotes.list.createFirst')}
               </button>
             )}
           </div>
@@ -271,11 +288,11 @@ export default function PresupuestosPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    <th className="text-left px-4 py-2.5 font-medium text-gray-600">Número</th>
-                    <th className="text-left px-4 py-2.5 font-medium text-gray-600">{isProfessional ? 'Cliente' : 'Profesional'}</th>
-                    <th className="text-left px-4 py-2.5 font-medium text-gray-600">Fecha</th>
-                    <th className="text-right px-4 py-2.5 font-medium text-gray-600">Total</th>
-                    <th className="text-center px-4 py-2.5 font-medium text-gray-600">Estado</th>
+                    <th className="text-left px-4 py-2.5 font-medium text-gray-600">{t('quotes.list.colNumber')}</th>
+                    <th className="text-left px-4 py-2.5 font-medium text-gray-600">{isProfessional ? t('clientLabel') : t('professionalLabel')}</th>
+                    <th className="text-left px-4 py-2.5 font-medium text-gray-600">{t('quotes.list.colDate')}</th>
+                    <th className="text-right px-4 py-2.5 font-medium text-gray-600">{t('total')}</th>
+                    <th className="text-center px-4 py-2.5 font-medium text-gray-600">{t('quotes.list.colStatus')}</th>
                     <th className="px-4 py-2.5"></th>
                   </tr>
                 </thead>
@@ -289,19 +306,19 @@ export default function PresupuestosPage() {
                       <td className="px-4 py-3 text-center"><StatusBadge status={q.status} /></td>
                       <td className="px-4 py-3">
                       <div className="flex gap-1 justify-end items-center">
-                        <button onClick={() => handleShare(q)} title="Compartir" className="p-1.5 hover:bg-blue-50 rounded">
+                        <button onClick={() => handleShare(q)} title={t('quotes.list.share')} className="p-1.5 hover:bg-blue-50 rounded">
                           <Share2 className="w-4 h-4 text-blue-500" />
                         </button>
-                        <button onClick={() => setViewQuote(q)} title="Ver" className="p-1.5 hover:bg-gray-100 rounded">
+                        <button onClick={() => setViewQuote(q)} title={t('view')} className="p-1.5 hover:bg-gray-100 rounded">
                           <Eye className="w-4 h-4 text-gray-500" />
                         </button>
-                        <button onClick={() => downloadQuotePDFWithLogo(q)} title="Descargar PDF" className="p-1.5 hover:bg-gray-100 rounded">
+                        <button onClick={() => downloadQuotePDFWithLogo(q)} title={t('downloadPDF')} className="p-1.5 hover:bg-gray-100 rounded">
                           <Download className="w-4 h-4 text-gray-500" />
                         </button>
                           {isProfessional && q.status === 'borrador' && (
                             <button
                               onClick={() => handleSendNow(q)}
-                              title="Enviar por chat"
+                              title={t('quotes.list.sendViaChat')}
                               disabled={sendingId === q.id}
                               className="p-1.5 hover:bg-blue-50 rounded"
                             >
@@ -310,21 +327,21 @@ export default function PresupuestosPage() {
                           )}
                           {isProfessional && q.status === 'aceptado' && (
                             <>
-                              <button onClick={() => handleConvertToInvoice(q)} title="Convertir a factura" className="p-1.5 hover:bg-green-50 rounded">
+                              <button onClick={() => handleConvertToInvoice(q)} title={t('quotes.list.convertToInvoice')} className="p-1.5 hover:bg-green-50 rounded">
                                 <FileText className="w-4 h-4 text-green-500" />
                               </button>
-                              <button onClick={() => handleConvertToProject(q)} title="Convertir a proyecto" className="p-1.5 hover:bg-indigo-50 rounded">
+                              <button onClick={() => handleConvertToProject(q)} title={t('quotes.list.convertToProject')} className="p-1.5 hover:bg-indigo-50 rounded">
                                 <FolderKanban className="w-4 h-4 text-indigo-500" />
                               </button>
                             </>
                           )}
                           {isProfessional && (
-                            <button onClick={() => { setEditingQuote(q); setShowForm(true); }} title="Editar" className="p-1.5 hover:bg-gray-100 rounded">
+                            <button onClick={() => { setEditingQuote(q); setShowForm(true); }} title={t('common.edit')} className="p-1.5 hover:bg-gray-100 rounded">
                               <RefreshCw className="w-4 h-4 text-gray-500" />
                             </button>
                           )}
                           {isProfessional && (
-                            <button onClick={() => setDeleteTarget(q)} title="Eliminar" className="p-1.5 hover:bg-red-50 rounded">
+                            <button onClick={() => setDeleteTarget(q)} title={t('common.delete')} className="p-1.5 hover:bg-red-50 rounded">
                               <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
                             </button>
                           )}
@@ -357,7 +374,7 @@ export default function PresupuestosPage() {
                         </button>
                       )}
                       {isProfessional && q.status === 'aceptado' && (
-                        <button onClick={() => handleConvertToInvoice(q)} title="Convertir a factura" className="p-1.5 hover:bg-green-50 rounded">
+                        <button onClick={() => handleConvertToInvoice(q)} title={t('quotes.list.convertToInvoice')} className="p-1.5 hover:bg-green-50 rounded">
                           <FileText className="w-4 h-4 text-green-500" />
                         </button>
                       )}
@@ -389,20 +406,20 @@ export default function PresupuestosPage() {
                 <span className="text-gray-500">{viewQuote.quote_number}</span>
               </div>
               <div className="grid grid-cols-2 gap-2 bg-gray-50 rounded-lg p-3 text-xs">
-                <div><span className="text-gray-500">Cliente:</span> <strong>{viewQuote.client_name}</strong></div>
-                <div><span className="text-gray-500">Fecha:</span> {viewQuote.issue_date || format(new Date(viewQuote.created_date), 'dd/MM/yyyy')}</div>
-                <div><span className="text-gray-500">Válido hasta:</span> {viewQuote.valid_until || '—'}</div>
-                {viewQuote.estimated_days && <div><span className="text-gray-500">Días estimados:</span> {viewQuote.estimated_days}</div>}
+                <div><span className="text-gray-500">{t('quotes.detail.client')}</span> <strong>{viewQuote.client_name}</strong></div>
+                <div><span className="text-gray-500">{t('quotes.detail.date')}</span> {viewQuote.issue_date || format(new Date(viewQuote.created_date), 'dd/MM/yyyy')}</div>
+                <div><span className="text-gray-500">{t('quotes.detail.validUntil')}</span> {viewQuote.valid_until || '—'}</div>
+                {viewQuote.estimated_days && <div><span className="text-gray-500">{t('quotes.detail.estimatedDays')}</span> {viewQuote.estimated_days}</div>}
               </div>
               {viewQuote.description && <p className="text-gray-700">{viewQuote.description}</p>}
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border rounded-lg overflow-hidden min-w-[360px]">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-3 py-2 text-left">Concepto</th>
-                      <th className="px-3 py-2 text-center">Cant.</th>
-                      <th className="px-3 py-2 text-right">Precio</th>
-                      <th className="px-3 py-2 text-right">Total</th>
+                      <th className="px-3 py-2 text-left">{t('quotes.table.concept')}</th>
+                      <th className="px-3 py-2 text-center">{t('qty')}</th>
+                      <th className="px-3 py-2 text-right">{t('quotes.table.price')}</th>
+                      <th className="px-3 py-2 text-right">{t('total')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -416,24 +433,24 @@ export default function PresupuestosPage() {
                     ))}
                   </tbody>
                   <tfoot className="bg-gray-50 font-medium">
-                    <tr className="border-t"><td colSpan={3} className="px-3 py-1.5 text-right">Subtotal:</td><td className="px-3 py-1.5 text-right">{parseFloat(viewQuote.subtotal || 0).toFixed(2)}€</td></tr>
-                    <tr><td colSpan={3} className="px-3 py-1.5 text-right">IVA:</td><td className="px-3 py-1.5 text-right">{parseFloat(viewQuote.total_iva || 0).toFixed(2)}€</td></tr>
-                    {viewQuote.aplica_retencion && <tr><td colSpan={3} className="px-3 py-1.5 text-right text-red-600">Retención ({viewQuote.porcentaje_retencion}%):</td><td className="px-3 py-1.5 text-right text-red-600">-{parseFloat(viewQuote.total_retencion || 0).toFixed(2)}€</td></tr>}
-                    <tr className="border-t-2"><td colSpan={3} className="px-3 py-2 text-right font-bold">TOTAL:</td><td className="px-3 py-2 text-right font-bold text-green-700">{parseFloat(viewQuote.total || 0).toFixed(2)}€</td></tr>
+                    <tr className="border-t"><td colSpan={3} className="px-3 py-1.5 text-right">{t('quotes.table.subtotal')}</td><td className="px-3 py-1.5 text-right">{parseFloat(viewQuote.subtotal || 0).toFixed(2)}€</td></tr>
+                    <tr><td colSpan={3} className="px-3 py-1.5 text-right">{t('quotes.table.vat')}</td><td className="px-3 py-1.5 text-right">{parseFloat(viewQuote.total_iva || 0).toFixed(2)}€</td></tr>
+                    {viewQuote.aplica_retencion && <tr><td colSpan={3} className="px-3 py-1.5 text-right text-red-600">{t('quotes.table.retention', { percent: viewQuote.porcentaje_retencion })}</td><td className="px-3 py-1.5 text-right text-red-600">-{parseFloat(viewQuote.total_retencion || 0).toFixed(2)}€</td></tr>}
+                    <tr className="border-t-2"><td colSpan={3} className="px-3 py-2 text-right font-bold">{t('quotes.table.grandTotal')}</td><td className="px-3 py-2 text-right font-bold text-green-700">{parseFloat(viewQuote.total || 0).toFixed(2)}€</td></tr>
                   </tfoot>
                 </table>
               </div>
               {viewQuote.rejection_reason && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-red-700 font-medium text-xs">Motivo del rechazo:</p>
+                  <p className="text-red-700 font-medium text-xs">{t('quotes.detail.rejectionReason')}</p>
                   <p className="text-red-600 text-xs mt-1">{viewQuote.rejection_reason}</p>
                 </div>
               )}
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cerrar</AlertDialogCancel>
+              <AlertDialogCancel>{t('common.close')}</AlertDialogCancel>
               <AlertDialogAction onClick={() => downloadQuotePDFWithLogo(viewQuote)} className="bg-gray-900 hover:bg-gray-800">
-                <Download className="w-4 h-4 mr-1" />Descargar PDF
+                <Download className="w-4 h-4 mr-1" />{t('downloadPDF')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -456,16 +473,20 @@ export default function PresupuestosPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-red-600">
-              <Trash2 className="w-5 h-5" />Eliminar presupuesto
+              <Trash2 className="w-5 h-5" />{t('quotes.list.deleteTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Seguro que quieres eliminar <strong>{deleteTarget?.title}</strong>? Esta acción no se puede deshacer.
+              <Trans
+                i18nKey="quotes.list.deleteConfirm"
+                values={{ title: deleteTarget?.title }}
+                components={{ 1: <strong /> }}
+              />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={deleting} className="bg-red-600 hover:bg-red-700">
-              {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}Eliminar
+              {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}{t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -477,15 +498,19 @@ export default function PresupuestosPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Share2 className="w-5 h-5" />
-              Compartir presupuesto
+              {t('quotes.share.title')}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4">
               <p>
-                Envía este enlace a <strong>{shareQuote?.client_name}</strong> para que pueda ver y aceptar el presupuesto online.
+                <Trans
+                  i18nKey="quotes.share.description"
+                  values={{ name: shareQuote?.client_name }}
+                  components={{ 1: <strong /> }}
+                />
               </p>
 
               <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-2">Enlace público:</p>
+                <p className="text-xs text-gray-500 mb-2">{t('quotes.share.publicLink')}</p>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -506,17 +531,16 @@ export default function PresupuestosPage() {
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-xs text-blue-800">
-                  <strong>💡 Consejo:</strong> El cliente podrá aceptar o rechazar el presupuesto desde este enlace. 
-                  Una vez aceptado, podrás convertirlo automáticamente en factura.
+                  <Trans i18nKey="quotes.share.tip" components={{ 1: <strong /> }} />
                 </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cerrar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.close')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleCopyLink} className="bg-blue-600 hover:bg-blue-700">
               {copied ? <CheckCircle className="w-4 h-4 mr-2" /> : <LinkIcon className="w-4 h-4 mr-2" />}
-              {copied ? "Copiado" : "Copiar enlace"}
+              {copied ? t('quotes.share.copied') : t('quotes.share.copyLink')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

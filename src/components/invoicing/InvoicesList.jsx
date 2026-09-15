@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, Download, Trash2, FileText, Search, Filter, Mail, CreditCard, CheckCircle, Copy, ExternalLink, Loader2 } from "lucide-react";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const statusColors = {
   draft: "bg-gray-100 text-gray-800",
@@ -27,7 +27,7 @@ export default function InvoicesList({
   onMarkAsPaid,
   loadingActions = {}
 }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
@@ -53,11 +53,11 @@ export default function InvoicesList({
 
   const getStatusLabel = (status) => {
     const labels = {
-      draft: t('draft') || 'Borrador',
-      sent: t('sent') || 'Emitida',
-      paid: t('paid') || 'Pagada',
-      overdue: t('overdue') || 'Vencida',
-      cancelled: t('cancelled') || 'Anulada'
+      draft: t('draft'),
+      sent: t('sent'),
+      paid: t('paid'),
+      overdue: t('overdue'),
+      cancelled: t('cancelled')
     };
     return labels[status] || status;
   };
@@ -70,32 +70,32 @@ export default function InvoicesList({
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar por nº factura o cliente..."
+            placeholder={t('invoices.list.searchPlaceholder')}
             className="pl-10"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full md:w-48">
-            <SelectValue placeholder="Todos los estados" />
+            <SelectValue placeholder={t('invoices.list.allStatuses')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            <SelectItem value="draft">Borrador</SelectItem>
-            <SelectItem value="sent">Emitida</SelectItem>
-            <SelectItem value="paid">Pagada</SelectItem>
-            <SelectItem value="overdue">Vencida</SelectItem>
+            <SelectItem value="all">{t('invoices.list.allStatuses')}</SelectItem>
+            <SelectItem value="draft">{t('draft')}</SelectItem>
+            <SelectItem value="sent">{t('sent')}</SelectItem>
+            <SelectItem value="paid">{t('paid')}</SelectItem>
+            <SelectItem value="overdue">{t('overdue')}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={dateFilter} onValueChange={setDateFilter}>
           <SelectTrigger className="w-full md:w-48">
-            <SelectValue placeholder="Todo el periodo" />
+            <SelectValue placeholder={t('invoices.period.allTime')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todo el periodo</SelectItem>
-            <SelectItem value="1">Último mes</SelectItem>
-            <SelectItem value="3">Últimos 3 meses</SelectItem>
-            <SelectItem value="6">Últimos 6 meses</SelectItem>
-            <SelectItem value="12">Último año</SelectItem>
+            <SelectItem value="all">{t('invoices.period.allTime')}</SelectItem>
+            <SelectItem value="1">{t('invoices.period.lastMonth')}</SelectItem>
+            <SelectItem value="3">{t('invoices.period.lastThreeMonths')}</SelectItem>
+            <SelectItem value="6">{t('invoices.period.lastSixMonths')}</SelectItem>
+            <SelectItem value="12">{t('invoices.period.lastYear')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -103,7 +103,7 @@ export default function InvoicesList({
       {filtered.length === 0 ? (
         <Card className="p-12 text-center">
           <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No hay facturas</p>
+          <p className="text-gray-500">{t('invoices.list.empty')}</p>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -125,7 +125,7 @@ export default function InvoicesList({
                       {invoice.payment_link && (
                         <span className="text-purple-600 flex items-center gap-1">
                           <CreditCard className="w-3 h-3" />
-                          Link Stripe
+                          {t('invoices.list.stripeLinkBadge')}
                         </span>
                       )}
                     </div>
@@ -140,14 +140,14 @@ export default function InvoicesList({
                         onClick={() => onSendEmail(invoice)}
                         disabled={loadingActions[`email_${invoice.id}`]}
                         className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 px-2"
-                        title="Enviar por email al cliente"
+                        title={t('invoices.list.sendEmailTitle')}
                       >
                         {loadingActions[`email_${invoice.id}`] ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
                           <Mail className="w-4 h-4" />
                         )}
-                        <span className="hidden md:inline ml-1 text-xs">Email</span>
+                        <span className="hidden md:inline ml-1 text-xs">{t('emailField')}</span>
                       </Button>
                     )}
                     
@@ -159,7 +159,7 @@ export default function InvoicesList({
                         onClick={() => onCreatePaymentLink(invoice)}
                         disabled={loadingActions[`stripe_${invoice.id}`]}
                         className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 h-8 px-2"
-                        title={invoice.payment_link ? "Ver/copiar link de pago" : "Crear link de pago Stripe"}
+                        title={invoice.payment_link ? t('invoices.list.viewPaymentLinkTitle') : t('invoices.list.createPaymentLinkTitle')}
                       >
                         {loadingActions[`stripe_${invoice.id}`] ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -167,7 +167,7 @@ export default function InvoicesList({
                           <CreditCard className="w-4 h-4" />
                         )}
                         <span className="hidden md:inline ml-1 text-xs">
-                          {invoice.payment_link ? 'Link' : 'Stripe'}
+                          {invoice.payment_link ? t('invoices.list.linkButton') : t('invoices.list.stripeButton')}
                         </span>
                       </Button>
                     )}
@@ -180,7 +180,7 @@ export default function InvoicesList({
                         onClick={() => onSendPaymentEmail(invoice)}
                         disabled={loadingActions[`payemail_${invoice.id}`]}
                         className="text-green-600 hover:text-green-700 hover:bg-green-50 h-8 px-2"
-                        title="Enviar enlace de pago por email"
+                        title={t('invoices.list.sendPaymentLinkTitle')}
                       >
                         {loadingActions[`payemail_${invoice.id}`] ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -190,7 +190,7 @@ export default function InvoicesList({
                             <CreditCard className="w-3 h-3 -ml-1" />
                           </>
                         )}
-                        <span className="hidden md:inline ml-1 text-xs">Cobrar</span>
+                        <span className="hidden md:inline ml-1 text-xs">{t('invoices.list.chargeButton')}</span>
                       </Button>
                     )}
                     
@@ -201,10 +201,10 @@ export default function InvoicesList({
                         size="sm"
                         onClick={() => onMarkAsPaid(invoice)}
                         className="text-green-600 hover:text-green-700 hover:bg-green-50 h-8 px-2"
-                        title="Marcar como pagada"
+                        title={t('invoices.list.markAsPaidTitle')}
                       >
                         <CheckCircle className="w-4 h-4" />
-                        <span className="hidden md:inline ml-1 text-xs">Pagada</span>
+                        <span className="hidden md:inline ml-1 text-xs">{t('paid')}</span>
                       </Button>
                     )}
                     
@@ -219,12 +219,12 @@ export default function InvoicesList({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="draft">{t('draft')}</SelectItem>
-                          <SelectItem value="sent">{t('markAsSent') || 'Emitida'}</SelectItem>
+                          <SelectItem value="sent">{t('markAsSent')}</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
                     
-                    <Button variant="ghost" size="icon" onClick={() => onView(invoice)} title={t('view') || 'Ver'} className="h-8 w-8">
+                    <Button variant="ghost" size="icon" onClick={() => onView(invoice)} title={t('view')} className="h-8 w-8">
                       <Eye className="w-4 h-4" />
                     </Button>
                     <Button 
@@ -232,7 +232,7 @@ export default function InvoicesList({
                       size="icon" 
                       onClick={() => onDownload(invoice)} 
                       disabled={loadingActions[`pdf_${invoice.id}`]}
-                      title={t('downloadPDF') || 'Descargar PDF'} 
+                      title={t('downloadPDF')} 
                       className="h-8 w-8"
                     >
                       {loadingActions[`pdf_${invoice.id}`] ? (
@@ -242,7 +242,7 @@ export default function InvoicesList({
                       )}
                     </Button>
                     {invoice.status === 'draft' && (
-                      <Button variant="ghost" size="icon" onClick={() => onDelete(invoice.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8" title={t('delete') || 'Eliminar'}>
+                      <Button variant="ghost" size="icon" onClick={() => onDelete(invoice.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8" title={t('delete')}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     )}

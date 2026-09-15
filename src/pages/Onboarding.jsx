@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import { CheckCircle, ArrowRight, ArrowLeft, Briefcase, Building2, Loader2, Aler
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
@@ -46,86 +48,87 @@ export default function OnboardingPage() {
     if (success === 'true') {
       setCurrentStep(steps.length); // Show success screen
     } else if (canceled === 'true') {
-      setError('El pago fue cancelado. Puedes intentarlo nuevamente.');
+      setError(t('subscription.onboarding.errors.paymentCanceled'));
     }
   }, []);
 
+  // Los `value` de las opciones son lo que se envía al backend: van literales.
   const steps = [
     {
-      question: "¿Eres autónomo o empresa?",
+      question: t('subscription.onboarding.steps.userType'),
       field: "userType",
       type: "choice",
       options: [
-        { value: "autonomo", label: "Autónomo", icon: Briefcase },
-        { value: "empresa", label: "Empresa", icon: Building2 }
+        { value: "autonomo", label: t('subscription.onboarding.userType.freelancer'), icon: Briefcase },
+        { value: "empresa", label: t('subscription.onboarding.userType.company'), icon: Building2 }
       ]
     },
     {
-      question: formData.userType === "empresa" ? "Razón social" : "¿Cuál es tu nombre?",
+      question: formData.userType === "empresa" ? t('subscription.onboarding.steps.companyName') : t('subscription.onboarding.steps.firstName'),
       field: "firstName",
       type: "text",
-      placeholder: formData.userType === "empresa" ? "Ej: Mi Empresa S.L." : "Ej: Juan",
+      placeholder: formData.userType === "empresa" ? t('subscription.onboarding.placeholders.companyName') : t('subscription.onboarding.placeholders.firstName'),
       maxLength: 50
     },
     {
-      question: "¿Y tus apellidos?",
+      question: t('subscription.onboarding.steps.lastName'),
       field: "lastName",
       type: "text",
-      placeholder: "Ej: Pérez García",
+      placeholder: t('subscription.onboarding.placeholders.lastName'),
       maxLength: 100,
       skipIfEmpresa: true
     },
     {
-      question: formData.userType === "empresa" ? "CIF de la empresa" : "Tu NIF",
+      question: formData.userType === "empresa" ? t('subscription.onboarding.steps.companyCif') : t('subscription.onboarding.steps.nif'),
       field: "cifNif",
       type: "nif",
-      placeholder: formData.userType === "empresa" ? "Ej: B12345678" : "Ej: 12345678A",
+      placeholder: formData.userType === "empresa" ? t('subscription.onboarding.placeholders.cif') : t('subscription.onboarding.placeholders.nif'),
       maxLength: 9
     },
     {
-      question: "¿Cuál es tu correo electrónico?",
+      question: t('subscription.onboarding.steps.email'),
       field: "email",
       type: "email",
-      placeholder: "tu@email.com",
+      placeholder: t('auth.email_placeholder'),
       maxLength: 100
     },
     {
-      question: "Crea una contraseña segura",
+      question: t('subscription.onboarding.steps.password'),
       field: "password",
       type: "password",
-      placeholder: "Mínimo 8 caracteres",
+      placeholder: t('subscription.onboarding.password.minChars'),
       maxLength: 50
     },
     {
-      question: "Teléfono de contacto",
+      question: t('phoneContactLabel'),
       field: "phone",
       type: "tel",
-      placeholder: "612345678 o +34612345678",
+      placeholder: t('subscription.onboarding.placeholders.phone'),
       maxLength: 15
     },
     {
-      question: "¿A qué te dedicas?",
+      question: t('subscription.onboarding.steps.activity'),
       field: "activity",
       type: "select",
       options: [
-        { value: "Electricista", label: "Electricista" },
-        { value: "Fontanero", label: "Fontanero" },
-        { value: "Carpintero", label: "Carpintero" },
-        { value: "Albañil / Reformas", label: "Albañil / Reformas" },
-        { value: "Jardinero", label: "Jardinero" },
-        { value: "Pintor", label: "Pintor" },
-        { value: "Transportista", label: "Transportista" },
-        { value: "Autónomo de limpieza", label: "Autónomo de limpieza" },
-        { value: "Asesoría o gestoría", label: "Asesoría o gestoría" },
-        { value: "Empresa multiservicios", label: "Empresa multiservicios" },
-        { value: "Otro tipo de servicio profesional", label: "Otro tipo de servicio profesional" }
+        { value: "Electricista", label: t('categories.electrician') },
+        { value: "Fontanero", label: t('categories.plumber') },
+        { value: "Carpintero", label: t('categories.carpenter') },
+        { value: "Albañil / Reformas", label: t('categories.builder') },
+        { value: "Jardinero", label: t('categories.gardener') },
+        { value: "Pintor", label: t('categories.painter') },
+        { value: "Transportista", label: t('subscription.onboarding.activities.transporter') },
+        { value: "Autónomo de limpieza", label: t('categories.cleaner') },
+        { value: "Asesoría o gestoría", label: t('subscription.onboarding.activities.consultancy') },
+        { value: "Empresa multiservicios", label: t('subscription.onboarding.activities.multiservice') },
+        { value: "Otro tipo de servicio profesional", label: t('subscription.onboarding.activities.other') }
       ]
     },
     {
-      question: "Dirección fiscal",
+      question: t('fiscalAddress'),
       field: "address",
       type: "text",
-      placeholder: "Calle, número, código postal, ciudad",
+      placeholder: t('subscription.onboarding.placeholders.address'),
       maxLength: 200
     }
   ];
@@ -186,7 +189,7 @@ export default function OnboardingPage() {
     const value = formData[currentField];
 
     if (!value || (typeof value === 'string' && value.trim() === '')) {
-      setError("Por favor completa este campo para continuar");
+      setError(t('subscription.onboarding.errors.required'));
       return false;
     }
 
@@ -194,15 +197,15 @@ export default function OnboardingPage() {
     if (currentField === "firstName") {
       if (!validateName(value)) {
         setError(formData.userType === "empresa" 
-          ? "La razón social debe tener entre 2 y 50 caracteres" 
-          : "El nombre debe tener entre 2 y 50 caracteres y solo contener letras");
+          ? t('subscription.onboarding.errors.companyNameLength') 
+          : t('subscription.onboarding.errors.firstNameInvalid'));
         return false;
       }
     }
 
     if (currentField === "lastName") {
       if (!validateName(value)) {
-        setError("Los apellidos deben tener entre 2 y 100 caracteres y solo contener letras");
+        setError(t('subscription.onboarding.errors.lastNameInvalid'));
         return false;
       }
     }
@@ -210,34 +213,34 @@ export default function OnboardingPage() {
     if (currentField === "cifNif") {
       if (!validateNIFCIF(value)) {
         setError(formData.userType === "empresa"
-          ? "CIF inválido. Formato: B12345678"
-          : "NIF inválido. Formato: 12345678A");
+          ? t('subscription.onboarding.errors.cifInvalid')
+          : t('subscription.onboarding.errors.nifInvalid'));
         return false;
       }
     }
 
     if (currentField === "email" && !validateEmail(value)) {
-      setError("Por favor introduce un email válido");
+      setError(t('subscription.onboarding.errors.emailInvalid'));
       return false;
     }
 
     if (currentField === "password" && !validatePassword(value)) {
-      setError("La contraseña debe tener al menos 8 caracteres");
+      setError(t('subscription.onboarding.errors.passwordLength'));
       return false;
     }
 
     if (currentField === "phone" && !validatePhone(value)) {
-      setError("Teléfono inválido. Formato: 612345678 o +34612345678");
+      setError(t('subscription.onboarding.errors.phoneInvalid'));
       return false;
     }
 
     if (currentField === "activity" && value === "Otro tipo de servicio profesional" && !formData.activityOther.trim()) {
-      setError("Por favor especifica tu actividad profesional");
+      setError(t('subscription.onboarding.errors.activityOtherRequired'));
       return false;
     }
 
     if (currentField === "address" && value.length < 10) {
-      setError("Por favor introduce una dirección completa (mínimo 10 caracteres)");
+      setError(t('subscription.onboarding.errors.addressLength'));
       return false;
     }
 
@@ -311,50 +314,50 @@ export default function OnboardingPage() {
 
       // Validate all fields
       if (!fullName || !formData.cifNif || !formData.email || !formData.password || !formData.phone || !formData.activity || !formData.address) {
-        setError("Por favor, completa todos los campos antes de continuar");
+        setError(t('subscription.onboarding.errors.allFieldsRequired'));
         setIsProcessing(false);
         return;
       }
 
       if (formData.activity === "Otro tipo de servicio profesional" && !formData.activityOther.trim()) {
-        setError("Por favor especifica tu actividad profesional");
+        setError(t('subscription.onboarding.errors.activityOtherRequired'));
         setIsProcessing(false);
         return;
       }
 
       // Final validations
       if (formData.userType !== "empresa" && !validateName(formData.firstName)) {
-        setError("El nombre contiene caracteres no válidos");
+        setError(t('subscription.onboarding.errors.firstNameChars'));
         setIsProcessing(false);
         return;
       }
 
       if (formData.userType !== "empresa" && !validateName(formData.lastName)) {
-        setError("Los apellidos contienen caracteres no válidos");
+        setError(t('subscription.onboarding.errors.lastNameChars'));
         setIsProcessing(false);
         return;
       }
 
       if (!validateNIFCIF(formData.cifNif)) {
-        setError("NIF/CIF inválido");
+        setError(t('subscription.onboarding.errors.nifCifInvalid'));
         setIsProcessing(false);
         return;
       }
 
       if (!validateEmail(formData.email)) {
-        setError("Email inválido");
+        setError(t('subscription.onboarding.errors.emailShort'));
         setIsProcessing(false);
         return;
       }
 
       if (!validatePassword(formData.password)) {
-        setError("La contraseña debe tener al menos 8 caracteres");
+        setError(t('subscription.onboarding.errors.passwordLength'));
         setIsProcessing(false);
         return;
       }
 
       if (!validatePhone(formData.phone)) {
-        setError("Teléfono inválido");
+        setError(t('subscription.onboarding.errors.phoneShort'));
         setIsProcessing(false);
         return;
       }
@@ -385,7 +388,7 @@ export default function OnboardingPage() {
 
     } catch (error) {
       console.error("Error:", error);
-      setError("Ha habido un problema temporal. Por favor, inténtalo de nuevo en unos segundos.");
+      setError(t('subscription.onboarding.errors.temporary'));
       setIsProcessing(false);
     }
   };
@@ -406,34 +409,34 @@ export default function OnboardingPage() {
               <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              ✅ ¡Pago completado con éxito!
+              {t('subscription.onboarding.success.title')}
             </h1>
             <p className="text-lg text-gray-600 mb-2">
-              Tu suscripción ha sido activada correctamente.
+              {t('subscription.onboarding.success.activated')}
             </p>
             <p className="text-lg text-gray-600 mb-8">
-              Recibirás un correo de confirmación en {formData.email}
+              {t('subscription.onboarding.success.emailSent', { email: formData.email })}
             </p>
             <div className="bg-blue-50 p-6 rounded-xl mb-6 text-left">
               <p className="text-sm font-semibold text-gray-900 mb-3">
-                ✨ Próximos pasos:
+                {t('subscription.onboarding.success.nextSteps')}
               </p>
               <ul className="text-sm text-gray-700 space-y-2">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span>Revisa tu correo para confirmar tu cuenta</span>
+                  <span>{t('subscription.onboarding.success.stepConfirmEmail')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span>Completa tu perfil profesional</span>
+                  <span>{t('subscription.onboarding.success.stepCompleteProfile')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span>Añade fotos de tus trabajos</span>
+                  <span>{t('subscription.onboarding.success.stepAddPhotos')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span>¡Comienza a recibir clientes!</span>
+                  <span>{t('subscription.onboarding.success.stepGetClients')}</span>
                 </li>
               </ul>
             </div>
@@ -444,7 +447,7 @@ export default function OnboardingPage() {
                 base44.auth.redirectToLogin(createPageUrl("MyProfile"));
               }}
             >
-              Ir a mi panel
+              {t('subscription.onboarding.success.goToPanel')}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </CardContent>
@@ -465,10 +468,10 @@ export default function OnboardingPage() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-3">
             <span className="text-white text-sm font-medium">
-              Paso {currentStep + 1} de {steps.length}
+              {t('subscription.onboarding.progress.step', { current: currentStep + 1, total: steps.length })}
             </span>
             <span className="text-white text-sm font-medium">
-              {Math.round(progress)}% completado
+              {t('subscription.onboarding.progress.completed', { percent: Math.round(progress) })}
             </span>
           </div>
           <Progress value={progress} className="h-3 bg-blue-900 rounded-full" />
@@ -532,12 +535,12 @@ export default function OnboardingPage() {
                   />
                   {currentStepData.maxLength && (
                     <p className="text-sm text-gray-500 mt-2">
-                      {getCharacterCount(currentStepData.field).current}/{currentStepData.maxLength} caracteres
+                      {t('subscription.onboarding.fields.charCount', { current: getCharacterCount(currentStepData.field).current, max: currentStepData.maxLength })}
                     </p>
                   )}
                   {currentStepData.type === "nif" && (
                     <p className="text-sm text-gray-500 mt-2">
-                      {formData.userType === "empresa" ? "Formato: B12345678" : "Formato: 12345678A"}
+                      {formData.userType === "empresa" ? t('subscription.onboarding.fields.cifFormat') : t('subscription.onboarding.fields.nifFormat')}
                     </p>
                   )}
                 </div>
@@ -556,7 +559,7 @@ export default function OnboardingPage() {
                   />
                   {currentStepData.maxLength && (
                     <p className="text-sm text-gray-500 mt-2">
-                      {getCharacterCount(currentStepData.field).current}/{currentStepData.maxLength} caracteres
+                      {t('subscription.onboarding.fields.charCount', { current: getCharacterCount(currentStepData.field).current, max: currentStepData.maxLength })}
                     </p>
                   )}
                 </div>
@@ -575,7 +578,7 @@ export default function OnboardingPage() {
                   />
                   <div className="mt-2 space-y-1">
                     <p className={`text-sm ${formData.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}`}>
-                      {formData.password.length >= 8 ? '✓' : '○'} Mínimo 8 caracteres
+                      {formData.password.length >= 8 ? '✓' : '○'} {t('subscription.onboarding.password.minChars')}
                     </p>
                   </div>
                 </div>
@@ -593,7 +596,7 @@ export default function OnboardingPage() {
                     autoFocus
                   />
                   <p className="text-sm text-gray-500 mt-2">
-                    Formatos válidos: 612345678 o +34612345678
+                    {t('subscription.onboarding.fields.phoneFormats')}
                   </p>
                 </div>
               )}
@@ -605,7 +608,7 @@ export default function OnboardingPage() {
                     onValueChange={(value) => handleFieldChange(currentStepData.field, value)}
                   >
                     <SelectTrigger className="h-14 text-lg border-2 rounded-xl focus:border-blue-600">
-                      <SelectValue placeholder="Selecciona una opción" />
+                      <SelectValue placeholder={t('subscription.onboarding.fields.selectOption')} />
                     </SelectTrigger>
                     <SelectContent>
                       {currentStepData.options.map((option) => (
@@ -619,18 +622,18 @@ export default function OnboardingPage() {
                   {currentStepData.field === "activity" && formData.activity === "Otro tipo de servicio profesional" && (
                     <div className="mt-4 p-4 bg-blue-50 rounded-xl">
                       <Label className="text-gray-900 mb-2 block font-medium">
-                        Especifica tu actividad
+                        {t('subscription.onboarding.fields.specifyActivity')}
                       </Label>
                       <Input
                         type="text"
                         value={formData.activityOther}
                         onChange={(e) => handleFieldChange('activityOther', e.target.value.slice(0, 50))}
-                        placeholder="Ej: Diseñador gráfico, Consultor IT..."
+                        placeholder={t('subscription.onboarding.placeholders.activityOther')}
                         maxLength={50}
                         className="h-12 text-base border-2 rounded-xl"
                       />
                       <p className="text-sm text-gray-600 mt-2">
-                        {formData.activityOther.length}/50 caracteres
+                        {t('subscription.onboarding.fields.charCount', { current: formData.activityOther.length, max: 50 })}
                       </p>
                     </div>
                   )}
@@ -643,37 +646,42 @@ export default function OnboardingPage() {
               <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-semibold text-gray-700">
-                    Plan seleccionado:
+                    {t('subscription.onboarding.plan.selected')}
                   </p>
                   <Badge className="bg-green-100 text-green-800 border-green-200">
-                    Más Popular
+                    {t('subscription.onboarding.plan.mostPopular')}
                   </Badge>
                 </div>
                 <div className="mb-2">
-                  <p className="text-xs font-semibold text-green-600 mb-1">🎁 7 días gratis</p>
-                  <p className="text-3xl font-bold text-blue-900">1€ <span className="text-base font-normal text-gray-500">el primer mes</span></p>
-                  <p className="text-sm text-gray-500 mt-1">Luego 13€/mes · Sin permanencia</p>
+                  <p className="text-xs font-semibold text-green-600 mb-1">{t('subscription.onboarding.plan.freeTrial')}</p>
+                  <p className="text-3xl font-bold text-blue-900">
+                    <Trans
+                      i18nKey="subscription.onboarding.plan.firstMonthPrice"
+                      components={{ muted: <span className="text-base font-normal text-gray-500" /> }}
+                    />
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">{t('subscription.onboarding.plan.thenPrice')}</p>
                 </div>
                 <p className="text-sm text-gray-600 mb-4">
-                  Acceso completo a la plataforma profesional
+                  {t('subscription.onboarding.plan.fullAccess')}
                 </p>
                 <ul className="text-sm text-gray-700 space-y-2">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                    <span>Aparece en todas las búsquedas</span>
+                    <span>{t('subscription.onboarding.plan.featureSearch')}</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                    <span>Perfil profesional completo con fotos</span>
+                    <span>{t('subscription.onboarding.plan.featureProfile')}</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                    <span>Mensajes ilimitados con clientes</span>
+                    <span>{t('pricing.free.includes.unlimitedMessages')}</span>
                   </li>
                 </ul>
                 <div className="mt-4 pt-4 border-t border-blue-200">
                   <p className="text-xs text-gray-600">
-                    🔒 Pago seguro procesado por Stripe
+                    {t('subscription.onboarding.plan.securePayment')}
                   </p>
                 </div>
               </div>
@@ -690,7 +698,7 @@ export default function OnboardingPage() {
                   disabled={isProcessing}
                 >
                   <ArrowLeft className="w-5 h-5 mr-2" />
-                  Atrás
+                  {t('subscription.onboarding.nav.back')}
                 </Button>
               )}
               <Button
@@ -708,16 +716,16 @@ export default function OnboardingPage() {
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Procesando...
+                    {t('subscription.actions.processing')}
                   </>
                 ) : currentStep === steps.length - 1 ? (
                   <>
-                    Continuar al pago
+                    {t('subscription.onboarding.nav.continueToPayment')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 ) : (
                   <>
-                    Continuar
+                    {t('subscription.onboarding.nav.continue')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}
@@ -728,7 +736,7 @@ export default function OnboardingPage() {
 
         {/* Help text */}
         <p className="text-center text-white text-sm mt-6 opacity-90">
-          🔒 Tus datos están seguros y protegidos • Puedes cancelar en cualquier momento
+          {t('subscription.onboarding.footer.secure')}
         </p>
       </div>
     </div>

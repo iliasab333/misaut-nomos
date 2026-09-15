@@ -1,10 +1,12 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Eye, MessageSquare, TrendingDown } from "lucide-react";
 import { subDays } from "date-fns";
 
 export default function AdminMetrics({ metrics, profiles, messages }) {
+  const { t } = useTranslation();
   // Filter out "system" entries
   const validMetrics = useMemo(() => metrics.filter(m => m.professional_id && m.professional_id !== "system"), [metrics]);
 
@@ -47,19 +49,19 @@ export default function AdminMetrics({ metrics, profiles, messages }) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold text-gray-900">📈 Métricas de actividad</h2>
+      <h2 className="text-lg font-bold text-gray-900">{t("admin.metrics.title")}</h2>
 
       <div className="grid md:grid-cols-2 gap-4">
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
               <Eye className="w-4 h-4 text-blue-500" />
-              Top 5 — Más vistas de perfil
+              {t("admin.metrics.topViews")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {topByViews.length === 0 ? (
-              <p className="text-sm text-gray-400">Sin datos de métricas</p>
+              <p className="text-sm text-gray-400">{t("admin.metrics.noMetrics")}</p>
             ) : (
               <div className="space-y-2">
                 {topByViews.map(({ id, views, profile }, i) => (
@@ -68,7 +70,7 @@ export default function AdminMetrics({ metrics, profiles, messages }) {
                       <span className="text-xs font-bold text-gray-400 w-4">#{i + 1}</span>
                       <span className="text-sm text-gray-800 font-medium">{profile?.business_name || id.slice(0, 8) + "..."}</span>
                     </div>
-                    <Badge className="bg-blue-50 text-blue-700">{views} vistas</Badge>
+                    <Badge className="bg-blue-50 text-blue-700">{t("admin.metrics.viewsCount", { count: views })}</Badge>
                   </div>
                 ))}
               </div>
@@ -80,12 +82,12 @@ export default function AdminMetrics({ metrics, profiles, messages }) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-green-500" />
-              Top 5 — Más mensajes recibidos
+              {t("admin.metrics.topMessages")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {topByMessages.length === 0 ? (
-              <p className="text-sm text-gray-400">Sin mensajes registrados</p>
+              <p className="text-sm text-gray-400">{t("admin.metrics.noMessages")}</p>
             ) : (
               <div className="space-y-2">
                 {topByMessages.map(({ id, count, profile }, i) => (
@@ -94,7 +96,7 @@ export default function AdminMetrics({ metrics, profiles, messages }) {
                       <span className="text-xs font-bold text-gray-400 w-4">#{i + 1}</span>
                       <span className="text-sm text-gray-800 font-medium">{profile?.business_name || id.slice(0, 8) + "..."}</span>
                     </div>
-                    <Badge className="bg-green-50 text-green-700">{count} msgs</Badge>
+                    <Badge className="bg-green-50 text-green-700">{t("admin.metrics.messagesCount", { count })}</Badge>
                   </div>
                 ))}
               </div>
@@ -107,21 +109,21 @@ export default function AdminMetrics({ metrics, profiles, messages }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <TrendingDown className="w-4 h-4 text-orange-500" />
-            Sin actividad en los últimos 30 días ({inactiveProfiles.length} profesionales activos)
+            {t("admin.metrics.inactiveTitle", { count: inactiveProfiles.length })}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {inactiveProfiles.length === 0 ? (
-            <p className="text-sm text-gray-400">Todos los profesionales tienen actividad reciente</p>
+            <p className="text-sm text-gray-400">{t("admin.metrics.allActive")}</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {inactiveProfiles.slice(0, 20).map(p => (
                 <Badge key={p.id} variant="outline" className="text-gray-500">
-                  {p.business_name || "Sin nombre"}
+                  {p.business_name || t("admin.metrics.noName")}
                 </Badge>
               ))}
               {inactiveProfiles.length > 20 && (
-                <Badge variant="outline" className="text-gray-400">+{inactiveProfiles.length - 20} más</Badge>
+                <Badge variant="outline" className="text-gray-400">{t("admin.metrics.more", { count: inactiveProfiles.length - 20 })}</Badge>
               )}
             </div>
           )}

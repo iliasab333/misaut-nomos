@@ -35,9 +35,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Users, Plus, Mail, Phone, Building, ArrowLeft, Search, Edit2, Trash2, IdCard, MapPin, Eye, Tag, Star, Filter, TrendingUp, Euro } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation, Trans } from "react-i18next";
 import Loader from "@/components/ui/Loader";
 
 export default function CRMPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
@@ -95,7 +97,7 @@ export default function CRMPage() {
       queryClient.invalidateQueries(['clientContacts']);
       setShowDialog(false);
       resetForm();
-      toast.success("Cliente creado");
+      toast.success(t('crm.toast.clientCreated'));
     },
   });
 
@@ -105,7 +107,7 @@ export default function CRMPage() {
       queryClient.invalidateQueries(['clientContacts']);
       setShowDialog(false);
       resetForm();
-      toast.success("Cliente actualizado");
+      toast.success(t('crm.toast.clientUpdated'));
     },
   });
 
@@ -114,10 +116,10 @@ export default function CRMPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(['clientContacts']);
       setDeleteDialog(null);
-      toast.success("Cliente eliminado");
+      toast.success(t('crm.toast.clientDeleted'));
     },
     onError: () => {
-      toast.error("Error al eliminar cliente");
+      toast.error(t('crm.toast.clientDeleteError'));
     }
   });
 
@@ -218,12 +220,12 @@ export default function CRMPage() {
       vip: "bg-amber-100 text-amber-800",
     };
     const labels = {
-      lead: "Lead",
-      contacted: "Contactado",
-      negotiating: "Negociando",
-      client: "Cliente",
-      inactive: "Inactivo",
-      vip: "VIP",
+      lead: t('crm.status.lead'),
+      contacted: t('crm.status.contacted'),
+      negotiating: t('crm.status.negotiating'),
+      client: t('clientLabel'),
+      inactive: t('crm.status.inactive'),
+      vip: t('crm.status.vip'),
     };
     return <Badge className={colors[status]}>{labels[status]}</Badge>;
   };
@@ -240,18 +242,18 @@ export default function CRMPage() {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate("/dashboard")}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver
+              {t('common.back')}
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">CRM - Gestión de Clientes</h1>
-              <p className="text-gray-600 mt-1">{filteredContacts.length} de {contacts.length} clientes</p>
+              <h1 className="text-3xl font-bold text-gray-900">{t('crm.list.title')}</h1>
+              <p className="text-gray-600 mt-1">{t('crm.list.countSummary', { shown: filteredContacts.length, total: contacts.length })}</p>
             </div>
           </div>
           <div className="flex gap-2">
 
             <Button onClick={() => { resetForm(); setShowDialog(true); }} className="bg-blue-600 hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-2" />
-              Nuevo cliente
+              {t('crm.actions.newClient')}
             </Button>
           </div>
         </div>
@@ -265,7 +267,7 @@ export default function CRMPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                <p className="text-xs text-gray-500">Total contactos</p>
+                <p className="text-xs text-gray-500">{t('crm.list.statTotalContacts')}</p>
               </div>
             </CardContent>
           </Card>
@@ -276,7 +278,7 @@ export default function CRMPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.leads}</p>
-                <p className="text-xs text-gray-500">Leads</p>
+                <p className="text-xs text-gray-500">{t('crm.list.statLeads')}</p>
               </div>
             </CardContent>
           </Card>
@@ -287,7 +289,7 @@ export default function CRMPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.clients}</p>
-                <p className="text-xs text-gray-500">Clientes</p>
+                <p className="text-xs text-gray-500">{t('crm.list.statClients')}</p>
               </div>
             </CardContent>
           </Card>
@@ -298,7 +300,7 @@ export default function CRMPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalValue.toLocaleString()}€</p>
-                <p className="text-xs text-gray-500">Valor estimado</p>
+                <p className="text-xs text-gray-500">{t('crm.list.statEstimatedValue')}</p>
               </div>
             </CardContent>
           </Card>
@@ -311,7 +313,7 @@ export default function CRMPage() {
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  placeholder="Buscar por nombre, email, teléfono, NIF o empresa..."
+                  placeholder={t('crm.list.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 h-11"
@@ -319,38 +321,38 @@ export default function CRMPage() {
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full md:w-40 h-11">
-                  <SelectValue placeholder="Estado" />
+                  <SelectValue placeholder={t('crm.form.status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="lead">Lead</SelectItem>
-                  <SelectItem value="contacted">Contactado</SelectItem>
-                  <SelectItem value="negotiating">Negociando</SelectItem>
-                  <SelectItem value="client">Cliente</SelectItem>
-                  <SelectItem value="vip">VIP</SelectItem>
-                  <SelectItem value="inactive">Inactivo</SelectItem>
+                  <SelectItem value="all">{t('crm.list.filterAll')}</SelectItem>
+                  <SelectItem value="lead">{t('crm.status.lead')}</SelectItem>
+                  <SelectItem value="contacted">{t('crm.status.contacted')}</SelectItem>
+                  <SelectItem value="negotiating">{t('crm.status.negotiating')}</SelectItem>
+                  <SelectItem value="client">{t('clientLabel')}</SelectItem>
+                  <SelectItem value="vip">{t('crm.status.vip')}</SelectItem>
+                  <SelectItem value="inactive">{t('crm.status.inactive')}</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={segmentFilter} onValueChange={setSegmentFilter}>
                 <SelectTrigger className="w-full md:w-40 h-11">
-                  <SelectValue placeholder="Segmento" />
+                  <SelectValue placeholder={t('crm.form.segment')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="residential">Residencial</SelectItem>
-                  <SelectItem value="commercial">Comercial</SelectItem>
-                  <SelectItem value="industrial">Industrial</SelectItem>
-                  <SelectItem value="government">Administración</SelectItem>
-                  <SelectItem value="other">Otro</SelectItem>
+                  <SelectItem value="all">{t('crm.list.filterAll')}</SelectItem>
+                  <SelectItem value="residential">{t('crm.segment.residential')}</SelectItem>
+                  <SelectItem value="commercial">{t('crm.segment.commercial')}</SelectItem>
+                  <SelectItem value="industrial">{t('crm.segment.industrial')}</SelectItem>
+                  <SelectItem value="government">{t('crm.segment.governmentShort')}</SelectItem>
+                  <SelectItem value="other">{t('crm.segment.other')}</SelectItem>
                 </SelectContent>
               </Select>
               {allTags.length > 0 && (
                 <Select value={tagFilter} onValueChange={setTagFilter}>
                   <SelectTrigger className="w-full md:w-40 h-11">
-                    <SelectValue placeholder="Etiqueta" />
+                    <SelectValue placeholder={t('crm.form.tag')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="all">{t('crm.list.filterAllTags')}</SelectItem>
                     {allTags.map(tag => (
                       <SelectItem key={tag} value={tag}>{tag}</SelectItem>
                     ))}
@@ -367,14 +369,14 @@ export default function CRMPage() {
           <Card className="border-0 shadow-sm">
             <CardContent className="p-12 text-center">
               <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No hay clientes</h3>
-              <p className="text-gray-600 mb-6">Empieza a añadir tus clientes y prospectos</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('crm.list.emptyTitle')}</h3>
+              <p className="text-gray-600 mb-6">{t('crm.list.emptyDescription')}</p>
               <Button 
                 onClick={() => { resetForm(); setShowDialog(true); }}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Añadir primer cliente
+                {t('crm.actions.addFirstClient')}
               </Button>
             </CardContent>
           </Card>
@@ -461,7 +463,7 @@ export default function CRMPage() {
                             className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
                           >
                             <Eye className="w-4 h-4 mr-1.5" />
-                            Ver detalle
+                            {t('crm.actions.viewDetails')}
                           </Button>
                           <Button 
                             size="sm" 
@@ -494,33 +496,33 @@ export default function CRMPage() {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">
-              {editingContact ? "Editar cliente" : "Nuevo cliente"}
+              {editingContact ? t('crm.actions.editClient') : t('crm.actions.newClient')}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-semibold">Nombre *</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.nameRequired')}</Label>
                 <Input
                   value={formData.client_name}
                   onChange={(e) => setFormData({...formData, client_name: e.target.value})}
-                  placeholder="Juan Pérez"
+                  placeholder={t('crm.form.namePlaceholder')}
                   required
                   className="mt-1.5"
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Email</Label>
+                <Label className="text-sm font-semibold">{t('emailField')}</Label>
                 <Input
                   type="email"
                   value={formData.client_email}
                   onChange={(e) => setFormData({...formData, client_email: e.target.value})}
-                  placeholder="juan@ejemplo.com"
+                  placeholder={t('crm.form.emailPlaceholder')}
                   className="mt-1.5"
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Teléfono</Label>
+                <Label className="text-sm font-semibold">{t('phoneField')}</Label>
                 <Input
                   value={formData.client_phone}
                   onChange={(e) => setFormData({...formData, client_phone: e.target.value})}
@@ -529,7 +531,7 @@ export default function CRMPage() {
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">NIF / CIF</Label>
+                <Label className="text-sm font-semibold">{t('nifCif')}</Label>
                 <Input
                   value={formData.client_nif}
                   onChange={(e) => setFormData({...formData, client_nif: e.target.value})}
@@ -538,31 +540,31 @@ export default function CRMPage() {
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Empresa</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.company')}</Label>
                 <Input
                   value={formData.company}
                   onChange={(e) => setFormData({...formData, company: e.target.value})}
-                  placeholder="Nombre de la empresa"
+                  placeholder={t('crm.form.companyPlaceholder')}
                   className="mt-1.5"
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Estado</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.status')}</Label>
                 <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="lead">Lead</SelectItem>
-                    <SelectItem value="contacted">Contactado</SelectItem>
-                    <SelectItem value="negotiating">Negociando</SelectItem>
-                    <SelectItem value="client">Cliente</SelectItem>
-                    <SelectItem value="inactive">Inactivo</SelectItem>
+                    <SelectItem value="lead">{t('crm.status.lead')}</SelectItem>
+                    <SelectItem value="contacted">{t('crm.status.contacted')}</SelectItem>
+                    <SelectItem value="negotiating">{t('crm.status.negotiating')}</SelectItem>
+                    <SelectItem value="client">{t('clientLabel')}</SelectItem>
+                    <SelectItem value="inactive">{t('crm.status.inactive')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="text-sm font-semibold">Valor estimado (€)</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.estimatedValue')}</Label>
                 <Input
                   type="number"
                   value={formData.estimated_value}
@@ -572,64 +574,64 @@ export default function CRMPage() {
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Origen del contacto</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.source')}</Label>
                 <Input
                   value={formData.source}
                   onChange={(e) => setFormData({...formData, source: e.target.value})}
-                  placeholder="Ej: Recomendación, Web..."
+                  placeholder={t('crm.form.sourcePlaceholder')}
                   className="mt-1.5"
                 />
               </div>
               <div>
-                <Label className="text-sm font-semibold">Segmento</Label>
+                <Label className="text-sm font-semibold">{t('crm.form.segment')}</Label>
                 <Select value={formData.segment || ""} onValueChange={(value) => setFormData({...formData, segment: value})}>
                   <SelectTrigger className="mt-1.5">
-                    <SelectValue placeholder="Seleccionar..." />
+                    <SelectValue placeholder={t('crm.form.selectPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="residential">Residencial</SelectItem>
-                    <SelectItem value="commercial">Comercial</SelectItem>
-                    <SelectItem value="industrial">Industrial</SelectItem>
-                    <SelectItem value="government">Administración pública</SelectItem>
-                    <SelectItem value="other">Otro</SelectItem>
+                    <SelectItem value="residential">{t('crm.segment.residential')}</SelectItem>
+                    <SelectItem value="commercial">{t('crm.segment.commercial')}</SelectItem>
+                    <SelectItem value="industrial">{t('crm.segment.industrial')}</SelectItem>
+                    <SelectItem value="government">{t('crm.segment.government')}</SelectItem>
+                    <SelectItem value="other">{t('crm.segment.other')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div>
-              <Label className="text-sm font-semibold">Etiquetas (separadas por coma)</Label>
+              <Label className="text-sm font-semibold">{t('crm.form.tags')}</Label>
               <Input
                 value={formData.tags}
                 onChange={(e) => setFormData({...formData, tags: e.target.value})}
-                placeholder="Ej: urgente, preferido, obras..."
+                placeholder={t('crm.form.tagsPlaceholder')}
                 className="mt-1.5"
               />
             </div>
             <div>
-              <Label className="text-sm font-semibold">Dirección</Label>
+              <Label className="text-sm font-semibold">{t('clientAddress')}</Label>
               <Input
                 value={formData.address}
                 onChange={(e) => setFormData({...formData, address: e.target.value})}
-                placeholder="Calle, número, código postal, ciudad"
+                placeholder={t('crm.form.addressPlaceholder')}
                 className="mt-1.5"
               />
             </div>
             <div>
-              <Label className="text-sm font-semibold">Notas</Label>
+              <Label className="text-sm font-semibold">{t('crm.form.notes')}</Label>
               <Textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({...formData, notes: e.target.value})}
                 rows={4}
-                placeholder="Información adicional sobre el cliente"
+                placeholder={t('crm.form.notesPlaceholder')}
                 className="mt-1.5"
               />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                {editingContact ? "Guardar cambios" : "Crear cliente"}
+                {editingContact ? t('crm.actions.saveChanges') : t('crm.list.createClient')}
               </Button>
             </DialogFooter>
           </form>
@@ -639,19 +641,22 @@ export default function CRMPage() {
       <AlertDialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
+            <AlertDialogTitle>{t('crm.deleteClient.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Estás a punto de eliminar a <strong>{deleteDialog?.client_name}</strong>. 
-              Esta acción no se puede deshacer.
+              <Trans
+                i18nKey="crm.list.deleteClientDescription"
+                values={{ name: deleteDialog?.client_name }}
+                components={{ 1: <strong /> }}
+              />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
               className="bg-red-600 hover:bg-red-700"
             >
-              Eliminar
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

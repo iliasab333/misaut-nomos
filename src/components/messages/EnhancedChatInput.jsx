@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mic, Paperclip, Smile, Send, X } from "lucide-react";
@@ -13,6 +14,7 @@ export default function EnhancedChatInput({
   onCancelReply,
   disabled 
 }) {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -62,7 +64,7 @@ export default function EnhancedChatInput({
       setIsRecording(true);
       setRecordingTime(0);
     } catch (error) {
-      toast.error('No se pudo acceder al micrófono');
+      toast.error(t('messages.chatInput.micError'));
     }
   };
 
@@ -116,7 +118,7 @@ export default function EnhancedChatInput({
       {replyingTo && (
         <div className="flex items-start justify-between gap-2 p-2 bg-blue-50 rounded-lg border border-blue-100 text-sm">
           <div className="flex-1">
-            <p className="text-xs text-gray-600 font-medium">Respondiendo a:</p>
+            <p className="text-xs text-gray-600 font-medium">{t('messages.chatInput.replyingTo')}</p>
             <p className="text-gray-900 truncate">{replyingTo.content}</p>
           </div>
           <button onClick={onCancelReply} className="flex-shrink-0">
@@ -128,7 +130,7 @@ export default function EnhancedChatInput({
       {/* Preview de imagen */}
       {previewImage && (
         <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
-          <img src={previewImage} alt="preview" className="w-full h-full object-cover" />
+          <img src={previewImage} alt={t('messages.chatInput.previewAlt')} className="w-full h-full object-cover" />
           <button
             onClick={() => setPreviewImage(null)}
             className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
@@ -149,7 +151,7 @@ export default function EnhancedChatInput({
             onClick={stopRecording}
             className="ml-auto text-red-600 hover:bg-red-100"
           >
-            Enviar
+            {t('messages.send')}
           </Button>
         </div>
       )}
@@ -180,7 +182,7 @@ export default function EnhancedChatInput({
           className="h-10 w-10 text-gray-600 hover:bg-gray-100"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || isRecording}
-          title="Adjuntar imagen"
+          title={t('messages.chatInput.attachImage')}
         >
           <Paperclip className="w-5 h-5" />
         </Button>
@@ -198,14 +200,14 @@ export default function EnhancedChatInput({
           className="h-10 w-10 text-gray-600 hover:bg-gray-100"
           onClick={() => setShowEmojis(!showEmojis)}
           disabled={disabled || isRecording}
-          title="Emojis"
+          title={t('messages.chatInput.emojis')}
         >
           <Smile className="w-5 h-5" />
         </Button>
 
         <div className="flex-1">
           <Input
-            placeholder="Escribe un mensaje..."
+            placeholder={t('messages.write_message')}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -223,7 +225,7 @@ export default function EnhancedChatInput({
               onMouseDown={startRecording}
               onTouchStart={startRecording}
               disabled={disabled}
-              title="Mantener para grabar audio"
+              title={t('messages.chatInput.holdToRecord')}
             >
               <Mic className="w-5 h-5" />
             </Button>

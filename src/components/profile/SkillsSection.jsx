@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Plus, X, Award, CheckCircle } from "lucide-react";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export default function SkillsSection({ 
   skills = [], 
@@ -16,7 +16,7 @@ export default function SkillsSection({
   onCertificationsChange,
   onYearsChange 
 }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [newSkill, setNewSkill] = useState("");
   const [newCertification, setNewCertification] = useState("");
 
@@ -56,14 +56,14 @@ export default function SkillsSection({
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Award className="w-5 h-5 text-blue-700" />
-            Experiencia Profesional
+            {t("proProfile.skills.experienceTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div>
             <Label className="flex items-center gap-2">
               {yearsExperience ? <CheckCircle className="w-4 h-4 text-green-600" /> : null}
-              Años de experiencia
+              {t("yearsExperience")}
             </Label>
             <Input
               type="number"
@@ -84,12 +84,12 @@ export default function SkillsSection({
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-purple-600" />
-            Habilidades Específicas
+            {t("proProfile.skills.skillsTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-600">
-            Añade las habilidades que te diferencian como profesional
+            {t("proProfile.skills.skillsIntro")}
           </p>
 
           {isEditing && (
@@ -98,7 +98,7 @@ export default function SkillsSection({
                 value={newSkill}
                 onChange={(e) => setNewSkill(e.target.value)}
                 onKeyPress={(e) => handleKeyPress(e, addSkill)}
-                placeholder="Ej: Instalación solar, Reparación de urgencia..."
+                placeholder={t("proProfile.skills.skillPlaceholder")}
                 className="flex-1"
               />
               <Button 
@@ -114,7 +114,7 @@ export default function SkillsSection({
 
           <div className="flex flex-wrap gap-2">
             {skills.length === 0 && !isEditing ? (
-              <p className="text-sm text-gray-400 italic">No hay habilidades añadidas</p>
+              <p className="text-sm text-gray-400 italic">{t("proProfile.skills.noSkills")}</p>
             ) : (
               skills.map((skill, idx) => (
                 <Badge 
@@ -138,8 +138,7 @@ export default function SkillsSection({
 
           {isEditing && (
             <p className="text-xs text-gray-500">
-              Sugerencias: Presupuestos gratuitos, Trabajo urgente, Garantía extendida, 
-              Atención 24h, Servicio express, Materiales incluidos
+              {t("proProfile.skills.suggestions")}
             </p>
           )}
         </CardContent>
@@ -150,12 +149,12 @@ export default function SkillsSection({
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Award className="w-5 h-5 text-amber-600" />
-            Certificaciones y Títulos
+            {t("proProfile.skills.certificationsTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-600">
-            Muestra tus certificaciones profesionales y títulos oficiales
+            {t("proProfile.skills.certificationsIntro")}
           </p>
 
           {isEditing && (
@@ -164,7 +163,7 @@ export default function SkillsSection({
                 value={newCertification}
                 onChange={(e) => setNewCertification(e.target.value)}
                 onKeyPress={(e) => handleKeyPress(e, addCertification)}
-                placeholder="Ej: Carnet instalador gas, Certificado PRL..."
+                placeholder={t("proProfile.skills.certificationPlaceholder")}
                 className="flex-1"
               />
               <Button 
@@ -180,7 +179,7 @@ export default function SkillsSection({
 
           <div className="flex flex-wrap gap-2">
             {certifications.length === 0 && !isEditing ? (
-              <p className="text-sm text-gray-400 italic">No hay certificaciones añadidas</p>
+              <p className="text-sm text-gray-400 italic">{t("proProfile.skills.noCertifications")}</p>
             ) : (
               certifications.map((cert, idx) => (
                 <Badge 

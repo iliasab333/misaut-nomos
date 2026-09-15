@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useAppData } from "@/lib/AppContext";
 import { Heart, MessageSquare, Star, MapPin, BadgeCheck, X } from "lucide-react";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import SEOHead from "../components/seo/SEOHead";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import OptimizedImage from "../components/ui/OptimizedImage";
@@ -16,7 +16,7 @@ const NAVY = '#00255C';
 export default function FavoritesPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { user } = useAppData();
 
   const { data: rawFavorites = [], isLoading: isLoadingFavorites } = useQuery({
@@ -96,24 +96,24 @@ export default function FavoritesPage() {
   return (
     <>
       <SEOHead
-        title={`${t('myFavorites') || 'Mis favoritos'} · MisAutónomos`}
-        description="Tus profesionales guardados"
+        title={t('favorites.page.seoTitle')}
+        description={t('favorites.page.seoDescription')}
       />
 
       <main className="min-h-screen bg-white">
         <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
           <header className="mb-8">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
-              Mi cuenta
+              {t('favorites.page.eyebrow')}
             </p>
             <h1
               className="text-2xl md:text-3xl font-semibold tracking-tight"
               style={{ color: NAVY, letterSpacing: '-0.02em' }}
             >
-              Mis favoritos
+              {t('favorites.page.title')}
             </h1>
             <p className="mt-2 text-slate-500 text-sm">
-              Los autónomos que has guardado. Toca el corazón en cualquier perfil para añadirlos.
+              {t('favorites.page.subtitle')}
             </p>
           </header>
 
@@ -133,10 +133,10 @@ export default function FavoritesPage() {
             <div className="border border-slate-200 rounded-2xl px-6 py-12 text-center">
               <Heart className="w-8 h-8 text-slate-300 mx-auto mb-4" aria-hidden="true" />
               <h2 className="text-base font-semibold text-slate-900 mb-1">
-                Aún no tienes favoritos
+                {t('favorites.page.emptyTitle')}
               </h2>
               <p className="text-sm text-slate-500 mb-6 max-w-sm mx-auto">
-                Cuando guardes un autónomo, aparecerá aquí para que puedas volver a contactarle en un toque.
+                {t('favorites.page.emptyBody')}
               </p>
               <button
                 type="button"
@@ -146,7 +146,7 @@ export default function FavoritesPage() {
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#001A45')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = NAVY)}
               >
-                Buscar autónomos
+                {t('messages.find_pros_cta')}
               </button>
             </div>
           ) : (
@@ -175,13 +175,13 @@ export default function FavoritesPage() {
                         type="button"
                         onClick={() => handleOpenProfile(profile)}
                         className="flex-shrink-0"
-                        aria-label={`Ver perfil de ${profile.business_name}`}
+                        aria-label={t('favorites.page.viewProfileOf', { name: profile.business_name })}
                       >
                         <Avatar className="w-12 h-12 ring-1 ring-slate-200">
                           {optimizedPhoto ? (
                             <OptimizedImage
                               src={optimizedPhoto}
-                              alt={profile.business_name || 'Perfil profesional'}
+                              alt={profile.business_name || t('favorites.page.professionalProfileAlt')}
                               className="w-full h-full"
                               objectFit="cover"
                               width={48}
@@ -203,10 +203,10 @@ export default function FavoritesPage() {
                         >
                           <div className="flex items-center gap-1.5">
                             <span className="font-semibold text-slate-900 text-[15px] truncate">
-                              {profile.business_name || 'Sin nombre'}
+                              {profile.business_name || t('favorites.page.unnamed')}
                             </span>
                             {isVerified && (
-                              <BadgeCheck className="w-4 h-4 flex-shrink-0" style={{ color: NAVY }} aria-label="Verificado" />
+                              <BadgeCheck className="w-4 h-4 flex-shrink-0" style={{ color: NAVY }} aria-label={t('proProfile.badges.verified')} />
                             )}
                           </div>
                           <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
@@ -237,17 +237,17 @@ export default function FavoritesPage() {
                           style={{ backgroundColor: NAVY }}
                           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#001A45')}
                           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = NAVY)}
-                          aria-label={`Contactar con ${profile.business_name}`}
+                          aria-label={t('proProfile.contact.contactWith', { name: profile.business_name })}
                         >
                           <MessageSquare className="w-3.5 h-3.5 mr-1.5" />
-                          Contactar
+                          {t('profile_card.contact')}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleRemoveFavorite(favorite.id)}
                           className="inline-flex items-center justify-center w-9 h-9 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                          aria-label={`Quitar a ${profile.business_name} de favoritos`}
-                          title="Quitar de favoritos"
+                          aria-label={t('favorites.page.removeAria', { name: profile.business_name })}
+                          title={t('favorites.page.remove')}
                         >
                           <X className="w-4 h-4" />
                         </button>

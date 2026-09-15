@@ -34,7 +34,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { toast } from "sonner";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { useTranslation, Trans } from "react-i18next";
 import SEOHead from "../components/seo/SEOHead";
 import { getEffectivePlan } from "@/utils/subscription";
 import { Gift } from "lucide-react";
@@ -49,7 +49,7 @@ const IS_NATIVE = (() => {
 export default function SubscriptionManagementPage() {
   // 1. HOOKS PRIMERO
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [effectivePlan, setEffectivePlan] = useState(null);
@@ -176,7 +176,7 @@ export default function SubscriptionManagementPage() {
     setIsFixing(true);
     try {
       if (!user?.email) {
-        toast.error("No se pudo obtener tu email");
+        toast.error(t('subscription.toasts.noEmail'));
         return;
       }
       
@@ -191,20 +191,20 @@ export default function SubscriptionManagementPage() {
         });
         
         if (fixResponse.data.ok) {
-          toast.success("Suscripción corregida, recargando...");
+          toast.success(t('subscription.toasts.fixed'));
           const currentUser = await loadUser();
           if (currentUser) {
             await loadSubscription(currentUser);
           }
         } else {
-          toast.error("No se pudo corregir automáticamente");
+          toast.error(t('subscription.toasts.fixFailed'));
         }
       } else {
-        toast.info("La suscripción está correctamente configurada");
+        toast.info(t('subscription.toasts.alreadyOk'));
       }
     } catch (error) {
       console.error('Error fixing subscription:', error);
-      toast.error("Error al verificar la suscripción");
+      toast.error(t('subscription.toasts.verifyError'));
     } finally {
       setIsFixing(false);
     }
@@ -220,17 +220,17 @@ export default function SubscriptionManagementPage() {
         if (currentUser) {
           await loadSubscription(currentUser);
         }
-        toast.success('Suscripción cancelada correctamente', {
-          description: 'Tu perfil ya no es visible en búsquedas'
+        toast.success(t('subscription.toasts.canceled'), {
+          description: t('subscription.toasts.canceledDescription')
         });
         setShowCancelDialog(false);
         sessionStorage.removeItem('current_user');
       } else {
-        toast.error(response.data?.error || 'Error al cancelar');
+        toast.error(response.data?.error || t('subscription.toasts.cancelError'));
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error al cancelar la suscripción');
+      toast.error(t('subscription.toasts.cancelSubscriptionError'));
     } finally {
       setIsCancelling(false);
     }
@@ -247,10 +247,10 @@ export default function SubscriptionManagementPage() {
           await loadSubscription(currentUser);
         }
       } else {
-        toast.error(response.data.error || "Error al reactivar");
+        toast.error(response.data.error || t('subscription.toasts.reactivateError'));
       }
     } catch (error) {
-      toast.error(error.message || "Error al reactivar la suscripción");
+      toast.error(error.message || t('subscription.toasts.reactivateSubscriptionError'));
     } finally {
       setIsReactivating(false);
     }
@@ -267,7 +267,7 @@ export default function SubscriptionManagementPage() {
       }
     } catch (error) {
       console.error('[Upgrade] Error:', error.message);
-      toast.error('Error al abrir el portal de facturación');
+      toast.error(t('subscription.toasts.portalError'));
       // Fallback: abrir el portal de login general
       window.open('https://billing.stripe.com/p/login/00w00j5OLbXH4PV7jbgjC00', '_blank');
     } finally {
@@ -283,18 +283,18 @@ export default function SubscriptionManagementPage() {
       });
 
       if (response.data?.ok) {
-        toast.success(response.data.message || 'Plan degradado correctamente');
+        toast.success(response.data.message || t('subscription.toasts.downgraded'));
         // Recargar con el user actual
         const currentUser = await loadUser();
         if (currentUser) {
           await loadSubscription(currentUser);
         }
       } else {
-        toast.error(response.data?.error || 'Error al degradar el plan');
+        toast.error(response.data?.error || t('subscription.toasts.downgradeError'));
       }
     } catch (error) {
       console.error('Error downgrading plan:', error);
-      toast.error('Error al degradar el plan');
+      toast.error(t('subscription.toasts.downgradeError'));
     } finally {
       setIsDowngrading(false);
     }
@@ -312,13 +312,13 @@ export default function SubscriptionManagementPage() {
   const getStatusBadge = (estado) => {
     switch (estado) {
       case "activo":
-        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />{t('active')}</Badge>;
+        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />{t('subscription.status.active')}</Badge>;
       case "cancelado":
-        return <Badge className="bg-amber-100 text-amber-800"><AlertTriangle className="w-3 h-3 mr-1" />{t('canceled')}</Badge>;
+        return <Badge className="bg-amber-100 text-amber-800"><AlertTriangle className="w-3 h-3 mr-1" />{t('subscription.status.canceled')}</Badge>;
       case "finalizada":
-        return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" />{t('finished')}</Badge>;
+        return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" />{t('subscription.status.finished')}</Badge>;
       case "en_prueba":
-        return <Badge className="bg-blue-100 text-blue-800"><Info className="w-3 h-3 mr-1" />{t('trial')}</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800"><Info className="w-3 h-3 mr-1" />{t('subscription.status.trial')}</Badge>;
       default:
         return <Badge variant="outline">{estado}</Badge>;
     }
@@ -342,7 +342,7 @@ export default function SubscriptionManagementPage() {
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-blue-700" />
         {syncing && (
-          <p className="text-sm text-gray-600">Sincronizando con Stripe...</p>
+          <p className="text-sm text-gray-600">{t('subscription.sync.stripe')}</p>
         )}
       </div>
     );
@@ -351,17 +351,17 @@ export default function SubscriptionManagementPage() {
   if (IS_NATIVE) {
     return (
       <>
-        <SEOHead title={`${t('mySubscription')} - MisAutónomos`} noindex />
+        <SEOHead title={`${t('nav.my_subscription')} - MisAutónomos`} noindex />
         <div className="min-h-screen bg-white p-4 md:p-8">
           <div className="max-w-2xl mx-auto">
             <Button
               variant="ghost"
               onClick={() => navigate(createPageUrl("MyProfile"))}
               className="mb-6 hover:bg-gray-100"
-              aria-label={t('backToProfile')}
+              aria-label={t('subscription.page.backToProfile')}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver
+              {t('common.back')}
             </Button>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -370,21 +370,26 @@ export default function SubscriptionManagementPage() {
                   <CreditCard className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-base font-semibold text-slate-900">Tu plan</h2>
+                  <h2 className="text-base font-semibold text-slate-900">{t('subscription.native.yourPlan')}</h2>
                   {subscription ? (
                     <p className="text-sm text-slate-700 mt-0.5">
-                      Estado: <span className="font-semibold">{subscription.estado || '—'}</span>
+                      {t('subscription.native.status')} <span className="font-semibold">{subscription.estado || '—'}</span>
                       {subscription.fecha_expiracion ? (
-                        <> · Renueva el {new Date(subscription.fecha_expiracion).toLocaleDateString('es-ES')}</>
+                        <> · {t('subscription.native.renewsOn', { date: new Date(subscription.fecha_expiracion).toLocaleDateString('es-ES') })}</>
                       ) : null}
                     </p>
                   ) : (
-                    <p className="text-sm text-slate-700 mt-0.5">Sin plan activo.</p>
+                    <p className="text-sm text-slate-700 mt-0.5">{t('subscription.native.noActivePlan')}</p>
                   )}
                 </div>
               </div>
               <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                Gestiona tu plan en <a href="https://misautonomos.es" target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-2" style={{ color: '#00255C' }}>misautonomos.es</a>.
+                <Trans
+                  i18nKey="subscription.native.manageOnWeb"
+                  components={{
+                    website: <a href="https://misautonomos.es" target="_blank" rel="noopener noreferrer" className="font-semibold underline underline-offset-2" style={{ color: '#00255C' }} />,
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -396,8 +401,8 @@ export default function SubscriptionManagementPage() {
   return (
     <>
       <SEOHead
-        title={`${t('mySubscription')} - MisAutónomos`}
-        description={t('manageProfessionalPlan')}
+        title={`${t('nav.my_subscription')} - MisAutónomos`}
+        description={t('subscription.page.seoDescription')}
         noindex={true}
       />
 
@@ -407,10 +412,10 @@ export default function SubscriptionManagementPage() {
             variant="ghost"
             onClick={() => navigate(createPageUrl("MyProfile"))}
             className="mb-6 hover:bg-gray-100"
-            aria-label={t('backToProfile')}
+            aria-label={t('subscription.page.backToProfile')}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver
+            {t('common.back')}
           </Button>
 
           {!subscription || subscription.estado === 'finalizada' ? (
@@ -420,13 +425,13 @@ export default function SubscriptionManagementPage() {
               </div>
               
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                {subscription?.estado === 'finalizada' ? 'Tu suscripción ha sido cancelada' : 'No tienes un plan activo'}
+                {subscription?.estado === 'finalizada' ? t('subscription.noPlan.canceledTitle') : t('subscription.noPlan.title')}
               </h2>
               
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
                 {subscription?.estado === 'finalizada' 
-                  ? 'Tu perfil ya no es visible en las búsquedas. Puedes volver a suscribirte cuando quieras.'
-                  : 'Necesitas contratar un plan profesional para que tu perfil aparezca en las búsquedas'}
+                  ? t('subscription.noPlan.canceledText')
+                  : t('subscription.noPlan.text')}
               </p>
 
               <div className="space-y-3">
@@ -435,11 +440,11 @@ export default function SubscriptionManagementPage() {
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
                 >
-                  Ver planes disponibles
+                  {t('subscription.noPlan.viewPlans')}
                 </Button>
                 
                 <p className="text-sm text-gray-500">
-                  ¿Necesitas ayuda? <a href="mailto:soporte@misautonomos.es" className="text-blue-600 hover:underline">soporte@misautonomos.es</a>
+                  {t('supportChat.needHelp')} <a href="mailto:soporte@misautonomos.es" className="text-blue-600 hover:underline">soporte@misautonomos.es</a>
                 </p>
               </div>
             </div>
@@ -453,16 +458,22 @@ export default function SubscriptionManagementPage() {
                       <Gift className="w-5 h-5 text-white"/>
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-amber-900">Tienes un plan regalado activo</h3>
+                      <h3 className="font-bold text-amber-900">{t('subscription.gift.title')}</h3>
                       <p className="text-sm text-amber-800 mt-1">
-                        Disfrutas de <strong>{effectivePlan.planName}</strong> hasta el{' '}
-                        <strong>{new Date(effectivePlan.giftedUntil).toLocaleDateString('es-ES', {day:'numeric', month:'long', year:'numeric'})}</strong>.
+                        <Trans
+                          i18nKey="subscription.gift.enjoyUntil"
+                          values={{
+                            plan: effectivePlan.planName,
+                            date: new Date(effectivePlan.giftedUntil).toLocaleDateString('es-ES', {day:'numeric', month:'long', year:'numeric'}),
+                          }}
+                          components={{ strong: <strong /> }}
+                        />
                       </p>
                       <p className="text-xs text-amber-700 mt-2">
-                        Tu facturación actual ({effectivePlan.originalPlanName}) no ha cambiado. Al terminar el regalo volverás automáticamente a este plan.
+                        {t('subscription.gift.billingUnchanged', { plan: effectivePlan.originalPlanName })}
                       </p>
                       <p className="text-xs text-amber-700 mt-2 font-medium">
-                        {Math.ceil((new Date(effectivePlan.giftedUntil) - new Date()) / (1000*60*60*24))} días restantes
+                        {t('dashboard.days_remaining', { days: Math.ceil((new Date(effectivePlan.giftedUntil) - new Date()) / (1000*60*60*24)) })}
                       </p>
                     </div>
                   </div>
@@ -473,12 +484,12 @@ export default function SubscriptionManagementPage() {
               <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Tu plan actual</p>
+                    <p className="text-sm text-gray-500 mb-1">{t('subscription.plan.current')}</p>
                     <h2 className="text-2xl font-semibold text-gray-900">
                       {plan?.nombre || (effectivePlan?.planName) || subscription.plan_nombre}
                       {effectivePlan?.isGifted && (
                         <span className="ml-2 bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full text-xs font-medium">
-                          Regalo
+                          {t('subscription.plan.giftBadge')}
                         </span>
                       )}
                     </h2>
@@ -486,31 +497,31 @@ export default function SubscriptionManagementPage() {
                   {subscription.estado === "activo" && (
                     <Badge className="bg-green-100 text-green-700 border-0 px-3 py-1">
                       <CheckCircle className="w-3 h-3 mr-1" />
-                      Activo
+                      {t('subscription.status.active')}
                     </Badge>
                   )}
                   {subscription.estado === "en_prueba" && (
                     <Badge className="bg-blue-100 text-blue-700 border-0 px-3 py-1">
-                      Periodo de prueba
+                      {t('subscription.status.trial')}
                     </Badge>
                   )}
                   {subscription.estado === "cancelado" && (
                     <Badge className="bg-amber-100 text-amber-700 border-0 px-3 py-1">
                       <AlertTriangle className="w-3 h-3 mr-1" />
-                      Cancelado
+                      {t('subscription.status.canceled')}
                     </Badge>
                   )}
                 </div>
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-gray-600">Precio</span>
-                    <span className="font-semibold text-gray-900">{plan?.precio || subscription.plan_precio}€/mes</span>
+                    <span className="text-gray-600">{t('subscription.plan.price')}</span>
+                    <span className="font-semibold text-gray-900">{t('subscription.plan.pricePerMonth', { price: plan?.precio || subscription.plan_precio })}</span>
                   </div>
                   
                   <div className="flex justify-between py-2 border-b border-gray-100">
                     <span className="text-gray-600">
-                      {subscription.estado === "en_prueba" ? "Fin de prueba" : "Próximo cobro"}
+                      {subscription.estado === "en_prueba" ? t('subscription.plan.trialEnds') : t('subscription.plan.nextCharge')}
                     </span>
                     <span className="font-semibold text-gray-900">
                       {new Date(subscription.fecha_expiracion).toLocaleDateString('es-ES', { 
@@ -520,7 +531,7 @@ export default function SubscriptionManagementPage() {
                       })}
                       {subscription.estado === "en_prueba" && getDaysLeft(subscription.fecha_expiracion) > 0 && (
                         <span className="text-blue-600 ml-2">
-                          ({getDaysLeft(subscription.fecha_expiracion)} días)
+                          {t('subscription.plan.daysLeft', { count: getDaysLeft(subscription.fecha_expiracion) })}
                         </span>
                       )}
                     </span>
@@ -529,9 +540,14 @@ export default function SubscriptionManagementPage() {
                   {subscription.estado === "en_prueba" && (
                     <div className="bg-blue-50 rounded-lg p-3 mt-3">
                       <p className="text-xs text-blue-900">
-                        <strong>Periodo de prueba:</strong> Los primeros 7 días son gratis. 
-                        Si no cancelas antes del {new Date(subscription.fecha_expiracion).toLocaleDateString('es-ES')}, 
-                        se cobrará automáticamente {plan?.precio || subscription.plan_precio}€/mes.
+                        <Trans
+                          i18nKey="subscription.plan.trialNotice"
+                          values={{
+                            date: new Date(subscription.fecha_expiracion).toLocaleDateString('es-ES'),
+                            price: plan?.precio || subscription.plan_precio,
+                          }}
+                          components={{ strong: <strong /> }}
+                        />
                       </p>
                     </div>
                   )}
@@ -545,9 +561,9 @@ export default function SubscriptionManagementPage() {
                   <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-6 text-white">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="text-xl font-semibold mb-2">Mejorar a Plan Ads+</h3>
+                        <h3 className="text-xl font-semibold mb-2">{t('subscription.upgrade.title')}</h3>
                         <p className="text-sm text-purple-100">
-                          Acceso completo al Dashboard Pro + Campañas publicitarias gestionadas
+                          {t('subscription.upgrade.subtitle')}
                         </p>
                       </div>
                       <TrendingUp className="w-10 h-10 opacity-80" />
@@ -556,15 +572,15 @@ export default function SubscriptionManagementPage() {
                     <ul className="space-y-2 mb-4 text-sm">
                       <li className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                        CRM completo y gestión de clientes
+                        {t('subscription.upgrade.featureCrm')}
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                        Campañas en Instagram, Facebook y TikTok
+                        {t('subscription.upgrade.featureAds')}
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                        Facturación y presupuestos automáticos
+                        {t('subscription.upgrade.featureInvoicing')}
                       </li>
                     </ul>
 
@@ -580,17 +596,17 @@ export default function SubscriptionManagementPage() {
                       {isUpgrading ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Procesando pago...
+                          {t('subscription.upgrade.processingPayment')}
                         </>
                       ) : (
                         <>
                           <Zap className="w-4 h-4 mr-2" />
-                          Mejorar por 33€/mes
+                          {t('subscription.upgrade.button')}
                         </>
                       )}
                     </Button>
                     <p className="text-xs text-purple-100 mt-2 text-center">
-                      Prorrateo automático. Solo pagas la diferencia del mes actual.
+                      {t('subscription.upgrade.proration')}
                     </p>
                   </div>
                 )}
@@ -600,9 +616,9 @@ export default function SubscriptionManagementPage() {
                   <div className="bg-white border border-gray-200 rounded-xl p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Cambiar a Plan Visibilidad</h3>
+                        <h3 className="font-semibold text-gray-900 mb-2">{t('subscription.downgrade.title')}</h3>
                         <p className="text-sm text-gray-600">
-                          Reduce tus gastos manteniendo visibilidad en búsquedas
+                          {t('subscription.downgrade.subtitle')}
                         </p>
                       </div>
                     </div>
@@ -616,16 +632,16 @@ export default function SubscriptionManagementPage() {
                       {isDowngrading ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Procesando...
+                          {t('subscription.actions.processing')}
                         </>
                       ) : (
                         <>
-                          Cambiar a 14€/mes
+                          {t('subscription.downgrade.button')}
                         </>
                       )}
                     </Button>
                     <p className="text-xs text-gray-500 mt-2 text-center">
-                      Se aplicará en el próximo período de facturación.
+                      {t('subscription.downgrade.appliesNextPeriod')}
                     </p>
                   </div>
                 )}
@@ -637,9 +653,9 @@ export default function SubscriptionManagementPage() {
                       <FileText className="w-6 h-6 text-blue-600" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">Facturas de tu suscripción</h3>
+                      <h3 className="font-semibold text-gray-900 mb-1">{t('subscription.invoices.title')}</h3>
                       <p className="text-sm text-gray-600">
-                        Descarga o consulta tus facturas de MisAutónomos
+                        {t('subscription.invoices.subtitle')}
                       </p>
                     </div>
                   </div>
@@ -652,10 +668,10 @@ export default function SubscriptionManagementPage() {
                     <div className="text-center py-8">
                       <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                       <p className="text-sm text-gray-500">
-                        No hay facturas disponibles aún
+                        {t('subscription.invoices.empty')}
                       </p>
                       <p className="text-xs text-gray-400 mt-1">
-                        Las facturas aparecen después del primer cobro
+                        {t('subscription.invoices.emptyHint')}
                       </p>
                     </div>
                   ) : (
@@ -671,7 +687,7 @@ export default function SubscriptionManagementPage() {
                             </div>
                             <div>
                               <p className="text-sm font-medium text-gray-900">
-                                {invoice.number || `Factura ${invoice.id}`}
+                                {invoice.number || t('subscription.invoices.fallbackNumber', { id: invoice.id })}
                               </p>
                               <p className="text-xs text-gray-500">
                                 {new Date(invoice.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -684,7 +700,7 @@ export default function SubscriptionManagementPage() {
                                 {invoice.amount.toFixed(2)}€
                               </p>
                               <p className="text-xs text-gray-500 capitalize">
-                                {invoice.status === 'paid' ? 'Pagada' : invoice.status === 'open' ? 'Pendiente' : invoice.status}
+                                {invoice.status === 'paid' ? t('paid') : invoice.status === 'open' ? t('subscription.invoices.statusOpen') : invoice.status}
                               </p>
                             </div>
                             <div className="flex gap-1">
@@ -694,7 +710,7 @@ export default function SubscriptionManagementPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-2 hover:bg-white rounded-md transition-colors"
-                                  title="Descargar PDF"
+                                  title={t('downloadPDF')}
                                 >
                                   <Download className="w-4 h-4 text-gray-600" />
                                 </a>
@@ -705,7 +721,7 @@ export default function SubscriptionManagementPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-2 hover:bg-white rounded-md transition-colors"
-                                  title="Ver factura"
+                                  title={t('subscription.invoices.view')}
                                 >
                                   <ExternalLink className="w-4 h-4 text-gray-600" />
                                 </a>
@@ -725,9 +741,9 @@ export default function SubscriptionManagementPage() {
                       <CreditCard className="w-6 h-6 text-blue-600" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">Método de pago</h3>
+                      <h3 className="font-semibold text-gray-900 mb-1">{t('paymentMethod')}</h3>
                       <p className="text-sm text-gray-600">
-                        Actualiza tu tarjeta o gestiona tu facturación
+                        {t('subscription.payment.subtitle')}
                       </p>
                     </div>
                   </div>
@@ -740,7 +756,7 @@ export default function SubscriptionManagementPage() {
                       setOpeningPortal(true);
                       
                       const timeout = setTimeout(() => {
-                        toast.error('La conexión está tardando mucho. Intenta de nuevo.');
+                        toast.error(t('subscription.payment.timeout'));
                         setOpeningPortal(false);
                       }, 10000);
 
@@ -756,18 +772,18 @@ export default function SubscriptionManagementPage() {
                           if (!newWindow) {
                             window.location.href = portalUrl;
                           } else {
-                            toast.success('Portal abierto en nueva pestaña');
+                            toast.success(t('subscription.payment.portalOpened'));
                             setOpeningPortal(false);
                           }
                         } else {
-                          const errorMsg = response.data?.error || 'Error al abrir el portal';
+                          const errorMsg = response.data?.error || t('subscription.payment.portalError');
                           toast.error(errorMsg);
                           setOpeningPortal(false);
                         }
                       } catch (error) {
                         clearTimeout(timeout);
                         console.error('Error completo:', error);
-                        toast.error('Error de conexión. Verifica tu suscripción e intenta de nuevo.');
+                        toast.error(t('subscription.payment.connectionError'));
                         setOpeningPortal(false);
                       }
                     }}
@@ -776,18 +792,18 @@ export default function SubscriptionManagementPage() {
                     {openingPortal ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Abriendo portal...
+                        {t('subscription.payment.openingPortal')}
                       </>
                     ) : (
                       <>
                         <CreditCard className="w-4 h-4 mr-2" />
-                        Gestionar pago
+                        {t('subscription.payment.manage')}
                       </>
                     )}
                   </Button>
                   {subscription?.stripe_customer_id && (
                     <p className="text-xs text-gray-500 mt-2 text-center">
-                      ID Cliente: {subscription.stripe_customer_id.substring(0, 12)}...
+                      {t('subscription.payment.customerId', { id: subscription.stripe_customer_id.substring(0, 12) })}
                     </p>
                   )}
                 </div>
@@ -799,11 +815,13 @@ export default function SubscriptionManagementPage() {
                       <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold text-gray-900 mb-1">
-                          Suscripción cancelada
+                          {t('subscription.reactivate.title')}
                         </p>
                         <p className="text-sm text-gray-700">
-                          Tu plan sigue activo hasta el {new Date(subscription.fecha_expiracion).toLocaleDateString('es-ES')}. 
-                          Quedan {getDaysLeft(subscription.fecha_expiracion)} días.
+                          {t('subscription.reactivate.activeUntil', {
+                            date: new Date(subscription.fecha_expiracion).toLocaleDateString('es-ES'),
+                            count: getDaysLeft(subscription.fecha_expiracion),
+                          })}
                         </p>
                       </div>
                     </div>
@@ -816,12 +834,12 @@ export default function SubscriptionManagementPage() {
                       {isReactivating ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Reactivando...
+                          {t('subscription.reactivate.loading')}
                         </>
                       ) : (
                         <>
                           <RefreshCw className="w-4 h-4 mr-2" />
-                          Reactivar suscripción
+                          {t('subscription.reactivate.button')}
                         </>
                       )}
                     </Button>
@@ -833,16 +851,16 @@ export default function SubscriptionManagementPage() {
                   <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
                     <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
                     <h3 className="font-semibold text-gray-900 mb-2">
-                      Tu plan ha expirado
+                      {t('subscription.expired.title')}
                     </h3>
                     <p className="text-sm text-gray-700 mb-4">
-                      Tu perfil no es visible en las búsquedas
+                      {t('subscription.expired.text')}
                     </p>
                     <Button
                       className="w-full bg-blue-600 hover:bg-blue-700"
                       onClick={() => navigate(createPageUrl("PricingPlans"))}
                     >
-                      Ver planes disponibles
+                      {t('subscription.noPlan.viewPlans')}
                     </Button>
                   </div>
                 )}
@@ -855,7 +873,7 @@ export default function SubscriptionManagementPage() {
                     onClick={() => setShowCancelDialog(true)}
                     className="text-sm text-gray-500 hover:text-red-600 transition-colors mx-auto block"
                   >
-                    Cancelar suscripción
+                    {t('subscription.cancel.link')}
                   </button>
                 </div>
               )}
@@ -866,28 +884,32 @@ export default function SubscriptionManagementPage() {
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle className="text-xl">
-                  ¿Cancelar tu suscripción?
+                  {t('subscription.cancel.dialogTitle')}
                 </DialogTitle>
                 <DialogDescription className="space-y-4 pt-4 text-base">
                   {subscription?.estado === "en_prueba" ? (
                     <>
                       <p className="text-gray-700">
-                        Si cancelas ahora, <strong>no se te cobrará nada</strong>. Tu prueba gratuita se detendrá inmediatamente.
+                        <Trans i18nKey="subscription.cancel.trialNoCharge" components={{ strong: <strong /> }} />
                       </p>
                       <div className="bg-amber-50 border-l-4 border-amber-500 p-3 rounded">
                         <p className="text-sm text-amber-900">
-                          Tu perfil dejará de aparecer en las búsquedas al instante y perderás tu plaza reservada (máximo 10 por ciudad).
+                          {t('subscription.cancel.trialWarning')}
                         </p>
                       </div>
                     </>
                   ) : (
                     <>
                       <p className="text-gray-700">
-                        Tu suscripción seguirá activa hasta el <strong>{new Date(subscription?.fecha_expiracion).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}</strong>.
+                        <Trans
+                          i18nKey="subscription.cancel.activeUntil"
+                          values={{ date: new Date(subscription?.fecha_expiracion).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }) }}
+                          components={{ strong: <strong /> }}
+                        />
                       </p>
                       <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded">
                         <p className="text-sm text-red-900">
-                          Después de esa fecha, tu perfil pasará a ser gratuito y <strong>perderás tu plaza reservada</strong> (máximo 10 profesionales por ciudad).
+                          <Trans i18nKey="subscription.cancel.activeWarning" components={{ strong: <strong /> }} />
                         </p>
                       </div>
                     </>
@@ -901,7 +923,7 @@ export default function SubscriptionManagementPage() {
                   disabled={isCancelling}
                   className="w-full sm:w-auto"
                 >
-                  No, mantener activo
+                  {t('subscription.cancel.keep')}
                 </Button>
                 <Button
                   variant="destructive"
@@ -912,10 +934,10 @@ export default function SubscriptionManagementPage() {
                   {isCancelling ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Cancelando...
+                      {t('subscription.cancel.loading')}
                     </>
                   ) : (
-                    'Sí, cancelar suscripción'
+                    t('subscription.cancel.confirm')
                   )}
                 </Button>
               </DialogFooter>

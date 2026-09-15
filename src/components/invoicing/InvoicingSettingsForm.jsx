@@ -9,10 +9,10 @@ import { Switch } from "@/components/ui/switch";
 import { Building2, Upload, X, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export default function InvoicingSettingsForm({ settings, onSave }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState(settings || {
     razon_social: "",
     nif_cif: "",
@@ -44,7 +44,7 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      toast.error(t('logoTooLarge') || "El logo no puede superar 2MB");
+      toast.error(t('invoices.settings.logoTooLarge'));
       return;
     }
 
@@ -52,9 +52,9 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFormData({ ...formData, logo_url: file_url });
-      toast.success(t('logoUploaded') || "Logo subido correctamente");
+      toast.success(t('invoices.settings.logoUploaded'));
     } catch (error) {
-      toast.error(t('errorUploadingLogo') || "Error al subir el logo");
+      toast.error(t('invoices.settings.logoUploadError'));
     } finally {
       setUploadingLogo(false);
     }
@@ -66,22 +66,22 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="w-5 h-5" />
-            {t('companyData') || 'Datos de la empresa'}
+            {t('companyData')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label>{t('companyName') || 'Razón social / Nombre comercial'} *</Label>
+            <Label>{t('companyName')} *</Label>
             <Input
               value={formData.razon_social}
               onChange={(e) => setFormData({ ...formData, razon_social: e.target.value })}
-              placeholder="Tu Empresa S.L."
+              placeholder={t('invoices.placeholders.companyName')}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>{t('nifCif') || 'NIF/CIF'} *</Label>
+              <Label>{t('nifCif')} *</Label>
               <Input
                 value={formData.nif_cif}
                 onChange={(e) => setFormData({ ...formData, nif_cif: e.target.value.toUpperCase() })}
@@ -90,27 +90,27 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
               />
             </div>
             <div>
-              <Label>{t('economicActivity') || 'Actividad económica'}</Label>
+              <Label>{t('economicActivity')}</Label>
               <Input
                 value={formData.actividad_economica}
                 onChange={(e) => setFormData({ ...formData, actividad_economica: e.target.value })}
-                placeholder="Servicios de construcción"
+                placeholder={t('invoices.placeholders.activity')}
               />
             </div>
           </div>
 
           <div>
-            <Label>{t('fiscalAddress') || 'Dirección fiscal'} *</Label>
+            <Label>{t('fiscalAddress')} *</Label>
             <Input
               value={formData.direccion_fiscal}
               onChange={(e) => setFormData({ ...formData, direccion_fiscal: e.target.value })}
-              placeholder="Calle Mayor, 123, 1º A"
+              placeholder={t('invoices.placeholders.address')}
             />
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <Label>{t('postalCode') || 'Código postal'}</Label>
+              <Label>{t('postalCode')}</Label>
               <Input
                 value={formData.codigo_postal}
                 onChange={(e) => setFormData({ ...formData, codigo_postal: e.target.value })}
@@ -119,34 +119,34 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
               />
             </div>
             <div>
-              <Label>{t('city') || 'Ciudad'}</Label>
+              <Label>{t('city')}</Label>
               <Input
                 value={formData.ciudad}
                 onChange={(e) => setFormData({ ...formData, ciudad: e.target.value })}
-                placeholder="Madrid"
+                placeholder={t('invoices.placeholders.city')}
               />
             </div>
             <div>
-              <Label>{t('province') || 'Provincia'}</Label>
+              <Label>{t('province')}</Label>
               <Input
                 value={formData.provincia}
                 onChange={(e) => setFormData({ ...formData, provincia: e.target.value })}
-                placeholder="Madrid"
+                placeholder={t('invoices.placeholders.city')}
               />
             </div>
             <div>
-              <Label>{t('country') || 'País'}</Label>
+              <Label>{t('countryField')}</Label>
               <Input
                 value={formData.pais}
                 onChange={(e) => setFormData({ ...formData, pais: e.target.value })}
-                placeholder="España"
+                placeholder={t('invoices.placeholders.country')}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label>{t('phone') || 'Teléfono'}</Label>
+              <Label>{t('phoneField')}</Label>
               <Input
                 value={formData.telefono}
                 onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
@@ -154,26 +154,26 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
               />
             </div>
             <div>
-              <Label>{t('email') || 'Email'} *</Label>
+              <Label>{t('emailField')} *</Label>
               <Input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="facturacion@tuempresa.com"
+                placeholder={t('invoices.placeholders.email')}
               />
             </div>
             <div>
-              <Label>{t('website') || 'Web'}</Label>
+              <Label>{t('invoices.settings.website')}</Label>
               <Input
                 value={formData.web}
                 onChange={(e) => setFormData({ ...formData, web: e.target.value })}
-                placeholder="www.tuempresa.com"
+                placeholder={t('invoices.placeholders.website')}
               />
             </div>
           </div>
 
           <div>
-            <Label>{t('iban') || 'IBAN'}</Label>
+            <Label>{t('ibanField')}</Label>
             <Input
               value={formData.iban}
               onChange={(e) => setFormData({ ...formData, iban: e.target.value.toUpperCase() })}
@@ -181,16 +181,16 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
               maxLength={34}
             />
             <p className="text-xs text-gray-500 mt-1">
-              {t('ibanInvoiceHelp') || 'Aparecerá en tus facturas para que los clientes sepan dónde pagar'}
+              {t('ibanInvoiceHelp')}
             </p>
           </div>
 
           <div>
-            <Label>{t('companyLogo') || 'Logo de la empresa'}</Label>
+            <Label>{t('invoices.settings.companyLogo')}</Label>
             <div className="mt-2">
               {formData.logo_url ? (
                 <div className="relative inline-block">
-                  <img src={formData.logo_url} alt="Logo" className="h-24 w-auto border rounded-lg" />
+                  <img src={formData.logo_url} alt={t('invoices.labels.logoAlt')} className="h-24 w-auto border rounded-lg" />
                   <button
                     onClick={() => setFormData({ ...formData, logo_url: "" })}
                     className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
@@ -213,8 +213,8 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
                     ) : (
                       <>
                         <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm text-gray-600">{t('uploadLogo') || 'Subir logo'}</p>
-                        <p className="text-xs text-gray-500">{t('maxSize2MB') || 'Máximo 2MB'}</p>
+                        <p className="text-sm text-gray-600">{t('uploadLogo')}</p>
+                        <p className="text-xs text-gray-500">{t('invoices.settings.maxLogoSize')}</p>
                       </>
                     )}
                   </div>
@@ -227,12 +227,12 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('defaultInvoicingConfig') || 'Configuración de facturación por defecto'}</CardTitle>
+          <CardTitle>{t('invoices.settings.defaultsTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>{t('invoiceSeries') || 'Serie de facturación'}</Label>
+              <Label>{t('invoiceSeries')}</Label>
               <Input
                 value={formData.serie_factura}
                 onChange={(e) => setFormData({ ...formData, serie_factura: e.target.value.toUpperCase() })}
@@ -240,11 +240,11 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
                 maxLength={3}
               />
               <p className="text-xs text-gray-500 mt-1">
-                {t('seriesHelp') || 'Ej: A, B, 2025... Las facturas se numerarán como A-2025-001'}
+                {t('invoices.settings.seriesHelp')}
               </p>
             </div>
             <div>
-              <Label>{t('defaultVAT') || 'IVA por defecto'}</Label>
+              <Label>{t('invoices.settings.defaultVat')}</Label>
               <Select
                 value={formData.iva_por_defecto.toString()}
                 onValueChange={(value) => setFormData({ ...formData, iva_por_defecto: parseFloat(value) })}
@@ -253,10 +253,10 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">0% - {t('exemptReduced') || 'Exento/Reducido especial'}</SelectItem>
-                  <SelectItem value="4">4% - {t('superReduced') || 'Superreducido'}</SelectItem>
-                  <SelectItem value="10">10% - {t('reduced') || 'Reducido'}</SelectItem>
-                  <SelectItem value="21">21% - {t('general') || 'General'}</SelectItem>
+                  <SelectItem value="0">0% - {t('invoices.settings.vatExempt')}</SelectItem>
+                  <SelectItem value="4">4% - {t('invoices.settings.vatSuperReduced')}</SelectItem>
+                  <SelectItem value="10">10% - {t('invoices.settings.vatReduced')}</SelectItem>
+                  <SelectItem value="21">21% - {t('invoices.settings.vatGeneral')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -265,8 +265,8 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
           <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium">{t('applyIRPFRetention') || '¿Aplicar retención IRPF?'}</Label>
-                <p className="text-xs text-gray-500">{t('retentionHelp') || 'Para profesionales con retención'}</p>
+                <Label className="text-sm font-medium">{t('applyIRPFRetention')}</Label>
+                <p className="text-xs text-gray-500">{t('invoices.settings.retentionHelp')}</p>
               </div>
               <Switch
                 checked={formData.aplica_retencion}
@@ -276,7 +276,7 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
 
             {formData.aplica_retencion && (
               <div>
-                <Label>{t('retentionPercentage') || 'Porcentaje de retención'}</Label>
+                <Label>{t('retentionPercentage')}</Label>
                 <Select
                   value={formData.porcentaje_retencion.toString()}
                   onValueChange={(value) => setFormData({ ...formData, porcentaje_retencion: parseFloat(value) })}
@@ -297,7 +297,7 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>{t('paymentTermDays') || 'Plazo de pago (días)'}</Label>
+              <Label>{t('paymentTermDays')}</Label>
               <Select
                 value={formData.plazo_pago_dias.toString()}
                 onValueChange={(value) => setFormData({ ...formData, plazo_pago_dias: parseInt(value) })}
@@ -306,17 +306,17 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">{t('immediate') || 'Inmediato'}</SelectItem>
-                  <SelectItem value="7">7 {t('days') || 'días'}</SelectItem>
-                  <SelectItem value="15">15 {t('days') || 'días'}</SelectItem>
-                  <SelectItem value="30">30 {t('days') || 'días'}</SelectItem>
-                  <SelectItem value="60">60 {t('days') || 'días'}</SelectItem>
-                  <SelectItem value="90">90 {t('days') || 'días'}</SelectItem>
+                  <SelectItem value="0">{t('invoices.settings.immediate')}</SelectItem>
+                  <SelectItem value="7">{t('invoices.settings.daysCount', { count: 7 })}</SelectItem>
+                  <SelectItem value="15">{t('invoices.settings.daysCount', { count: 15 })}</SelectItem>
+                  <SelectItem value="30">{t('invoices.settings.daysCount', { count: 30 })}</SelectItem>
+                  <SelectItem value="60">{t('invoices.settings.daysCount', { count: 60 })}</SelectItem>
+                  <SelectItem value="90">{t('invoices.settings.daysCount', { count: 90 })}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>{t('defaultPaymentMethod') || 'Método de pago por defecto'}</Label>
+              <Label>{t('defaultPaymentMethod')}</Label>
               <Select
                 value={formData.metodo_pago_defecto}
                 onValueChange={(value) => setFormData({ ...formData, metodo_pago_defecto: value })}
@@ -325,26 +325,26 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Transferencia bancaria">{t('bankTransfer') || 'Transferencia bancaria'}</SelectItem>
-                  <SelectItem value="Tarjeta">{t('card') || 'Tarjeta'}</SelectItem>
-                  <SelectItem value="Efectivo">{t('cash') || 'Efectivo'}</SelectItem>
-                  <SelectItem value="Bizum">Bizum</SelectItem>
-                  <SelectItem value="PayPal">PayPal</SelectItem>
+                  <SelectItem value="Transferencia bancaria">{t('bankTransfer')}</SelectItem>
+                  <SelectItem value="Tarjeta">{t('card')}</SelectItem>
+                  <SelectItem value="Efectivo">{t('cash')}</SelectItem>
+                  <SelectItem value="Bizum">{t('invoices.paymentMethods.bizum')}</SelectItem>
+                  <SelectItem value="PayPal">{t('invoices.paymentMethods.paypal')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div>
-            <Label>{t('legalText') || 'Texto legal para facturas'}</Label>
+            <Label>{t('invoices.settings.legalText')}</Label>
             <Textarea
               value={formData.texto_legal}
               onChange={(e) => setFormData({ ...formData, texto_legal: e.target.value })}
-              placeholder={t('legalTextPlaceholder') || 'Ej: Factura sujeta a retención del 15% según normativa vigente...'}
+              placeholder={t('legalTextPlaceholder')}
               className="h-24"
             />
             <p className="text-xs text-gray-500 mt-1">
-              {t('legalTextHelp') || 'Este texto aparecerá al pie de todas tus facturas'}
+              {t('invoices.settings.legalTextHelp')}
             </p>
           </div>
         </CardContent>
@@ -352,7 +352,7 @@ export default function InvoicingSettingsForm({ settings, onSave }) {
 
       <div className="flex justify-end">
         <Button onClick={() => onSave(formData)} className="bg-blue-600 hover:bg-blue-700">
-          {t('saveSettings') || 'Guardar configuración'}
+          {t('invoices.settings.save')}
         </Button>
       </div>
     </div>

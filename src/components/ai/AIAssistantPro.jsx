@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Sparkles, Copy, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AIAssistantPro({ type, context, onApply }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [suggestion, setSuggestion] = useState("");
   const [copied, setCopied] = useState(false);
@@ -80,7 +82,7 @@ Sugerencia:`;
 
       setSuggestion(response);
     } catch (error) {
-      toast.error("Error al generar sugerencia");
+      toast.error(t('assistant.pro.generateError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -90,23 +92,23 @@ Sugerencia:`;
   const copyToClipboard = () => {
     navigator.clipboard.writeText(suggestion);
     setCopied(true);
-    toast.success("Copiado al portapapeles");
+    toast.success(t('assistant.pro.copied'));
     setTimeout(() => setCopied(false), 2000);
   };
 
   const getTitle = () => {
     switch (type) {
-      case "message": return "💬 Sugerencia de respuesta";
-      case "description": return "✨ Generar descripción";
-      case "pricing": return "💰 Sugerir precios";
-      default: return "Asistente AI";
+      case "message": return t('assistant.pro.titleMessage');
+      case "description": return t('assistant.pro.titleDescription');
+      case "pricing": return t('assistant.pro.titlePricing');
+      default: return t('assistant.pro.titleDefault');
     }
   };
 
   const getPlaceholder = () => {
     switch (type) {
-      case "description": return "Palabras clave opcionales (ej: rápido, profesional, garantía)...";
-      case "pricing": return "Detalles adicionales opcionales (ej: incluye materiales, desplazamiento)...";
+      case "description": return t('assistant.pro.placeholderDescription');
+      case "pricing": return t('assistant.pro.placeholderPricing');
       default: return "";
     }
   };
@@ -138,12 +140,12 @@ Sugerencia:`;
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Generando...
+              {t('assistant.pro.generating')}
             </>
           ) : (
             <>
               <Sparkles className="w-4 h-4 mr-2" />
-              Generar con IA
+              {t('assistant.pro.generate')}
             </>
           )}
         </Button>
@@ -161,12 +163,12 @@ Sugerencia:`;
                 {copied ? (
                   <>
                     <Check className="w-3 h-3 mr-2 text-green-600" />
-                    Copiado
+                    {t('assistant.pro.copiedShort')}
                   </>
                 ) : (
                   <>
                     <Copy className="w-3 h-3 mr-2" />
-                    Copiar
+                    {t('assistant.pro.copy')}
                   </>
                 )}
               </Button>
@@ -176,7 +178,7 @@ Sugerencia:`;
                   className="flex-1 bg-purple-600 hover:bg-purple-700"
                   size="sm"
                 >
-                  Usar sugerencia
+                  {t('assistant.pro.useSuggestion')}
                 </Button>
               )}
             </div>

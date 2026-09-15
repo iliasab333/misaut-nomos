@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation, Trans } from 'react-i18next';
 
 export default function UrgencyBanner() {
+  const { t } = useTranslation();
   const [recentSignups, setRecentSignups] = useState(8);
   const [showPulse, setShowPulse] = useState(false);
 
@@ -37,15 +39,21 @@ export default function UrgencyBanner() {
               )}
             </AnimatePresence>
             <Users className="w-5 h-5" />
-            <span className="font-bold text-lg">{recentSignups} profesionales</span>
-            <span className="font-light">se unieron hoy</span>
+            <Trans
+              i18nKey="pricing.urgency.joinedToday"
+              values={{ signups: recentSignups }}
+              components={{
+                bold: <span className="font-bold text-lg" />,
+                light: <span className="font-light" />,
+              }}
+            />
           </div>
           
           <div className="hidden md:block w-px h-6 bg-white/30" />
           
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5" />
-            <span className="font-light">Oferta 7 días gratis termina pronto</span>
+            <span className="font-light">{t('pricing.urgency.offerEnding')}</span>
           </div>
         </div>
       </div>

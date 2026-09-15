@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { Instagram, Facebook, Search, Upload, X, Check, ChevronLeft, Linkedin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ function TikTokIcon(props) {
 
 export default function BriefingMensualPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [professionalProfile, setProfessionalProfile] = useState(null);
   const [insights, setInsights] = useState(null);
@@ -94,12 +96,12 @@ export default function BriefingMensualPage() {
     e.preventDefault();
     
     if (!formData.platform || !formData.goal) {
-      toast.error("Selecciona una red y un objetivo");
+      toast.error(t('ads.briefing.selectPlatformAndGoal'));
       return;
     }
 
     if (!user) {
-      toast.error("Error: no hay sesión de usuario. Recarga la página.");
+      toast.error(t('ads.shared.noSessionError'));
       return;
     }
     
@@ -133,7 +135,7 @@ export default function BriefingMensualPage() {
         await base44.entities.AdsBriefing.create(briefingData);
       }
 
-      // Notificar al admin por email
+      // Notificar al admin por email (correo interno al equipo, en español: no se traduce)
       const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'hola@misautonomos.es';
       const platformLabelsMap = {
         instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok',
@@ -167,11 +169,11 @@ export default function BriefingMensualPage() {
         console.warn('Email al admin falló, pero el briefing fue guardado:', emailError);
       }
       
-      toast.success(isEditMode ? "✅ Briefing actualizado correctamente." : "✅ Briefing enviado. Nuestro equipo lo revisará pronto.");
+      toast.success(isEditMode ? t('ads.briefing.updatedSuccess') : t('ads.briefing.submittedSuccess'));
       navigate("/mi-campana");
     } catch (error) {
       console.error("Error submitting briefing:", error);
-      toast.error(`Error al guardar el briefing: ${error?.message || JSON.stringify(error)}`);
+      toast.error(t('ads.briefing.saveError', { message: error?.message || JSON.stringify(error) }));
     } finally {
       setSaving(false);
     }
@@ -182,7 +184,7 @@ export default function BriefingMensualPage() {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("La imagen no puede superar los 10MB");
+      toast.error(t('ads.briefing.imageTooLarge'));
       return;
     }
 
@@ -194,9 +196,9 @@ export default function BriefingMensualPage() {
         ...prev,
         images_provided: [...prev.images_provided, file_url]
       }));
-      toast.success("✅ Foto añadida");
+      toast.success(t('ads.briefing.photoAdded'));
     } catch (error) {
-      toast.error("Error al subir la foto");
+      toast.error(t('ads.briefing.uploadError'));
     } finally {
       setUploadingFiles(false);
     }
@@ -219,12 +221,13 @@ export default function BriefingMensualPage() {
     }));
   };
 
+  // Los nombres de las redes son marcas: van literales.
   const platforms = [
-    { id: 'instagram', label: 'Instagram', icon: Instagram, hint: 'Gran alcance visual, 25-45 años', color: 'from-pink-600 to-purple-600' },
-    { id: 'facebook', label: 'Facebook', icon: Facebook, hint: 'Local + 35-65 años', color: 'from-blue-600 to-blue-800' },
-    { id: 'tiktok', label: 'TikTok', icon: TikTokIcon, hint: '18-30 años, formato vídeo', color: 'from-gray-800 to-black' },
-    { id: 'google_search', label: 'Google', icon: Search, hint: 'Intención alta de compra', color: 'from-green-600 to-blue-600' },
-    { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, hint: 'B2B, profesionales', color: 'from-blue-700 to-blue-900' }
+    { id: 'instagram', label: 'Instagram', icon: Instagram, hint: t('ads.briefing.platforms.instagramHint'), color: 'from-pink-600 to-purple-600' },
+    { id: 'facebook', label: 'Facebook', icon: Facebook, hint: t('ads.briefing.platforms.facebookHint'), color: 'from-blue-600 to-blue-800' },
+    { id: 'tiktok', label: 'TikTok', icon: TikTokIcon, hint: t('ads.briefing.platforms.tiktokHint'), color: 'from-gray-800 to-black' },
+    { id: 'google_search', label: 'Google', icon: Search, hint: t('ads.briefing.platforms.googleHint'), color: 'from-green-600 to-blue-600' },
+    { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, hint: t('ads.briefing.platforms.linkedinHint'), color: 'from-blue-700 to-blue-900' }
   ];
 
   // Función de recomendación basada en ClientInsights
@@ -234,27 +237,27 @@ export default function BriefingMensualPage() {
     
     // Si cliente es empresa → LinkedIn prioritario
     if (client_type === 'company') {
-      return { platform: 'linkedin', reason: 'Para captar clientes empresa, LinkedIn da mejor calidad de lead.' };
+      return { platform: 'linkedin', reason: t('ads.briefing.recommendation.company') };
     }
     
     // Si cliente joven (18-30) → TikTok o Instagram
     const ages = client_age_range || [];
     if (ages.includes('18-25') && !ages.includes('45-55')) {
-      return { platform: 'tiktok', reason: 'Tu cliente es joven y TikTok funciona mejor para este rango de edad.' };
+      return { platform: 'tiktok', reason: t('ads.briefing.recommendation.young') };
     }
     
     // Si ámbito local + intención compra → Google
     if (service_area_type === 'local_city' && client_type === 'particular') {
-      return { platform: 'google_search', reason: 'Para captación local con intención de compra, Google Search convierte más.' };
+      return { platform: 'google_search', reason: t('ads.briefing.recommendation.local') };
     }
     
     // Si ya lo usa habitualmente y tiene presencia → potenciar esa red
     if (preferred_platforms?.includes('instagram')) {
-      return { platform: 'instagram', reason: 'Tu cliente ya está en Instagram y tú ya publicas ahí — potenciamos tu presencia.' };
+      return { platform: 'instagram', reason: t('ads.briefing.recommendation.instagram') };
     }
     
     // Default para particulares adultos
-    return { platform: 'facebook', reason: 'Para tu perfil de cliente, Facebook da el mejor coste por lead.' };
+    return { platform: 'facebook', reason: t('ads.briefing.recommendation.default') };
   };
 
   const recommendedPlatform = recommendPlatform(insights);
@@ -267,12 +270,14 @@ export default function BriefingMensualPage() {
   };
 
   const goals = [
-    { id: 'more_calls', label: 'Más llamadas', desc: 'Que me llamen pidiendo info' },
-    { id: 'more_leads', label: 'Más contactos por mensaje', desc: 'Formularios o WhatsApp' },
-    { id: 'more_quotes', label: 'Más solicitudes de presupuesto', desc: 'Clientes con intención clara' },
-    { id: 'brand_awareness', label: 'Notoriedad', desc: 'Que me conozcan en mi zona' },
-    { id: 'website_traffic', label: 'Tráfico a mi perfil', desc: 'Visitas a mi web o perfil MisAutónomos' }
+    { id: 'more_calls', label: t('ads.briefing.goal.moreCalls'), desc: t('ads.briefing.goal.moreCallsDesc') },
+    { id: 'more_leads', label: t('ads.briefing.goal.moreLeads'), desc: t('ads.briefing.goal.moreLeadsDesc') },
+    { id: 'more_quotes', label: t('ads.briefing.goal.moreQuotes'), desc: t('ads.briefing.goal.moreQuotesDesc') },
+    { id: 'brand_awareness', label: t('ads.briefing.goal.brandAwareness'), desc: t('ads.briefing.goal.brandAwarenessDesc') },
+    { id: 'website_traffic', label: t('ads.briefing.goal.websiteTraffic'), desc: t('ads.briefing.goal.websiteTrafficDesc') }
   ];
+
+  const currentMonthLabel = new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 px-4">
@@ -284,18 +289,19 @@ export default function BriefingMensualPage() {
             className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-3"
           >
             <ChevronLeft className="w-4 h-4" />
-            Volver a Mi campaña
+            {t('ads.briefing.backToCampaign')}
           </button>
           <h1 className="text-2xl font-bold text-gray-900">
-            {isEditMode ? "Editar campaña mensual" : "Configurar campaña mensual"}
+            {isEditMode ? t('ads.briefing.editTitle') : t('ads.briefing.createTitle')}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            {isEditMode ? "Modifica los datos de tu campaña de este mes" : "Elige dónde y cómo quieres anunciarte este mes"}
+            {isEditMode ? t('ads.briefing.editSubtitle') : t('ads.briefing.createSubtitle')}
           </p>
           {isEditMode && (
             <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-              ✏️ <strong>Editando tu briefing de {new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' })}.</strong>{" "}
-              Puedes actualizar cualquier campo antes del día 5 del mes.
+              <Trans i18nKey="ads.briefing.editingNotice" values={{ month: currentMonthLabel }}>
+                ✏️ <strong>Editando tu briefing de {{ month: currentMonthLabel }}.</strong> Puedes actualizar cualquier campo antes del día 5 del mes.
+              </Trans>
             </div>
           )}
         </div>
@@ -306,7 +312,12 @@ export default function BriefingMensualPage() {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 flex items-start gap-2">
               <Sparkles className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"/>
               <div className="text-xs text-amber-900">
-                <strong>Recomendación:</strong> Según tu cuestionario, tus clientes suelen estar en <strong>{platformLabels[recommendedPlatform.platform]}</strong>. {recommendedPlatform.reason}
+                <Trans
+                  i18nKey="ads.briefing.recommendation.text"
+                  values={{ platform: platformLabels[recommendedPlatform.platform], reason: recommendedPlatform.reason }}
+                >
+                  <strong>Recomendación:</strong> Según tu cuestionario, tus clientes suelen estar en <strong>{{ platform: platformLabels[recommendedPlatform.platform] }}</strong>. {{ reason: recommendedPlatform.reason }}
+                </Trans>
               </div>
             </div>
           )}
@@ -315,10 +326,10 @@ export default function BriefingMensualPage() {
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                ¿Dónde quieres anunciarte este mes?
+                {t('ads.briefing.platformQuestion')}
               </CardTitle>
               <p className="text-xs text-gray-500">
-                Elige UNA red. El próximo mes puedes cambiar.
+                {t('ads.briefing.platformHint')}
               </p>
             </CardHeader>
             <CardContent>
@@ -349,7 +360,7 @@ export default function BriefingMensualPage() {
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                ¿Cuál es tu objetivo principal este mes?
+                {t('ads.briefing.goalQuestion')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -386,10 +397,10 @@ export default function BriefingMensualPage() {
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold">
-                  ¿Qué servicios quieres destacar?
+                  {t('ads.briefing.servicesQuestion')}
                 </CardTitle>
                 <p className="text-xs text-gray-500">
-                  Puedes elegir varios de los servicios que ofreces.
+                  {t('ads.briefing.servicesHint')}
                 </p>
               </CardHeader>
               <CardContent>
@@ -417,7 +428,7 @@ export default function BriefingMensualPage() {
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                Zona de captación
+                {t('ads.briefing.areaTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -425,7 +436,7 @@ export default function BriefingMensualPage() {
                 type="text"
                 value={formData.service_area}
                 onChange={e => setFormData({ ...formData, service_area: e.target.value })}
-                placeholder="Ej: Barcelona ciudad + 20km a la redonda"
+                placeholder={t('ads.briefing.areaPlaceholder')}
                 className="w-full"
               />
             </CardContent>
@@ -435,10 +446,10 @@ export default function BriefingMensualPage() {
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                ¿Oferta especial este mes? (opcional)
+                {t('ads.briefing.offerQuestion')}
               </CardTitle>
               <p className="text-xs text-gray-500">
-                Descuentos u ofertas funcionan muy bien en ads.
+                {t('ads.briefing.offerHint')}
               </p>
             </CardHeader>
             <CardContent>
@@ -446,7 +457,7 @@ export default function BriefingMensualPage() {
                 type="text"
                 value={formData.special_offer}
                 onChange={e => setFormData({ ...formData, special_offer: e.target.value })}
-                placeholder="Ej: 10% descuento primera reparación"
+                placeholder={t('ads.briefing.offerPlaceholder')}
                 className="w-full"
               />
             </CardContent>
@@ -456,10 +467,10 @@ export default function BriefingMensualPage() {
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                ¿Quieres aportar fotos o vídeo?
+                {t('ads.briefing.mediaQuestion')}
               </CardTitle>
               <p className="text-xs text-gray-500">
-                Si no, usaremos las de tu perfil y crearemos creatividades desde cero.
+                {t('ads.briefing.mediaHint')}
               </p>
             </CardHeader>
             <CardContent>
@@ -479,7 +490,7 @@ export default function BriefingMensualPage() {
                       <>
                         <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
                         <p className="text-sm text-gray-600">
-                          Click para añadir ({formData.images_provided.length}/5)
+                          {t('ads.briefing.addMedia', { current: formData.images_provided.length })}
                         </p>
                       </>
                     )}
@@ -493,7 +504,7 @@ export default function BriefingMensualPage() {
                     <div key={idx} className="relative group">
                       <img
                         src={url}
-                        alt={`Material ${idx + 1}`}
+                        alt={t('ads.briefing.mediaAlt', { number: idx + 1 })}
                         className="w-full h-24 object-cover rounded-lg"
                       />
                       <button
@@ -514,14 +525,14 @@ export default function BriefingMensualPage() {
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                ¿Algún testimonio o caso de éxito que destaquemos?
+                {t('ads.briefing.testimonialQuestion')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea
                 value={formData.best_testimonials}
                 onChange={e => setFormData({ ...formData, best_testimonials: e.target.value })}
-                placeholder="Ej: Reformé la cocina de María en 10 días y quedó encantada..."
+                placeholder={t('ads.briefing.testimonialPlaceholder')}
                 rows={3}
                 className="w-full"
               />
@@ -531,11 +542,11 @@ export default function BriefingMensualPage() {
           {/* Presupuesto explícito */}
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-blue-900">Presupuesto publicitario del mes</span>
+              <span className="text-sm font-semibold text-blue-900">{t('ads.briefing.budgetTitle')}</span>
               <span className="text-lg font-bold text-blue-900">30,00 €</span>
             </div>
             <p className="text-xs text-blue-700">
-              Este presupuesto se invierte íntegramente en tu campaña. Gestión y creatividades ya incluidas en tu plan.
+              {t('ads.briefing.budgetHint')}
             </p>
           </div>
 
@@ -543,14 +554,14 @@ export default function BriefingMensualPage() {
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                Notas adicionales (opcional)
+                {t('ads.briefing.notesTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea
                 value={formData.additional_notes}
                 onChange={e => setFormData({ ...formData, additional_notes: e.target.value })}
-                placeholder="Cualquier otra información que quieras compartir..."
+                placeholder={t('ads.briefing.notesPlaceholder')}
                 rows={2}
                 className="w-full"
               />
@@ -566,12 +577,12 @@ export default function BriefingMensualPage() {
             {saving ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                {isEditMode ? "Actualizando..." : "Enviando..."}
+                {isEditMode ? t('ads.briefing.updating') : t('ads.shared.sending')}
               </>
             ) : (
               <>
                 <Check className="w-5 h-5 mr-2" />
-                {isEditMode ? "Actualizar briefing" : "Enviar briefing"}
+                {isEditMode ? t('ads.briefing.updateButton') : t('ads.briefing.submitButton')}
               </>
             )}
           </Button>

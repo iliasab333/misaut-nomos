@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, AlertTriangle, AlertCircle, CheckCircle, Lightbulb, TrendingUp, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export default function InvoiceAIAssistant({ 
   invoice, 
@@ -13,6 +14,7 @@ export default function InvoiceAIAssistant({
   showValidation = true,
   showSuggestions = true 
 }) {
+  const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState([]);
   const [validation, setValidation] = useState({ errors: [], warnings: [], isValid: true });
   const [planRecommendation, setPlanRecommendation] = useState(null);
@@ -76,7 +78,7 @@ export default function InvoiceAIAssistant({
       <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
         <CardContent className="p-6 flex items-center justify-center">
           <Loader2 className="w-6 h-6 animate-spin text-purple-600 mr-2" />
-          <span className="text-purple-700">Analizando con IA...</span>
+          <span className="text-purple-700">{t('invoices.ai.analyzing')}</span>
         </CardContent>
       </Card>
     );
@@ -100,7 +102,7 @@ export default function InvoiceAIAssistant({
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2 text-purple-800">
           <Sparkles className="w-5 h-5 text-purple-600" />
-          Asistente IA de Facturación
+          {t('invoices.ai.title')}
         </CardTitle>
       </CardHeader>
 
@@ -117,7 +119,7 @@ export default function InvoiceAIAssistant({
             )}
           >
             <Lightbulb className="w-4 h-4 inline mr-1" />
-            Sugerencias
+            {t('invoices.ai.suggestionsTab')}
           </button>
           <button
             onClick={() => setActiveTab('validation')}
@@ -129,7 +131,7 @@ export default function InvoiceAIAssistant({
             )}
           >
             <AlertCircle className="w-4 h-4 inline mr-1" />
-            Validación
+            {t('invoices.ai.validationTab')}
             {hasIssues && (
               <span className={cn(
                 "absolute -top-1 -right-1 w-4 h-4 rounded-full text-xs flex items-center justify-center text-white",
@@ -149,7 +151,7 @@ export default function InvoiceAIAssistant({
             )}
           >
             <TrendingUp className="w-4 h-4 inline mr-1" />
-            Mi plan
+            {t('invoices.ai.planTab')}
           </button>
         </div>
 
@@ -157,12 +159,12 @@ export default function InvoiceAIAssistant({
         {activeTab === 'suggestions' && (
           <div className="space-y-2">
             <p className="text-xs text-purple-600 mb-3">
-              Basado en tus facturas anteriores y tu actividad:
+              {t('invoices.ai.suggestionsIntro')}
             </p>
             
             {suggestions.length === 0 ? (
               <p className="text-sm text-gray-500 italic">
-                Aún no hay suficientes datos. Las sugerencias aparecerán cuando tengas más facturas.
+                {t('invoices.ai.noSuggestions')}
               </p>
             ) : (
               <div className="grid gap-2 max-h-48 overflow-y-auto">
@@ -178,7 +180,7 @@ export default function InvoiceAIAssistant({
                       </p>
                       {suggestion.usageCount > 0 && (
                         <p className="text-xs text-gray-500">
-                          Usado {suggestion.usageCount} {suggestion.usageCount === 1 ? 'vez' : 'veces'}
+                          {t('invoices.ai.usedCount', { count: suggestion.usageCount })}
                         </p>
                       )}
                     </div>
@@ -187,7 +189,7 @@ export default function InvoiceAIAssistant({
                         {suggestion.suggestedPrice.toFixed(2)}€
                       </span>
                       <span className="text-xs text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        + Usar
+                        {t('invoices.ai.useSuggestion')}
                       </span>
                     </div>
                   </button>
@@ -203,7 +205,7 @@ export default function InvoiceAIAssistant({
               <div className="flex items-center gap-2 p-3 bg-green-100 rounded-lg">
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <span className="text-sm text-green-800 font-medium">
-                  ¡Todo correcto! La factura está lista.
+                  {t('invoices.ai.allValid')}
                 </span>
               </div>
             ) : (
@@ -234,7 +236,7 @@ export default function InvoiceAIAssistant({
           <div className="space-y-3">
             <div className="p-4 bg-white rounded-lg border border-purple-200">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="font-semibold text-gray-900">Tu actividad</h4>
+                <h4 className="font-semibold text-gray-900">{t('invoices.ai.yourActivity')}</h4>
                 <Badge variant="outline" className="text-purple-700 border-purple-300">
                   {planRecommendation.metrics.activity}
                 </Badge>
@@ -245,33 +247,33 @@ export default function InvoiceAIAssistant({
                   <p className="text-lg font-bold text-purple-700">
                     {planRecommendation.metrics.invoiceCount}
                   </p>
-                  <p className="text-xs text-gray-600">Facturas (6m)</p>
+                  <p className="text-xs text-gray-600">{t('invoices.ai.invoicesSixMonths')}</p>
                 </div>
                 <div className="p-2 bg-purple-50 rounded-lg">
                   <p className="text-lg font-bold text-purple-700">
                     {planRecommendation.metrics.monthlyAverage}€
                   </p>
-                  <p className="text-xs text-gray-600">Media/mes</p>
+                  <p className="text-xs text-gray-600">{t('invoices.ai.monthlyAverage')}</p>
                 </div>
                 <div className="p-2 bg-purple-50 rounded-lg">
                   <p className="text-lg font-bold text-purple-700">
                     {planRecommendation.metrics.totalRevenue}€
                   </p>
-                  <p className="text-xs text-gray-600">Total (6m)</p>
+                  <p className="text-xs text-gray-600">{t('invoices.ai.totalSixMonths')}</p>
                 </div>
               </div>
 
               <div className="p-3 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-4 h-4 text-purple-600" />
-                  <span className="font-semibold text-purple-800">Recomendación IA</span>
+                  <span className="font-semibold text-purple-800">{t('invoices.ai.recommendation')}</span>
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed">
                   {planRecommendation.reason}
                 </p>
                 {planRecommendation.savings > 0 && (
                   <Badge className="mt-2 bg-green-100 text-green-800 hover:bg-green-100">
-                    💰 Ahorro potencial: {planRecommendation.savings}€/año
+                    {t('invoices.ai.potentialSavings', { amount: planRecommendation.savings })}
                   </Badge>
                 )}
               </div>

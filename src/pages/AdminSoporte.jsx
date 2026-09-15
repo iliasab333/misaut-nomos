@@ -4,28 +4,34 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search as SearchIcon, Send, Lock, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import SEOHead from '@/components/seo/SEOHead';
+import { useTranslation } from 'react-i18next';
 
 const NAVY = '#00255C';
 const NAVY_SOFT = 'rgba(0,37,92,0.06)';
 
-const STATUS_OPTIONS = [
-  { value: 'open',         label: 'Abierto',        bg: '#FEF3C7', color: '#92400E' },
-  { value: 'in_progress',  label: 'En curso',       bg: '#DBEAFE', color: '#1E40AF' },
-  { value: 'waiting_user', label: 'Esperando user', bg: '#F3E8FF', color: '#6B21A8' },
-  { value: 'resolved',     label: 'Resuelto',       bg: '#D1FAE5', color: '#065F46' },
-  { value: 'closed',       label: 'Cerrado',        bg: '#E5E7EB', color: '#374151' },
+// Reciben `t` para que las etiquetas se retraduzcan al cambiar de idioma
+// (una constante de módulo se evaluaría una sola vez al importar).
+const statusOptions = (t) => [
+  { value: 'open',         label: t('admin.soporte.status.open'),        bg: '#FEF3C7', color: '#92400E' },
+  { value: 'in_progress',  label: t('admin.soporte.status.inProgress'),  bg: '#DBEAFE', color: '#1E40AF' },
+  { value: 'waiting_user', label: t('admin.soporte.status.waitingUser'), bg: '#F3E8FF', color: '#6B21A8' },
+  { value: 'resolved',     label: t('admin.soporte.status.resolved'),    bg: '#D1FAE5', color: '#065F46' },
+  { value: 'closed',       label: t('admin.soporte.status.closed'),      bg: '#E5E7EB', color: '#374151' },
 ];
-const PRIORITY_OPTIONS = [
-  { value: 'low',    label: 'Baja' },
-  { value: 'normal', label: 'Normal' },
-  { value: 'high',   label: 'Alta' },
-  { value: 'urgent', label: 'Urgente' },
+const priorityOptions = (t) => [
+  { value: 'low',    label: t('admin.soporte.priority.low') },
+  { value: 'normal', label: t('admin.soporte.priority.normal') },
+  { value: 'high',   label: t('admin.soporte.priority.high') },
+  { value: 'urgent', label: t('admin.soporte.priority.urgent') },
 ];
 
-function statusMeta(s) { return STATUS_OPTIONS.find(o => o.value === s) || STATUS_OPTIONS[0]; }
+function statusMeta(options, s) { return options.find(o => o.value === s) || options[0]; }
 function formatDate(d) { try { return new Date(d).toLocaleString('es-ES'); } catch { return ''; } }
 
 function TicketList({ tickets, activeId, onSelect, q, setQ, status, setStatus, type, setType, priority, setPriority }) {
+  const { t } = useTranslation();
+  const STATUS_OPTIONS = statusOptions(t);
+  const PRIORITY_OPTIONS = priorityOptions(t);
   return (
     <aside className="w-full md:w-[360px] md:flex-shrink-0 border-r border-slate-100 bg-white flex flex-col">
       <div className="p-4 border-b border-slate-100 space-y-2">
@@ -35,57 +41,57 @@ function TicketList({ tickets, activeId, onSelect, q, setQ, status, setStatus, t
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Título o nº ticket…"
+            placeholder={t('admin.soporte.searchPlaceholder')}
             className="w-full pl-9 pr-3 h-9 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
           />
         </div>
         <div className="grid grid-cols-3 gap-2">
           <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-8 px-2 text-[12px] border border-slate-200 rounded-md bg-white">
-            <option value="all">Estado</option>
+            <option value="all">{t('admin.soporte.filter.status')}</option>
             {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
           <select value={priority} onChange={(e) => setPriority(e.target.value)} className="h-8 px-2 text-[12px] border border-slate-200 rounded-md bg-white">
-            <option value="all">Prioridad</option>
+            <option value="all">{t('admin.soporte.filter.priority')}</option>
             {PRIORITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
           <select value={type} onChange={(e) => setType(e.target.value)} className="h-8 px-2 text-[12px] border border-slate-200 rounded-md bg-white">
-            <option value="all">Tipo</option>
-            <option value="bug">Bug</option>
-            <option value="question">Pregunta</option>
-            <option value="feature">Mejora</option>
-            <option value="billing">Facturación</option>
-            <option value="other">Otro</option>
+            <option value="all">{t('admin.soporte.filter.type')}</option>
+            <option value="bug">{t('admin.soporte.type.bug')}</option>
+            <option value="question">{t('admin.soporte.type.question')}</option>
+            <option value="feature">{t('admin.soporte.type.feature')}</option>
+            <option value="billing">{t('supportChat.ticketTypeBilling')}</option>
+            <option value="other">{t('admin.soporte.type.other')}</option>
           </select>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {tickets.length === 0 ? (
-          <p className="px-4 py-8 text-sm text-center text-slate-400">Sin tickets.</p>
-        ) : tickets.map((t) => {
-          const meta = statusMeta(t.status);
-          const isActive = t.id === activeId;
+          <p className="px-4 py-8 text-sm text-center text-slate-400">{t('admin.soporte.emptyState')}</p>
+        ) : tickets.map((tk) => {
+          const meta = statusMeta(STATUS_OPTIONS, tk.status);
+          const isActive = tk.id === activeId;
           return (
             <button
-              key={t.id}
+              key={tk.id}
               type="button"
-              onClick={() => onSelect(t.id)}
+              onClick={() => onSelect(tk.id)}
               className={`w-full text-left px-4 py-3 border-b border-slate-100 flex flex-col gap-1 transition ${isActive ? 'bg-slate-50' : 'hover:bg-slate-50/60'}`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] text-slate-500 font-mono">#{t.number || t.id.slice(-6)}</span>
+                <span className="text-[11px] text-slate-500 font-mono">#{tk.number || tk.id.slice(-6)}</span>
                 <span className="inline-flex text-[10px] font-semibold uppercase tracking-[0.06em] px-1.5 py-0.5 rounded-full" style={{ background: meta.bg, color: meta.color }}>{meta.label}</span>
               </div>
-              <p className="text-[14px] font-medium text-slate-900 truncate">{t.title || 'Sin título'}</p>
+              <p className="text-[14px] font-medium text-slate-900 truncate">{tk.title || t('admin.soporte.untitled')}</p>
               {(() => {
-                const name = (t.creator_name || '').trim();
-                const email = (t.creator_email || t.user_email || '').trim();
+                const name = (tk.creator_name || '').trim();
+                const email = (tk.creator_email || tk.user_email || '').trim();
                 const who = name || email || '';
                 return who ? (
                   <p className="text-[11px] text-slate-500 truncate">{who}</p>
                 ) : null;
               })()}
-              <p className="text-[11px] text-slate-400">{formatDate(t.updated_date || t.created_date)}</p>
+              <p className="text-[11px] text-slate-400">{formatDate(tk.updated_date || tk.created_date)}</p>
             </button>
           );
         })}
@@ -95,9 +101,12 @@ function TicketList({ tickets, activeId, onSelect, q, setQ, status, setStatus, t
 }
 
 function TicketDetail({ ticket, onClose, refresh }) {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const [reply, setReply] = useState('');
   const [internal, setInternal] = useState(false);
+  const STATUS_OPTIONS = statusOptions(t);
+  const PRIORITY_OPTIONS = priorityOptions(t);
 
   const { data: messages = [] } = useQuery({
     queryKey: ['admin:ticket:messages', ticket.id],
@@ -112,9 +121,9 @@ function TicketDetail({ ticket, onClose, refresh }) {
       await base44.entities.TicketEvent.create({
         ticket_id: ticket.id, event_type: 'status_change', payload: { to: status }, created_by: 'admin',
       });
-      toast.success('Estado actualizado');
+      toast.success(t('statusUpdated'));
       refresh();
-    } catch (e) { toast.error('Error: ' + e.message); }
+    } catch (e) { toast.error(t('admin.soporte.errorGeneric', { message: e.message })); }
   };
   const setPriority = async (priority) => {
     try {
@@ -122,9 +131,9 @@ function TicketDetail({ ticket, onClose, refresh }) {
       await base44.entities.TicketEvent.create({
         ticket_id: ticket.id, event_type: 'priority_change', payload: { to: priority }, created_by: 'admin',
       });
-      toast.success('Prioridad actualizada');
+      toast.success(t('admin.soporte.priorityUpdated'));
       refresh();
-    } catch (e) { toast.error('Error: ' + e.message); }
+    } catch (e) { toast.error(t('admin.soporte.errorGeneric', { message: e.message })); }
   };
 
   const send = async (e) => {
@@ -142,10 +151,10 @@ function TicketDetail({ ticket, onClose, refresh }) {
       setReply(''); setInternal(false);
       qc.invalidateQueries({ queryKey: ['admin:ticket:messages', ticket.id] });
       refresh();
-    } catch (err) { toast.error('No se ha podido enviar: ' + err.message); }
+    } catch (err) { toast.error(t('admin.soporte.sendError', { message: err.message })); }
   };
 
-  const meta = statusMeta(ticket.status);
+  const meta = statusMeta(STATUS_OPTIONS, ticket.status);
   const visibleMessages = messages.filter(m => !m.is_internal);
   const internalNotes = messages.filter(m => m.is_internal);
 
@@ -159,9 +168,9 @@ function TicketDetail({ ticket, onClose, refresh }) {
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] text-slate-500 font-mono">#{ticket.number || ticket.id.slice(-6)}</span>
             <span className="inline-flex text-[10px] font-semibold uppercase tracking-[0.06em] px-1.5 py-0.5 rounded-full" style={{ background: meta.bg, color: meta.color }}>{meta.label}</span>
-            {ticket.priority && <span className="text-[11px] text-slate-500">prioridad: {ticket.priority}</span>}
+            {ticket.priority && <span className="text-[11px] text-slate-500">{t('admin.soporte.priorityLabel', { priority: ticket.priority })}</span>}
           </div>
-          <h2 className="text-[16px] font-semibold text-slate-900 truncate">{ticket.title || 'Sin título'}</h2>
+          <h2 className="text-[16px] font-semibold text-slate-900 truncate">{ticket.title || t('admin.soporte.untitled')}</h2>
           {(() => {
             const name = (ticket.creator_name || '').trim();
             const email = (ticket.creator_email || ticket.user_email || '').trim();
@@ -209,7 +218,7 @@ function TicketDetail({ ticket, onClose, refresh }) {
 
         {internalNotes.length > 0 && (
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-700 my-3">Notas internas (no visibles al usuario)</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-700 my-3">{t('admin.soporte.internalNotesTitle')}</p>
             {internalNotes.map((m) => (
               <div key={m.id} className="my-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
                 <p className="whitespace-pre-wrap">{m.body}</p>
@@ -225,13 +234,13 @@ function TicketDetail({ ticket, onClose, refresh }) {
           value={reply}
           onChange={(e) => setReply(e.target.value)}
           rows={3}
-          placeholder={internal ? 'Nota interna…' : 'Responder al usuario…'}
+          placeholder={internal ? t('admin.soporte.internalNotePlaceholder') : t('admin.soporte.replyPlaceholder')}
           className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
         />
         <div className="mt-2 flex items-center justify-between">
           <label className="inline-flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
             <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
-            <span className="inline-flex items-center gap-1"><Lock className="w-3 h-3" /> Nota interna</span>
+            <span className="inline-flex items-center gap-1"><Lock className="w-3 h-3" /> {t('admin.soporte.internalNote')}</span>
           </label>
           <button
             type="submit"
@@ -240,7 +249,7 @@ function TicketDetail({ ticket, onClose, refresh }) {
             style={{ background: NAVY }}
           >
             <Send className="w-3.5 h-3.5" />
-            Enviar
+            {t('messages.send')}
           </button>
         </div>
       </form>
@@ -249,6 +258,7 @@ function TicketDetail({ ticket, onClose, refresh }) {
 }
 
 export default function AdminSoportePage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('all');
@@ -264,15 +274,15 @@ export default function AdminSoportePage() {
 
   const filtered = useMemo(() => {
     let arr = tickets;
-    if (status !== 'all') arr = arr.filter(t => t.status === status);
-    if (type !== 'all') arr = arr.filter(t => t.type === type);
-    if (priority !== 'all') arr = arr.filter(t => t.priority === priority);
+    if (status !== 'all') arr = arr.filter(tk => tk.status === status);
+    if (type !== 'all') arr = arr.filter(tk => tk.type === type);
+    if (priority !== 'all') arr = arr.filter(tk => tk.priority === priority);
     if (q.trim()) {
       const needle = q.trim().toLowerCase();
-      arr = arr.filter(t =>
-        (t.title || '').toLowerCase().includes(needle) ||
-        (t.number || '').toString().includes(needle) ||
-        t.id.toLowerCase().includes(needle)
+      arr = arr.filter(tk =>
+        (tk.title || '').toLowerCase().includes(needle) ||
+        (tk.number || '').toString().includes(needle) ||
+        tk.id.toLowerCase().includes(needle)
       );
     }
     return arr;
@@ -282,12 +292,12 @@ export default function AdminSoportePage() {
     if (!activeId && filtered.length > 0) setActiveId(filtered[0].id);
   }, [filtered, activeId]);
 
-  const active = tickets.find(t => t.id === activeId) || null;
+  const active = tickets.find(tk => tk.id === activeId) || null;
   const refresh = () => qc.invalidateQueries({ queryKey: ['admin:tickets'] });
 
   return (
     <>
-      <SEOHead title="Soporte · Admin" noindex />
+      <SEOHead title={t('admin.soporte.seoTitle')} noindex />
       <main className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-0 md:px-6 py-0 md:py-8">
           <div className="md:rounded-2xl md:border md:border-slate-200 bg-white overflow-hidden flex flex-col md:flex-row md:h-[calc(100vh-160px)] md:min-h-[640px]">
@@ -304,7 +314,7 @@ export default function AdminSoportePage() {
               <TicketDetail ticket={active} onClose={() => setActiveId(null)} refresh={refresh} />
             ) : (
               <div className="flex-1 flex items-center justify-center text-sm text-slate-400 p-8">
-                Selecciona un ticket para ver el detalle.
+                {t('admin.soporte.selectTicket')}
               </div>
             )}
           </div>

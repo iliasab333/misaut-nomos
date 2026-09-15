@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, FileText, Paperclip, X, Send, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
 import SEOHead from "../components/seo/SEOHead";
 
+// Nombres propios (no se traducen). "Otras" es el único valor con texto: su
+// etiqueta visible pasa por t() al pintarse, el valor guardado no cambia.
 const PROVINCIAS_ESPANA = [
   "Madrid", "Barcelona", "Valencia", "Sevilla", "Zaragoza", "Málaga", "Murcia",
   "Palma de Mallorca", "Las Palmas", "Bilbao", "Alicante", "Córdoba", "Valladolid",
@@ -22,7 +24,7 @@ const PROVINCIAS_ESPANA = [
 ];
 
 export default function RequestQuotePage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
@@ -100,9 +102,9 @@ export default function RequestQuotePage() {
         })
       );
       setAttachments([...attachments, ...uploadedFiles]);
-      toast.success("Archivo(s) subido(s)");
+      toast.success(t('quotes.request.filesUploaded'));
     } catch (error) {
-      toast.error("Error al subir archivo");
+      toast.error(t('quotes.request.uploadError'));
     } finally {
       setUploadingFile(false);
     }
@@ -269,11 +271,11 @@ export default function RequestQuotePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quoteRequests'] });
-      toast.success("Solicitud enviada correctamente");
+      toast.success(t('quotes.request.sentToast'));
       navigate(createPageUrl("Search"));
     },
     onError: (error) => {
-      toast.error("Error al enviar solicitud");
+      toast.error(t('quotes.request.sendError'));
       console.error(error);
     }
   });
@@ -282,12 +284,12 @@ export default function RequestQuotePage() {
     e.preventDefault();
 
     if (!formData.title.trim() || !formData.description.trim()) {
-      toast.error("Completa título y descripción");
+      toast.error(t('quotes.request.validationError'));
       return;
     }
 
     if (!professionalId) {
-      toast.error("Selecciona un profesional");
+      toast.error(t('quotes.request.selectProfessional'));
       return;
     }
 
@@ -318,8 +320,8 @@ export default function RequestQuotePage() {
   return (
     <>
       <SEOHead 
-        title="Solicitar Presupuesto - MisAutónomos"
-        description="Solicita presupuestos a profesionales verificados"
+        title={t('quotes.request.seoTitle')}
+        description={t('quotes.request.seoDescription')}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
@@ -328,13 +330,19 @@ export default function RequestQuotePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-6 h-6 text-blue-600" />
-                Solicitar Presupuesto
+                {t('quotes.request.title')}
               </CardTitle>
               <CardDescription>
                 {professional?.profile ? (
-                  <span>Solicita presupuesto a <strong>{professional.profile.business_name}</strong></span>
+                  <span>
+                    <Trans
+                      i18nKey="quotes.request.subtitleFor"
+                      values={{ name: professional.profile.business_name }}
+                      components={{ 1: <strong /> }}
+                    />
+                  </span>
                 ) : (
-                  <span>Describe tu proyecto y recibe presupuestos</span>
+                  <span>{t('quotes.request.subtitle')}</span>
                 )}
               </CardDescription>
             </CardHeader>
@@ -342,21 +350,21 @@ export default function RequestQuotePage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <Label>Título del trabajo *</Label>
+                  <Label>{t('quotes.request.titleLabel')}</Label>
                   <Input
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Ej: Instalación de aire acondicionado"
+                    placeholder={t('quotes.request.titlePlaceholder')}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label>Descripción detallada *</Label>
+                  <Label>{t('quotes.request.descriptionLabel')}</Label>
                   <Textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Describe el trabajo que necesitas..."
+                    placeholder={t('quotes.request.descriptionPlaceholder')}
                     rows={5}
                     required
                   />
@@ -364,74 +372,74 @@ export default function RequestQuotePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Provincia</Label>
+                    <Label>{t('province')}</Label>
                     <Select value={formData.provincia} onValueChange={(v) => setFormData({ ...formData, provincia: v })}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecciona" />
+                        <SelectValue placeholder={t('quotes.request.selectPlaceholder')} />
                       </SelectTrigger>
                       <SelectContent>
                         {PROVINCIAS_ESPANA.map(p => (
-                          <SelectItem key={p} value={p}>{p}</SelectItem>
+                          <SelectItem key={p} value={p}>{p === "Otras" ? t('quotes.request.otherProvince') : p}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
-                    <Label>Ciudad</Label>
+                    <Label>{t('city')}</Label>
                     <Input
                       value={formData.ciudad}
                       onChange={(e) => setFormData({ ...formData, ciudad: e.target.value })}
-                      placeholder="Ciudad o municipio"
+                      placeholder={t('quotes.request.cityPlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label>Dirección completa (opcional)</Label>
+                  <Label>{t('quotes.request.addressLabel')}</Label>
                   <Input
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    placeholder="Calle, número, código postal..."
+                    placeholder={t('quotes.request.addressPlaceholder')}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Rango de presupuesto</Label>
+                    <Label>{t('quotes.request.budgetLabel')}</Label>
                     <Select value={formData.budget_range} onValueChange={(v) => setFormData({ ...formData, budget_range: v })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="no_definido">No definido</SelectItem>
-                        <SelectItem value="0-500">0€ - 500€</SelectItem>
-                        <SelectItem value="500-1000">500€ - 1.000€</SelectItem>
-                        <SelectItem value="1000-2500">1.000€ - 2.500€</SelectItem>
-                        <SelectItem value="2500-5000">2.500€ - 5.000€</SelectItem>
-                        <SelectItem value="5000+">Más de 5.000€</SelectItem>
+                        <SelectItem value="no_definido">{t('quotes.request.budgetUndefined')}</SelectItem>
+                        <SelectItem value="0-500">{t('quotes.request.budget0to500')}</SelectItem>
+                        <SelectItem value="500-1000">{t('quotes.request.budget500to1000')}</SelectItem>
+                        <SelectItem value="1000-2500">{t('quotes.request.budget1000to2500')}</SelectItem>
+                        <SelectItem value="2500-5000">{t('quotes.request.budget2500to5000')}</SelectItem>
+                        <SelectItem value="5000+">{t('quotes.request.budgetOver5000')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
-                    <Label>Urgencia</Label>
+                    <Label>{t('quotes.request.urgencyLabel')}</Label>
                     <Select value={formData.urgency} onValueChange={(v) => setFormData({ ...formData, urgency: v })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="baja">Baja</SelectItem>
-                        <SelectItem value="media">Media</SelectItem>
-                        <SelectItem value="alta">Alta</SelectItem>
-                        <SelectItem value="urgente">Urgente</SelectItem>
+                        <SelectItem value="baja">{t('quotes.urgency.low')}</SelectItem>
+                        <SelectItem value="media">{t('quotes.urgency.medium')}</SelectItem>
+                        <SelectItem value="alta">{t('quotes.urgency.high')}</SelectItem>
+                        <SelectItem value="urgente">{t('quotes.urgency.urgent')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div>
-                  <Label>Fecha límite (opcional)</Label>
+                  <Label>{t('quotes.request.deadlineLabel')}</Label>
                   <Input
                     type="date"
                     value={formData.deadline}
@@ -440,16 +448,16 @@ export default function RequestQuotePage() {
                 </div>
 
                 <div>
-                  <Label>Tu teléfono de contacto</Label>
+                  <Label>{t('quotes.request.phoneLabel')}</Label>
                   <Input
                     value={formData.client_phone}
                     onChange={(e) => setFormData({ ...formData, client_phone: e.target.value })}
-                    placeholder="Teléfono"
+                    placeholder={t('phoneField')}
                   />
                 </div>
 
                 <div>
-                  <Label>Archivos adjuntos (opcional)</Label>
+                  <Label>{t('quotes.request.attachmentsLabel')}</Label>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -470,7 +478,7 @@ export default function RequestQuotePage() {
                     ) : (
                       <Paperclip className="w-4 h-4 mr-2" />
                     )}
-                    Adjuntar fotos o documentos
+                    {t('quotes.request.attachButton')}
                   </Button>
 
                   {attachments.length > 0 && (
@@ -499,7 +507,7 @@ export default function RequestQuotePage() {
                     onClick={() => navigate(-1)}
                     className="flex-1"
                   >
-                    Cancelar
+                    {t('common.cancel')}
                   </Button>
                   <Button
                     type="submit"
@@ -509,12 +517,12 @@ export default function RequestQuotePage() {
                     {createQuoteMutation.isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Enviando...
+                        {t('quotes.actions.sending')}
                       </>
                     ) : (
                       <>
                         <Send className="w-4 h-4 mr-2" />
-                        Enviar solicitud
+                        {t('quotes.request.submit')}
                       </>
                     )}
                   </Button>

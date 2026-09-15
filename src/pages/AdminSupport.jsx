@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminSupport() {
+  const { t } = useTranslation();
   const [selectedConvId, setSelectedConvId] = useState(null);
   const [messageInput, setMessageInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,8 +64,8 @@ export default function AdminSupport() {
           ...conv,
           isBriefing,
           userName: isBriefing 
-            ? userMsg?.client_name || 'Profesional Ads+'
-            : userMsg?.client_name || userMsg?.professional_name || 'Usuario',
+            ? userMsg?.client_name || t('admin.support.adsProfessional')
+            : userMsg?.client_name || userMsg?.professional_name || t('admin.support.userFallback'),
           userId: userMsg?.sender_id,
         };
       })
@@ -76,7 +78,7 @@ export default function AdminSupport() {
         if (a.unread === 0 && b.unread > 0) return 1;
         return new Date(b.lastMsg?.created_date) - new Date(a.lastMsg?.created_date);
       });
-  }, [allMessages]);
+  }, [allMessages, t]);
 
   // Mensajes de la conversación activa, ordenados por fecha
   const activeMessages = useMemo(() => {
@@ -152,16 +154,16 @@ export default function AdminSupport() {
         <div className="p-4 border-b border-gray-100">
           <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <Headphones className="w-5 h-5 text-blue-600" />
-            Bandeja de Soporte
+            {t('supportChat.supportInbox')}
           </h1>
-          <p className="text-xs text-gray-500 mt-0.5">{filteredConversations.length} conversaciones</p>
+          <p className="text-xs text-gray-500 mt-0.5">{t('supportChat.conversationsCount', { count: filteredConversations.length })}</p>
         </div>
 
         <div className="px-3 py-2 border-b border-gray-100">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
             <Input
-              placeholder="Buscar usuario..."
+              placeholder={t('admin.support.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8 h-9 text-sm"
@@ -171,9 +173,9 @@ export default function AdminSupport() {
 
         <div className="flex-1 overflow-y-auto">
           {isLoading ? (
-            <div className="p-4 text-sm text-gray-400 text-center">Cargando...</div>
+            <div className="p-4 text-sm text-gray-400 text-center">{t('common.loading')}</div>
           ) : filteredConversations.length === 0 ? (
-            <div className="p-6 text-center text-sm text-gray-400">No hay conversaciones de soporte</div>
+            <div className="p-6 text-center text-sm text-gray-400">{t('admin.support.emptyState')}</div>
           ) : (
             filteredConversations.map(conv => (
               <button
@@ -196,7 +198,7 @@ export default function AdminSupport() {
                           {conv.userName}
                         </p>
                         {conv.isBriefing && (
-                          <span className="bg-yellow-100 text-yellow-700 text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0">Ads+</span>
+                          <span className="bg-yellow-100 text-yellow-700 text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0">{t('admin.support.adsBadge')}</span>
                         )}
                       </div>
                       <p className="text-xs text-gray-400 truncate">
@@ -224,7 +226,7 @@ export default function AdminSupport() {
         {!selectedConvId ? (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3">
             <Headphones className="w-12 h-12 text-gray-200" />
-            <p className="text-sm">Selecciona una conversación para responder</p>
+            <p className="text-sm">{t('supportChat.selectConversation')}</p>
           </div>
         ) : (
           <>
@@ -245,10 +247,10 @@ export default function AdminSupport() {
                 <div className="flex items-center gap-2">
                   <p className="font-semibold text-gray-900 text-sm">{activeConv?.userName}</p>
                   {activeConv?.isBriefing && (
-                    <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded font-semibold">⚡ Ads+</span>
+                    <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded font-semibold">{t('admin.support.adsBadgeActive')}</span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500">{activeConv?.isBriefing ? 'Chat de campaña Ads+' : 'Chat de soporte'}</p>
+                <p className="text-xs text-gray-500">{activeConv?.isBriefing ? t('admin.support.adsCampaignChat') : t('admin.support.supportChat')}</p>
               </div>
             </div>
 
@@ -280,7 +282,7 @@ export default function AdminSupport() {
                 <Input
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
-                  placeholder="Responder como Soporte MisAutónomos..."
+                  placeholder={t('admin.support.replyPlaceholder')}
                   className="flex-1 rounded-full bg-gray-50 border-gray-200 text-sm"
                   disabled={sendMutation.isPending}
                 />

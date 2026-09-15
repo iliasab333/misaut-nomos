@@ -5,15 +5,17 @@ import { supabase } from '@/api/supabaseClient';
 import { base44 } from '@/api/base44Client';
 import SEOHead from '@/components/seo/SEOHead';
 import { toast } from 'sonner';
+import { useTranslation, Trans } from 'react-i18next';
 
 const NAVY = '#00255C';
 const GOLD = '#F5C13D';
 
-const SUBRATINGS = [
-  { key: 'rapidez', label: 'Rapidez' },
-  { key: 'comunicacion', label: 'Comunicación' },
-  { key: 'calidad', label: 'Calidad' },
-  { key: 'precio_satisfaccion', label: 'Precio / Satisfacción' },
+// Recibe `t` para que las etiquetas se retraduzcan al cambiar de idioma.
+const subratingsFor = (t) => [
+  { key: 'rapidez', label: t('reviews.criteria.speed') },
+  { key: 'comunicacion', label: t('reviews.criteria.communication') },
+  { key: 'calidad', label: t('reviews.criteria.quality') },
+  { key: 'precio_satisfaccion', label: t('reviews.criteria.priceSatisfaction') },
 ];
 
 function avg(arr, key) {
@@ -40,6 +42,7 @@ function Stars({ value, size = 14 }) {
 
 export default function MisValoracionesPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [me, setMe] = useState(null);
@@ -71,7 +74,7 @@ export default function MisValoracionesPage() {
         if (cancelled) return;
         setReviews(Array.isArray(list) ? list : []);
       } catch (e) {
-        if (!cancelled) setErr(e?.message || 'No se han podido cargar las valoraciones.');
+        if (!cancelled) setErr(e?.message || t('reviews.mine.loadError'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -81,17 +84,19 @@ export default function MisValoracionesPage() {
     };
   }, [navigate]);
 
+  const subratings = useMemo(() => subratingsFor(t), [t]);
+
   const stats = useMemo(() => {
     const visibles = reviews.filter((r) => !r.is_reported);
     const total = visibles.length;
     const avgGlobal = avg(visibles, 'rating');
-    const subs = SUBRATINGS.map((s) => ({ ...s, value: avg(visibles, s.key) }));
+    const subs = subratings.map((s) => ({ ...s, value: avg(visibles, s.key) }));
     return { total, avgGlobal, subs };
-  }, [reviews]);
+  }, [reviews, subratings]);
 
   return (
     <>
-      <SEOHead title="Mis valoraciones — MisAutónomos" noindex />
+      <SEOHead title={t('reviews.mine.seoTitle')} noindex />
       <div className="min-h-screen bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
           <button
@@ -100,14 +105,14 @@ export default function MisValoracionesPage() {
             className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-3"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver al panel
+            {t('reviews.mine.backToDashboard')}
           </button>
 
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">Valoraciones</h1>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">{t('reviews.mine.title')}</h1>
               <p className="text-sm text-slate-500 mt-1">
-                Las reseñas que recibes de tus clientes en MisAutónomos.
+                {t('reviews.mine.subtitle')}
               </p>
             </div>
             <button
@@ -117,7 +122,7 @@ export default function MisValoracionesPage() {
               style={{ background: NAVY }}
             >
               <Send className="w-4 h-4" />
-              Pedir valoración
+              {t('reviews.request.title')}
             </button>
           </div>
 
@@ -141,7 +146,7 @@ export default function MisValoracionesPage() {
                       <Stars value={stats.avgGlobal} size={16} />
                     </div>
                     <div className="text-xs text-slate-500 mt-1">
-                      {stats.total} {stats.total === 1 ? 'valoración' : 'valoraciones'}
+                      {t('reviews.summary.count', { count: stats.total })}
                     </div>
                   </div>
                   <div className="flex-1 min-w-[220px] grid grid-cols-2 gap-x-5 gap-y-2">
@@ -160,12 +165,14 @@ export default function MisValoracionesPage() {
 
               <section className="mt-6">
                 <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500 mb-2">
-                  Últimas reseñas
+                  {t('reviews.mine.latest')}
                 </h2>
                 {reviews.length === 0 ? (
                   <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
-                    Todavía no tienes valoraciones. Pulsa <strong>Pedir valoración</strong> para
-                    invitar a tus clientes a opinar.
+                    <Trans i18nKey="reviews.mine.emptyState">
+                      Todavía no tienes valoraciones. Pulsa <strong>Pedir valoración</strong> para
+                      invitar a tus clientes a opinar.
+                    </Trans>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -191,18 +198,20 @@ export default function MisValoracionesPage() {
 }
 
 function ReviewCard({ review }) {
+  const { t, i18n } = useTranslation();
   const [showAll, setShowAll] = useState(false);
+  const subratings = subratingsFor(t);
   return (
     <div className="rounded-2xl bg-white border border-slate-200 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-900 text-sm truncate">
-              {review.client_name || 'Cliente'}
+              {review.client_name || t('clientLabel')}
             </span>
             {review.client_verified && (
               <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5">
-                Verificado
+                {t('proProfile.badges.verified')}
               </span>
             )}
           </div>
@@ -212,7 +221,7 @@ function ReviewCard({ review }) {
         </div>
         <div className="text-[11px] text-slate-400 flex-shrink-0">
           {review.created_date
-            ? new Date(review.created_date).toLocaleDateString('es-ES', {
+            ? new Date(review.created_date).toLocaleDateString(i18n.language, {
                 day: '2-digit',
                 month: 'short',
                 year: 'numeric',
@@ -232,12 +241,12 @@ function ReviewCard({ review }) {
           onClick={() => setShowAll((v) => !v)}
           className="text-[11px] font-semibold text-slate-500 hover:text-slate-700 mt-1"
         >
-          {showAll ? 'Mostrar menos' : 'Leer todo'}
+          {showAll ? t('reviews.card.showLess') : t('reviews.card.readAll')}
         </button>
       )}
 
       <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1.5">
-        {SUBRATINGS.map((s) => (
+        {subratings.map((s) => (
           <div key={s.key} className="flex items-center justify-between gap-2">
             <span className="text-[11px] text-slate-500">{s.label}</span>
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700">
@@ -251,7 +260,7 @@ function ReviewCard({ review }) {
       {review.professional_response && (
         <div className="mt-3 rounded-xl bg-slate-50 border border-slate-100 p-3">
           <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1">
-            Tu respuesta
+            {t('reviews.card.yourResponse')}
           </div>
           <div className="text-sm text-slate-700 whitespace-pre-wrap">
             {review.professional_response}
@@ -263,6 +272,7 @@ function ReviewCard({ review }) {
 }
 
 function RequestReviewModal({ me, onClose }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [contacts, setContacts] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -294,7 +304,7 @@ function RequestReviewModal({ me, onClose }) {
             byClient.set(otherId, {
               user_id: otherId,
               name:
-                m.sender_id === me.id ? m.professional_name : m.client_name || 'Cliente',
+                m.sender_id === me.id ? m.professional_name : m.client_name || t('clientLabel'),
               conversation_id: m.conversation_id,
               last: m.created_date,
             });
@@ -339,9 +349,9 @@ function RequestReviewModal({ me, onClose }) {
           : `${window.location.origin}${res.url.startsWith('/') ? res.url : '/' + res.url}`
         : `${window.location.origin}/valorar/${token}`;
       setLink(url);
-      toast.success('Solicitud creada.');
+      toast.success(t('reviews.request.created'));
     } catch (e) {
-      toast.error(e?.message || 'No se pudo crear la solicitud.');
+      toast.error(e?.message || t('reviews.request.createError'));
     } finally {
       setSubmitting(false);
     }
@@ -366,16 +376,16 @@ function RequestReviewModal({ me, onClose }) {
       >
         <div className="p-5 border-b border-slate-100 flex items-start justify-between gap-3">
           <div>
-            <h2 className="font-semibold text-slate-900">Pedir valoración</h2>
+            <h2 className="font-semibold text-slate-900">{t('reviews.request.title')}</h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Genera un enlace para que un cliente te puntúe.
+              {t('reviews.request.subtitle')}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-slate-100 text-slate-500"
-            aria-label="Cerrar"
+            aria-label={t('common.close')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -394,7 +404,7 @@ function RequestReviewModal({ me, onClose }) {
                   className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg text-sm font-semibold border border-slate-200 text-slate-700 hover:bg-slate-50"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                  {copied ? 'Copiado' : 'Copiar enlace'}
+                  {copied ? t('reviews.request.copied') : t('reviews.request.copyLink')}
                 </button>
                 <button
                   type="button"
@@ -402,7 +412,7 @@ function RequestReviewModal({ me, onClose }) {
                   className="ml-auto inline-flex items-center justify-center h-10 px-4 rounded-lg text-sm font-semibold text-white"
                   style={{ background: NAVY }}
                 >
-                  Hecho
+                  {t('reviews.request.done')}
                 </button>
               </div>
             </div>
@@ -412,12 +422,11 @@ function RequestReviewModal({ me, onClose }) {
             </div>
           ) : contacts.length === 0 ? (
             <div className="text-sm text-slate-600">
-              Aún no tienes clientes con los que hayas hablado. Los enlaces de valoración se
-              generan a partir de tus conversaciones.
+              {t('reviews.request.noContacts')}
             </div>
           ) : (
             <div className="space-y-2">
-              <p className="text-xs text-slate-500 mb-2">Elige el cliente al que quieres pedir la valoración:</p>
+              <p className="text-xs text-slate-500 mb-2">{t('reviews.request.chooseClient')}</p>
               <div className="max-h-72 overflow-y-auto rounded-xl border border-slate-200 divide-y divide-slate-100">
                 {contacts.slice(0, 30).map((c) => {
                   const isSel = selected?.user_id === c.user_id;
@@ -431,7 +440,7 @@ function RequestReviewModal({ me, onClose }) {
                       }`}
                     >
                       <MessageSquare className="w-4 h-4 text-slate-400" />
-                      <span className="text-sm text-slate-800 flex-1 truncate">{c.name || 'Cliente'}</span>
+                      <span className="text-sm text-slate-800 flex-1 truncate">{c.name || t('clientLabel')}</span>
                       {isSel && <Check className="w-4 h-4 text-emerald-600" />}
                     </button>
                   );
@@ -443,7 +452,7 @@ function RequestReviewModal({ me, onClose }) {
                   onClick={onClose}
                   className="h-10 px-4 rounded-lg text-sm font-semibold border border-slate-200 text-slate-700 hover:bg-slate-50"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="button"
@@ -453,7 +462,7 @@ function RequestReviewModal({ me, onClose }) {
                   style={{ background: NAVY }}
                 >
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  Generar enlace
+                  {t('reviews.request.generateLink')}
                 </button>
               </div>
             </div>

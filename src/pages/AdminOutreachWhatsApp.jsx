@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useTranslation, Trans } from 'react-i18next';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
 import {
@@ -197,6 +198,7 @@ export default function AdminOutreachWhatsAppPage() {
 }
 
 function OutreachWaContent() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const queueQ = useQueue(true);
   const sentTodayQ = useSentTodayCount(true);
@@ -245,11 +247,11 @@ function OutreachWaContent() {
       });
     },
     onSuccess: () => {
-      toast.success('Marcado como contactado');
+      toast.success(t('admin.outreach.contacted'));
       queryClient.invalidateQueries({ queryKey: ['outreach-wa-sent-today'] });
       advance();
     },
-    onError: (err) => toast.error(`Error: ${err.message || 'no se pudo actualizar'}`),
+    onError: (err) => toast.error(t('admin.outreach.updateError', { message: err.message || t('admin.outreach.updateErrorFallback') })),
   });
 
   const discardMut = useMutation({
@@ -260,10 +262,10 @@ function OutreachWaContent() {
       });
     },
     onSuccess: () => {
-      toast.success('Descartado');
+      toast.success(t('admin.outreach.discarded'));
       advance();
     },
-    onError: (err) => toast.error(`Error: ${err.message || 'no se pudo actualizar'}`),
+    onError: (err) => toast.error(t('admin.outreach.updateError', { message: err.message || t('admin.outreach.updateErrorFallback') })),
   });
 
   const advance = useCallback(() => {
@@ -292,31 +294,31 @@ function OutreachWaContent() {
       {/* Header */}
       <header className="mb-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
-          Admin · Outreach
+          {t('admin.outreach.eyebrow')}
         </p>
         <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em' }}>
-          Outreach WhatsApp
+          {t('admin.outreach.title')}
         </h1>
         <p className="mt-2 text-slate-500 text-sm">
-          Cola asistida de leads. El envío es manual vía wa.me — el sistema solo prepara el mensaje y trackea el estado.
+          {t('admin.outreach.subtitle')}
         </p>
       </header>
 
       {/* Contador del día */}
       <div className={`rounded-2xl border px-4 py-3 mb-6 flex items-center justify-between ${overCap ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-slate-700 font-medium">Enviados hoy:</span>
+          <span className="text-slate-700 font-medium">{t('admin.outreach.sentToday')}</span>
           <span className={`text-base font-bold ${overCap ? 'text-amber-700' : 'text-slate-900'}`}>{sentTodayQ.isLoading ? '…' : sentToday}</span>
-          <span className="text-slate-400">/ {DAILY_SOFT_CAP} recomendados</span>
+          <span className="text-slate-400">{t('admin.outreach.recommendedCap', { cap: DAILY_SOFT_CAP })}</span>
         </div>
         <button
           type="button"
           onClick={() => { queryClient.invalidateQueries({ queryKey: ['outreach-wa-queue'] }); queryClient.invalidateQueries({ queryKey: ['outreach-wa-sent-today'] }); }}
           className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900"
-          aria-label="Recargar cola"
+          aria-label={t('admin.outreach.reloadQueue')}
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          Recargar
+          {t('admin.outreach.reload')}
         </button>
       </div>
 
@@ -324,8 +326,8 @@ function OutreachWaContent() {
         <div className="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 mb-6 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-amber-900">
-            <p className="font-semibold mb-1">Para por hoy.</p>
-            <p>Has enviado {sentToday} mensajes en las últimas 24h. Aunque sea envío manual, pasar de {DAILY_SOFT_CAP}/día aumenta el riesgo de que WhatsApp marque tu número. Vuelve mañana.</p>
+            <p className="font-semibold mb-1">{t('admin.outreach.capReached.title')}</p>
+            <p>{t('admin.outreach.capReached.text', { sent: sentToday, cap: DAILY_SOFT_CAP })}</p>
           </div>
         </div>
       )}
@@ -334,22 +336,25 @@ function OutreachWaContent() {
       {queueQ.isLoading && (
         <div className="rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center">
           <Loader2 className="w-6 h-6 animate-spin text-slate-400 mx-auto mb-3" />
-          <p className="text-sm text-slate-500">Cargando cola…</p>
+          <p className="text-sm text-slate-500">{t('admin.outreach.loadingQueue')}</p>
         </div>
       )}
 
       {!queueQ.isLoading && queueQ.isError && (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-8">
-          <p className="text-sm text-rose-800">Error cargando la cola: {String(queueQ.error?.message || queueQ.error)}</p>
+          <p className="text-sm text-rose-800">{t('admin.outreach.queueError', { message: String(queueQ.error?.message || queueQ.error) })}</p>
         </div>
       )}
 
       {!queueQ.isLoading && !queueQ.isError && !current && (
         <div className="rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center">
           <MessageCircle className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-          <h2 className="text-base font-semibold text-slate-900 mb-1">No hay leads en cola</h2>
+          <h2 className="text-base font-semibold text-slate-900 mb-1">{t('admin.outreach.empty.title')}</h2>
           <p className="text-sm text-slate-500 max-w-sm mx-auto">
-            No quedan leads con <code>status = 'nuevo'</code> y teléfono. Ejecuta <code>scripts/seed-leads.mjs</code> para descubrir más, o pulsa "Recargar".
+            <Trans
+              i18nKey="admin.outreach.empty.text"
+              components={[<code key="status" />, <code key="script" />]}
+            />
           </p>
         </div>
       )}
@@ -362,10 +367,10 @@ function OutreachWaContent() {
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <h2 className="text-lg font-semibold text-slate-900 leading-tight" style={{ letterSpacing: '-0.01em' }}>
-                  {current.business_name || 'Sin nombre'}
+                  {current.business_name || t('admin.outreach.leadNoName')}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Lead {idx + 1} de {leads.length}
+                  {t('admin.outreach.leadPosition', { index: idx + 1, total: leads.length })}
                 </p>
               </div>
               {current.user_ratings_total > 0 && (
@@ -406,17 +411,17 @@ function OutreachWaContent() {
           {/* Mensaje editable */}
           <div className="px-6 py-5">
             <label className="block text-xs font-semibold uppercase tracking-[0.06em] text-slate-500 mb-2">
-              Mensaje (editable)
+              {t('admin.outreach.messageLabel')}
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={9}
               className="w-full text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00255C]/15 focus:border-[#00255C] resize-y"
-              placeholder="Mensaje a enviar por WhatsApp…"
+              placeholder={t('admin.outreach.messagePlaceholder')}
             />
             <p className="mt-2 text-[11px] text-slate-400">
-              Plantilla con {'{nombre}'}, {'{oficio}'}, {'{ciudad}'} ya sustituidos. Edita lo que necesites antes de abrir WhatsApp.
+              {t('admin.outreach.templateHint')}
             </p>
           </div>
 
@@ -431,11 +436,11 @@ function OutreachWaContent() {
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1FAD4F')}
             >
               <WhatsAppIcon className="w-5 h-5" />
-              {waOpened ? 'Abrir WhatsApp de nuevo' : 'Abrir WhatsApp'}
+              {waOpened ? t('admin.outreach.openWhatsAppAgain') : t('admin.outreach.openWhatsApp')}
             </button>
             {!waOpened && (
               <p className="mt-2 text-[11px] text-center text-slate-400">
-                Se abre WhatsApp con el mensaje listo. Lo envías tú con un clic, después marcas el resultado abajo.
+                {t('admin.outreach.openHint')}
               </p>
             )}
           </div>
@@ -452,7 +457,7 @@ function OutreachWaContent() {
               onMouseLeave={(e) => !markContactedMut.isPending && (e.currentTarget.style.backgroundColor = '#00255C')}
             >
               {markContactedMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-              Marcar contactado
+              {t('admin.outreach.markContacted')}
             </button>
             <button
               type="button"
@@ -461,7 +466,7 @@ function OutreachWaContent() {
               className="inline-flex items-center justify-center gap-2 h-11 rounded-xl font-semibold text-sm border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
             >
               {discardMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
-              Descartar
+              {t('admin.outreach.discard')}
             </button>
           </div>
         </article>
