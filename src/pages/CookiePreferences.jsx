@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import i18n from '@/i18n';
 import { Link } from 'react-router-dom';
 import { Cookie, Check, AlertCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -59,7 +60,7 @@ export default function CookiePreferencesPage() {
         accepted_analytics: newPrefs.analytics,
         accepted_marketing: newPrefs.marketing,
         legal_version: 'cookies-v1',
-        language: localStorage.getItem('language') || 'es',
+        language: i18n.language?.split('-')[0] || 'es',
         user_agent: navigator.userAgent,
         consent_timestamp: new Date().toISOString()
       });

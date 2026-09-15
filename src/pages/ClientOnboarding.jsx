@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import i18n from '@/i18n';
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -114,7 +115,7 @@ export default function ClientOnboardingPage() {
         email: email,
         name: userData.name || '',
         status: 'confirmed',
-        language: localStorage.getItem('language') || 'es',
+        language: i18n.language?.split('-')[0] || 'es',
         source: 'auto_signup',
         user_type_interest: userData.user_type === 'professionnel' ? 'autonomo' : userData.user_type === 'client' ? 'cliente' : 'ambos',
         confirmation_token: Math.random().toString(36).substring(2),

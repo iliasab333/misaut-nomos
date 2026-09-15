@@ -10,7 +10,7 @@ import { setupIframeMessaging } from './lib/iframe-messaging';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { AppProvider } from '@/lib/AppContext';
-import { AutoTranslateProvider } from '@/lib/AutoTranslate';
+import { routerBasename } from '@/i18n';
 import ScrollToTop from '@/lib/ScrollToTop';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -424,19 +424,20 @@ function App() {
       <AuthProvider>
         <AppProvider>
           <QueryClientProvider client={queryClientInstance}>
-            <AutoTranslateProvider>
-              <Router>
-                <ScrollToTop />
-                <NavigationTracker />
-                <AuthenticatedApp />
-              </Router>
-              <Toaster />
-              <VisualEditAgent />
-              {/* Vercel RUM: Core Web Vitals reales (LCP/CLS/INP) por ruta.
-                  El componente carga el script de forma diferida, no afecta al
-                  LCP, y solo envía métricas en producción (en dev es no-op). */}
-              <SpeedInsights />
-            </AutoTranslateProvider>
+            {/* basename: si la URL lleva prefijo de idioma (/ar/…), React
+                Router lo quita de useLocation() y lo pone en cada <Link>.
+                Ninguna página tiene que saber que existe. */}
+            <Router basename={routerBasename()}>
+              <ScrollToTop />
+              <NavigationTracker />
+              <AuthenticatedApp />
+            </Router>
+            <Toaster />
+            <VisualEditAgent />
+            {/* Vercel RUM: Core Web Vitals reales (LCP/CLS/INP) por ruta.
+                El componente carga el script de forma diferida, no afecta al
+                LCP, y solo envía métricas en producción (en dev es no-op). */}
+            <SpeedInsights />
           </QueryClientProvider>
         </AppProvider>
       </AuthProvider>

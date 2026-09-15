@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run prerender",
+    "build": "npm run check:i18n && vite build && npm run prerender",
     "prerender": "node scripts/prerender.mjs",
     "build:nossr": "vite build",
+    "check:i18n": "node scripts/check-i18n.mjs",
     "lint": "eslint .",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview",
