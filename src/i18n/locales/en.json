@@ -2299,7 +2299,7 @@
       "body": "Your profile is active, but clients prioritise verified profiles. Verifying your identity only takes <strong>2 minutes</strong>.",
       "cta": "Verify now — It's free"
     },
-    "toast": {
+    "status": {
       "rejected": "Verification rejected"
     }
   }

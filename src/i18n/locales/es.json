@@ -2299,7 +2299,7 @@
       "body": "Tu perfil está activo, pero los clientes priorizan los perfiles verificados. Verificar tu identidad solo tarda <strong>2 minutos</strong>.",
       "cta": "Verificar ahora — Es gratis"
     },
-    "toast": {
+    "status": {
       "rejected": "Verificación rechazada"
     }
   }

@@ -39,7 +39,15 @@ function flatten(obj, prefix = '', out = new Set()) {
   return out;
 }
 
-const known = flatten(JSON.parse(readFileSync(join(ROOT, 'src/i18n/locales/es.json'), 'utf8')));
+// Las dos mitades del locale fuente: el público y el de aplicación. Una clave
+// existe si está en cualquiera de las dos — el reparto es una cuestión de
+// cuándo se descarga, no de si la clave existe.
+const known = new Set();
+for (const f of ['src/i18n/locales/es.json', 'src/i18n/locales/es.app.json']) {
+  const file = join(ROOT, f);
+  if (!existsSync(file)) continue;
+  for (const k of flatten(JSON.parse(readFileSync(file, 'utf8')))) known.add(k);
+}
 const partsDir = join(ROOT, 'src/i18n/parts');
 if (existsSync(partsDir)) {
   for (const f of readdirSync(partsDir).filter((f) => f.endsWith('.json'))) {

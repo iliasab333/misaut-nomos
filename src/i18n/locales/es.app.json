@@ -897,7 +897,8 @@
         "all": "Todas"
       },
       "toast": {
-        "approved": "Verificación aprobada"
+        "approved": "Verificación aprobada",
+        "rejected": "Verificación rechazada"
       }
     },
     "metrics": {
