@@ -18,7 +18,10 @@
     "success": "Éxito",
     "error": "Error",
     "required": "Obligatorio",
-    "optional": "Opcional"
+    "optional": "Opcional",
+    "errorGenericTitle": "Algo ha fallado",
+    "errorGenericBody": "No hemos podido cargar esto. Inténtalo de nuevo.",
+    "retry": "Reintentar"
   },
   "nav": {
     "search_professionals": "Buscar Autónomos",

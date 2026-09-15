@@ -18,7 +18,10 @@
     "success": "Success",
     "error": "Error",
     "required": "Required",
-    "optional": "Optional"
+    "optional": "Optional",
+    "errorGenericTitle": "Something went wrong",
+    "errorGenericBody": "We couldn't load this. Please try again.",
+    "retry": "Try again"
   },
   "nav": {
     "search_professionals": "Find Professionals",

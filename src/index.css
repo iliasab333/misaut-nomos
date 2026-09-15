@@ -92,7 +92,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-c-border outline-ring/50;
   }
   html {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -133,4 +133,287 @@
   outline: 2px solid hsl(var(--brand-navy));
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   REFONTE — sistema de diseño portado de khdemlidaba
+   ═══════════════════════════════════════════════════════════════════════
+   Tokens en canales RGB sueltos para que Tailwind pueda aplicarles
+   opacidad (`bg-c-accent/10` compila a `rgb(var(--c-accent) / 0.1)`).
+
+   Los valores son la paleta REAL de misautonomos — la que se ve —, no los
+   `--brand-navy/gold/cream` de arriba, que no usa ningún fichero. Lo que
+   la web pinta hoy es blue-600 de primario, gray/slate de neutros y
+   green-600 de éxito; eso es lo que hay que conservar. Los `--brand-*`
+   se quedan definidos por si algún día se usan, pero no gobiernan nada.
+
+   Esta capa es ADITIVA mientras dura la migración: `bg-c-accent` empieza a
+   funcionar sin que `bg-blue-600` deje de hacerlo. Cuando el último
+   consumidor de shadcn esté migrado, tailwind.config.js resetea la
+   paleta y sólo quedan estos tokens (como en khdemlidaba). */
+:root {
+  --c-canvas:         255 255 255;   /* fondo de página */
+  --c-surface:        255 255 255;   /* cartas, inputs, modales */
+  --c-ink:             17  24  39;   /* gray-900 — texto principal */
+  --c-contrast:        17  24  39;   /* inverso del canvas (botón oscuro) */
+  --c-muted:          107 114 128;   /* gray-500 — texto secundario */
+  --c-border:         229 231 235;   /* gray-200 — filetes */
+  --c-soft:           243 244 246;   /* gray-100 — fondos suaves, chips */
+  --c-accent:          37  99 235;   /* blue-600 — primario */
+  --c-accent-hover:    29  78 216;   /* blue-700 */
+  --c-success:         22 163  74;   /* green-600 */
+  --c-error:          220  38  38;   /* red-600 */
+  --c-warning:        217 119   6;   /* amber-600 */
+  --c-star:           251 191  36;   /* amber-400 — valoraciones */
+  --c-whatsapp:        37 211 102;
+  --c-whatsapp-hover:  30 190  93;
+
+  --r-md: 0.5rem;
+  --r-lg: 0.75rem;
+  --r-xl: 1rem;
+  --sh-card: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06);
+}
+
+@layer components {
+  /* Layout */
+  .container-page {
+    @apply mx-auto w-full max-w-page px-5 sm:px-8;
+  }
+  /* Ritmo de sección — 48px móvil (compacto), 96px+ escritorio */
+  .section       { @apply py-12 sm:py-24; }
+  .section-tight { @apply py-8 sm:py-16; }
+
+  /* ---- Botones — 48px mínimo en móvil (regla dura), 56 en lg ----------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-base font-medium leading-none
+           transition-colors select-none
+           disabled:opacity-50 disabled:pointer-events-none;
+    min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-primary   { @apply btn bg-c-accent text-white hover:bg-accent-hover; }
+  .btn-secondary { @apply btn bg-surface text-ink border border-c-border hover:border-ink; }
+  /* Terciario: sin fondo ni borde, subrayado al pasar. Para acciones que
+     abren un detalle en vez de decidir — el peso visual queda para las
+     dos opciones reales. */
+  .btn-ghost     { @apply btn bg-transparent text-ink underline underline-offset-2 hover:opacity-80; }
+  .btn-dark      { @apply btn bg-contrast text-canvas hover:opacity-90; }
+  .btn-whatsapp  { @apply btn bg-whatsapp text-white hover:bg-whatsapp-hover; }
+  .btn-danger-outline {
+    @apply btn bg-surface border;
+    color: rgb(var(--c-error));
+    border-color: rgb(var(--c-error) / 0.45);
+    border-width: 1.5px;
+  }
+  .btn-danger-outline:hover { background: rgb(var(--c-error) / 0.08); border-color: rgb(var(--c-error)); }
+  .btn-danger-solid { @apply btn text-white; background: rgb(var(--c-error)); }
+  .btn-danger-solid:hover { background: #B91C1C; }
+  .btn-lg { @apply px-6 py-4 text-base; min-height: 56px; }
+  .btn-sm { @apply px-4 py-2 text-sm;  min-height: 44px; }
+  /* Botón sólo-icono cuadrado, 44px táctil. */
+  .btn-icon { @apply btn p-0 w-11 h-11; min-height: 44px; }
+
+  /* ---- Campos — 48px, texto 16px (nunca menos: iOS hace zoom por debajo) */
+  .input {
+    @apply block w-full rounded-lg bg-surface px-4 py-3 text-base text-ink
+           placeholder:text-c-muted
+           border border-c-border
+           focus:border-ink focus:outline-none
+           transition-colors
+           disabled:bg-soft disabled:text-c-muted disabled:cursor-not-allowed;
+    min-height: 48px;
+    font-size: 16px;
+  }
+  .textarea { @apply input resize-y; min-height: 120px; line-height: 1.5; }
+  /* Error: borde rojo suave. NUNCA fondo rojo — el usuario sigue
+     escribiendo tranquilo. El mensaje va debajo con .field-error. */
+  .input-error { border-color: rgb(var(--c-error)); }
+  .input-error:focus {
+    border-color: rgb(var(--c-error));
+    box-shadow: 0 0 0 3px rgb(var(--c-error) / 0.15);
+  }
+  .label       { @apply block text-sm font-medium text-ink mb-1.5; }
+  .field-hint  { @apply mt-2 text-xs text-c-muted leading-snug; }
+  .field-error { @apply mt-2 text-xs text-error leading-snug; }
+  .field-ok    { @apply mt-2 text-xs text-success leading-snug; }
+  .select {
+    /* `pe-10` y no `pr-10`, flecha por `background-position` que se
+       voltea en RTL: en árabe el texto de la opción va a la derecha y
+       pasaría por debajo de la flecha. */
+    @apply input pe-10 appearance-none bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23111827'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-position: right 0.9rem center;
+    background-size: 1.1rem;
+    font-size: 16px;
+  }
+  [dir="rtl"] .select { background-position: left 0.9rem center; }
+  /* Checkbox / radio nativos con el acento de marca. Sin Radix: el
+     control del navegador, coloreado, 20px táctil. */
+  .checkbox, .radio {
+    @apply w-5 h-5 shrink-0 border border-c-border rounded bg-surface cursor-pointer
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-c-accent/40;
+    accent-color: rgb(var(--c-accent));
+  }
+  .radio { @apply rounded-full; }
+
+  /* ---- Switch (interruptor) — CSS puro sobre un <input type=checkbox> -- */
+  .switch {
+    @apply relative inline-block w-11 h-6 shrink-0 rounded-full bg-c-border cursor-pointer
+           transition-colors appearance-none
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-c-accent/40;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .switch::after {
+    content: '';
+    @apply absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform;
+  }
+  .switch:checked { @apply bg-c-accent; }
+  .switch:checked::after { transform: translateX(20px); }
+  .switch:disabled { @apply opacity-50 cursor-not-allowed; }
+  [dir="rtl"] .switch::after { left: auto; right: 0.125rem; }
+  [dir="rtl"] .switch:checked::after { transform: translateX(-20px); }
+
+  /* ---- Carta ------------------------------------------------------------- */
+  .card { @apply bg-surface border border-c-border rounded-xl shadow-card overflow-hidden; }
+
+  /* ---- Chips — 48px táctil (regla dura) --------------------------------- */
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium
+           bg-surface border border-c-border text-ink
+           hover:border-ink
+           transition-colors whitespace-nowrap;
+    min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Seleccionado: el mismo azul que el botón primario, misma selección. */
+  .chip-active {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium
+           bg-c-accent border border-c-accent text-white
+           transition-colors whitespace-nowrap;
+    min-height: 48px;
+  }
+  /* Chip compacto informativo — no clicable, 24px alto */
+  .chip-info {
+    @apply inline-flex items-center gap-1 rounded-full text-xs font-medium
+           bg-soft text-ink border border-c-border whitespace-nowrap;
+    padding: 3px 10px;
+  }
+
+  /* ---- Badges — sustituyen a las variantes de shadcn ---------------------
+     default → .badge-accent · secondary → .badge-muted · destructive →
+     .badge-error · outline → .badge-outline · y .badge-success que faltaba. */
+  .badge { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap; }
+  .badge-accent  { @apply badge bg-c-accent text-white; }
+  .badge-muted   { @apply badge bg-soft text-c-muted; }
+  .badge-success { @apply badge; background: rgb(var(--c-success) / 0.12); color: rgb(var(--c-success)); }
+  .badge-error   { @apply badge; background: rgb(var(--c-error) / 0.12);   color: rgb(var(--c-error)); }
+  .badge-warning { @apply badge; background: rgb(var(--c-warning) / 0.12); color: rgb(var(--c-warning)); }
+  .badge-outline { @apply badge bg-transparent text-ink border border-c-border; }
+  .badge-verified {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold;
+    color: rgb(var(--c-success));
+  }
+
+  /* ---- Separador ----------------------------------------------------------- */
+  .separator { @apply block w-full h-px bg-c-border; }
+
+  /* ---- Esqueleto ---------------------------------------------------------
+     OJO: globals.css (Base44) define OTRO .skeleton sin @layer, que gana
+     por cascada. Se elimina en el swap de la capa UI; hasta entonces este
+     sólo se ve en componentes nuevos que no carguen aquél. */
+  .skeleton { @apply bg-soft rounded-lg relative overflow-hidden; }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+    background-size: 800px 100%;
+    animation: ma-shimmer 1.5s linear infinite;
+  }
+  @keyframes ma-shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+  }
+
+  /* ---- Carril horizontal de chips ---------------------------------------- */
+  .scroll-x {
+    @apply flex gap-2 overflow-x-auto snap-x snap-mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  .scroll-x::-webkit-scrollbar { display: none; }
+  .scroll-x > * { scroll-snap-align: start; flex-shrink: 0; }
+
+  /* ---- Toast — imperativo, ver src/lib/toast.js -------------------------
+     Arriba, bajo la barra de estado: donde aparecen las notificaciones del
+     sistema, y fuera del camino de la tab bar nativa. */
+  .ma-toast {
+    position: fixed;
+    left: 50%;
+    top: calc(env(safe-area-inset-top) + 12px);
+    transform: translate(-50%, -20px);
+    background: rgb(var(--c-ink));
+    color: rgb(var(--c-surface));
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    max-width: min(400px, calc(100vw - 32px));
+    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transition: opacity 220ms ease-out, transform 220ms ease-out;
+    z-index: 100;
+    pointer-events: none;
+  }
+  .ma-toast-show    { opacity: 1; transform: translate(-50%, 0); }
+  .ma-toast-success { background: rgb(var(--c-success)); color: #fff; }
+  .ma-toast-error   { background: rgb(var(--c-error));   color: #fff; }
+  .ma-toast-info    { background: rgb(var(--c-accent));  color: #fff; }
+
+  /* ---- Modal genérico — ver src/components/Modal.jsx --------------------
+     Móvil: hoja pegada abajo. Escritorio: centrado. */
+  .ma-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgb(var(--c-ink) / 0.5);
+    z-index: 90;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+    animation: ma-modal-overlay-in 200ms ease-out;
+  }
+  .ma-modal-card {
+    background: rgb(var(--c-surface));
+    width: 100%;
+    max-width: 480px;
+    max-height: calc(100dvh - env(safe-area-inset-top) - 24px);
+    overflow-y: auto;
+    border-radius: 16px 16px 0 0;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    box-shadow: 0 -12px 40px -8px rgba(0, 0, 0, 0.25);
+    animation: ma-modal-card-in 220ms ease-out;
+  }
+  .ma-modal-card-lg { max-width: 720px; }
+  .ma-modal-card-xl { max-width: 960px; }
+  @media (min-width: 640px) {
+    .ma-modal-overlay { align-items: center; padding: 24px; }
+    .ma-modal-card {
+      border-radius: 16px;
+      padding: 28px;
+      max-height: calc(100dvh - 48px);
+      box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.35);
+    }
+  }
+  @keyframes ma-modal-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ma-modal-card-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ma-modal-overlay, .ma-modal-card, .ma-toast { animation: none; transition: none; }
+  }
 }
