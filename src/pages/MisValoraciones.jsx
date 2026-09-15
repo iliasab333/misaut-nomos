@@ -169,10 +169,7 @@ export default function MisValoracionesPage() {
                 </h2>
                 {reviews.length === 0 ? (
                   <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
-                    <Trans i18nKey="reviews.mine.emptyState">
-                      Todavía no tienes valoraciones. Pulsa <strong>Pedir valoración</strong> para
-                      invitar a tus clientes a opinar.
-                    </Trans>
+                    <Trans i18nKey="reviews.mine.emptyState" components={{ 1: <strong /> }} />
                   </div>
                 ) : (
                   <div className="space-y-3">

@@ -42,13 +42,10 @@ export default function FinalCTASection() {
           </div>
 
           <h2 className="text-4xl md:text-6xl font-extrabold mb-5 leading-tight tracking-tight">
-            <Trans i18nKey="home.finalCta.title">
-              Únete ahora —
-              <br />
-              <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">
-                Es gratis para siempre
-              </span>
-            </Trans>
+            <Trans
+              i18nKey="home.finalCta.title"
+              components={{ 2: <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent" /> }}
+            />
           </h2>
 
           <p className="text-white/80 text-xl mb-10 max-w-xl mx-auto leading-relaxed">

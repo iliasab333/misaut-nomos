@@ -1,10 +1,10 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Calendar } from "lucide-react";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export default function AvailabilityBadge({ profile }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   
   if (!profile) return null;
 
@@ -38,8 +38,8 @@ export default function AvailabilityBadge({ profile }) {
       return (
         <Badge className="bg-green-100 text-green-800 border border-green-300 flex items-center gap-1.5 w-fit">
           <Clock className="w-3.5 h-3.5" />
-          <span className="font-semibold">{t('availableNow')}</span>
-          <span className="text-xs">· {t('until')} {profile.horario_cierre}</span>
+          <span className="font-semibold">{t('proProfile.availability.availableNow')}</span>
+          <span className="text-xs">· {t('proProfile.availability.until')} {profile.horario_cierre}</span>
         </Badge>
       );
     }
@@ -48,13 +48,13 @@ export default function AvailabilityBadge({ profile }) {
   const getDayTypeText = () => {
     switch (profile.disponibilidad_tipo) {
       case "laborables":
-        return t('mondayFriday');
+        return t('proProfile.availability.mondayFriday');
       case "festivos":
-        return t('weekends');
+        return t('proProfile.availability.weekends');
       case "ambos":
-        return t('everyday');
+        return t('proProfile.availability.everyday');
       default:
-        return t('mondayFriday');
+        return t('proProfile.availability.mondayFriday');
     }
   };
 

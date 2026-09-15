@@ -172,7 +172,130 @@
     "no_results": "No results",
     "load_more": "Load more professionals ({{count}} remaining)",
     "filters": "Filters",
-    "filters_advanced": "Advanced filters"
+    "filters_advanced": "Advanced filters",
+    "favoritesError": "Couldn't update favorites",
+    "seo": {
+      "titleCategoryProvince": "{{category}} in {{province}} - MisAutónomos",
+      "titleCategory": "{{category}} in Spain - MisAutónomos",
+      "titleProvince": "Freelancers in {{province}} - MisAutónomos",
+      "titleDefault": "Find Professional Freelancers - MisAutónomos",
+      "description": "Find and contact verified freelance professionals in Spain. {{count}}+ professionals available."
+    },
+    "heading": {
+      "categoryProvince": "{{category}} in {{province}}",
+      "province": "Freelancers in {{province}}",
+      "resultsCount_one": "{{count}} result",
+      "resultsCount_other": "{{count}} results",
+      "hint": "Pick a category or city to get started."
+    },
+    "results": {
+      "loading": "Searching for professionals...",
+      "countHeading": "<num>{{count}}</num> professionals"
+    },
+    "view": {
+      "grid": "Grid view",
+      "map": "Map view"
+    },
+    "empty": {
+      "title": "No professionals match this search",
+      "hint": "Try removing a filter or changing the city.",
+      "suggestions": "You might be interested in these professionals:"
+    },
+    "proCta": {
+      "body": "Show up in results for your area. Direct contact with clients, no commissions."
+    },
+    "finalCta": {
+      "titleHighlight": "Get listed on MisAutónomos",
+      "body": "Set up your profile and get into the results for your area. No commissions, no middlemen, direct contact with clients."
+    },
+    "card": {
+      "featuredTitle": "Featured professional",
+      "featured": "Featured",
+      "addFavorite": "Add to favorites",
+      "saveFavorite": "Save to favorites",
+      "openWhatsAppOf": "Open WhatsApp with {{name}}",
+      "callNumber": "Call {{phone}}",
+      "showPhone": "Show phone number",
+      "openWhatsApp": "Open WhatsApp"
+    },
+    "saved": {
+      "savedToast": "Search saved",
+      "deletedToast": "Search deleted",
+      "loadAria": "Load search: {{name}}",
+      "deleteAria": "Delete saved search: {{name}}",
+      "saveThis": "Save this search",
+      "title": "Save search",
+      "namePlaceholder": "E.g. Electricians in Madrid",
+      "filtersIntro": "These filters will be saved:",
+      "filterCategory": "• Category: {{value}}",
+      "filterProvince": "• Province: {{value}}",
+      "filterCity": "• City: {{value}}",
+      "filterMinRating": "• Minimum rating: {{value}}⭐",
+      "filterAvailability": "• Availability: {{value}}",
+      "resultsFound": "{{count}} results found"
+    },
+    "trust": {
+      "subtitle": "Clear rules for clients and freelancers. No tricks.",
+      "bestOnly": {
+        "body": "A maximum of 10 freelancers per city and category. We give visibility to the best rated."
+      },
+      "promotion": {
+        "title": "We promote them",
+        "body": "We invest in social media ads so they reach more clients. At no cost to them."
+      },
+      "verifiedReviews": {
+        "body": "Only clients who have contacted the professional can leave a review."
+      },
+      "zeroTolerance": {
+        "title": "Zero tolerance",
+        "body": "Three verified negative reviews and the freelancer is removed automatically."
+      },
+      "noCommitment": {
+        "body": "Signing up is free. No card, no lock-in, no fine print."
+      },
+      "completeProfiles": {
+        "title": "Complete profiles",
+        "body": "Real photos, work area, indicative prices and years of experience on display."
+      },
+      "slideAria": "Slide {{number}}"
+    },
+    "profile": {
+      "seo": {
+        "title": "{{name}} - {{category}} in {{location}} | MisAutónomos",
+        "rating": "★{{rating}} ({{count}} reviews). ",
+        "experience": "{{years}} years of experience. ",
+        "services": "{{category}} services in {{location}}",
+        "description": "{{rating}}{{experience}}{{base}}. Contact {{name}} for free.",
+        "defaultCategory": "Professional",
+        "defaultLocation": "Spain"
+      },
+      "photoOf": "Photo of {{name}}",
+      "professionalFallback": "professional",
+      "share": {
+        "defaultTitle": "Verified professional",
+        "thisProfessional": "This professional",
+        "text": "{{name}} on MisAutónomos",
+        "button": "Share"
+      },
+      "portfolioTitle": "Work portfolio",
+      "morePhotos": "+{{count}} photos",
+      "reviewsCount_one": "{{count}} review",
+      "reviewsCount_other": "{{count}} reviews",
+      "noReviews": "No reviews yet — be the first to leave one after getting in touch"
+    },
+    "filterPanel": {
+      "category": "Category",
+      "selectProvinceFirst": "Select a province first",
+      "minRating": "Minimum rating",
+      "anyRating": "Any",
+      "ratingPlus": "{{rating}}+ ⭐",
+      "noFilter": "No filter",
+      "anyAvailability": "Any availability",
+      "weekdaysOnly": "Weekdays only",
+      "allWeek": "Available all week",
+      "clearAdvanced": "Clear advanced filters",
+      "clearAll": "✕ Clear all ({{count}})"
+    }
   },
   "allCategories": "All categories",
   "allProvinces": "All provinces",
@@ -208,7 +331,100 @@
     "rate": "Rate",
     "record_audio": "Record audio",
     "attach_file": "Attach file",
-    "default_contact_message": "Hi, I'm interested in your service. Can we talk?"
+    "default_contact_message": "Hi, I'm interested in your service. Can we talk?",
+    "professionalFallback": "the professional",
+    "guestContact": {
+      "defaultMessageWithName": "Hi {{name}}, I'm interested in your service. Can we talk?",
+      "nameRequired": "Enter your name",
+      "invalidEmail": "Invalid email",
+      "messageTooShort": "Tell the professional a bit more",
+      "sendError": "Could not send.",
+      "title": "Contact {{name}}",
+      "subtitle": "Your message reaches them and they reply straight to your email.",
+      "sentTitle": "Message sent",
+      "professionalFallbackCapital": "The professional",
+      "sentDescription": "{{name}} will reply to <email>{{email}}</email>.",
+      "messagePlaceholder": "Tell them what you need, where and when.",
+      "noAccountNeeded": "No account needed."
+    },
+    "chatInput": {
+      "micError": "Could not access the microphone",
+      "replyingTo": "Replying to:",
+      "previewAlt": "Preview",
+      "attachImage": "Attach image",
+      "emojis": "Emojis",
+      "holdToRecord": "Hold to record audio"
+    },
+    "bubble": {
+      "acceptedContent": "✅ I've accepted your quote {{number}}",
+      "acceptedPushTitle": "✅ Quote accepted",
+      "acceptedPushBody": "{{name}} has accepted your quote for €{{amount}}",
+      "clientFallback": "The client",
+      "error": "Error: {{message}}",
+      "rejectedContent": "❌ I've declined quote {{number}}",
+      "rejectedPushTitle": "❌ Quote declined",
+      "rejectedPushBody": "{{name}} has declined your quote",
+      "reply": "Reply",
+      "quotePdf": "Quote PDF",
+      "download": "Download",
+      "accept": "✓ Accept",
+      "imageAlt": "Image"
+    },
+    "reviewRequest": {
+      "title": "Review request",
+      "sentByMe": "You've asked for a review. The client can leave it with a single tap.",
+      "received": "{{name}} is asking you to review their service. It takes less than a minute.",
+      "leaveReview": "Leave a review",
+      "singleUseNote": "You've sent them a single-use button. Don't share the link with third parties."
+    },
+    "page": {
+      "seoTitle": "Messages - MisAutónomos",
+      "seoDescription": "Messages and conversations",
+      "adsBadge": "Ads+",
+      "hasWhatsapp": "Has WhatsApp",
+      "askReviewTitle": "Ask this client for a review",
+      "askReview": "Ask for a review",
+      "cancelAudio": "Cancel audio",
+      "sendAudio": "Send audio",
+      "cancelRecording": "Cancel recording",
+      "sendRecording": "Send recording",
+      "stopAndSend": "Stop and send",
+      "recordVoice": "Record voice message",
+      "yesterday": "Yesterday",
+      "voiceMessage": "🎤 Voice message",
+      "fileAttachment": "📎 Attachment",
+      "audioUnsupported": "Your browser doesn't support audio recording",
+      "micPermissionDenied": "Allow microphone access to send voice messages. Go to your browser Settings → Site permissions → Microphone.",
+      "micNotFound": "No microphone found. Connect a microphone and try again.",
+      "micError": "Could not access the microphone: {{message}}",
+      "noAudioRecorded": "No audio was recorded. Try again.",
+      "sendAudioError": "Error sending audio",
+      "sendError": "Error sending: {{message}}",
+      "filesTooLarge": "Files too large (max 5MB)",
+      "quoteSent": "Quote sent successfully",
+      "quoteSendError": "Error sending quote",
+      "quoteUpdated": "Quote updated",
+      "reviewRequestSent": "Request sent to the client."
+    },
+    "quoteDialog": {
+      "title": "Request a quote",
+      "subtitle": "Send a request to the professional",
+      "descriptionLabel": "Job description *",
+      "descriptionPlaceholder": "Describe what you need...",
+      "budgetLabel": "Estimated budget (€)",
+      "budgetPlaceholder": "E.g. 500",
+      "deadlineLabel": "Deadline",
+      "submit": "Send request"
+    },
+    "reviewDialog": {
+      "title": "Review {{name}}",
+      "subtitle": "Your opinion helps other clients",
+      "commentPlaceholder": "Tell us about your experience...",
+      "submit": "Publish review",
+      "rateAll": "Rate every aspect",
+      "published": "Review published!",
+      "clientFallback": "A client"
+    }
   },
   "profile_page": {
     "about": "About me",
@@ -278,7 +494,85 @@
     "already_have_account": "Already have an account? Sign in",
     "continue_with_google": "Continue with Google",
     "accept_terms": "I accept the terms and conditions",
-    "welcome_toast": "Welcome! You can now contact professionals 🎉"
+    "welcome_toast": "Welcome! You can now contact professionals 🎉",
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "invalidCredentials": "Incorrect email or password.",
+      "emailNotConfirmed": "Your email hasn't been confirmed yet. Check your inbox.",
+      "alreadyRegistered": "This email is already registered. Sign in instead.",
+      "passwordTooShort": "Password must be at least 6 characters.",
+      "rateLimit": "Too many attempts. Wait a few minutes and try again.",
+      "invalidEmail": "The email address is not valid."
+    },
+    "validation": {
+      "emailAndPassword": "Enter your email and password.",
+      "nameRequired": "Enter your name.",
+      "emailRequired": "Enter your email.",
+      "emailForReset": "Enter your email above so we can send you the recovery link."
+    },
+    "reset": {
+      "sent": "We've sent you an email with instructions to reset your password.",
+      "sending": "Sending...",
+      "link": "Forgot your password?"
+    },
+    "tagline": "Connect with the best freelancers in Spain",
+    "signup": {
+      "tab": "Create account",
+      "asPro": "Create account as a freelancer",
+      "asClient": "Create account as a client"
+    },
+    "role": {
+      "title": "How do you want to start?",
+      "proSubtitle": "Sign up and get clients",
+      "client": "I'm looking for professionals",
+      "clientSubtitle": "Find and contact freelancers",
+      "preselectedPro": "You're creating a freelancer account. Looking for professionals?",
+      "preselectedClient": "You're creating a client account. Are you a freelancer?",
+      "switch": "Switch"
+    },
+    "social": {
+      "connecting": "Connecting…",
+      "continueApple": "Continue with Apple",
+      "signupApple": "Sign up with Apple",
+      "signupGoogle": "Sign up with Google"
+    },
+    "separator": {
+      "signIn": "or sign in with email",
+      "signUp": "or create your account with email"
+    },
+    "passwordPlaceholder": "Your password",
+    "passwordMinPlaceholder": "At least 6 characters",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "submitting": {
+      "signIn": "Signing in...",
+      "signUp": "Creating account..."
+    },
+    "footer": {
+      "trust": "Verified professionals near you",
+      "noAccount": "Don't have an account?",
+      "createOne": "Create one",
+      "haveAccount": "Already have an account?"
+    },
+    "confirmEmail": {
+      "resent": "We've resent the email. Check your inbox (and the Promotions or Spam folder).",
+      "resendError": "We couldn't resend the email. Try again in a minute.",
+      "notConfirmedYet": "We don't see your confirmation yet. Open the email and click the button, then come back here.",
+      "changeEmail": "Change email",
+      "title": "Confirm your email",
+      "sentTo": "We've sent a link to",
+      "yourEmail": "your email address",
+      "howToContinue": "How to continue:",
+      "stepOpen": "Open the email from <strong>MisAutónomos</strong>.",
+      "stepClick": "Click the <strong>\"Confirm my account\"</strong> button.",
+      "stepReturn": "You'll come back here and be able to publish your profile.",
+      "spamHint": "Can't see it? Check your <strong>Promotions</strong> or <strong>Spam</strong> folder. It can take up to 2 minutes to arrive.",
+      "checking": "Checking…",
+      "confirmed": "I've confirmed it",
+      "resending": "Resending…",
+      "resendIn": "Resend the email in {{seconds}} s",
+      "resend": "Resend the email"
+    }
   },
   "pricing": {
     "title": "Choose your plan and start getting clients",
@@ -375,26 +669,6 @@
         "result": "650% ROI"
       }
     }
-  },
-  "dashboard": {
-    "welcome": "Hi, {{name}}! 👋",
-    "subtitle": "Here's your activity summary on MisAutónomos",
-    "views_this_month": "Views this month",
-    "messages_this_month": "Messages this month",
-    "quote_requests": "Quote requests",
-    "accepted": "accepted",
-    "average_rating": "Rating",
-    "profile_completeness": "Profile completion",
-    "complete_profile": "Complete my profile",
-    "recent_activity": "Recent activity",
-    "recent_messages": "Recent messages",
-    "recent_quotes": "Recent quotes",
-    "tips_title": "Tips to stand out",
-    "subscription_title": "Your subscription",
-    "days_remaining": "{{days}} days remaining",
-    "renew_now": "Renew now",
-    "manage_subscription": "Manage subscription",
-    "views_chart_title": "Profile views — last 30 days"
   },
   "footer": {
     "tagline": "Your trusted professional",
@@ -555,52 +829,66 @@
   "view": "View",
   "downloadPDF": "Download PDF",
   "delete": "Delete",
-  "quotesPage": {
-    "title": "Quotes",
-    "subtitle": "Create, send and manage your quotes",
-    "newQuote": "New quote",
-    "sentSuccessfully": "Quote sent via chat to client",
-    "quoteAccepted": "Quote accepted",
-    "quoteRejected": "Quote rejected"
-  },
   "notifications": {
     "enable_title": "Don't miss any client",
     "enable_subtitle": "Get instant alerts when someone contacts you or sends a request.",
     "activate": "Activate",
     "not_now": "Not now",
-    "activated_toast": "✓ Notifications enabled"
-  },
-  "supportChat": {
-    "talkToSupport": "Talk to support",
-    "supportTeam": "MisAutónomos Support",
-    "responseTime": "We respond as soon as possible",
-    "supportInbox": "Support Inbox",
-    "selectConversation": "Select a conversation to reply",
-    "conversationsCount": "{{count}} conversations",
-    "needHelp": "Need help?",
-    "helpDescription": "Our team responds within 24 hours. Write to us and we'll help you with anything related to your account, payments, invoices, or platform functionality.",
-    "startSupportChat": "Start support chat",
-    "contactSupport": "Contact support",
-    "newTicketDesc": "Create a new support ticket and our team will respond as soon as possible",
-    "ticketType": "Type of inquiry",
-    "ticketTypeTechnical": "Technical issue",
-    "ticketTypeBilling": "Billing",
-    "ticketTypeComplaint": "Complaint",
-    "ticketTypeOther": "Other",
-    "ticketSubject": "Subject",
-    "ticketMessage": "Message",
-    "sendTicket": "Send",
-    "fieldRequired": "Please fill in all required fields",
-    "errorCreatingTicket": "Error creating ticket",
-    "errorLoadingUser": "Error loading your information",
-    "myTickets": "My tickets",
-    "supportSubtitle": "Help and support tickets",
-    "newTicket": "New ticket",
-    "noTicketsYet": "No tickets yet",
-    "createFirstTicket": "Create your first support ticket",
-    "supportMisautonomos": "MisAutónomos Support",
-    "typeYourReply": "Type your reply...",
-    "supportRepliedTitle": "💬 Support has replied"
+    "activated_toast": "✓ Notifications enabled",
+    "title": "Notifications",
+    "empty": "No notifications",
+    "emptyHint": "We'll let you know when there's news",
+    "center": {
+      "allRead": "All notifications marked as read",
+      "markAllRead": "Mark all as read",
+      "loading": "Loading notifications...",
+      "viewAll": "View all notifications"
+    },
+    "toast": {
+      "deleted": "Notification deleted",
+      "allRead": "All marked as read",
+      "deletedMany": "Notifications deleted"
+    },
+    "banner": {
+      "activatedDescription": "You'll get alerts when someone contacts you.",
+      "ariaLabel": "Enable notifications"
+    },
+    "page": {
+      "configure": "Settings",
+      "subtitle": "Stay up to date with all your updates",
+      "upcomingTasks": "Upcoming tasks",
+      "viewCalendar": "View in calendar →",
+      "invoicesDue": "Invoices due",
+      "viewInvoices": "View invoices →",
+      "pendingQuotes": "Pending quotes",
+      "viewQuotes": "View quotes →",
+      "tabAll": "All ({{count}})",
+      "tabUnread": "New ({{count}})",
+      "tabRead": "Read ({{count}})",
+      "markAll": "Mark all",
+      "mark": "Mark",
+      "deleteRead": "Delete read",
+      "emptyUnread": "No new notifications",
+      "emptyRead": "No read notifications",
+      "newBadge": "New"
+    },
+    "settings": {
+      "title": "Notification settings",
+      "channels": "Notification channels",
+      "email": "Email notifications",
+      "emailHint": "Get alerts in your inbox",
+      "push": "Push notifications",
+      "pushHint": "Get notifications on the platform",
+      "alertTypes": "Alert types",
+      "newMessages": "New messages",
+      "quoteUpdates": "Quote updates",
+      "taskReminders": "Task reminders",
+      "invoiceDue": "Invoice due dates",
+      "subscriptionAlerts": "Subscription alerts",
+      "reminderTimes": "Reminder timing",
+      "taskHoursBefore": "Remind me of tasks (hours in advance)",
+      "invoiceDaysBefore": "Remind me of invoices (days in advance)"
+    }
   },
   "cookies": {
     "bannerTitle": "We use cookies",
@@ -619,1256 +907,116 @@
     "marketing": "Marketing",
     "marketingDesc": "Allow us to show you relevant ads on other websites based on your interests.",
     "alwaysActive": "Always active",
-    "managePrefs": "Manage cookie preferences"
-  },
-  "admin": {
-    "payments": {
-      "title": "💰 Payments Received",
-      "subtitle": "Full record of every Stripe payment",
-      "syncing": "Syncing...",
-      "syncWithStripe": "Sync with Stripe",
-      "refresh": "Refresh",
-      "totalRevenue": "Total revenue",
-      "payingCustomers": "Paying customers",
-      "visibleProfiles": "Visible profiles",
-      "totalPayments": "Total payments",
-      "searchPlaceholder": "Search by email, plan, invoice ID...",
-      "table": {
-        "date": "Date",
-        "user": "User",
-        "plan": "Plan",
-        "amount": "Amount",
-        "status": "Status",
-        "period": "Period",
-        "profile": "Profile",
-        "action": "Action"
-      },
-      "notAvailable": "N/A",
-      "trialBadge": "Trial",
-      "status": {
-        "succeeded": "Succeeded",
-        "failed": "Failed"
-      },
-      "profileVisible": "✅ Visible",
-      "profileHidden": "❌ Hidden",
-      "noProfile": "No profile",
-      "activate": "🔥 Activate",
-      "noProfileWarning": "⚠️ No profile",
-      "profileActivated": "🔥 Profile activated: {{payments}} confirmed payments ({{total}}€)",
-      "errorGeneric": "Error: {{message}}",
-      "syncSuccess": "✅ {{registered}} payments synced from Stripe",
-      "syncError": "Sync error: {{message}}"
+    "managePrefs": "Manage cookie preferences",
+    "preferences": {
+      "toggleOn": "{{title}}: on",
+      "toggleOff": "{{title}}: off",
+      "intro": "Manage which cookies you accept on MisAutónomos. You can change your preferences at any time.",
+      "essentialTitle": "Essential cookies",
+      "essentialBody": "They're always on so the platform works properly. They don't require your consent.",
+      "rejectOptional": "Reject all optional",
+      "fullPolicyLink": "→ Full cookie policy",
+      "fullPolicyHint": "Details of every cookie, provider and duration",
+      "privacyLink": "→ Privacy policy",
+      "privacyHint": "How we handle your personal data",
+      "contactLink": "→ Contact: {{email}}",
+      "contactHint": "Questions about cookies or privacy?"
     },
-    "gifts": {
-      "title": "🎁 Gift a free month",
-      "subtitle": "Works for any user — client, professional or no account at all.",
-      "thisMonth_one": "{{count}} gift this month",
-      "thisMonth_other": "{{count}} gifts this month",
-      "refresh": "Refresh",
-      "newGift": "New gift",
-      "emailPlaceholder": "Recipient's email",
-      "planVisibility": "Visibility plan (€13/month)",
-      "planAdsPlus": "Ads+ plan (€33/month)",
-      "checkUser": "Check user",
-      "case": {
-        "noUser": "Doesn't exist",
-        "professionalNoSub": "Professional, no subscription",
-        "professionalActive": "Active professional"
-      },
-      "caseBadge": "Case {{code}} — {{label}}",
-      "noName": "(no name)",
-      "activeSub": "Active sub:",
-      "nextInvoiceWithCoupon": "→ Next invoice with coupon: {{amount}}€",
-      "confirmGrant": "Confirm and gift",
-      "granted": "Gift granted — Case {{code}}",
-      "copyMessage": "Copy message",
-      "subscriptionId": "Subscription ID:",
-      "trialUntil": "· Trial until: {{date}}",
-      "nextInvoiceVerified": "Next invoice verified:",
-      "makeAnother": "Gift another",
-      "lastGrants": "Last 50 gifts",
-      "records_one": "{{count}} record",
-      "records_other": "{{count}} records",
-      "emptyState": "No gifts yet",
-      "table": {
-        "type": "Type",
-        "case": "Case",
-        "plan": "Plan",
-        "stripeId": "Stripe ID",
-        "status": "Status",
-        "grantedAt": "Granted",
-        "expiresAt": "Expires"
-      },
-      "previewError": "Preview error: {{message}}",
-      "grantSuccess": "Free month granted!",
-      "grantError": "Error: {{message}}",
-      "copied": "Copied to clipboard"
-    },
-    "messagesStats": {
-      "accessDenied": "Access denied",
-      "accessDeniedAdminsOnly": "Access denied - Admins only",
-      "title": "Message Statistics",
-      "subtitle": "Professionals contacted through website messages",
-      "totalProfessionals": "Total Professionals",
-      "totalMessages": "Total Messages",
-      "uniqueClients": "Unique Clients",
-      "avgPerPro": "Average per Pro",
-      "contactedProfessionals": "Contacted Professionals",
-      "professionalsCount_one": "{{count}} professional",
-      "professionalsCount_other": "{{count}} professionals",
-      "searchPlaceholder": "Search by name, email or category...",
-      "table": {
-        "categories": "Categories",
-        "location": "Location",
-        "lastContact": "Last Contact"
-      },
-      "noName": "No name",
-      "noResults": "No professionals found"
-    },
-    "referrals": {
-      "title": "Referral Rewards",
-      "subtitle": "Audit of referral rewards applied in Stripe",
-      "stripeKeyMissing": "<strong>STRIPE_SECRET_KEY is not set.</strong> Rewards are only applied inside the app, not in real Stripe. Go to Base44 → Settings → Environment variables and add <code>STRIPE_SECRET_KEY = sk_live_...</code>",
-      "totalRewards": "Total rewards",
-      "appliedInStripe": "Applied in Stripe",
-      "internalCreditOnly": "Internal credit only",
-      "history": "Reward history",
-      "emptyState": "No rewards yet",
-      "table": {
-        "referrer": "Referrer",
-        "referred": "Referred",
-        "stripe": "Stripe",
-        "method": "Method",
-        "date": "Date",
-        "action": "Action"
-      },
-      "retryTitle": "Retry applying in Stripe",
-      "method": {
-        "trialExtended": "Trial +30d",
-        "balanceCredit": "Invoice credit"
-      },
-      "stripeError": "Stripe error: {{error}} — {{reason}}",
-      "stripeContactError": "Could not reach Stripe: {{message}}"
-    },
-    "dashboard": {
-      "seoTitle": "Metrics · Admin",
-      "title": "Metrics",
-      "subtitle": "Live platform data.",
-      "rangeDays": "{{days}}d",
-      "noData": "No data.",
-      "unassigned": "Unassigned",
-      "stats": {
-        "users": "Users",
-        "activeProfessionals": "Active professionals",
-        "subscribers": "Subscribers",
-        "newUsers_one": "{{count}} new {{days}}d",
-        "newUsers_other": "{{count}} new {{days}}d",
-        "totalCount_one": "{{count}} total",
-        "totalCount_other": "{{count}} total",
-        "lastDays": "last {{days}}d",
-        "profileViews": "Profile views",
-        "searchAppearances": "Search appearances",
-        "contactClicks": "Contact clicks",
-        "messagesReceived": "Messages received"
-      },
-      "activity": "Activity ({{days}}d)",
-      "breakdownTitle": "Breakdown of active professionals",
-      "topCategories": "Top categories",
-      "topProvinces": "Top provinces",
-      "topCities": "Top cities"
-    },
-    "soporte": {
-      "seoTitle": "Support · Admin",
-      "searchPlaceholder": "Title or ticket no.…",
-      "filter": {
-        "status": "Status",
-        "priority": "Priority",
-        "type": "Type"
-      },
-      "status": {
-        "open": "Open",
-        "inProgress": "In progress",
-        "waitingUser": "Waiting on user",
-        "resolved": "Resolved",
-        "closed": "Closed"
-      },
-      "priority": {
-        "low": "Low",
-        "normal": "Normal",
-        "high": "High",
-        "urgent": "Urgent"
-      },
-      "type": {
-        "bug": "Bug",
-        "question": "Question",
-        "feature": "Improvement",
-        "other": "Other"
-      },
-      "emptyState": "No tickets.",
-      "untitled": "Untitled",
-      "priorityUpdated": "Priority updated",
-      "errorGeneric": "Error: {{message}}",
-      "sendError": "Could not send: {{message}}",
-      "priorityLabel": "priority: {{priority}}",
-      "internalNotesTitle": "Internal notes (not visible to the user)",
-      "internalNotePlaceholder": "Internal note…",
-      "replyPlaceholder": "Reply to the user…",
-      "internalNote": "Internal note",
-      "selectTicket": "Select a ticket to see its details."
-    },
-    "support": {
-      "adsProfessional": "Ads+ professional",
-      "userFallback": "User",
-      "searchPlaceholder": "Search user...",
-      "emptyState": "No support conversations",
-      "adsBadge": "Ads+",
-      "adsBadgeActive": "⚡ Ads+",
-      "adsCampaignChat": "Ads+ campaign chat",
-      "supportChat": "Support chat",
-      "replyPlaceholder": "Reply as MisAutónomos Support..."
-    },
-    "supportInbox": {
-      "userFallback": "User",
-      "notAvailable": "N/A",
-      "activeConversations_one": "{{count}} active conversation",
-      "activeConversations_other": "{{count}} active conversations",
-      "searchPlaceholder": "Search by name...",
-      "noMatches": "No matching conversations",
-      "emptyState": "No support conversations",
-      "youPrefix": "You:",
-      "professionalType": "Professional",
-      "replyPlaceholder": "Write as MisAutónomos Support..."
-    },
-    "emails": {
-      "title": "📧 Email Center",
-      "subtitle": "Manage templates, logs and test sends for transactional and marketing emails."
-    },
-    "emailsPanel": {
-      "title": "📧 Email management",
-      "campaignsTitle": "Campaigns",
-      "test": {
-        "title": "Test email",
-        "emailRequired": "Enter an email address",
-        "invalidJson": "Invalid JSON variables",
-        "sent": "Test email sent",
-        "error": "Error: {{message}}",
-        "recipient": "Recipient",
-        "recipientPlaceholder": "test@example.com",
-        "variables": "Variables (JSON)",
-        "sending": "Sending..."
-      },
-      "metrics": {
-        "delivery": "Delivery",
-        "open": "Opens",
-        "clicks": "Clicks",
-        "bounces": "Bounces"
-      },
-      "periods": {
-        "last7d": "Last 7d",
-        "last30d": "Last 30d",
-        "last90d": "Last 90d",
-        "all": "All time"
-      },
-      "filters": {
-        "searchPlaceholder": "Search email...",
-        "allStatuses": "All",
-        "allCategories": "All",
-        "allTemplates": "All",
-        "statusSent": "Sent",
-        "statusDelivered": "Delivered",
-        "statusOpened": "Opened",
-        "statusBounced": "Bounced",
-        "statusFailed": "Failed"
-      },
-      "fields": {
-        "date": "Date",
-        "subject": "Subject",
-        "template": "Template",
-        "category": "Category",
-        "status": "Status",
-        "period": "Period",
-        "actions": "Actions"
-      },
-      "category": {
-        "transactional": "Transactional",
-        "transactionalShort": "Trans.",
-        "marketing": "Marketing"
-      },
-      "templates": {
-        "welcome": "Welcome",
-        "giftReceived": "Gift",
-        "reviewRequest": "Review",
-        "generic": "Generic"
-      },
-      "status": {
-        "queued": "Queued",
-        "sent": "Sent",
-        "delivered": "Delivered",
-        "opened": "Opened",
-        "clicked": "Clicked",
-        "bounced": "Bounced",
-        "spam": "Spam",
-        "failed": "Failed",
-        "skipped": "Skipped"
+    "policy": {
+      "seoDescription": "Information about the cookies we use on MisAutónomos",
+      "title": "Cookie Policy",
+      "updated": "Last updated: January 15, 2025",
+      "sections": {
+        "what": {
+          "title": "1. What are Cookies?",
+          "text": "Cookies are small text files stored on your device when you visit a website. They help us improve your experience, remember your preferences and analyze how you use our platform."
+        },
+        "used": {
+          "title": "2. Cookies We Use",
+          "text": "We use the following types of cookies:"
+        },
+        "legalBasis": {
+          "title": "3. Legal Basis (GDPR + LSSI-CE)",
+          "text": "Cookie usage in MisAutónomos complies with: • GDPR (Regulation 2016/679): prior consent for non-essential cookies • LSSI-CE (Law 34/2002): clear information and right to refuse • Requirement to obtain consent before loading third-party scripts • Right to withdraw consent at any time"
+        },
+        "manage": {
+          "title": "4. How to Manage Cookies",
+          "text": "You can manage cookies in multiple ways:"
+        },
+        "withdraw": {
+          "title": "5. Right to Withdraw Consent",
+          "text": "You can change or withdraw your consent at any time by accessing the Cookie Preferences page. If you withdraw consent for analytics, associated _ga* cookies will be deleted."
+        },
+        "thirdParty": {
+          "title": "6. Third-Party Cookies",
+          "text": "We use third-party services that may set cookies: Google Analytics (analytics - only if you consent), Stripe (payments - essential), OneSignal (notifications - only if subscribed)"
+        },
+        "duration": {
+          "title": "7. Cookie Duration",
+          "text": "• Session cookies: deleted when closing browser\n• Persistent cookies: maintained between 30 days and 2 years depending on their purpose\n• See the detailed tables above for exact durations"
+        },
+        "contact": {
+          "title": "8. Contact and GDPR Rights",
+          "text": "For inquiries about cookies, privacy, or to exercise your GDPR rights (access, rectification, deletion, portability): hola@misautonomos.com"
+        }
       },
       "table": {
-        "empty": "No emails"
-      },
-      "detail": {
-        "title": "Email details"
-      }
-    },
-    "campaigns": {
-      "shared": {
-        "userNotFound": "(not found)",
-        "audienceLoadError": "Couldn't load the audience. {{message}}",
-        "testSent": "Test email sent to {{email}}",
-        "testError": "Error sending test: {{message}}",
-        "nothingToSend": "All recipients already have the tag. Nothing to send.",
-        "completed": "Campaign complete: {{ok}} sent, {{failed}} failed",
-        "readyBadge": "Ready to send",
-        "subjectLabel": "Subject:",
-        "targetAudienceLabel": "Target audience:",
-        "campaignIdLabel": "campaign_id:",
-        "previewAudience": "Preview audience",
-        "sending": "Sending...",
-        "progress": "Sending {{done}} / {{total}}...",
-        "result": {
-          "sentOk": "{{ok}} sent OK",
-          "failed": "{{failed}} failed",
-          "blocked": "{{blocked}} blocked",
-          "alreadyTagged": "{{tagged}} already tagged"
-        },
-        "audienceSummary": "Total audience: <strong>{{total}}</strong> · Pending: <strong>{{pending}}</strong>",
-        "reload": "🔄 Reload",
-        "table": {
-          "status": "Status",
-          "alreadySent": "✓ already sent",
-          "pending": "pending"
-        },
-        "confirmSend": "Yes, send now"
-      },
-      "manage": {
-        "header": {
-          "title": "Campaign {{monthYear}} — {{name}}"
-        },
-        "tabs": {
-          "briefing": "📋 Client briefing",
-          "material": "🎨 Campaign material",
-          "chat": "💬 Chat",
-          "metrics": "📊 Metrics",
-          "notes": "🔒 Internal notes"
-        },
-        "goals": {
-          "moreCalls": "More calls",
-          "moreLeads": "More leads",
-          "brandAwareness": "Brand awareness",
-          "websiteTraffic": "Website traffic",
-          "moreQuotes": "More quote requests"
-        },
-        "sources": {
-          "wordOfMouth": "Word of mouth",
-          "paidAds": "Paid ads",
-          "other": "Other"
-        },
-        "months": {
-          "january": "January",
-          "february": "February",
-          "march": "March",
-          "april": "April",
-          "may": "May",
-          "june": "June",
-          "july": "July",
-          "august": "August",
-          "september": "September",
-          "october": "October",
-          "november": "November",
-          "december": "December"
-        },
-        "teamName": "MisAutónomos team",
-        "teamNameFallback": "The MisAutónomos team",
-        "saveError": "Error saving",
-        "sendError": "Error sending: {{message}}",
-        "briefing": {
-          "previewAlt": "Preview",
-          "platform": "Platform",
-          "goal": "Goal",
-          "serviceArea": "Service area",
-          "specialOffer": "Special offer",
-          "topServices": "Services to promote",
-          "clientProfile": "Ideal client profile",
-          "testimonials": "Testimonials and success stories",
-          "additionalNotes": "Additional notes",
-          "clientSources": "How they currently get clients",
-          "imagesProvided": "Images provided by the client",
-          "video": "Video",
-          "askMoreInfo": "💬 Ask the client for more info →"
-        },
-        "material": {
-          "imagesUploaded": "{{n}} image(s) uploaded",
-          "uploadError": "Error uploading images",
-          "saved": "Material saved",
-          "copyOrImagesRequired": "Add the copy or images before sending",
-          "materialReadyMessage": "🎨 We've prepared your campaign material. Review and approve it under \"My campaign\".",
-          "copyPreview": "Copy: {{copy}}...",
-          "sentToClient": "Material sent to the client for approval ✅",
-          "adCopy": "Ad copy",
-          "adCopyPlaceholder": "Write the ad text here...",
-          "creatives": "Creatives",
-          "uploading": "Uploading...",
-          "uploadImages": "Upload campaign images",
-          "budget": "Budget",
-          "budgetStandard": "Standard — €30",
-          "budgetBoosted": "Boosted — €100",
-          "startDate": "Start date",
-          "endDate": "End date",
-          "externalCampaignId": "External campaign ID (Meta/TikTok)",
-          "externalCampaignIdPlaceholder": "e.g. 23857291...",
-          "saveChanges": "Save changes",
-          "sendForApproval": "Send to the client for approval"
-        },
-        "chat": {
-          "attachError": "Error uploading file",
-          "sent": "Message sent",
-          "empty": "No messages yet. Write the first one.",
-          "attachmentFallback": "File",
-          "placeholder": "Write a message to the professional..."
-        },
-        "metrics": {
-          "updated": "Metrics updated",
-          "saveError": "Error saving metrics",
-          "budgetSpent": "Budget spent",
-          "reach": "Reach",
-          "impressions": "Impressions",
-          "clicks": "Clicks",
-          "conversions": "Conversions",
-          "leadsGenerated": "Leads generated",
-          "totalSpent": "Total spend",
-          "update": "Update metrics"
-        },
-        "notes": {
-          "saved": "Notes saved",
-          "privacyNotice": "🔒 These notes are only visible to the admin team. The professional will never see them.",
-          "placeholder": "Internal notes about this campaign...",
-          "save": "Save notes"
+        "essentialTitle": "Essential Cookies",
+        "analyticsTitle": "Analytics Cookies (Optional)",
+        "marketingTitle": "Marketing Cookies (Optional)",
+        "name": "Name",
+        "provider": "Provider",
+        "purpose": "Purpose",
+        "duration": "Duration",
+        "rows": {
+          "session": {
+            "purpose": "Keep session logged in",
+            "duration": "Session"
+          },
+          "language": {
+            "purpose": "Remember selected language",
+            "duration": "1 year"
+          },
+          "cookieConsent": {
+            "purpose": "Store cookie preferences",
+            "duration": "1 year"
+          },
+          "consentId": {
+            "purpose": "Unique GDPR consent ID",
+            "duration": "1 year"
+          },
+          "sessionStorage": {
+            "purpose": "User cache and consent records",
+            "duration": "Session"
+          },
+          "ga": {
+            "purpose": "Distinguish unique users",
+            "duration": "2 years"
+          },
+          "gid": {
+            "purpose": "Identify user session",
+            "duration": "24 hours"
+          },
+          "gat": {
+            "purpose": "Throttle requests to GA",
+            "duration": "1 minute"
+          },
+          "gaWildcard": {
+            "purpose": "Session persistence and events",
+            "duration": "2 years"
+          },
+          "fbp": {
+            "purpose": "Personalized ads on Facebook/Instagram",
+            "duration": "3 months"
+          },
+          "fr": {
+            "purpose": "Contain Meta user ID list",
+            "duration": "3 months"
+          }
         }
       },
-      "metrics": {
-        "title": "Campaign metrics",
-        "refreshed": "Data refreshed",
-        "backfillDone": "Backfill complete: {{updated}} updated, {{failed}} errors",
-        "backfillError": "Backfill error: {{message}}",
-        "selectCampaign": "Select campaign",
-        "allCampaigns": "All",
-        "transactionalOnly": "Transactional (no campaign)",
-        "refresh": "Refresh",
-        "exportCsv": "Export CSV",
-        "syncing": "Syncing...",
-        "backfill": "Backfill from Resend",
-        "kpi": {
-          "totalSent": "Total sent",
-          "delivered": "Delivered",
-          "opened": "Opened",
-          "clicks": "Clicks",
-          "bouncesSpam": "Bounces / Spam",
-          "ofDelivered": "{{pct}} of delivered",
-          "ofOpened": "{{pct}} of opened"
-        },
-        "rates": {
-          "delivery": "Delivery rate",
-          "open": "Open rate",
-          "click": "Click rate",
-          "ctr": "CTR (clicks/opens)"
-        },
-        "status": {
-          "sent": "Sent",
-          "delivered": "Delivered",
-          "opened": "Opened",
-          "clicked": "Clicked",
-          "bounced": "Bounced",
-          "spam": "Spam",
-          "failed": "Failed",
-          "queued": "Queued",
-          "skipped": "Skipped"
-        },
-        "table": {
-          "sentAt": "Sent",
-          "deliveredAt": "Delivered",
-          "openedAt": "Opened",
-          "clickedAt": "Clicked",
-          "campaign": "Campaign",
-          "resendId": "Resend ID"
-        },
-        "empty": "No data for this filter",
-        "backfillConfirm": {
-          "title": "Confirm backfill",
-          "body": "This will query the Resend API for every email with status=\"sent\" and update its status. It may take several minutes. Continue?",
-          "confirm": "Yes, run it"
-        }
-      },
-      "blogPlataformas": {
-        "title": "Blog Platforms V1",
-        "subtitle": "Audience: 11 hardcoded users · Tag: {{tag}}",
-        "targetAudience": "11 active professionals. Fixed hardcoded list.",
-        "testToMe": "Send test to myself",
-        "sendPending": "Send campaign ({{pending}} pending)",
-        "confirm": {
-          "title": "⚠️ Confirm blog send",
-          "body": "You're about to send <strong>{{pending}} blog emails</strong> to professionals. This can't be undone. Confirm?"
-        }
-      },
-      "winback": {
-        "title": "Win-back Professionals V1",
-        "subtitle": "Audience: 6 hardcoded users · Tag: {{tag}}",
-        "cancelledBadge": "Cancelled — do not send",
-        "targetAudience": "6 professionals who previously had a subscription. Fixed hardcoded list.",
-        "cancelledNotice": "Campaign cancelled. Sending is blocked. Data is kept for the record.",
-        "sendCancelled": "Send campaign (cancelled)",
-        "confirm": {
-          "title": "⚠️ Confirm win-back send",
-          "body": "You're about to send <strong>{{pending}} win-back emails</strong> to professionals with a previous subscription. This can't be undone. Confirm?"
-        }
-      },
-      "repesca": {
-        "title": "Client Re-engagement V1",
-        "subtitle": "Audience: clients without onboarding · Tag: {{tag}}",
-        "targetAudience": "users with user_type = client / cliente / empty, excluding {{blocked}} blocked emails and anyone who already has the tag.",
-        "audienceError": "Error calculating audience: {{message}}",
-        "calculating": "Calculating...",
-        "sendMeTest": "Send me a test",
-        "sendAll": "Send campaign ({{total}} recipients)",
-        "effectiveAudience": "Effective audience: <strong>{{total}}</strong> recipients",
-        "noRecipients": "No recipients (everyone already has the tag or is blocked).",
-        "table": {
-          "userType": "user_type"
-        },
-        "emptyUserType": "(empty)",
-        "confirm": {
-          "title": "⚠️ Confirm send",
-          "body": "You're about to send <strong>{{total}} real emails</strong> to clients. This can't be undone. Confirm?"
-        }
-      }
-    },
-    "business": {
-      "title": "Admin dashboard",
-      "subtitle": "Business overview · Updated {{time}}",
-      "paymentsLink": "Payments",
-      "updatedNow": "just now",
-      "updatedAgo": "{{mins}}m ago",
-      "noName": "No name",
-      "confirmExtend": "Extend by {{days}} days?",
-      "trialExtended": "Trial extended by {{days}} days",
-      "confirmCancel": "Cancel this subscription?",
-      "subscriptionCancelled": "Subscription cancelled",
-      "status": {
-        "active": "Active",
-        "trial": "Trial",
-        "cancelled": "Cancelled",
-        "expired": "Expired",
-        "suspended": "Suspended"
-      },
-      "planNames": {
-        "visibility": "Visibility",
-        "adsPlus": "Ads+"
-      },
-      "slackAlert": {
-        "title": "📢 Slack alerts not set up",
-        "description": "Metrics are calculated in real time. To get alerts in Slack, add the <1>SLACK_WEBHOOK_URL</1> environment variable.",
-        "howTo": "How to get one"
-      },
-      "kpi": {
-        "activeSubscribers": "{{count}} active subscribers",
-        "annualized": "Annualised (MRR × 12)",
-        "monthlyChurn": "Monthly churn",
-        "cancellationsThisMonth": "{{count}} cancellations this month",
-        "trialToPaid": "Trial → Paid",
-        "trialsConverted": "{{converted}} of {{total}} trials converted",
-        "newThisMonth": "New this month",
-        "vsLastMonth": "{{change}}% vs last month",
-        "estimatedLtv": "Estimated LTV",
-        "arpuLifetime": "ARPU €{{arpu}} · ~{{months}} months",
-        "cacNote": "CAC: N/A — no marketing tracking"
-      },
-      "charts": {
-        "mrrHistory": "MRR, last 12 months",
-        "mrrToday": "€{{amount}} today",
-        "weeklySignups": "New sign-ups per week",
-        "professionals": "Professionals",
-        "clients": "Clients"
-      },
-      "funnel": {
-        "title": "Conversion funnel",
-        "signups": "Sign-ups",
-        "onboarded": "Onboarded",
-        "activeTrial": "Active trial",
-        "paying": "Paying",
-        "retained90d": "Retained 90d"
-      },
-      "topProvinces": {
-        "title": "Top provinces",
-        "empty": "No province data yet"
-      },
-      "topCategories": {
-        "title": "Most active categories",
-        "empty": "No category data"
-      },
-      "subscribers": {
-        "title": "Subscribers ({{count}})",
-        "searchPlaceholder": "Search by name or email...",
-        "noResults": "No results",
-        "extendDays": "Extend +{{days}} days",
-        "cancelSubscription": "Cancel subscription",
-        "filters": {
-          "all": "All",
-          "active": "Active",
-          "trial": "On trial",
-          "cancelled": "Cancelled",
-          "expired": "Expired"
-        },
-        "columns": {
-          "professional": "Professional",
-          "plan": "Plan",
-          "signupDate": "Joined",
-          "renewal": "Renewal",
-          "status": "Status",
-          "paid": "Paid"
-        }
-      }
-    },
-    "usersTable": {
-      "searchPlaceholder": "Search by email or name...",
-      "count": "{{count}} users",
-      "adminBadge": "Admin",
-      "noSubscription": "No subscription",
-      "classify": "Classify",
-      "removeAdmin": "Remove admin",
-      "makeAdmin": "Make admin",
-      "type": {
-        "unclassified": "Unclassified"
-      },
-      "filters": {
-        "all": "All",
-        "professionals": "Professionals",
-        "clients": "Clients",
-        "withSubscription": "With subscription"
-      },
-      "columns": {
-        "type": "Type",
-        "subscription": "Subscription",
-        "signupDate": "Joined",
-        "actions": "Actions"
-      },
-      "deleteModal": {
-        "title": "Delete user?",
-        "confirm": "Are you sure you want to delete <1>{{email}}</1>? All their data will be erased.",
-        "permanentNotice": "This will permanently delete:",
-        "itemProfile": "• Professional profile, photos and metrics",
-        "itemSubscription": "• Subscription and payments",
-        "itemMessages": "• Messages, reviews, notifications and favourites"
-      },
-      "assignModal": {
-        "title": "Assign user type",
-        "client": "👤 Client",
-        "professional": "💼 Professional",
-        "submit": "Assign"
-      },
-      "toast": {
-        "userDeleted": "User {{email}} deleted successfully",
-        "deleteError": "Error deleting user: {{message}}",
-        "typeAssigned": "Type assigned: {{type}}",
-        "assignError": "Error assigning type",
-        "roleChanged": "Role changed to {{role}}",
-        "roleError": "Error changing role",
-        "noProfile": "This user has no professional profile",
-        "profileSuspended": "Profile suspended",
-        "profileActivated": "Profile activated",
-        "statusError": "Error changing status"
-      }
-    },
-    "giftUpgrade": {
-      "title": "Gift an upgrade",
-      "userLabel": "User:",
-      "emailLabel": "Email:",
-      "currentPlanLabel": "Current plan:",
-      "planToGift": "Plan to gift",
-      "duration": "Gift duration",
-      "internalReason": "Internal reason",
-      "reasonPlaceholder": "E.g. goodwill for a technical issue, marketing campaign, VIP customer...",
-      "applying": "Applying...",
-      "submit": "Gift upgrade",
-      "planOptions": {
-        "adsPlus": "Ads+ plan (€33/month)",
-        "visibility": "Visibility plan (€13/month)"
-      },
-      "durations": {
-        "days": "{{count}} days",
-        "oneMonth": "1 month (30 days)",
-        "twoMonths": "2 months (60 days)",
-        "threeMonths": "3 months (90 days)",
-        "sixMonths": "6 months (180 days)",
-        "oneYear": "1 year"
-      },
-      "info": {
-        "title": "ℹ️ Important:",
-        "benefits": "• The user will get {{plan}} benefits for {{days}} days",
-        "stripeUnchanged": "• Stripe will NOT change — they keep being billed for {{plan}}",
-        "manualSubscription": "• A manual subscription will be created (no Stripe charge)",
-        "notification": "• They will get an email and a push notification about the gift",
-        "expiryRevert": "• When it expires, they will automatically go back to {{plan}}",
-        "expiryInactive": "• When it expires, their subscription will become inactive"
-      },
-      "errors": {
-        "reasonRequired": "Add an internal reason for the gift",
-        "applyFailed": "Error applying gift: {{message}}"
-      },
-      "toast": {
-        "success": "Upgrade gifted successfully"
-      }
-    },
-    "planAudit": {
-      "title": "📋 Audit log",
-      "subtitle": "History of every plan change",
-      "refresh": "Refresh",
-      "searchPlaceholder": "Search by email or reason...",
-      "allTypes": "All types",
-      "count_one": "{{count}} record",
-      "count_other": "{{count}} records",
-      "types": {
-        "giftUpgrade": "Gifted upgrade",
-        "giftRevoke": "Gift revoked",
-        "giftExpire": "Gift expired",
-        "planChange": "Plan change",
-        "trialStart": "Trial started",
-        "subscriptionCancel": "Subscription cancelled",
-        "subscriptionReactivate": "Reactivated"
-      },
-      "empty": {
-        "title": "No records yet",
-        "description": "Plan changes will be logged here"
-      },
-      "columns": {
-        "date": "Date",
-        "type": "Type",
-        "user": "Affected user",
-        "change": "Change",
-        "changedBy": "Changed by",
-        "reason": "Reason",
-        "validUntil": "Valid until"
-      }
-    },
-    "subscriptionsTable": {
-      "title": "💳 Subscriptions",
-      "expiringSoon": "{{count}} expire within 7 days",
-      "filterAll": "All",
-      "giftBadge": "gift: {{plan}} until {{date}}",
-      "pricePerMonth": "€{{price}}/month",
-      "giftedUntil": "Gifted until {{date}}",
-      "giftUpgrade": "Gift upgrade",
-      "columns": {
-        "user": "User",
-        "plan": "Plan",
-        "price": "Price",
-        "status": "Status",
-        "start": "Start",
-        "expiry": "Expiry",
-        "actions": "Actions"
-      }
-    },
-    "verificationRequests": {
-      "title": "Identity verifications",
-      "emptyAll": "No verifications",
-      "emptyFiltered": "No verifications with status \"{{status}}\"",
-      "dateFormat": "d MMM yyyy 'at' HH:mm",
-      "review": "Review",
-      "userFallback": "User",
-      "documentFront": "Document front",
-      "documentBack": "Document back",
-      "selfie": "Selfie with document",
-      "rejectionReasonLabel": "Rejection reason:",
-      "rejectReasonLabel": "Rejection reason (if applicable)",
-      "rejectReasonPlaceholder": "E.g. document unreadable, selfie doesn't match...",
-      "approving": "Approving...",
-      "approve": "Approve",
-      "rejecting": "Rejecting...",
-      "status": {
-        "approved": "Approved",
-        "rejected": "Rejected",
-        "pending": "Pending"
-      },
-      "filters": {
-        "pending": "Pending",
-        "approved": "Approved",
-        "rejected": "Rejected",
-        "all": "All"
-      },
-      "toast": {
-        "approved": "Verification approved",
-        "rejected": "Verification rejected"
-      }
-    },
-    "metrics": {
-      "title": "📈 Activity metrics",
-      "topViews": "Top 5 — Most profile views",
-      "noMetrics": "No metrics data",
-      "viewsCount": "{{count}} views",
-      "topMessages": "Top 5 — Most messages received",
-      "noMessages": "No messages recorded",
-      "messagesCount": "{{count}} msgs",
-      "inactiveTitle": "No activity in the last 30 days ({{count}} active professionals)",
-      "allActive": "Every professional has recent activity",
-      "noName": "No name",
-      "more": "+{{count}} more"
-    },
-    "dashboardStats": {
-      "title": "📊 Overview",
-      "totalUsers": "Total users",
-      "usersSub": "+{{week}} this week · +{{month}} this month",
-      "activeProfessionals": "Active professionals",
-      "pendingApproval": "{{count}} awaiting approval",
-      "activeSubscriptions": "Active subscriptions",
-      "inTrial": "{{count}} on trial",
-      "expiredThisMonth": "Expired this month",
-      "totalMessages": "Total messages",
-      "totalReviews": "Total reviews",
-      "noUserType": "No user_type",
-      "unclassifiedUsers": "Unclassified users",
-      "noSubscription": "No subscription",
-      "weeklySignups": "New sign-ups — last 8 weeks",
-      "usersSeries": "users"
-    },
-    "referralWidget": {
-      "title": "Referral programme",
-      "qualifiedThisMonth": "Qualified this month",
-      "totalQualified": "Total qualified",
-      "pending": "Pending",
-      "topReferrers": "Top referrers",
-      "empty": "No qualified referrals yet",
-      "defaultLocation": "Spain",
-      "referralsLabel": "referrals",
-      "fourth": "4th",
-      "fifth": "5th"
-    },
-    "pendingProfiles": {
-      "title": "🔧 Profiles awaiting approval",
-      "noName": "No name",
-      "approve": "Approve",
-      "empty": {
-        "title": "No pending profiles",
-        "description": "Every profile has been reviewed"
-      },
-      "toast": {
-        "approved": "✅ {{name}}'s profile approved",
-        "approveError": "Error approving profile",
-        "rejected": "{{name}}'s profile rejected",
-        "rejectError": "Error rejecting profile"
-      }
-    },
-    "adsBriefings": {
-      "title": "Ads+ campaigns",
-      "subtitle": "{{count}} briefings in total · current month: {{month}}",
-      "filterAll": "All",
-      "empty": "No briefings match this filter.",
-      "clientApproved": "✅ Approved by client",
-      "status": {
-        "draft": "Draft",
-        "submitted": "Submitted",
-        "inProgress": "In review",
-        "approved": "Approved",
-        "live": "Active",
-        "completed": "Completed"
-      },
-      "campaignStatus": {
-        "pending": "Pending",
-        "inReview": "In review",
-        "creating": "Creating assets",
-        "live": "Live",
-        "paused": "Paused",
-        "finished": "Finished"
-      }
-    },
-    "supportTickets": {
-      "title": "🎫 Support tickets",
-      "unresolved": "{{count}} unresolved",
-      "viewAll": "View all",
-      "filterAll": "All",
-      "empty": "No tickets match this filter"
-    },
-    "layout": {
-      "title": "⚙️ Admin Panel",
-      "nav": {
-        "dashboard": "Dashboard",
-        "users": "Users",
-        "pending": "Pending",
-        "subscriptions": "Subscriptions",
-        "outreach": "WhatsApp outreach",
-        "gifts": "Gifts",
-        "audit": "Audit",
-        "adsBriefings": "Ads+ briefings",
-        "referrals": "Referrals",
-        "emails": "Emails",
-        "metrics": "Metrics",
-        "support": "Support",
-        "verifications": "Verifications"
-      }
-    }
-  },
-  "blog": {
-    "editor": {
-      "category": {
-        "legalFiscal": "Legal & tax",
-        "tools": "Tools",
-        "news": "News"
-      },
-      "upload": {
-        "notImage": "The file must be an image",
-        "tooLarge": "Image too large (max. 5 MB)",
-        "success": "Image uploaded",
-        "error": "Upload error: {{message}}",
-        "remove": "Remove image",
-        "uploading": "Uploading…",
-        "button": "Upload image",
-        "urlPlaceholder": "…or paste a URL"
-      },
-      "unknownError": "unknown",
-      "validation": {
-        "titleRequired": "The Spanish title is missing.",
-        "slugRequired": "The slug is missing.",
-        "slugFormat": "The slug can only contain lowercase letters, numbers and hyphens.",
-        "slugExists": "That slug is already used by \"{{title}}\".",
-        "contentTooShort": "The Spanish content is too short (minimum 50 characters)."
-      },
-      "saved": {
-        "published": "Article published",
-        "scheduled": "Scheduled for {{date}}",
-        "draft": "Draft saved"
-      },
-      "saveError": "Save error: {{message}}",
-      "tabs": {
-        "content": "Content",
-        "meta": "Metadata",
-        "seo": "SEO",
-        "author": "Author",
-        "publish": "Publishing",
-        "related": "Related"
-      },
-      "editArticle": "Edit article",
-      "newArticle": "New article",
-      "saveDraft": "Save draft",
-      "publishButton": "Publish",
-      "content": {
-        "titleEs": "Title (ES) *",
-        "titleEsPlaceholder": "Article title in Spanish",
-        "titleEn": "Title (EN)",
-        "titleEnPlaceholder": "Article title in English",
-        "excerptEs": "Excerpt (ES)",
-        "excerptEsPlaceholder": "Short description (≤160 characters)",
-        "excerptEn": "Excerpt (EN)",
-        "excerptEnPlaceholder": "Short description in English",
-        "bodyLabel": "Content ({{lang}})",
-        "bodyEsPlaceholder": "Write the article body in Spanish…",
-        "bodyEnPlaceholder": "Write the body in English…",
-        "readTimeEstimate": "Estimated reading time: ~{{minutes}} min"
-      },
-      "meta": {
-        "slug": "Slug (URL) *",
-        "slugPlaceholder": "my-example-article",
-        "regenerateSlug": "Regenerate from title",
-        "category": "Category",
-        "tags": "Tags (comma-separated)",
-        "tagsHint": "E.g. freelancers, tax, irpf",
-        "tagsPlaceholder": "freelancers, tax, irpf",
-        "readTime": "Reading time (minutes)"
-      },
-      "seo": {
-        "metaTitleEs": "Meta title (ES)",
-        "metaTitleEsPlaceholder": "{{title}} | Blog MisAutónomos",
-        "metaDescriptionEs": "Meta description (ES)",
-        "metaDescriptionEsPlaceholder": "Description for search engines (max. 160)",
-        "metaTitleEn": "Meta title (EN)",
-        "metaTitleEnPlaceholder": "{{title}} | MisAutónomos Blog",
-        "metaDescriptionEn": "Meta description (EN)",
-        "metaDescriptionEnPlaceholder": "SEO description in English (max 160)",
-        "charCount": "{{length}}/{{max}} characters",
-        "ogImage": "Open Graph image (1200×630 recommended)",
-        "ogImageAlt": "Open Graph image"
-      },
-      "author": {
-        "name": "Author name",
-        "avatar": "Avatar",
-        "bio": "Author bio"
-      },
-      "publish": {
-        "featuredImage": "Featured image",
-        "featuredImageHint": "Shown in the article header and in the blog listing.",
-        "status": "Status",
-        "date": "Publish date",
-        "dateHint": "If the date is in the future, the status switches to 'Scheduled' when you click Publish.",
-        "featured": "Featured article (shown up front)"
-      },
-      "status": {
-        "scheduled": "Scheduled",
-        "published": "Published",
-        "archived": "Archived"
-      },
-      "related": {
-        "title": "Related articles (max. 3)",
-        "maxReached": "Maximum 3 related articles",
-        "empty": "There are no other articles yet."
-      }
-    }
-  },
-  "crm": {
-    "status": {
-      "lead": "Lead",
-      "contacted": "Contacted",
-      "negotiating": "Negotiating",
-      "inactive": "Inactive",
-      "vip": "VIP"
-    },
-    "segment": {
-      "residential": "Residential",
-      "commercial": "Commercial",
-      "industrial": "Industrial",
-      "government": "Public administration",
-      "governmentShort": "Public sector",
-      "other": "Other"
-    },
-    "activityType": {
-      "note": "Note",
-      "call": "Call",
-      "meeting": "Meeting",
-      "reminder": "Reminder",
-      "payment": "Payment",
-      "paymentReceived": "Payment received",
-      "jobCompleted": "Job completed",
-      "quoteSent": "Quote sent",
-      "invoiceSent": "Invoice sent",
-      "other": "Other"
-    },
-    "form": {
-      "nameRequired": "Name *",
-      "namePlaceholder": "John Smith",
-      "emailPlaceholder": "john@example.com",
-      "company": "Company",
-      "companyPlaceholder": "Company name",
-      "status": "Status",
-      "segment": "Segment",
-      "notes": "Notes",
-      "notesPlaceholder": "Additional information about the client",
-      "estimatedValue": "Estimated value (€)",
-      "source": "Lead source",
-      "sourcePlaceholder": "e.g. Referral, website...",
-      "tag": "Tag",
-      "tags": "Tags (comma-separated)",
-      "tagsPlaceholder": "e.g. urgent, preferred, construction...",
-      "addressPlaceholder": "Street, number, postcode, city",
-      "type": "Type",
-      "any": "Any",
-      "select": "Select",
-      "selectPlaceholder": "Select..."
-    },
-    "actions": {
-      "newClient": "New client",
-      "editClient": "Edit client",
-      "addFirstClient": "Add your first client",
-      "saveChanges": "Save changes",
-      "viewDetails": "View details",
-      "addNote": "Add note",
-      "backToCrm": "Back to CRM"
-    },
-    "deleteClient": {
-      "title": "Delete this client?"
-    },
-    "toast": {
-      "clientCreated": "Client created",
-      "clientUpdated": "Client updated",
-      "clientDeleted": "Client deleted",
-      "clientDeleteError": "Couldn't delete the client",
-      "clientAdded": "Client added",
-      "noteSaved": "Note saved",
-      "activityAdded": "Activity added",
-      "activityUpdated": "Activity updated",
-      "activityDeleted": "Activity deleted",
-      "reminderUpdated": "Reminder updated",
-      "automationCreated": "Automation created",
-      "automationUpdated": "Automation updated",
-      "automationDeleted": "Automation deleted",
-      "automationActivated": "Automation activated",
-      "automationPaused": "Automation paused"
-    },
-    "list": {
-      "title": "CRM - Client Management",
-      "countSummary": "{{shown}} of {{total}} clients",
-      "statTotalContacts": "Total contacts",
-      "statLeads": "Leads",
-      "statClients": "Clients",
-      "statEstimatedValue": "Estimated value",
-      "searchPlaceholder": "Search by name, email, phone, NIF or company...",
-      "filterAll": "All",
-      "filterAllTags": "All",
-      "emptyTitle": "No clients yet",
-      "emptyDescription": "Start adding your clients and prospects",
-      "createClient": "Create client",
-      "deleteClientDescription": "You're about to delete <1>{{name}}</1>. This can't be undone."
-    },
-    "myClients": {
-      "seoTitle": "My Clients — MisAutónomos",
-      "title": "My Clients",
-      "savedCount_one": "{{count}} saved contact",
-      "savedCount_other": "{{count}} saved contacts",
-      "searchPlaceholder": "Search by name, email, phone...",
-      "allStatuses": "All statuses",
-      "noResultsTitle": "No results",
-      "noResultsHint": "Try a different search",
-      "emptyTitle": "You don't have any clients yet",
-      "emptyDescription": "Add your first client to keep track of your contacts.",
-      "companyPlaceholder": "Company name (optional)",
-      "addressPlaceholder": "Street, number, postcode...",
-      "notesPlaceholder": "Additional information about this client...",
-      "addClient": "Add client",
-      "noteFor": "Note for {{name}}",
-      "quickNotePlaceholder": "Write a note about this client...",
-      "saveNote": "Save note",
-      "deleteClientDescription": "You'll delete <1>{{name}}</1>. This can't be undone."
-    },
-    "detail": {
-      "notFoundTitle": "Client not found",
-      "notFoundDescription": "The client you're looking for doesn't exist or has been deleted.",
-      "jobs": "Jobs",
-      "paid": "Paid",
-      "reminders": "Reminders",
-      "tabOverview": "Overview",
-      "tabHistory": "History",
-      "tabJobs": "Jobs ({{count}})",
-      "tabInvoices": "Invoices ({{count}})",
-      "pinnedNotes": "Pinned notes",
-      "add": "Add",
-      "noPendingReminders": "No pending reminders",
-      "info": "Details",
-      "nifCif": "NIF/CIF",
-      "source": "Source",
-      "preferredContact": "Preferred contact method",
-      "nextFollowup": "Next follow-up",
-      "activityHistory": "Activity history",
-      "addActivity": "Add activity",
-      "noActivities": "No activities recorded",
-      "dateTimeFormat": "d MMM yyyy 'at' HH:mm",
-      "newJob": "New job",
-      "noJobs": "No jobs recorded",
-      "jobStart": "Start: {{date}}",
-      "jobStatus": {
-        "completed": "Completed",
-        "inProgress": "In progress",
-        "cancelled": "Cancelled",
-        "pending": "Pending"
-      },
-      "noInvoices": "No invoices recorded",
-      "totalInvoiced": "Total invoiced:",
-      "totalCollected": "Total collected:",
-      "internalNotes": "Internal notes",
-      "noNotes": "No notes",
-      "editClientTitle": "Edit client",
-      "tagsPlaceholder": "e.g. urgent, preferred, construction",
-      "rating": "Rating (1-5)",
-      "ratingPlaceholder": "Not rated",
-      "editActivity": "Edit activity",
-      "newActivity": "New activity",
-      "titleRequired": "Title *",
-      "amount": "Amount (€)",
-      "isReminder": "Set as a reminder",
-      "pinNote": "Pin note",
-      "reminderDate": "Reminder date",
-      "deleteClientDescription": "This will permanently delete <1>{{name}}</1> and all their associated history.",
-      "deleteActivityTitle": "Delete this activity?",
-      "deleteActivityDescription": "This can't be undone."
-    },
-    "automations": {
-      "triggerTypes": {
-        "clientCreated": "New client created",
-        "statusChanged": "Status change",
-        "jobCompleted": "Job completed",
-        "jobsCount": "Job count reached",
-        "daysInactive": "Days without contact",
-        "birthday": "Client's birthday",
-        "contractEnd": "Contract/warranty end"
-      },
-      "actionTypes": {
-        "addTag": "Add tag",
-        "removeTag": "Remove tag",
-        "changeStatus": "Change status",
-        "changeSegment": "Change segment",
-        "createReminder": "Create reminder",
-        "createActivity": "Log activity"
-      },
-      "title": "Automations",
-      "subtitle": "Automate repetitive tasks in your CRM",
-      "newAutomation": "New automation",
-      "active": "Active",
-      "statExecutions": "Runs",
-      "tabAll": "All",
-      "tabSequences": "Sequences",
-      "tabAutoTags": "Auto-tags",
-      "tabReminders": "Reminders",
-      "emptyTitle": "No automations yet",
-      "emptyDescription": "Create your first automation to save time",
-      "createAutomation": "Create automation",
-      "statusActive": "Active",
-      "statusPaused": "Paused",
-      "typeSequence": "Sequence",
-      "typeAutoTag": "Auto-tag",
-      "typeReminder": "Reminder",
-      "triggerSummary": "Trigger: {{trigger}}",
-      "actionsCount_one": "{{count}} action",
-      "actionsCount_other": "{{count}} actions",
-      "executedTimes_one": "Run {{count}} time",
-      "executedTimes_other": "Run {{count}} times",
-      "quickTemplates": "Quick templates",
-      "templates": {
-        "welcome": {
-          "name": "Welcome new leads",
-          "activityTitle": "New lead registered",
-          "firstFollowup": "Initial follow-up",
-          "secondFollowup": "Second contact",
-          "title": "Welcome sequence",
-          "description": "Automatic follow-up for new leads"
-        },
-        "recurring": {
-          "name": "Repeat client",
-          "tag": "Repeat",
-          "title": "Flag repeat clients",
-          "description": "Tags clients with 2+ jobs"
-        },
-        "birthday": {
-          "name": "Birthday greeting",
-          "reminderTitle": "Send birthday wishes",
-          "title": "Birthdays",
-          "description": "Reminder to send wishes"
-        }
-      },
-      "editAutomation": "Edit automation",
-      "namePlaceholder": "e.g. Lead follow-up",
-      "typeSequenceFull": "Follow-up sequence",
-      "typeAutoTagFull": "Auto-tagging",
-      "typeReminderFull": "Automatic reminder",
-      "trigger": "Trigger",
-      "previousStatus": "Previous status",
-      "newStatus": "New status",
-      "minJobs": "Minimum number of jobs",
-      "actions": "Actions",
-      "addAction": "Add action",
-      "actionNumber": "Action {{number}}",
-      "actionType": "Action type",
-      "delayDays": "Delay (days)",
-      "tagPlaceholder": "e.g. Repeat, VIP, Urgent...",
-      "newSegment": "New segment",
-      "reminderTitle": "Reminder title",
-      "reminderTitlePlaceholder": "e.g. Follow-up call",
-      "activityTitle": "Title",
-      "activityTitlePlaceholder": "e.g. Lead registered",
-      "activityType": "Activity type",
-      "create": "Create",
-      "deleteTitle": "Delete this automation?",
-      "deleteDescription": "You're about to delete \"{{name}}\". This can't be undone."
+      "contactLead": "For cookie inquiries",
+      "goToPreferences": "Go to Cookie Preferences"
     }
   },
   "layout": {
@@ -2073,281 +1221,6 @@
       "profileTime": "Profile in 10 min"
     }
   },
-  "projects": {
-    "seo": {
-      "title": "Project Management - MisAutónomos",
-      "description": "Manage your projects, phases and tasks"
-    },
-    "title": "Projects",
-    "subtitle": "Manage your projects from start to finish",
-    "goToCrm": "Go to CRM",
-    "newProject": "New Project",
-    "progress": "Progress",
-    "stats": {
-      "completed": "Completed",
-      "totalHours": "Total hours"
-    },
-    "quickActions": {
-      "title": "Quick actions",
-      "viewClients": "View clients"
-    },
-    "list": {
-      "searchPlaceholder": "Search projects or clients...",
-      "emptyTitle": "You don't have any projects yet",
-      "noResultsTitle": "No projects found",
-      "emptyDescription": "Create your first project and manage the work with your clients",
-      "noResultsDescription": "Try adjusting your search filters",
-      "addClientsFirst": "Add clients first",
-      "createFirst": "Create your first project",
-      "priorityTooltip": "Priority: {{priority}}"
-    },
-    "status": {
-      "label": "Status",
-      "all": "All statuses",
-      "planning": "Planning",
-      "inProgress": "In progress",
-      "onHold": "On hold",
-      "completed": "Completed",
-      "cancelled": "Cancelled",
-      "pending": "Pending"
-    },
-    "priority": {
-      "label": "Priority",
-      "low": "Low",
-      "medium": "Medium",
-      "high": "High",
-      "urgent": "Urgent"
-    },
-    "detail": {
-      "saved": "Project saved",
-      "saveError": "Error saving project",
-      "nameRequired": "Project name is required",
-      "tabs": {
-        "overview": "Overview"
-      },
-      "infoTitle": "Project Information",
-      "form": {
-        "name": "Project Name *",
-        "selectClient": "Select client",
-        "color": "Color",
-        "startDate": "Start Date",
-        "endDate": "End Date",
-        "budget": "Budget (€)"
-      },
-      "progressTitle": "Project Progress",
-      "stats": {
-        "completed": "Completed",
-        "hours": "Hours"
-      }
-    },
-    "dialogs": {
-      "name": "Name *",
-      "nameRequired": "Name is required"
-    },
-    "phases": {
-      "title": "Phases",
-      "heading": "Project Phases",
-      "new": "New Phase",
-      "create": "Create Phase",
-      "created": "Phase created",
-      "empty": "No phases created yet",
-      "status": {
-        "completed": "Completed"
-      },
-      "startLabel": "Start: {{date}}",
-      "endLabel": "End: {{date}}",
-      "form": {
-        "startDate": "Start Date",
-        "endDate": "End Date"
-      }
-    },
-    "tasks": {
-      "title": "Tasks",
-      "new": "New Task",
-      "create": "Create Task",
-      "created": "Task created",
-      "updated": "Task updated",
-      "empty": "No tasks created yet",
-      "form": {
-        "phase": "Phase",
-        "selectPhase": "Select phase (optional)",
-        "dueDate": "Due Date",
-        "estimatedHours": "Estimated Hours"
-      }
-    },
-    "time": {
-      "title": "Time",
-      "heading": "Time Log",
-      "log": "Log Time",
-      "submit": "Log",
-      "logged": "Time logged",
-      "empty": "No time logged yet",
-      "billable": "Billable",
-      "hoursRequired": "Hours are required",
-      "form": {
-        "date": "Date *",
-        "hours": "Hours *",
-        "descriptionPlaceholder": "What did you work on?",
-        "billable": "Billable hours"
-      }
-    },
-    "files": {
-      "title": "Files",
-      "heading": "Project Files",
-      "attach": "Attach File",
-      "empty": "No attachments yet",
-      "uploaded": "File(s) uploaded",
-      "uploadError": "Error uploading file"
-    },
-    "jobs": {
-      "seo": {
-        "title": "Job Management - MisAutónomos",
-        "description": "Manage your jobs and projects with clients"
-      },
-      "title": "Job Management",
-      "subtitle": "Manage your projects and jobs",
-      "new": "New job",
-      "edit": "Edit job",
-      "create": "Create job",
-      "saveChanges": "Save changes",
-      "created": "Job created",
-      "updated": "Job updated",
-      "deleted": "Job deleted",
-      "createError": "Error creating job",
-      "updateError": "Error updating job",
-      "deleteError": "Error deleting job",
-      "titleRequired": "Title is required",
-      "photoTooLarge": "{{name}} is over 5MB",
-      "photoUploadError": "Error uploading photo",
-      "searchPlaceholder": "Search jobs...",
-      "emptyTitle": "No jobs yet",
-      "emptyDescription": "Create your first job to start managing your projects",
-      "photoCount_one": "{{count}} photo",
-      "photoCount_other": "{{count}} photos",
-      "deleteTitle": "Delete job?",
-      "deleteConfirm": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
-      "stats": {
-        "pending": "Pending",
-        "inProgress": "In progress",
-        "revenue": "Revenue"
-      },
-      "form": {
-        "title": "Title *",
-        "titlePlaceholder": "E.g. Kitchen electrical installation",
-        "selectClient": "Select client",
-        "manualClient": "Enter manually",
-        "clientNamePlaceholder": "Client name",
-        "descriptionPlaceholder": "Describe the work to be done...",
-        "location": "Location",
-        "locationPlaceholder": "Job address",
-        "startDate": "Start date",
-        "endDate": "End date",
-        "estimatedHours": "Estimated hours",
-        "actualHours": "Actual hours",
-        "estimatedCost": "Estimated cost (€)",
-        "finalCost": "Final cost (€)",
-        "notes": "Notes",
-        "notesPlaceholder": "Additional notes...",
-        "photos": "Job photos",
-        "addPhotos": "Add photos",
-        "photoAlt": "Photo {{index}}"
-      }
-    }
-  },
-  "calendar": {
-    "title": "Calendar",
-    "subtitle": "Manage your schedule of projects, jobs, invoices and tasks",
-    "today": "Today",
-    "days": {
-      "mon": "Mon",
-      "tue": "Tue",
-      "wed": "Wed",
-      "thu": "Thu",
-      "fri": "Fri",
-      "sat": "Sat",
-      "sun": "Sun"
-    },
-    "months": {
-      "january": "January",
-      "february": "February",
-      "march": "March",
-      "april": "April",
-      "may": "May",
-      "june": "June",
-      "july": "July",
-      "august": "August",
-      "september": "September",
-      "october": "October",
-      "november": "November",
-      "december": "December"
-    },
-    "export": {
-      "icsButton": "Export .ics",
-      "icsButtonShort": "Export",
-      "calendarName": "MisAutónomos - Professional Calendar",
-      "invoiceDueDescription": "{{description}} - Invoice due",
-      "downloaded": "Calendar downloaded. Import the .ics file into Apple Calendar, Google Calendar or Outlook"
-    },
-    "events": {
-      "jobEnd": "End: {{title}}",
-      "invoice": "Invoice {{number}}"
-    },
-    "quickLinks": {
-      "title": "Quick links",
-      "clients": "Clients"
-    },
-    "filters": {
-      "jobs": "Jobs",
-      "reminders": "Reminders",
-      "tasks": "Tasks"
-    },
-    "upcoming": {
-      "title": "Upcoming events",
-      "empty": "No upcoming events"
-    },
-    "day": {
-      "selectPrompt": "Select a day",
-      "addTask": "Add task",
-      "empty": "No events for this day",
-      "hint": "Click on a day to see its events"
-    },
-    "tasks": {
-      "new": "New task",
-      "newShort": "Task",
-      "edit": "Edit task",
-      "created": "Task created",
-      "updated": "Task updated",
-      "deleted": "Task deleted"
-    },
-    "taskForm": {
-      "title": "Title *",
-      "titlePlaceholder": "E.g. Call the client",
-      "descriptionPlaceholder": "Task details...",
-      "date": "Date *",
-      "time": "Time",
-      "category": "Category",
-      "categories": {
-        "work": "Work",
-        "admin": "Admin",
-        "personal": "Personal"
-      },
-      "recurrence": "Repeat task",
-      "recurrenceOptions": {
-        "none": "Don't repeat",
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "biweekly": "Every 2 weeks",
-        "monthly": "Monthly"
-      },
-      "recurrenceEnd": "End repeat",
-      "recurrenceEndHint": "Leave empty to repeat indefinitely",
-      "relatedClient": "Related client",
-      "noClient": "None",
-      "titleAndDateRequired": "Fill in the title and the date",
-      "saving": "Saving...",
-      "create": "Create"
-    }
-  },
   "proProfile": {
     "seo": {
       "title": "{{name}} - {{category}} in {{city}}",
@@ -2505,7 +1378,7 @@
     },
     "availability": {
       "weekdays": "Weekdays",
-      "weekends": "Weekends and public holidays",
+      "weekends": "Weekends",
       "title": "Availability and hours",
       "intro": "Set your availability so clients know when they can reach you",
       "typeLabel": "Availability type",
@@ -2556,7 +1429,11 @@
           "short": "S",
           "abbr": "Sun"
         }
-      }
+      },
+      "availableNow": "Available now",
+      "until": "until",
+      "mondayFriday": "Monday to Friday",
+      "everyday": "Every day"
     },
     "picture": {
       "tooLarge": "The image can't be larger than 5MB",
@@ -2696,285 +1573,734 @@
       "removed": "Removed from favourites"
     }
   },
-  "subscription": {
-    "page": {
-      "backToProfile": "Back to my profile",
-      "seoDescription": "Manage your professional plan"
+  "faq": {
+    "sections": {
+      "autonomos": "For the self-employed",
+      "clientes": "For clients",
+      "plataforma": "About MisAutónomos"
     },
-    "sync": {
-      "stripe": "Syncing with Stripe..."
-    },
-    "native": {
-      "yourPlan": "Your plan",
-      "status": "Status:",
-      "renewsOn": "Renews on {{date}}",
-      "noActivePlan": "No active plan.",
-      "manageOnWeb": "Manage your plan at <website>misautonomos.es</website>."
-    },
-    "noPlan": {
-      "canceledTitle": "Your subscription has been cancelled",
-      "title": "You don't have an active plan",
-      "canceledText": "Your profile no longer shows up in searches. You can subscribe again whenever you like.",
-      "text": "You need a professional plan for your profile to appear in searches",
-      "viewPlans": "See available plans"
-    },
-    "gift": {
-      "title": "You have an active gifted plan",
-      "enjoyUntil": "You're enjoying <strong>{{plan}}</strong> until <strong>{{date}}</strong>.",
-      "billingUnchanged": "Your current billing ({{plan}}) hasn't changed. When the gift ends you'll automatically go back to that plan."
-    },
-    "status": {
-      "active": "Active",
-      "trial": "Trial period",
-      "canceled": "Cancelled",
-      "finished": "Ended"
-    },
-    "plan": {
-      "current": "Your current plan",
-      "giftBadge": "Gift",
-      "price": "Price",
-      "pricePerMonth": "€{{price}}/month",
-      "trialEnds": "Trial ends",
-      "nextCharge": "Next charge",
-      "daysLeft_one": "({{count}} day)",
-      "daysLeft_other": "({{count}} days)",
-      "trialNotice": "<strong>Trial period:</strong> The first 7 days are free. If you don't cancel before {{date}}, you'll automatically be charged €{{price}}/month."
-    },
-    "upgrade": {
-      "title": "Upgrade to the Ads+ Plan",
-      "subtitle": "Full access to the Pro Dashboard + managed ad campaigns",
-      "featureCrm": "Full CRM and client management",
-      "featureAds": "Campaigns on Instagram, Facebook and TikTok",
-      "featureInvoicing": "Automatic invoicing and quotes",
-      "processingPayment": "Processing payment...",
-      "button": "Upgrade for €33/month",
-      "proration": "Automatic proration. You only pay the difference for the current month."
-    },
-    "downgrade": {
-      "title": "Switch to the Visibility Plan",
-      "subtitle": "Cut your costs while staying visible in searches",
-      "button": "Switch to €14/month",
-      "appliesNextPeriod": "Takes effect on your next billing period."
-    },
-    "actions": {
-      "processing": "Processing..."
-    },
-    "invoices": {
-      "title": "Your subscription invoices",
-      "subtitle": "Download or review your MisAutónomos invoices",
-      "empty": "No invoices available yet",
-      "emptyHint": "Invoices appear after your first payment",
-      "fallbackNumber": "Invoice {{id}}",
-      "statusOpen": "Pending",
-      "view": "View invoice"
-    },
-    "payment": {
-      "subtitle": "Update your card or manage your billing",
-      "timeout": "The connection is taking too long. Please try again.",
-      "portalOpened": "Portal opened in a new tab",
-      "portalError": "Couldn't open the portal",
-      "connectionError": "Connection error. Check your subscription and try again.",
-      "openingPortal": "Opening portal...",
-      "manage": "Manage payment",
-      "customerId": "Customer ID: {{id}}..."
-    },
-    "reactivate": {
-      "title": "Subscription cancelled",
-      "activeUntil_one": "Your plan stays active until {{date}}. {{count}} day left.",
-      "activeUntil_other": "Your plan stays active until {{date}}. {{count}} days left.",
-      "loading": "Reactivating...",
-      "button": "Reactivate subscription"
-    },
-    "expired": {
-      "title": "Your plan has expired",
-      "text": "Your profile isn't visible in searches"
-    },
-    "cancel": {
-      "link": "Cancel subscription",
-      "dialogTitle": "Cancel your subscription?",
-      "trialNoCharge": "If you cancel now, <strong>you won't be charged anything</strong>. Your free trial will stop immediately.",
-      "trialWarning": "Your profile will disappear from searches right away and you'll lose your reserved spot (maximum 10 per city).",
-      "activeUntil": "Your subscription will stay active until <strong>{{date}}</strong>.",
-      "activeWarning": "After that date your profile will switch to the free tier and <strong>you'll lose your reserved spot</strong> (maximum 10 professionals per city).",
-      "keep": "No, keep it active",
-      "loading": "Cancelling...",
-      "confirm": "Yes, cancel subscription"
-    },
-    "toasts": {
-      "noEmail": "Couldn't retrieve your email",
-      "fixed": "Subscription fixed, reloading...",
-      "fixFailed": "Couldn't fix it automatically",
-      "alreadyOk": "Your subscription is set up correctly",
-      "verifyError": "Error checking your subscription",
-      "canceled": "Subscription cancelled successfully",
-      "canceledDescription": "Your profile is no longer visible in searches",
-      "cancelError": "Error cancelling",
-      "cancelSubscriptionError": "Error cancelling your subscription",
-      "reactivateError": "Error reactivating",
-      "reactivateSubscriptionError": "Error reactivating your subscription",
-      "portalError": "Couldn't open the billing portal",
-      "downgraded": "Plan downgraded successfully",
-      "downgradeError": "Error downgrading your plan"
-    },
-    "onboarding": {
-      "steps": {
-        "userType": "Are you self-employed or a company?",
-        "companyName": "Company name",
-        "firstName": "What's your first name?",
-        "lastName": "And your last name?",
-        "companyCif": "Company tax ID (CIF)",
-        "nif": "Your tax ID (NIF)",
-        "email": "What's your email address?",
-        "password": "Create a secure password",
-        "activity": "What do you do?"
+    "items": {
+      "altaAutonomo": {
+        "question": "How do I register as self-employed (autónomo) in Spain in 2026?",
+        "answer": "To register as self-employed in Spain you need three steps: register with the Tax Agency (Hacienda) using form 036 or 037, register with Social Security under the RETA scheme, and notify the town hall if you open physical premises. The whole process is free if you do it yourself and can be completed online in under an hour with a digital certificate.",
+        "cta": "Need an accountant to handle it for you? Find one on MisAutónomos"
       },
-      "userType": {
-        "freelancer": "Self-employed",
-        "company": "Company"
+      "cuotaAutonomos": {
+        "question": "How much is the self-employed Social Security contribution in 2026?",
+        "answer": "In 2026 the self-employed contribution works in brackets based on net income: from roughly €230/month for the lowest brackets to over €590/month for the highest. New self-employed workers can opt for the flat rate of €80/month during the first year, extendable for one more year if income is low.",
+        "cta": "Work out your exact contribution with an advisor"
       },
-      "placeholders": {
-        "companyName": "E.g. My Company Ltd.",
-        "firstName": "E.g. John",
-        "lastName": "E.g. Smith",
-        "cif": "E.g. B12345678",
-        "nif": "E.g. 12345678A",
-        "phone": "612345678 or +34612345678",
-        "address": "Street, number, postcode, city",
-        "activityOther": "E.g. Graphic designer, IT consultant..."
+      "impuestosAutonomo": {
+        "question": "What taxes does a self-employed worker pay in Spain?",
+        "answer": "A self-employed worker in Spain mainly pays income tax (IRPF, quarterly via form 130 or through 7-15% withholdings), VAT (form 303 quarterly, generally 21%), and the monthly Social Security contribution. You must also file annual summaries (form 390 and the annual income tax return, form 100).",
+        "cta": "Talk to a specialised accountancy firm"
       },
-      "password": {
-        "minChars": "At least 8 characters"
+      "gastosDeducibles": {
+        "question": "What expenses can a self-employed worker deduct?",
+        "answer": "You can deduct expenses directly tied to your activity: premises rent, utilities (with limits if you work from home, normally 30% of the 30% of the property), office supplies, a vehicle if used exclusively for work, meal allowances, training, activity-related insurance and professional association fees.",
+        "cta": "Optimise your deductions with a tax advisor"
       },
-      "activities": {
-        "transporter": "Transport / haulage",
-        "consultancy": "Accounting or tax advisory",
-        "multiservice": "Multi-service company",
-        "other": "Other professional service"
+      "facturarAutonomo": {
+        "question": "How do I invoice as a self-employed worker?",
+        "answer": "A self-employed invoice must include: a sequential number, issue date, full details of issuer and recipient (name, tax ID, address), a description of the service or product, taxable base, VAT applied and total. Since 2024 electronic invoicing is mandatory between companies and self-employed workers in Spain.",
+        "cta": "Need invoicing software or an accountant?"
       },
-      "errors": {
-        "paymentCanceled": "The payment was cancelled. You can try again.",
-        "required": "Please fill in this field to continue",
-        "companyNameLength": "The company name must be between 2 and 50 characters",
-        "firstNameInvalid": "Your first name must be between 2 and 50 characters and contain only letters",
-        "lastNameInvalid": "Your last name must be between 2 and 100 characters and contain only letters",
-        "cifInvalid": "Invalid CIF. Format: B12345678",
-        "nifInvalid": "Invalid NIF. Format: 12345678A",
-        "emailInvalid": "Please enter a valid email",
-        "passwordLength": "Your password must be at least 8 characters",
-        "phoneInvalid": "Invalid phone number. Format: 612345678 or +34612345678",
-        "activityOtherRequired": "Please specify your professional activity",
-        "addressLength": "Please enter a full address (at least 10 characters)",
-        "allFieldsRequired": "Please fill in all the fields before continuing",
-        "firstNameChars": "Your first name contains invalid characters",
-        "lastNameChars": "Your last name contains invalid characters",
-        "nifCifInvalid": "Invalid NIF/CIF",
-        "emailShort": "Invalid email",
-        "phoneShort": "Invalid phone number",
-        "temporary": "There was a temporary problem. Please try again in a few seconds."
+      "autonomoVsSl": {
+        "question": "When is it better to be self-employed and when to set up an SL (limited company)?",
+        "answer": "Being self-employed is simpler and cheaper at the start (no minimum capital, simple admin). An SL makes sense when your net profit exceeds roughly €40,000-60,000 a year (corporate tax is a flat 25% versus the progressive income tax of the self-employed) or when you want to limit personal liability.",
+        "cta": "Ask an advisor which one suits you"
       },
-      "success": {
-        "title": "✅ Payment completed!",
-        "activated": "Your subscription has been activated.",
-        "emailSent": "You'll receive a confirmation email at {{email}}",
-        "nextSteps": "✨ Next steps:",
-        "stepConfirmEmail": "Check your inbox to confirm your account",
-        "stepCompleteProfile": "Complete your professional profile",
-        "stepAddPhotos": "Add photos of your work",
-        "stepGetClients": "Start getting clients!",
-        "goToPanel": "Go to my dashboard"
+      "tarifaPlana": {
+        "question": "What is the self-employed flat rate and who qualifies?",
+        "answer": "The flat rate is a reduced contribution of €80/month for the first 12 months for new self-employed workers. It can be extended 12 more months if net income stays below the minimum wage (SMI). It is open to those who have not been registered in the previous 2 years (3 years if they already used the flat rate before).",
+        "cta": "Check whether you meet the requirements"
       },
-      "progress": {
-        "step": "Step {{current}} of {{total}}",
-        "completed": "{{percent}}% complete"
+      "modelo130": {
+        "question": "When do I file form 130 and what is it for?",
+        "answer": "Form 130 is the advance income tax payment for self-employed workers under direct estimation. It is filed quarterly: by 20 April, 20 July, 20 October and 30 January of the following year. You pay 20% of the year's accumulated net profit, minus what was already paid in previous quarters.",
+        "cta": "Let an accountant file your taxes"
       },
-      "fields": {
-        "charCount": "{{current}}/{{max}} characters",
-        "cifFormat": "Format: B12345678",
-        "nifFormat": "Format: 12345678A",
-        "phoneFormats": "Valid formats: 612345678 or +34612345678",
-        "selectOption": "Select an option",
-        "specifyActivity": "Specify your activity"
+      "pluriactividad": {
+        "question": "Can I be self-employed and an employee at the same time?",
+        "answer": "Yes, it's called pluriactividad. You can combine salaried employment with self-employed activity. Social Security refunds up to 50% of the self-employed contribution during the first 18 months if your salary as an employee exceeds the minimum wage (SMI).",
+        "cta": "Work out the refund you're entitled to"
       },
-      "plan": {
-        "selected": "Selected plan:",
-        "mostPopular": "Most Popular",
-        "freeTrial": "🎁 7 days free",
-        "firstMonthPrice": "€1 <muted>for the first month</muted>",
-        "thenPrice": "Then €13/month · No commitment",
-        "fullAccess": "Full access to the professional platform",
-        "featureSearch": "Appear in every search",
-        "featureProfile": "Complete professional profile with photos",
-        "securePayment": "🔒 Secure payment processed by Stripe"
+      "bajaAutonomo": {
+        "question": "How do I deregister as self-employed?",
+        "answer": "To deregister you must file the deregistration with the Tax Agency (form 036/037) and with Social Security (form TA.0521) within a maximum of 3 days from ceasing activity. Missing the deadline can lead to penalties. You are still required to file the returns for the current quarter.",
+        "cta": "Let an accountant handle your deregistration"
       },
-      "nav": {
-        "back": "Back",
-        "continueToPayment": "Continue to payment",
-        "continue": "Continue"
+      "encontrarAutonomo": {
+        "question": "How do I find a trustworthy self-employed professional near me?",
+        "answer": "To find a reliable professional check that they are registered under RETA (you can ask for the certificate), have liability insurance, reviews from other clients, a detailed written quote before starting, and always issue an invoice. On MisAutónomos every professional is verified.",
+        "cta": "Find verified professionals in my area"
       },
-      "footer": {
-        "secure": "🔒 Your data is safe and protected • You can cancel at any time"
+      "cuantoCobra": {
+        "question": "How much does a self-employed professional charge per hour in Spain in 2026?",
+        "answer": "Rates vary a lot by trade: a plumber or electrician bills between €30 and €50/hour, a freelance developer between €35 and €80/hour, a designer between €25 and €60/hour, an accountancy firm between €60 and €150/hour, a self-employed lawyer between €80 and €200/hour. Always ask for a fixed quote to avoid surprises.",
+        "cta": "Get free quotes from several professionals"
+      },
+      "facturaObligatoria": {
+        "question": "Is a self-employed professional required to give me an invoice?",
+        "answer": "Yes, every self-employed worker is legally required to issue an invoice for each service provided. If they refuse, you can report it to the Tax Agency. The invoice is your legal guarantee that the service was provided and, where applicable, lets you deduct VAT if you are a company or self-employed.",
+        "cta": "Work with professionals who always invoice"
+      },
+      "noTermina": {
+        "question": "What can I do if a professional doesn't finish the job or disappears?",
+        "answer": "Gather all the evidence (contract, signed quotes, messages, payments), send a burofax with a deadline to comply, and if there's no response you can file a consumer complaint (if you're a private individual) or a lawsuit. To avoid this risk, always hire professionals with verified reviews and never pay 100% up front.",
+        "cta": "Hire verified professionals with a guarantee"
+      },
+      "autonomoVsEmpresa": {
+        "question": "Is a self-employed professional cheaper than a company?",
+        "answer": "Generally yes, a self-employed professional tends to be cheaper because they have lower overheads. But there are important differences: a company usually offers more formal guarantees, greater capacity for large projects and continuity. For one-off and mid-sized jobs, a self-employed professional is the most cost-effective option.",
+        "cta": "Compare quotes from professionals in your area"
+      },
+      "queEs": {
+        "question": "What is MisAutónomos and how does it work?",
+        "answer": "MisAutónomos is a platform that connects clients with verified self-employed professionals across Spain. Clients post what they need, professionals send quotes, and after comparing, the client picks the one they prefer. For professionals it's a way to win new clients without spending on advertising.",
+        "cta": "Sign up for free"
+      },
+      "esGratis": {
+        "question": "Is it free to sign up to MisAutónomos as a professional?",
+        "answer": "Yes, signing up as a professional on MisAutónomos is completely free with no commitment. You can create your professional profile, receive quote requests and work with clients without paying anything. We offer optional paid plans (Visibility and Ads+) for professionals who want to stand out in search results.",
+        "cta": "Sign me up for free as a professional"
+      },
+      "planes": {
+        "question": "What do the Visibility Plan and the Ads+ Plan include?",
+        "answer": "The Visibility Plan highlights your profile in search results and gives you access to visit statistics. The Ads+ Plan includes all of that plus active advertising campaigns managed by our team, priority ranking in your area and dedicated support. Both plans can be cancelled at any time."
+      },
+      "verificacion": {
+        "question": "How are professionals verified on MisAutónomos?",
+        "answer": "We verify every professional by checking their RETA registration, tax ID (NIF/DNI), real contact details and, in regulated trades, their qualification or licence. Verified profiles show a specific badge. This gives clients peace of mind and sets serious professionals apart.",
+        "cta": "Verify your profile"
+      },
+      "solicitudes": {
+        "question": "How do I receive quote requests on MisAutónomos?",
+        "answer": "When a client posts a need in your category and area, you get an alert by email and in your platform dashboard. You decide whether to send a quote. The more complete your profile (photo, description, work examples, reviews), the more requests you'll receive. Complete profiles receive up to 5 times more requests.",
+        "cta": "Complete your profile now"
       }
+    },
+    "page": {
+      "seoTitle": "FAQ about self-employed workers in Spain | MisAutónomos",
+      "seoDescription": "Answers to your questions about registering as self-employed, hiring professionals, contributions, invoicing and much more. Guide updated for 2026.",
+      "badge": "Guide updated for 2026",
+      "subtitle": "Answers to your questions about self-employment in Spain: registration, taxes, contributions and how to find the right professional.",
+      "searchPlaceholder": "Search your question...",
+      "results_one": "{{count}} result for \"{{term}}\"",
+      "results_other": "{{count}} results for \"{{term}}\"",
+      "noResults": "No results found",
+      "noResultsHint": "Try different words",
+      "viewAll": "View all questions",
+      "questionCount_one": "{{count}} question",
+      "questionCount_other": "{{count}} questions",
+      "ctaTitle": "Can't find your answer?",
+      "ctaSubtitle": "Talk directly to a professional in your area or contact us.",
+      "findPro": "Find a professional",
+      "viewPlans": "See plans and pricing"
     }
   },
-  "premium": {
-    "dashboard": {
-      "title": "Premium Dashboard",
-      "activeSubtitle": "Enjoy every perk of your plan",
-      "inactiveSubtitle": "Upgrade your plan to unlock every feature",
-      "badge": "Premium",
-      "checks": {
-        "businessName": "Professional name",
-        "shortDescription": "Short description",
-        "fullDescription": "Detailed description",
-        "categories": "Categories",
-        "workPhotos": "Photos of your work",
-        "serviceArea": "Service area",
-        "paymentMethods": "Payment methods"
+  "forPros": {
+    "seo": {
+      "title": "Join MisAutónomos as a freelancer — Show up in your area, no commissions",
+      "description": "Get visibility as a freelancer in Spain. Verified identity, direct contact with clients and zero commissions per job."
+    },
+    "hero": {
+      "eyebrow": "For freelancers in Spain",
+      "title": "Show up where your clients are looking.",
+      "titleHighlight": "No commissions.",
+      "subtitle": "MisAutónomos puts you in front of the people who need your trade in your area. Direct contact, verified identity, tools to run your schedule. You do the work; we bring you the clients."
+    },
+    "benefits": {
+      "eyebrow": "Why freelancers choose MisAutónomos",
+      "title": "What a platform for freelancers should get right.",
+      "verified": {
+        "body": "We check your DNI/NIE, phone and trade before publishing your profile. Clients trust you more and you answer real requests."
       },
-      "features": {
-        "featuredProfile": "Featured profile",
-        "featuredProfileText": "Show up at the top of search results",
-        "badge": "Premium badge",
-        "badgeText": "A visible badge that builds trust",
-        "advancedStats": "Advanced statistics",
-        "advancedStatsText": "Detailed metrics for your profile",
-        "moreVisibility": "More visibility",
-        "moreVisibilityText": "Multiply your business opportunities"
+      "noFees": {
+        "title": "No commissions per job",
+        "body": "You negotiate and get paid directly. We don't take a cut of the quote or charge per contact."
       },
-      "metrics": {
-        "views": "Profile visits (30 days)",
-        "perDay": "~{{views}} per day",
-        "messages": "Messages received",
-        "last30Days": "Last 30 days",
-        "searches": "Search appearances",
-        "contacts": "Contact clicks",
-        "contactsHint": "Phone, WhatsApp, etc."
+      "directContact": {
+        "body": "Chat, phone and WhatsApp. The client decides how to reach you. No middlemen."
       },
-      "locked": {
-        "title": "Unlock your statistics",
-        "text": "With a premium plan you can see all your metrics and optimise your profile",
-        "viewPlans": "See premium plans"
+      "promotion": {
+        "title": "We promote you",
+        "body": "We invest in social media and Google ads to bring you clients in your area. At no cost to you."
       },
-      "completeness": {
-        "title": "Profile completeness",
-        "percent": "{{percent}}% complete",
-        "excellent": "Excellent!",
-        "good": "Good progress",
-        "addMore": "Add more information",
-        "missingIntro": "Complete these items to improve your visibility:"
+      "reviews": {
+        "body": "Only clients who have contacted you can leave a review. Every real review moves you up the rankings."
       },
-      "benefits": {
-        "title": "Your plan's perks",
-        "activate": "Activate premium plan"
-      },
-      "tips": {
-        "photosTitle": "📸 Add more photos",
-        "photosText": "Profiles with 5+ photos get 80% more contacts",
-        "replyTitle": "⚡ Reply fast",
-        "replyText": "Replying within 1 hour improves your ranking",
-        "reviewsTitle": "⭐ Ask for reviews",
-        "reviewsText": "Reviews build trust and boost conversions"
+      "fast": {
+        "title": "Profile live in minutes",
+        "body": "Sign up in under 10 minutes. No lock-in, no card until you decide."
       }
+    },
+    "steps": {
+      "createAccount": {
+        "title": "Create your account",
+        "body": "Email and password. Pick the \"I'm a freelancer\" role and go straight to profile setup."
+      },
+      "completeProfile": {
+        "title": "Complete your profile"
+      },
+      "receiveClients": {
+        "title": "Get clients",
+        "body": "You show up at /categoria/<trade>-en-<city>. Clients reach you by chat, phone or WhatsApp."
+      }
+    },
+    "differences": {
+      "eyebrow": "How we differ from other platforms",
+      "title": "What we DON'T do.",
+      "noPerContact": "We don't charge for each contact you receive.",
+      "noCut": "We don't take a percentage of your quote.",
+      "noDataSale": "We don't sell your data.",
+      "noAnonymousReviews": "We don't allow anonymous or unverified reviews.",
+      "noLockIn": "We don't lock you in if you decide to leave.",
+      "noFalsePromises": "We don't promise clients we can't bring."
+    },
+    "faq": {
+      "title": "What people usually ask us.",
+      "cost": {
+        "q": "How much does it cost?",
+        "a": "There's a permanent free plan to get started. The Pro and Ads+ plans add visibility and tools; no lock-in."
+      },
+      "verified": {
+        "q": "What does \"verified\" mean?",
+        "a": "We check your DNI/NIE, phone and trade. Once you pass, a visible badge shows on your profile and in search results."
+      },
+      "badReviews": {
+        "q": "What happens if I get bad reviews?",
+        "a": "Reviews come from clients who have contacted you. If you collect three verified negative reviews, your profile is deactivated automatically."
+      },
+      "cancel": {
+        "q": "Can I cancel?",
+        "a": "Yes, whenever you want from your dashboard. No lock-in, no penalties."
+      }
+    },
+    "finalCta": {
+      "title": "Ready to show up where they're looking for you?",
+      "body": "We get you set up in minutes. No card, no lock-in."
+    }
+  },
+  "contact": {
+    "seo": {
+      "title": "Contact · MisAutónomos",
+      "description": "Questions, suggestions or need help? Write to hola@misautonomos.es or use the form. We reply within 24 working hours."
+    },
+    "validation": {
+      "nameRequired": "Enter your name.",
+      "emailInvalid": "Enter a valid email.",
+      "messageTooShort": "Tell us a bit more (at least 10 characters)."
+    },
+    "hero": {
+      "eyebrow": "We're here to help",
+      "title": "Talk to us",
+      "subtitle": "Questions about the platform, signing up as a freelancer, issues with a profile or suggestions. We reply within 24 working hours."
+    },
+    "form": {
+      "title": "Send us a message",
+      "subtitle": "Only the essential fields. No spam.",
+      "topic": "Subject",
+      "topics": {
+        "general": "General information",
+        "pro": "I'm a freelancer — sign-up / profile",
+        "client": "I'm a client — I need a service",
+        "issue": "Report an issue",
+        "press": "Press / partnerships"
+      },
+      "message": "Message",
+      "messagePlaceholder": "Tell us how we can help.",
+      "sending": "Sending…",
+      "sent": "Message received. We'll reply to {{email}}.",
+      "orEmail": "Or write to us at <link>{{email}}</link>"
+    },
+    "aside": {
+      "responseTime": "Reply within 24 working hours.",
+      "supportTitle": "Account support",
+      "supportBody": "If you already have an account, write to us from your dashboard so we can help you faster.",
+      "proBody": "Sign up for free and show up where your clients are looking.",
+      "proCta": "See how it works"
+    }
+  },
+  "category": {
+    "seo": {
+      "titleCity": "{{category}} in {{city}} - MisAutónomos",
+      "title": "{{category}} - Find verified freelancers | MisAutónomos",
+      "descriptionCity": "Find verified {{category}} in {{city}}. Contact them directly and request a free quote.",
+      "description": "Directory of freelance {{category}} in Spain. Compare prices, read reviews and get in touch for free."
+    },
+    "heading": {
+      "inCity": "{{category}} in {{city}}",
+      "inSpain": "{{category}} in Spain"
+    },
+    "loading": "Searching for professionals…",
+    "available_one": "{{count}} professional available",
+    "available_other": "{{count}} professionals available",
+    "filter": {
+      "selectCity": "Select a city",
+      "allSpain": "All of Spain"
+    },
+    "empty": {
+      "titleCity": "Be the first {{category}} in {{city}} on MisAutónomos",
+      "title": "Be the first {{category}} on MisAutónomos",
+      "body": "We're growing. If you set up your profile now, you'll show first when someone searches for this trade. No lock-in, no commissions.",
+      "allTrades": "See all trades",
+      "otherCity": "Looking for {{category}} in another city?",
+      "viewAllSpain": "See {{category}} across Spain"
+    },
+    "cta": {
+      "title": "Are you a {{category}}?",
+      "body": "Sign up and get more clients",
+      "button": "Register as a professional"
+    }
+  },
+  "newsletter": {
+    "backHome": "Back to home",
+    "unsubscribe": {
+      "processing": "Processing...",
+      "title": "You've been unsubscribed",
+      "bodyEmail": "You won't receive marketing emails at <strong>{{email}}</strong> anymore.",
+      "body": "You won't receive any more marketing emails.",
+      "transactionalNoteLong": "You'll still receive important transactional notifications (confirmations, account notifications, etc.).",
+      "transactionalNote": "You'll still receive important transactional notifications.",
+      "resubscribe": "Reactivate subscription",
+      "resubscribedTitle": "You're back on the list!",
+      "resubscribedBody": "You'll receive our marketing emails again.",
+      "errorBodySupport": "We couldn't process your request. Please try again or contact support.",
+      "errorBody": "We couldn't process your request. Please try again.",
+      "notFoundTitle": "Email not found",
+      "notFoundBody": "We couldn't find this email in our system.",
+      "notFoundBodyAlt": "We couldn't find this email in our system."
+    },
+    "baja": {
+      "seoTitle": "Newsletter unsubscribe · MisAutónomos",
+      "loadingTitle": "Processing your unsubscribe…",
+      "loadingBody": "One moment.",
+      "successBodyEmail": "You won't receive any more newsletter emails at {{email}}.",
+      "successBody": "You won't receive any more newsletter emails.",
+      "alreadyTitle": "You were already unsubscribed",
+      "alreadyBodyEmail": "{{email}} doesn't receive our newsletter.",
+      "alreadyBody": "Your email no longer receives our newsletter.",
+      "notFoundTitle": "Invalid link",
+      "notFoundBody": "We couldn't find this unsubscribe link. It may have expired.",
+      "noTokenTitle": "Missing token",
+      "noTokenBody": "This unsubscribe link doesn't include the identifier. Use the link from the email you received.",
+      "errorBody": "We couldn't process your unsubscribe. Try again or write to us at hola@misautonomos.es.",
+      "resubscribeHint": "Unsubscribed by mistake? You can subscribe again anytime from the footer."
+    },
+    "signup": {
+      "invalidEmail": "Enter a valid email.",
+      "alreadySubscribed": "This email is already subscribed.",
+      "error": "Something went wrong. Please try again later.",
+      "footerTitle": "Subscribe to our newsletter",
+      "footerSubtitle": "Practical tips and news once a month",
+      "thanks": "Thanks! Check your email.",
+      "button": "Subscribe",
+      "consent": "By subscribing you agree to receive our newsletter. You can unsubscribe at any time.",
+      "blogTitle": "Get the best of the blog in your inbox",
+      "blogSubtitle": "New articles, tax guides and practical tips, once a month.",
+      "both": "Both"
+    }
+  },
+  "legal": {
+    "notice": {
+      "seoDescription": "Legal notice of the MisAutónomos platform",
+      "title": "Legal Notice",
+      "updated": "Last updated: January 15, 2025",
+      "sections": {
+        "identification": {
+          "title": "1. Identifying Information",
+          "text": "In compliance with article 10 of Law 34/2002 on Information Society Services and Electronic Commerce, we inform: Owner: Astra Invest and Finance S.L., Tax ID: B10865418, Address: Calle Andalucía 18, Melilla, Spain, Email: info@misautonomos.es, Website: https://misautonomos.es"
+        },
+        "purpose": {
+          "title": "2. Purpose",
+          "text": "This legal notice regulates the use of the MisAutónomos website (hereinafter, the website). Browsing the website grants user status and implies full acceptance of all provisions included in this legal notice."
+        },
+        "termsOfUse": {
+          "title": "3. Terms of Use",
+          "text": "The user agrees to use the website and its services in accordance with the law, this legal notice, and good practices. Use of the website for unlawful purposes or that harm MisAutónomos or third parties is prohibited."
+        },
+        "intellectualProperty": {
+          "title": "4. Intellectual and Industrial Property",
+          "text": "All website content (texts, images, trademarks, logos, source code, graphic design) is property of MisAutónomos or third parties who have authorized its use. All rights thereto are reserved."
+        },
+        "liability": {
+          "title": "5. Liability",
+          "text": "MisAutónomos is not responsible for: (a) Technical availability and continuity of the website, (b) Information or content published by users, (c) Services provided by professionals to clients, (d) Damages arising from improper use of the website."
+        },
+        "links": {
+          "title": "6. Links",
+          "text": "The website may contain links to third-party websites. MisAutónomos does not control and is not responsible for the content, privacy policies or practices of such external websites."
+        },
+        "dataProtection": {
+          "title": "7. Data Protection",
+          "text": "For information on how we process your personal data, see our Privacy Policy."
+        },
+        "applicableLaw": {
+          "title": "8. Applicable Law",
+          "text": "This legal notice is governed by Spanish law. For any dispute, the jurisdiction of Madrid, Spain shall be competent."
+        },
+        "contact": {
+          "title": "9. Contact",
+          "text": "For legal communications: info@misautonomos.es"
+        }
+      },
+      "contactLead": "For legal communications"
+    },
+    "privacy": {
+      "seoDescription": "Learn how we protect your personal data at MisAutónomos",
+      "title": "Privacy Policy",
+      "updated": "Last updated: January 15, 2025",
+      "sections": {
+        "controller": {
+          "title": "1. Data Controller",
+          "text": "MisAutónomos is responsible for processing your personal data. Our commitment is to protect your privacy and ensure the security of your information."
+        },
+        "dataCollected": {
+          "title": "2. Data We Collect",
+          "text": "We collect the following information: (a) Identification data: name, email, phone, (b) Professional data: CIF/NIF, service categories, location, (c) Usage data: platform interactions, messages, favorites, (d) Payment data: billing information managed by Stripe."
+        },
+        "purpose": {
+          "title": "3. Purpose of Processing",
+          "text": "We use your data to: (a) Provide and improve our services, (b) Facilitate connection between clients and professionals, (c) Process payments and subscriptions, (d) Send service-related communications, (e) Comply with legal obligations."
+        },
+        "legalBasis": {
+          "title": "4. Legal Basis",
+          "text": "We process your data based on: (a) Performance of service contract, (b) User consent, (c) Legitimate interest of MisAutónomos, (d) Compliance with legal obligations."
+        },
+        "sharing": {
+          "title": "5. Data Sharing",
+          "text": "Your data may be shared with: (a) Professionals/clients you interact with, (b) Stripe for payment processing, (c) Technical service providers (hosting, email), (d) Authorities when legally required."
+        },
+        "retention": {
+          "title": "6. Data Retention",
+          "text": "We retain your data while: (a) You maintain your active account, (b) It's necessary to comply with legal obligations, (c) Pending claims exist. After deleting your account, your data will be erased within 30 days."
+        },
+        "rights": {
+          "title": "7. Your Rights",
+          "text": "You have the right to: (a) Access your personal data, (b) Rectify incorrect data, (c) Request deletion of your data, (d) Object to processing, (e) Data portability, (f) Revoke consent. To exercise your rights, contact: soporte@misautonomos.es"
+        },
+        "security": {
+          "title": "8. Security",
+          "text": "We implement technical and organizational measures to protect your data against unauthorized access, alteration, disclosure or destruction. We use SSL encryption, secure authentication and protected storage."
+        },
+        "cookies": {
+          "title": "9. Cookies",
+          "text": "We use cookies to improve your experience. You can manage cookie preferences in our Cookie Policy."
+        },
+        "changes": {
+          "title": "10. Policy Changes",
+          "text": "We may update this policy occasionally. We will notify you about significant changes by email or notice on the platform."
+        },
+        "contact": {
+          "title": "11. Contact",
+          "text": "For privacy inquiries: soporte@misautonomos.es"
+        }
+      },
+      "contactLead": "To exercise your rights or privacy inquiries"
+    },
+    "terms": {
+      "seoDescription": "Read our terms and conditions for using the MisAutónomos platform",
+      "title": "Terms and Conditions",
+      "updated": "Last updated: January 15, 2025",
+      "sections": {
+        "acceptance": {
+          "title": "1. Acceptance of Terms",
+          "text": "By accessing and using MisAutónomos, you agree to be legally bound by these terms and conditions. If you do not agree with any part of these terms, you should not use our services."
+        },
+        "service": {
+          "title": "2. Service Description",
+          "text": "MisAutónomos is a digital platform that connects clients with verified freelance professionals in Spain. We facilitate contact between both parties but are not responsible for the quality, safety or legality of services provided by professionals."
+        },
+        "accounts": {
+          "title": "3. User Registration and Accounts",
+          "text": "To use certain services, you must create an account providing accurate and up-to-date information. You are responsible for maintaining the confidentiality of your account and password, and for all activities that occur under your account."
+        },
+        "proObligations": {
+          "title": "4. Professional Obligations",
+          "text": "Professionals who register on MisAutónomos must: (a) Be legally authorized to work as freelancers in Spain, (b) Provide truthful and verifiable information, (c) Keep their profile and availability updated, (d) Comply with all applicable laws and regulations."
+        },
+        "clientObligations": {
+          "title": "5. Client Obligations",
+          "text": "Clients using MisAutónomos must: (a) Provide accurate information about required services, (b) Communicate respectfully with professionals, (c) Comply with agreements established with professionals."
+        },
+        "subscriptions": {
+          "title": "6. Subscriptions and Payments",
+          "text": "Professionals must maintain an active subscription to appear in searches. Subscriptions renew automatically unless canceled before the renewal date. Payments are processed through Stripe. All prices include VAT when applicable."
+        },
+        "userContent": {
+          "title": "7. User Content",
+          "text": "You retain all rights to content you publish on MisAutónomos. However, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce and display such content in connection with the operation of our services."
+        },
+        "intellectualProperty": {
+          "title": "8. Intellectual Property",
+          "text": "All content on MisAutónomos, including but not limited to text, graphics, logos, icons, images and software, is property of MisAutónomos or its licensors and is protected by Spanish and international intellectual property laws."
+        },
+        "liability": {
+          "title": "9. Limitation of Liability",
+          "text": "MisAutónomos acts only as an intermediary. We are not responsible for: (a) Quality, safety or legality of services offered, (b) Truthfulness of professional profiles, (c) Direct or indirect damages arising from platform use, (d) Disputes between clients and professionals."
+        },
+        "termination": {
+          "title": "10. Suspension and Termination",
+          "text": "We reserve the right to suspend or terminate your account if: (a) You violate these terms, (b) You provide false information, (c) You use the platform for illegal activities, (d) You abuse or harass other users."
+        },
+        "modifications": {
+          "title": "11. Modifications",
+          "text": "We may modify these terms at any time. Changes will take effect immediately after publication on the platform. Continued use of the service constitutes acceptance of the modified terms."
+        },
+        "law": {
+          "title": "12. Applicable Law and Jurisdiction",
+          "text": "These terms shall be governed and interpreted in accordance with the laws of Spain. Any dispute shall be subject to the exclusive jurisdiction of the courts of Madrid, Spain."
+        },
+        "contact": {
+          "title": "13. Contact",
+          "text": "For any questions about these terms, you can contact us at: soporte@misautonomos.es"
+        }
+      },
+      "contactLead": "For any questions, contact us at"
+    }
+  },
+  "account": {
+    "delete": {
+      "button": "Delete my account",
+      "confirmPrompt": "Type ELIMINAR to confirm",
+      "error": "The account couldn't be deleted.",
+      "success": "Account deleted.",
+      "title": "Delete your account?",
+      "subtitle": "This action is permanent and can't be undone.",
+      "loseIntro": "If you continue you'll lose:",
+      "loseProfile": "Your professional profile and public data.",
+      "loseConversations": "All your conversations, reviews and tickets.",
+      "loseSubscriptions": "Active subscriptions (no refund for the current period).",
+      "confirm": "Delete permanently"
+    }
+  },
+  "supportChat": {
+    "talkToSupport": "Talk to support",
+    "supportTeam": "MisAutónomos Support",
+    "responseTime": "We respond as soon as possible",
+    "supportInbox": "Support Inbox",
+    "selectConversation": "Select a conversation to reply",
+    "conversationsCount": "{{count}} conversations",
+    "needHelp": "Need help?",
+    "helpDescription": "Our team responds within 24 hours. Write to us and we'll help you with anything related to your account, payments, invoices, or platform functionality.",
+    "startSupportChat": "Start support chat",
+    "contactSupport": "Contact support",
+    "newTicketDesc": "Create a new support ticket and our team will respond as soon as possible",
+    "ticketType": "Type of inquiry",
+    "ticketTypeTechnical": "Technical issue",
+    "ticketTypeBilling": "Billing",
+    "ticketTypeComplaint": "Complaint",
+    "ticketTypeOther": "Other",
+    "ticketSubject": "Subject",
+    "ticketMessage": "Message",
+    "sendTicket": "Send",
+    "fieldRequired": "Please fill in all required fields",
+    "errorCreatingTicket": "Error creating ticket",
+    "errorLoadingUser": "Error loading your information",
+    "myTickets": "My tickets",
+    "supportSubtitle": "Help and support tickets",
+    "newTicket": "New ticket",
+    "noTicketsYet": "No tickets yet",
+    "createFirstTicket": "Create your first support ticket",
+    "supportMisautonomos": "MisAutónomos Support",
+    "typeYourReply": "Type your reply...",
+    "supportRepliedTitle": "💬 Support has replied"
+  },
+  "blog": {
+    "editor": {
+      "category": {
+        "legalFiscal": "Legal & tax",
+        "tools": "Tools",
+        "news": "News"
+      },
+      "upload": {
+        "notImage": "The file must be an image",
+        "tooLarge": "Image too large (max. 5 MB)",
+        "success": "Image uploaded",
+        "error": "Upload error: {{message}}",
+        "remove": "Remove image",
+        "uploading": "Uploading…",
+        "button": "Upload image",
+        "urlPlaceholder": "…or paste a URL"
+      },
+      "unknownError": "unknown",
+      "validation": {
+        "titleRequired": "The Spanish title is missing.",
+        "slugRequired": "The slug is missing.",
+        "slugFormat": "The slug can only contain lowercase letters, numbers and hyphens.",
+        "slugExists": "That slug is already used by \"{{title}}\".",
+        "contentTooShort": "The Spanish content is too short (minimum 50 characters)."
+      },
+      "saved": {
+        "published": "Article published",
+        "scheduled": "Scheduled for {{date}}",
+        "draft": "Draft saved"
+      },
+      "saveError": "Save error: {{message}}",
+      "tabs": {
+        "content": "Content",
+        "meta": "Metadata",
+        "seo": "SEO",
+        "author": "Author",
+        "publish": "Publishing",
+        "related": "Related"
+      },
+      "editArticle": "Edit article",
+      "newArticle": "New article",
+      "saveDraft": "Save draft",
+      "publishButton": "Publish",
+      "content": {
+        "titleEs": "Title (ES) *",
+        "titleEsPlaceholder": "Article title in Spanish",
+        "titleEn": "Title (EN)",
+        "titleEnPlaceholder": "Article title in English",
+        "excerptEs": "Excerpt (ES)",
+        "excerptEsPlaceholder": "Short description (≤160 characters)",
+        "excerptEn": "Excerpt (EN)",
+        "excerptEnPlaceholder": "Short description in English",
+        "bodyLabel": "Content ({{lang}})",
+        "bodyEsPlaceholder": "Write the article body in Spanish…",
+        "bodyEnPlaceholder": "Write the body in English…",
+        "readTimeEstimate": "Estimated reading time: ~{{minutes}} min"
+      },
+      "meta": {
+        "slug": "Slug (URL) *",
+        "slugPlaceholder": "my-example-article",
+        "regenerateSlug": "Regenerate from title",
+        "category": "Category",
+        "tags": "Tags (comma-separated)",
+        "tagsHint": "E.g. freelancers, tax, irpf",
+        "tagsPlaceholder": "freelancers, tax, irpf",
+        "readTime": "Reading time (minutes)"
+      },
+      "seo": {
+        "metaTitleEs": "Meta title (ES)",
+        "metaTitleEsPlaceholder": "{{title}} | Blog MisAutónomos",
+        "metaDescriptionEs": "Meta description (ES)",
+        "metaDescriptionEsPlaceholder": "Description for search engines (max. 160)",
+        "metaTitleEn": "Meta title (EN)",
+        "metaTitleEnPlaceholder": "{{title}} | MisAutónomos Blog",
+        "metaDescriptionEn": "Meta description (EN)",
+        "metaDescriptionEnPlaceholder": "SEO description in English (max 160)",
+        "charCount": "{{length}}/{{max}} characters",
+        "ogImage": "Open Graph image (1200×630 recommended)",
+        "ogImageAlt": "Open Graph image"
+      },
+      "author": {
+        "name": "Author name",
+        "avatar": "Avatar",
+        "bio": "Author bio"
+      },
+      "publish": {
+        "featuredImage": "Featured image",
+        "featuredImageHint": "Shown in the article header and in the blog listing.",
+        "status": "Status",
+        "date": "Publish date",
+        "dateHint": "If the date is in the future, the status switches to 'Scheduled' when you click Publish.",
+        "featured": "Featured article (shown up front)"
+      },
+      "status": {
+        "scheduled": "Scheduled",
+        "published": "Published",
+        "archived": "Archived"
+      },
+      "related": {
+        "title": "Related articles (max. 3)",
+        "maxReached": "Maximum 3 related articles",
+        "empty": "There are no other articles yet."
+      }
+    },
+    "list": {
+      "seo": {
+        "title": "MisAutónomos Blog · Guides and tips for freelancers in Spain",
+        "description": "Tax, tools and best practices for freelancers. Plus tips for clients hiring professionals."
+      },
+      "hero": {
+        "title": "What matters to freelancers and to the people who hire them",
+        "subtitle": "No filler. Short guides, tax explained in plain language and tools we actually use."
+      },
+      "searchPlaceholder": "Search articles...",
+      "allCategories": "All",
+      "empty": "No articles match your search.",
+      "featured": "Featured",
+      "readTime": "{{minutes}} min",
+      "readArticle": "Read the article"
+    },
+    "post": {
+      "notFound": "Article not found",
+      "backToBlogArrow": "← Back to the blog",
+      "backToBlog": "Back to the blog",
+      "metaTitle": "{{title}} | MisAutónomos Blog",
+      "defaultAuthor": "MisAutónomos team",
+      "readTime": "{{minutes}} min read",
+      "toc": "Table of contents",
+      "tocShort": "Contents",
+      "share": "Found it useful? Share it:",
+      "cta": {
+        "title": "Are you a freelancer? Show up where they're looking for you",
+        "body": "Create your profile in minutes, get clients and manage everything in one place. No commissions.",
+        "button": "How it works for freelancers"
+      },
+      "related": "Related articles"
+    }
+  },
+  "verification": {
+    "toasts": {
+      "fileTooLarge": "The file can't be larger than 8MB",
+      "frontRequired": "Upload the front of your ID document",
+      "backRequired": "Upload the back of your ID document",
+      "selfieRequired": "Upload a selfie holding your ID document",
+      "submitted": "Request sent! We'll review it within 24-48h.",
+      "submitError": "Error sending. Please try again."
+    },
+    "form": {
+      "title": "Verify identity",
+      "privacyNote": "Your documents are stored securely and will only be seen by platform administrators. We never share them with third parties.",
+      "documentType": "Document type",
+      "passport": "Passport",
+      "frontLabel": "Front of the document *",
+      "uploadFront": "Upload front photo",
+      "backLabel": "Back of the document *",
+      "uploadBack": "Upload back photo",
+      "selfieLabel": "Selfie holding the document *",
+      "uploadSelfie": "Upload selfie with document",
+      "submit": "Submit for verification"
+    },
+    "approved": {
+      "subtitle": "Your verified badge is active on your profile"
+    },
+    "pending": {
+      "title": "Verification under review",
+      "subtitle": "We'll review your documents within 24-48h"
+    },
+    "rejected": {
+      "reason": "Reason: {{reason}}",
+      "retry": "Try again"
+    },
+    "idle": {
+      "title": "Verify your identity",
+      "subtitle": "Get the verified badge and you'll be able to leave reviews",
+      "cta": "Verify"
+    },
+    "banner": {
+      "title": "🛡️ Verify your identity and appear as Verified",
+      "body": "Verified profiles get up to <strong>3× more contacts</strong>. It only takes 2 minutes.",
+      "cta": "Verify now →",
+      "close": "Close banner"
+    },
+    "modal": {
+      "benefits": {
+        "searches": "You appear as Verified in searches",
+        "trust": "Clients trust you more and contact you more",
+        "reviews": "You can leave and receive verified reviews"
+      },
+      "title": "Activate your Verified badge",
+      "body": "Your profile is active, but clients prioritise verified profiles. Verifying your identity only takes <strong>2 minutes</strong>.",
+      "cta": "Verify now — It's free"
+    },
+    "toast": {
+      "rejected": "Verification rejected"
     }
   }
 }

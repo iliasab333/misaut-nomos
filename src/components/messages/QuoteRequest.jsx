@@ -6,8 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { FileText, CheckCircle, XCircle, Clock, Euro, Calendar, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 export default function QuoteRequest({ quote, isProfessional, isClient, onRespond, onStatusChange }) {
+  const { t } = useTranslation();
   const [responding, setResponding] = useState(false);
   const [quoteAmount, setQuoteAmount] = useState("");
   const [quoteNotes, setQuoteNotes] = useState("");
@@ -15,10 +17,10 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
   const [breakdown, setBreakdown] = useState([{ concept: "", amount: "" }]);
 
   const statusConfig = {
-    pending: { icon: Clock, color: "bg-yellow-100 text-yellow-800", label: "Pendiente" },
-    accepted: { icon: CheckCircle, color: "bg-green-100 text-green-800", label: "Aceptado" },
-    rejected: { icon: XCircle, color: "bg-red-100 text-red-800", label: "Rechazado" },
-    completed: { icon: CheckCircle, color: "bg-blue-100 text-blue-800", label: "Completado" }
+    pending: { icon: Clock, color: "bg-yellow-100 text-yellow-800", label: t('quotes.status.pending') },
+    accepted: { icon: CheckCircle, color: "bg-green-100 text-green-800", label: t('quotes.status.accepted') },
+    rejected: { icon: XCircle, color: "bg-red-100 text-red-800", label: t('quotes.status.rejected') },
+    completed: { icon: CheckCircle, color: "bg-blue-100 text-blue-800", label: t('quotes.status.completed') }
   };
 
   const status = statusConfig[quote.status || "pending"];
@@ -69,7 +71,7 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-blue-600" />
-            <CardTitle className="text-base">Solicitud de presupuesto</CardTitle>
+            <CardTitle className="text-base">{t('quotes.chat.requestTitle')}</CardTitle>
           </div>
           <Badge className={status.color}>
             <StatusIcon className="w-3 h-3 mr-1" />
@@ -79,14 +81,14 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
       </CardHeader>
       <CardContent className="space-y-3">
         <div>
-          <p className="text-sm font-medium text-gray-700 mb-1">Descripción</p>
+          <p className="text-sm font-medium text-gray-700 mb-1">{t('description')}</p>
           <p className="text-sm text-gray-600">{quote.description}</p>
         </div>
 
         {quote.budget && (
           <div className="flex items-center gap-2 text-sm">
             <Euro className="w-4 h-4 text-gray-500" />
-            <span className="text-gray-700">Presupuesto estimado:</span>
+            <span className="text-gray-700">{t('quotes.fields.estimatedBudget')}</span>
             <span className="font-semibold text-gray-900">{quote.budget}€</span>
           </div>
         )}
@@ -94,7 +96,7 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
         {quote.deadline && (
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="w-4 h-4 text-gray-500" />
-            <span className="text-gray-700">Fecha límite:</span>
+            <span className="text-gray-700">{t('quotes.chat.deadline')}</span>
             <span className="font-semibold text-gray-900">{format(new Date(quote.deadline), 'dd/MM/yyyy')}</span>
           </div>
         )}
@@ -102,13 +104,13 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
         {quote.professional_responded && quote.quote_amount && (
           <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-base font-bold text-blue-900">Presupuesto Profesional</p>
+              <p className="text-base font-bold text-blue-900">{t('quotes.chat.professionalQuote')}</p>
               <p className="text-2xl font-bold text-blue-900">{quote.quote_amount}€</p>
             </div>
 
             {quote.breakdown && quote.breakdown.length > 0 && (
               <div className="space-y-2 mb-3">
-                <p className="text-xs font-semibold text-blue-700 uppercase">Desglose de costes</p>
+                <p className="text-xs font-semibold text-blue-700 uppercase">{t('quotes.chat.costBreakdown')}</p>
                 {quote.breakdown.map((item, idx) => (
                   <div key={idx} className="flex justify-between text-sm bg-white/60 p-2 rounded">
                     <span className="text-gray-700">{item.concept}</span>
@@ -121,13 +123,13 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
             {quote.estimated_days && (
               <div className="flex items-center gap-2 text-sm text-blue-800 mb-2">
                 <Clock className="w-4 h-4" />
-                <span>Plazo estimado: <strong>{quote.estimated_days} días</strong></span>
+                <span>{t('quotes.chat.estimatedTime')} <strong>{t('quotes.fields.daysCount', { count: Number(quote.estimated_days) })}</strong></span>
               </div>
             )}
 
             {quote.quote_notes && (
               <div className="mt-2 pt-2 border-t border-blue-200">
-                <p className="text-xs font-semibold text-blue-700 mb-1">Términos y condiciones</p>
+                <p className="text-xs font-semibold text-blue-700 mb-1">{t('quotes.chat.terms')}</p>
                 <p className="text-sm text-blue-800 whitespace-pre-wrap">{quote.quote_notes}</p>
               </div>
             )}
@@ -139,7 +141,7 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
             onClick={() => setResponding(true)}
             className="w-full bg-blue-600 hover:bg-blue-700"
           >
-            Enviar presupuesto detallado
+            {t('quotes.chat.sendDetailedQuote')}
           </Button>
         )}
 
@@ -147,13 +149,13 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
           <div className="space-y-4 pt-3 border-t">
             <div>
               <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Desglose de costes
+                {t('quotes.chat.costBreakdown')}
               </label>
               <div className="space-y-2">
                 {breakdown.map((item, index) => (
                   <div key={index} className="flex gap-2">
                     <Input
-                      placeholder="Concepto (ej: Mano de obra)"
+                      placeholder={t('quotes.chat.conceptPlaceholder')}
                       value={item.concept}
                       onChange={(e) => updateBreakdownItem(index, "concept", e.target.value)}
                       className="flex-1"
@@ -186,11 +188,11 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
                   className="w-full"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  Añadir concepto
+                  {t('quotes.chat.addConcept')}
                 </Button>
                 {breakdown.some(item => item.amount) && (
                   <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <span className="font-semibold text-blue-900">Total:</span>
+                    <span className="font-semibold text-blue-900">{t('quotes.chat.total')}</span>
                     <span className="text-xl font-bold text-blue-900">{calculateTotal()}€</span>
                   </div>
                 )}
@@ -199,11 +201,11 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
 
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Plazo estimado (días)
+                {t('quotes.chat.estimatedDaysLabel')}
               </label>
               <Input
                 type="number"
-                placeholder="Ej: 3"
+                placeholder={t('quotes.chat.estimatedDaysPlaceholder')}
                 value={estimatedDays}
                 onChange={(e) => setEstimatedDays(e.target.value)}
               />
@@ -211,10 +213,10 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
 
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Términos y condiciones
+                {t('quotes.chat.terms')}
               </label>
               <Textarea
-                placeholder="Incluye materiales, garantías, formas de pago, etc..."
+                placeholder={t('quotes.chat.termsPlaceholder')}
                 value={quoteNotes}
                 onChange={(e) => setQuoteNotes(e.target.value)}
                 rows={4}
@@ -227,14 +229,14 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
                 disabled={breakdown.every(item => !item.concept || !item.amount)}
               >
-                Enviar presupuesto
+                {t('quotes.actions.sendQuote')}
               </Button>
               <Button 
                 onClick={() => setResponding(false)}
                 variant="outline"
                 className="flex-1"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
             </div>
           </div>
@@ -247,7 +249,7 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
               className="flex-1 bg-green-600 hover:bg-green-700"
             >
               <CheckCircle className="w-4 h-4 mr-1" />
-              Aceptar presupuesto
+              {t('quotes.actions.acceptQuote')}
             </Button>
             <Button 
               onClick={() => handleClientAction("rejected")}
@@ -255,7 +257,7 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
               className="flex-1 text-red-600 hover:bg-red-50"
             >
               <XCircle className="w-4 h-4 mr-1" />
-              Rechazar
+              {t('common.reject')}
             </Button>
           </div>
         )}
@@ -266,7 +268,7 @@ export default function QuoteRequest({ quote, isProfessional, isClient, onRespon
             className="w-full bg-blue-600 hover:bg-blue-700 mt-3"
           >
             <CheckCircle className="w-4 h-4 mr-1" />
-            Marcar como completado
+            {t('quotes.chat.markCompleted')}
           </Button>
         )}
       </CardContent>

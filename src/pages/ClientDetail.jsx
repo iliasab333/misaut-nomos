@@ -69,11 +69,13 @@ import {
   Loader2
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation, Trans } from "react-i18next";
 import Loader from "@/components/ui/Loader";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 export default function ClientDetailPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
@@ -155,14 +157,14 @@ export default function ClientDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(['client', clientId]);
       setShowEditDialog(false);
-      toast.success("Cliente actualizado");
+      toast.success(t('crm.toast.clientUpdated'));
     },
   });
 
   const deleteClientMutation = useMutation({
     mutationFn: () => base44.entities.ClientContact.delete(clientId),
     onSuccess: () => {
-      toast.success("Cliente eliminado");
+      toast.success(t('crm.toast.clientDeleted'));
       navigate(createPageUrl("CRM"));
     },
   });
@@ -178,7 +180,7 @@ export default function ClientDetailPage() {
       queryClient.invalidateQueries(['clientActivities', clientId]);
       setShowActivityDialog(false);
       resetActivityForm();
-      toast.success("Actividad añadida");
+      toast.success(t('crm.toast.activityAdded'));
     },
   });
 
@@ -189,7 +191,7 @@ export default function ClientDetailPage() {
       setShowActivityDialog(false);
       setEditingActivity(null);
       resetActivityForm();
-      toast.success("Actividad actualizada");
+      toast.success(t('crm.toast.activityUpdated'));
     },
   });
 
@@ -198,7 +200,7 @@ export default function ClientDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(['clientActivities', clientId]);
       setDeleteActivityId(null);
-      toast.success("Actividad eliminada");
+      toast.success(t('crm.toast.activityDeleted'));
     },
   });
 
@@ -206,7 +208,7 @@ export default function ClientDetailPage() {
     mutationFn: ({ id, completed }) => base44.entities.ClientActivity.update(id, { reminder_completed: completed }),
     onSuccess: () => {
       queryClient.invalidateQueries(['clientActivities', clientId]);
-      toast.success("Recordatorio actualizado");
+      toast.success(t('crm.toast.reminderUpdated'));
     },
   });
 
@@ -296,10 +298,10 @@ export default function ClientDetailPage() {
         <Card className="max-w-md w-full">
           <CardContent className="p-8 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Cliente no encontrado</h2>
-            <p className="text-gray-600 mb-4">El cliente que buscas no existe o ha sido eliminado.</p>
+            <h2 className="text-xl font-bold mb-2">{t('crm.detail.notFoundTitle')}</h2>
+            <p className="text-gray-600 mb-4">{t('crm.detail.notFoundDescription')}</p>
             <Button onClick={() => navigate(createPageUrl("CRM"))}>
-              Volver al CRM
+              {t('crm.actions.backToCrm')}
             </Button>
           </CardContent>
         </Card>
@@ -317,12 +319,12 @@ export default function ClientDetailPage() {
 
   const getStatusBadge = (status) => {
     const config = {
-      lead: { color: "bg-yellow-100 text-yellow-800", label: "Lead" },
-      contacted: { color: "bg-blue-100 text-blue-800", label: "Contactado" },
-      negotiating: { color: "bg-purple-100 text-purple-800", label: "Negociando" },
-      client: { color: "bg-green-100 text-green-800", label: "Cliente" },
-      inactive: { color: "bg-gray-100 text-gray-800", label: "Inactivo" },
-      vip: { color: "bg-amber-100 text-amber-800", label: "VIP" },
+      lead: { color: "bg-yellow-100 text-yellow-800", label: t('crm.status.lead') },
+      contacted: { color: "bg-blue-100 text-blue-800", label: t('crm.status.contacted') },
+      negotiating: { color: "bg-purple-100 text-purple-800", label: t('crm.status.negotiating') },
+      client: { color: "bg-green-100 text-green-800", label: t('clientLabel') },
+      inactive: { color: "bg-gray-100 text-gray-800", label: t('crm.status.inactive') },
+      vip: { color: "bg-amber-100 text-amber-800", label: t('crm.status.vip') },
     };
     const c = config[status] || config.lead;
     return <Badge className={c.color}>{c.label}</Badge>;
@@ -346,16 +348,16 @@ export default function ClientDetailPage() {
 
   const getActivityTypeLabel = (type) => {
     const labels = {
-      note: "Nota",
-      call: "Llamada",
-      email: "Email",
-      meeting: "Reunión",
-      reminder: "Recordatorio",
-      payment: "Pago",
-      job_completed: "Trabajo completado",
-      quote_sent: "Presupuesto enviado",
-      invoice_sent: "Factura enviada",
-      other: "Otro"
+      note: t('crm.activityType.note'),
+      call: t('crm.activityType.call'),
+      email: t('emailField'),
+      meeting: t('crm.activityType.meeting'),
+      reminder: t('crm.activityType.reminder'),
+      payment: t('crm.activityType.payment'),
+      job_completed: t('crm.activityType.jobCompleted'),
+      quote_sent: t('crm.activityType.quoteSent'),
+      invoice_sent: t('crm.activityType.invoiceSent'),
+      other: t('crm.activityType.other')
     };
     return labels[type] || type;
   };
@@ -368,17 +370,17 @@ export default function ClientDetailPage() {
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate(createPageUrl("CRM"))}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver al CRM
+              {t('crm.actions.backToCrm')}
             </Button>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={openEditClient}>
               <Edit2 className="w-4 h-4 mr-2" />
-              Editar
+              {t('common.edit')}
             </Button>
             <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
               <Trash2 className="w-4 h-4 mr-2" />
-              Eliminar
+              {t('common.delete')}
             </Button>
           </div>
         </div>
@@ -450,19 +452,19 @@ export default function ClientDetailPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:w-auto">
                 <div className="bg-blue-50 rounded-xl p-4 text-center">
                   <p className="text-2xl font-bold text-blue-700">{jobs.length}</p>
-                  <p className="text-xs text-blue-600">Trabajos</p>
+                  <p className="text-xs text-blue-600">{t('crm.detail.jobs')}</p>
                 </div>
                 <div className="bg-green-50 rounded-xl p-4 text-center">
                   <p className="text-2xl font-bold text-green-700">{totalPaid.toFixed(0)}€</p>
-                  <p className="text-xs text-green-600">Pagado</p>
+                  <p className="text-xs text-green-600">{t('crm.detail.paid')}</p>
                 </div>
                 <div className="bg-purple-50 rounded-xl p-4 text-center">
                   <p className="text-2xl font-bold text-purple-700">{invoices.length}</p>
-                  <p className="text-xs text-purple-600">Facturas</p>
+                  <p className="text-xs text-purple-600">{t('nav.invoices')}</p>
                 </div>
                 <div className="bg-amber-50 rounded-xl p-4 text-center">
                   <p className="text-2xl font-bold text-amber-700">{pendingReminders.length}</p>
-                  <p className="text-xs text-amber-600">Recordatorios</p>
+                  <p className="text-xs text-amber-600">{t('crm.detail.reminders')}</p>
                 </div>
               </div>
             </div>
@@ -472,11 +474,11 @@ export default function ClientDetailPage() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="bg-white shadow-sm p-1 rounded-xl">
-            <TabsTrigger value="overview" className="rounded-lg">Resumen</TabsTrigger>
-            <TabsTrigger value="history" className="rounded-lg">Historial</TabsTrigger>
-            <TabsTrigger value="jobs" className="rounded-lg">Trabajos ({jobs.length})</TabsTrigger>
-            <TabsTrigger value="invoices" className="rounded-lg">Facturas ({invoices.length})</TabsTrigger>
-            <TabsTrigger value="notes" className="rounded-lg">Notas</TabsTrigger>
+            <TabsTrigger value="overview" className="rounded-lg">{t('crm.detail.tabOverview')}</TabsTrigger>
+            <TabsTrigger value="history" className="rounded-lg">{t('crm.detail.tabHistory')}</TabsTrigger>
+            <TabsTrigger value="jobs" className="rounded-lg">{t('crm.detail.tabJobs', { count: jobs.length })}</TabsTrigger>
+            <TabsTrigger value="invoices" className="rounded-lg">{t('crm.detail.tabInvoices', { count: invoices.length })}</TabsTrigger>
+            <TabsTrigger value="notes" className="rounded-lg">{t('crm.form.notes')}</TabsTrigger>
           </TabsList>
 
           {/* Tab: Resumen */}
@@ -488,7 +490,7 @@ export default function ClientDetailPage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Pin className="w-5 h-5 text-amber-600" />
-                      Notas Fijadas
+                      {t('crm.detail.pinnedNotes')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -510,7 +512,7 @@ export default function ClientDetailPage() {
                   <CardTitle className="text-lg flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <Bell className="w-5 h-5 text-blue-600" />
-                      Recordatorios
+                      {t('crm.detail.reminders')}
                     </span>
                     <Button size="sm" variant="outline" onClick={() => {
                       resetActivityForm();
@@ -518,13 +520,13 @@ export default function ClientDetailPage() {
                       setShowActivityDialog(true);
                     }}>
                       <Plus className="w-4 h-4 mr-1" />
-                      Añadir
+                      {t('crm.detail.add')}
                     </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {pendingReminders.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">Sin recordatorios pendientes</p>
+                    <p className="text-sm text-gray-500 text-center py-4">{t('crm.detail.noPendingReminders')}</p>
                   ) : (
                     <div className="space-y-2">
                       {pendingReminders.map(reminder => (
@@ -553,37 +555,37 @@ export default function ClientDetailPage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="w-5 h-5 text-gray-600" />
-                    Información
+                    {t('crm.detail.info')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   {client.client_nif && (
                     <div className="flex justify-between">
-                      <span className="text-gray-500">NIF/CIF</span>
+                      <span className="text-gray-500">{t('crm.detail.nifCif')}</span>
                       <span className="font-medium">{client.client_nif}</span>
                     </div>
                   )}
                   {client.segment && (
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Segmento</span>
+                      <span className="text-gray-500">{t('crm.form.segment')}</span>
                       <Badge variant="outline">{client.segment}</Badge>
                     </div>
                   )}
                   {client.source && (
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Origen</span>
+                      <span className="text-gray-500">{t('crm.detail.source')}</span>
                       <span className="font-medium">{client.source}</span>
                     </div>
                   )}
                   {client.preferred_contact_method && (
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Contacto preferido</span>
+                      <span className="text-gray-500">{t('crm.detail.preferredContact')}</span>
                       <span className="font-medium capitalize">{client.preferred_contact_method}</span>
                     </div>
                   )}
                   {client.next_followup_date && (
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Próximo seguimiento</span>
+                      <span className="text-gray-500">{t('crm.detail.nextFollowup')}</span>
                       <span className="font-medium">{format(new Date(client.next_followup_date), "d MMM yyyy", { locale: es })}</span>
                     </div>
                   )}
@@ -596,7 +598,7 @@ export default function ClientDetailPage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <MessageSquare className="w-5 h-5 text-gray-600" />
-                      Notas
+                      {t('crm.form.notes')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -614,11 +616,11 @@ export default function ClientDetailPage() {
                 <CardTitle className="text-lg flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <History className="w-5 h-5 text-blue-600" />
-                    Historial de Actividad
+                    {t('crm.detail.activityHistory')}
                   </span>
                   <Button onClick={() => { resetActivityForm(); setShowActivityDialog(true); }}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Añadir actividad
+                    {t('crm.detail.addActivity')}
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -628,7 +630,7 @@ export default function ClientDetailPage() {
                 ) : activities.length === 0 ? (
                   <div className="text-center py-8">
                     <History className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">No hay actividades registradas</p>
+                    <p className="text-gray-500">{t('crm.detail.noActivities')}</p>
                   </div>
                 ) : (
                   <div className="relative">
@@ -664,7 +666,7 @@ export default function ClientDetailPage() {
                                       <p className="text-sm font-medium text-green-600 mt-1">{activity.amount}€</p>
                                     )}
                                     <p className="text-xs text-gray-400 mt-2">
-                                      {format(new Date(activity.created_date), "d MMM yyyy 'a las' HH:mm", { locale: es })}
+                                      {format(new Date(activity.created_date), t('crm.detail.dateTimeFormat'), { locale: es })}
                                     </p>
                                   </div>
                                   <div className="flex gap-1">
@@ -694,11 +696,11 @@ export default function ClientDetailPage() {
                 <CardTitle className="text-lg flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Briefcase className="w-5 h-5 text-blue-600" />
-                    Trabajos
+                    {t('crm.detail.jobs')}
                   </span>
                   <Button onClick={() => navigate(createPageUrl("Jobs") + `?client_id=${clientId}`)}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Nuevo trabajo
+                    {t('crm.detail.newJob')}
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -706,7 +708,7 @@ export default function ClientDetailPage() {
                 {jobs.length === 0 ? (
                   <div className="text-center py-8">
                     <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">No hay trabajos registrados</p>
+                    <p className="text-gray-500">{t('crm.detail.noJobs')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -718,7 +720,7 @@ export default function ClientDetailPage() {
                             <p className="text-sm text-gray-500 line-clamp-1">{job.description}</p>
                           )}
                           <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
-                            {job.start_date && <span>Inicio: {format(new Date(job.start_date), "d MMM", { locale: es })}</span>}
+                            {job.start_date && <span>{t('crm.detail.jobStart', { date: format(new Date(job.start_date), "d MMM", { locale: es }) })}</span>}
                             {job.final_cost && <span className="text-green-600 font-medium">{job.final_cost}€</span>}
                           </div>
                         </div>
@@ -728,9 +730,9 @@ export default function ClientDetailPage() {
                           job.status === 'cancelled' ? 'bg-red-100 text-red-800' :
                           'bg-yellow-100 text-yellow-800'
                         }>
-                          {job.status === 'completed' ? 'Completado' :
-                           job.status === 'in_progress' ? 'En curso' :
-                           job.status === 'cancelled' ? 'Cancelado' : 'Pendiente'}
+                          {job.status === 'completed' ? t('crm.detail.jobStatus.completed') :
+                           job.status === 'in_progress' ? t('crm.detail.jobStatus.inProgress') :
+                           job.status === 'cancelled' ? t('crm.detail.jobStatus.cancelled') : t('crm.detail.jobStatus.pending')}
                         </Badge>
                       </div>
                     ))}
@@ -747,11 +749,11 @@ export default function ClientDetailPage() {
                 <CardTitle className="text-lg flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Receipt className="w-5 h-5 text-purple-600" />
-                    Facturas
+                    {t('nav.invoices')}
                   </span>
                   <Button onClick={() => navigate(createPageUrl("Invoices") + `?client_id=${clientId}`)}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Nueva factura
+                    {t('newInvoice')}
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -759,7 +761,7 @@ export default function ClientDetailPage() {
                 {invoices.length === 0 ? (
                   <div className="text-center py-8">
                     <Receipt className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">No hay facturas registradas</p>
+                    <p className="text-gray-500">{t('crm.detail.noInvoices')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -780,10 +782,10 @@ export default function ClientDetailPage() {
                             invoice.status === 'cancelled' ? 'bg-gray-100 text-gray-800' :
                             'bg-yellow-100 text-yellow-800'
                           }>
-                            {invoice.status === 'paid' ? 'Pagada' :
-                             invoice.status === 'sent' ? 'Emitida' :
-                             invoice.status === 'overdue' ? 'Vencida' :
-                             invoice.status === 'cancelled' ? 'Anulada' : 'Borrador'}
+                            {invoice.status === 'paid' ? t('paid') :
+                             invoice.status === 'sent' ? t('sent') :
+                             invoice.status === 'overdue' ? t('overdue') :
+                             invoice.status === 'cancelled' ? t('cancelled') : t('draft')}
                           </Badge>
                         </div>
                       </div>
@@ -792,11 +794,11 @@ export default function ClientDetailPage() {
                     {/* Resumen */}
                     <Separator className="my-4" />
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Total facturado:</span>
+                      <span className="text-gray-500">{t('crm.detail.totalInvoiced')}</span>
                       <span className="font-bold">{totalInvoiced.toFixed(2)}€</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Total cobrado:</span>
+                      <span className="text-gray-500">{t('crm.detail.totalCollected')}</span>
                       <span className="font-bold text-green-600">{totalPaid.toFixed(2)}€</span>
                     </div>
                   </div>
@@ -812,11 +814,11 @@ export default function ClientDetailPage() {
                 <CardTitle className="text-lg flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <StickyNote className="w-5 h-5 text-amber-600" />
-                    Notas Internas
+                    {t('crm.detail.internalNotes')}
                   </span>
                   <Button onClick={() => { resetActivityForm(); setActivityForm(prev => ({ ...prev, type: "note" })); setShowActivityDialog(true); }}>
                     <Plus className="w-4 h-4 mr-2" />
-                    Añadir nota
+                    {t('crm.actions.addNote')}
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -824,7 +826,7 @@ export default function ClientDetailPage() {
                 {activities.filter(a => a.type === 'note').length === 0 ? (
                   <div className="text-center py-8">
                     <StickyNote className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">No hay notas</p>
+                    <p className="text-gray-500">{t('crm.detail.noNotes')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -869,61 +871,61 @@ export default function ClientDetailPage() {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Editar Cliente</DialogTitle>
+            <DialogTitle>{t('crm.detail.editClientTitle')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmitClient} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>Nombre *</Label>
+                <Label>{t('crm.form.nameRequired')}</Label>
                 <Input value={formData.client_name} onChange={(e) => setFormData({...formData, client_name: e.target.value})} required />
               </div>
               <div>
-                <Label>Email</Label>
+                <Label>{t('emailField')}</Label>
                 <Input type="email" value={formData.client_email} onChange={(e) => setFormData({...formData, client_email: e.target.value})} />
               </div>
               <div>
-                <Label>Teléfono</Label>
+                <Label>{t('phoneField')}</Label>
                 <Input value={formData.client_phone} onChange={(e) => setFormData({...formData, client_phone: e.target.value})} />
               </div>
               <div>
-                <Label>NIF/CIF</Label>
+                <Label>{t('crm.detail.nifCif')}</Label>
                 <Input value={formData.client_nif} onChange={(e) => setFormData({...formData, client_nif: e.target.value})} />
               </div>
               <div>
-                <Label>Empresa</Label>
+                <Label>{t('crm.form.company')}</Label>
                 <Input value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} />
               </div>
               <div>
-                <Label>Estado</Label>
+                <Label>{t('crm.form.status')}</Label>
                 <Select value={formData.status} onValueChange={(v) => setFormData({...formData, status: v})}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="lead">Lead</SelectItem>
-                    <SelectItem value="contacted">Contactado</SelectItem>
-                    <SelectItem value="negotiating">Negociando</SelectItem>
-                    <SelectItem value="client">Cliente</SelectItem>
-                    <SelectItem value="vip">VIP</SelectItem>
-                    <SelectItem value="inactive">Inactivo</SelectItem>
+                    <SelectItem value="lead">{t('crm.status.lead')}</SelectItem>
+                    <SelectItem value="contacted">{t('crm.status.contacted')}</SelectItem>
+                    <SelectItem value="negotiating">{t('crm.status.negotiating')}</SelectItem>
+                    <SelectItem value="client">{t('clientLabel')}</SelectItem>
+                    <SelectItem value="vip">{t('crm.status.vip')}</SelectItem>
+                    <SelectItem value="inactive">{t('crm.status.inactive')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Segmento</Label>
+                <Label>{t('crm.form.segment')}</Label>
                 <Select value={formData.segment || ""} onValueChange={(v) => setFormData({...formData, segment: v})}>
-                  <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t('crm.form.selectPlaceholder')} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="residential">Residencial</SelectItem>
-                    <SelectItem value="commercial">Comercial</SelectItem>
-                    <SelectItem value="industrial">Industrial</SelectItem>
-                    <SelectItem value="government">Administración pública</SelectItem>
-                    <SelectItem value="other">Otro</SelectItem>
+                    <SelectItem value="residential">{t('crm.segment.residential')}</SelectItem>
+                    <SelectItem value="commercial">{t('crm.segment.commercial')}</SelectItem>
+                    <SelectItem value="industrial">{t('crm.segment.industrial')}</SelectItem>
+                    <SelectItem value="government">{t('crm.segment.government')}</SelectItem>
+                    <SelectItem value="other">{t('crm.segment.other')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Valoración (1-5)</Label>
+                <Label>{t('crm.detail.rating')}</Label>
                 <Select value={formData.rating?.toString() || ""} onValueChange={(v) => setFormData({...formData, rating: v})}>
-                  <SelectTrigger><SelectValue placeholder="Sin valorar" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t('crm.detail.ratingPlaceholder')} /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="1">⭐ 1</SelectItem>
                     <SelectItem value="2">⭐⭐ 2</SelectItem>
@@ -934,57 +936,57 @@ export default function ClientDetailPage() {
                 </Select>
               </div>
               <div>
-                <Label>Contacto preferido</Label>
+                <Label>{t('crm.detail.preferredContact')}</Label>
                 <Select value={formData.preferred_contact_method || "any"} onValueChange={(v) => setFormData({...formData, preferred_contact_method: v})}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="any">Cualquiera</SelectItem>
-                    <SelectItem value="email">Email</SelectItem>
-                    <SelectItem value="phone">Teléfono</SelectItem>
-                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                    <SelectItem value="any">{t('crm.form.any')}</SelectItem>
+                    <SelectItem value="email">{t('emailField')}</SelectItem>
+                    <SelectItem value="phone">{t('phoneField')}</SelectItem>
+                    <SelectItem value="whatsapp">{t('profile_page.whatsapp')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Valor estimado (€)</Label>
+                <Label>{t('crm.form.estimatedValue')}</Label>
                 <Input type="number" value={formData.estimated_value} onChange={(e) => setFormData({...formData, estimated_value: e.target.value})} />
               </div>
               <div>
-                <Label>Origen</Label>
+                <Label>{t('crm.detail.source')}</Label>
                 <Input value={formData.source} onChange={(e) => setFormData({...formData, source: e.target.value})} />
               </div>
               <div>
-                <Label>Próximo seguimiento</Label>
+                <Label>{t('crm.detail.nextFollowup')}</Label>
                 <Input type="date" value={formData.next_followup_date} onChange={(e) => setFormData({...formData, next_followup_date: e.target.value})} />
               </div>
             </div>
             <div>
-              <Label>Dirección</Label>
+              <Label>{t('clientAddress')}</Label>
               <Input value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Ciudad</Label>
+                <Label>{t('city')}</Label>
                 <Input value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} />
               </div>
               <div>
-                <Label>Código postal</Label>
+                <Label>{t('postalCode')}</Label>
                 <Input value={formData.postal_code} onChange={(e) => setFormData({...formData, postal_code: e.target.value})} />
               </div>
             </div>
             <div>
-              <Label>Etiquetas (separadas por coma)</Label>
-              <Input value={formData.tags} onChange={(e) => setFormData({...formData, tags: e.target.value})} placeholder="ej: urgente, preferido, obras" />
+              <Label>{t('crm.form.tags')}</Label>
+              <Input value={formData.tags} onChange={(e) => setFormData({...formData, tags: e.target.value})} placeholder={t('crm.detail.tagsPlaceholder')} />
             </div>
             <div>
-              <Label>Notas</Label>
+              <Label>{t('crm.form.notes')}</Label>
               <Textarea value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} rows={3} />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>Cancelar</Button>
+              <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>{t('common.cancel')}</Button>
               <Button type="submit" disabled={updateClientMutation.isPending}>
                 {updateClientMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                Guardar
+                {t('common.save')}
               </Button>
             </DialogFooter>
           </form>
@@ -995,60 +997,60 @@ export default function ClientDetailPage() {
       <Dialog open={showActivityDialog} onOpenChange={(open) => { setShowActivityDialog(open); if (!open) { setEditingActivity(null); resetActivityForm(); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingActivity ? "Editar actividad" : "Nueva actividad"}</DialogTitle>
+            <DialogTitle>{editingActivity ? t('crm.detail.editActivity') : t('crm.detail.newActivity')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmitActivity} className="space-y-4">
             <div>
-              <Label>Tipo</Label>
+              <Label>{t('crm.form.type')}</Label>
               <Select value={activityForm.type} onValueChange={(v) => setActivityForm({...activityForm, type: v})}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="note">Nota</SelectItem>
-                  <SelectItem value="call">Llamada</SelectItem>
-                  <SelectItem value="email">Email</SelectItem>
-                  <SelectItem value="meeting">Reunión</SelectItem>
-                  <SelectItem value="reminder">Recordatorio</SelectItem>
-                  <SelectItem value="payment">Pago recibido</SelectItem>
-                  <SelectItem value="quote_sent">Presupuesto enviado</SelectItem>
-                  <SelectItem value="other">Otro</SelectItem>
+                  <SelectItem value="note">{t('crm.activityType.note')}</SelectItem>
+                  <SelectItem value="call">{t('crm.activityType.call')}</SelectItem>
+                  <SelectItem value="email">{t('emailField')}</SelectItem>
+                  <SelectItem value="meeting">{t('crm.activityType.meeting')}</SelectItem>
+                  <SelectItem value="reminder">{t('crm.activityType.reminder')}</SelectItem>
+                  <SelectItem value="payment">{t('crm.activityType.paymentReceived')}</SelectItem>
+                  <SelectItem value="quote_sent">{t('crm.activityType.quoteSent')}</SelectItem>
+                  <SelectItem value="other">{t('crm.activityType.other')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Título *</Label>
+              <Label>{t('crm.detail.titleRequired')}</Label>
               <Input value={activityForm.title} onChange={(e) => setActivityForm({...activityForm, title: e.target.value})} required />
             </div>
             <div>
-              <Label>Descripción</Label>
+              <Label>{t('description')}</Label>
               <Textarea value={activityForm.description} onChange={(e) => setActivityForm({...activityForm, description: e.target.value})} rows={3} />
             </div>
             {(activityForm.type === 'payment' || activityForm.type === 'quote_sent') && (
               <div>
-                <Label>Importe (€)</Label>
+                <Label>{t('crm.detail.amount')}</Label>
                 <Input type="number" value={activityForm.amount} onChange={(e) => setActivityForm({...activityForm, amount: e.target.value})} />
               </div>
             )}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Checkbox checked={activityForm.is_reminder} onCheckedChange={(checked) => setActivityForm({...activityForm, is_reminder: checked})} />
-                <Label className="cursor-pointer">Es un recordatorio</Label>
+                <Label className="cursor-pointer">{t('crm.detail.isReminder')}</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Checkbox checked={activityForm.is_pinned} onCheckedChange={(checked) => setActivityForm({...activityForm, is_pinned: checked})} />
-                <Label className="cursor-pointer">Fijar nota</Label>
+                <Label className="cursor-pointer">{t('crm.detail.pinNote')}</Label>
               </div>
             </div>
             {activityForm.is_reminder && (
               <div>
-                <Label>Fecha del recordatorio</Label>
+                <Label>{t('crm.detail.reminderDate')}</Label>
                 <Input type="date" value={activityForm.reminder_date} onChange={(e) => setActivityForm({...activityForm, reminder_date: e.target.value})} />
               </div>
             )}
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => { setShowActivityDialog(false); setEditingActivity(null); resetActivityForm(); }}>Cancelar</Button>
+              <Button type="button" variant="outline" onClick={() => { setShowActivityDialog(false); setEditingActivity(null); resetActivityForm(); }}>{t('common.cancel')}</Button>
               <Button type="submit" disabled={createActivityMutation.isPending || updateActivityMutation.isPending}>
                 {(createActivityMutation.isPending || updateActivityMutation.isPending) ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                {editingActivity ? "Guardar" : "Añadir"}
+                {editingActivity ? t('common.save') : t('crm.detail.add')}
               </Button>
             </DialogFooter>
           </form>
@@ -1059,15 +1061,19 @@ export default function ClientDetailPage() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
+            <AlertDialogTitle>{t('crm.deleteClient.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción eliminará permanentemente a <strong>{client?.client_name}</strong> y todo su historial asociado.
+              <Trans
+                i18nKey="crm.detail.deleteClientDescription"
+                values={{ name: client?.client_name }}
+                components={{ 1: <strong /> }}
+              />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={() => deleteClientMutation.mutate()} className="bg-red-600 hover:bg-red-700">
-              Eliminar
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1077,13 +1083,13 @@ export default function ClientDetailPage() {
       <AlertDialog open={!!deleteActivityId} onOpenChange={() => setDeleteActivityId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar actividad?</AlertDialogTitle>
-            <AlertDialogDescription>Esta acción no se puede deshacer.</AlertDialogDescription>
+            <AlertDialogTitle>{t('crm.detail.deleteActivityTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('crm.detail.deleteActivityDescription')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={() => deleteActivityMutation.mutate(deleteActivityId)} className="bg-red-600 hover:bg-red-700">
-              Eliminar
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

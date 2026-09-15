@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import SEOHead from '@/components/seo/SEOHead';
 
 const NAVY = '#00255C';
 const GOLD = '#F5C13D';
+const BRAND = 'misAutónomos';
+const SUPPORT_EMAIL = 'hola@misautonomos.es';
 
 // Estados de la página: comprobando token → confirmado / error.
 const STATE = {
@@ -19,6 +22,7 @@ const STATE = {
 
 export default function BajaNewsletter() {
   const [params] = useSearchParams();
+  const { t } = useTranslation();
   const token = params.get('token');
   const [state, setState] = useState(STATE.loading);
   const [email, setEmail] = useState('');
@@ -42,54 +46,54 @@ export default function BajaNewsletter() {
         });
         setState(STATE.success);
       } catch (err) {
-        setMsg(err?.message || 'Error');
+        setMsg(err?.message || t('common.error'));
         setState(STATE.error);
       }
     })();
-  }, [token]);
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const panelByState = () => {
     switch (state) {
       case STATE.loading:
         return {
           icon: <Loader2 className="w-7 h-7 animate-spin" style={{ color: NAVY }} />,
-          title: 'Procesando tu baja…',
-          body: 'Un momento.',
+          title: t('newsletter.baja.loadingTitle'),
+          body: t('newsletter.baja.loadingBody'),
         };
       case STATE.success:
         return {
           icon: <CheckCircle2 className="w-7 h-7" style={{ color: NAVY }} />,
-          title: 'Te has dado de baja',
+          title: t('newsletter.unsubscribe.title'),
           body: email
-            ? `Ya no recibirás más emails de la newsletter en ${email}.`
-            : 'Ya no recibirás más emails de la newsletter.',
+            ? t('newsletter.baja.successBodyEmail', { email })
+            : t('newsletter.baja.successBody'),
         };
       case STATE.already:
         return {
           icon: <CheckCircle2 className="w-7 h-7 text-emerald-600" />,
-          title: 'Ya estabas dado de baja',
+          title: t('newsletter.baja.alreadyTitle'),
           body: email
-            ? `${email} no recibe nuestra newsletter.`
-            : 'Tu email ya no recibe nuestra newsletter.',
+            ? t('newsletter.baja.alreadyBodyEmail', { email })
+            : t('newsletter.baja.alreadyBody'),
         };
       case STATE.not_found:
         return {
           icon: <AlertCircle className="w-7 h-7 text-amber-600" />,
-          title: 'Enlace no válido',
-          body: 'No hemos encontrado este enlace de baja. Puede que ya haya caducado.',
+          title: t('newsletter.baja.notFoundTitle'),
+          body: t('newsletter.baja.notFoundBody'),
         };
       case STATE.no_token:
         return {
           icon: <AlertCircle className="w-7 h-7 text-amber-600" />,
-          title: 'Falta el token',
-          body: 'Este enlace de baja no incluye el identificador. Usa el enlace del email que recibiste.',
+          title: t('newsletter.baja.noTokenTitle'),
+          body: t('newsletter.baja.noTokenBody'),
         };
       case STATE.error:
       default:
         return {
           icon: <AlertCircle className="w-7 h-7 text-rose-600" />,
-          title: 'Algo ha fallado',
-          body: msg || 'No hemos podido procesar tu baja. Vuelve a intentarlo o escríbenos a hola@misautonomos.es.',
+          title: t('common.errorGenericTitle'),
+          body: msg || t('newsletter.baja.errorBody'),
         };
     }
   };
@@ -97,7 +101,7 @@ export default function BajaNewsletter() {
 
   return (
     <>
-      <SEOHead title="Baja de newsletter · MisAutónomos" noindex />
+      <SEOHead title={t('newsletter.baja.seoTitle')} noindex />
       <main className="min-h-screen bg-white text-slate-900">
         <section className="max-w-xl mx-auto px-4 pt-20 md:pt-28 pb-16 text-center">
           <div
@@ -116,7 +120,7 @@ export default function BajaNewsletter() {
 
           {(state === STATE.success || state === STATE.already) && (
             <p className="mt-2 text-xs text-slate-500">
-              ¿Te diste de baja por error? Puedes volver a suscribirte cuando quieras desde el footer.
+              {t('newsletter.baja.resubscribeHint')}
             </p>
           )}
 
@@ -126,19 +130,19 @@ export default function BajaNewsletter() {
               className="inline-flex items-center justify-center h-11 px-6 rounded-xl font-semibold text-white"
               style={{ background: NAVY }}
             >
-              Volver al inicio
+              {t('newsletter.backHome')}
             </Link>
             <Link
               to="/contacto"
               className="inline-flex items-center justify-center h-11 px-6 rounded-xl font-semibold border border-slate-200 text-slate-700 hover:bg-slate-50"
             >
-              Contactar
+              {t('profile_card.contact')}
             </Link>
           </div>
 
           <p className="mt-10 text-[11px] text-slate-400">
             <span className="inline-block w-1.5 h-1.5 rounded-full align-middle mr-1.5" style={{ background: GOLD }} />
-            misAutónomos · hola@misautonomos.es
+            {BRAND} · {SUPPORT_EMAIL}
           </p>
         </section>
       </main>

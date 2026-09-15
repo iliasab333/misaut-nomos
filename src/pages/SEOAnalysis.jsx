@@ -11,6 +11,7 @@ import {
   TrendingUp, Search, MousePointer, Eye, RefreshCw,
   ArrowUpRight, ArrowDownRight, Target, Globe, Award
 } from "lucide-react";
+import { useTranslation, Trans } from "react-i18next";
 
 const MetricCard = ({ icon: IconComp, label, value, sub, color = "blue", trend }) => (
   <Card className="border-0 shadow-sm">
@@ -34,14 +35,16 @@ const MetricCard = ({ icon: IconComp, label, value, sub, color = "blue", trend }
 );
 
 const PositionBadge = ({ pos }) => {
+  const { t } = useTranslation();
   const p = parseFloat(pos);
-  if (p <= 3) return <Badge className="bg-emerald-100 text-emerald-700 border-0 text-xs">Top {p}</Badge>;
-  if (p <= 10) return <Badge className="bg-blue-100 text-blue-700 border-0 text-xs">Pág. 1</Badge>;
-  if (p <= 20) return <Badge className="bg-amber-100 text-amber-700 border-0 text-xs">Pág. 2</Badge>;
-  return <Badge className="bg-gray-100 text-gray-600 border-0 text-xs">Pág. {Math.ceil(p / 10)}</Badge>;
+  if (p <= 3) return <Badge className="bg-emerald-100 text-emerald-700 border-0 text-xs">{t('seo.analysis.position.top', { position: p })}</Badge>;
+  if (p <= 10) return <Badge className="bg-blue-100 text-blue-700 border-0 text-xs">{t('seo.analysis.position.page1')}</Badge>;
+  if (p <= 20) return <Badge className="bg-amber-100 text-amber-700 border-0 text-xs">{t('seo.analysis.position.page2')}</Badge>;
+  return <Badge className="bg-gray-100 text-gray-600 border-0 text-xs">{t('seo.analysis.position.pageN', { page: Math.ceil(p / 10) })}</Badge>;
 };
 
 export default function SEOAnalysis() {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,7 +57,7 @@ export default function SEOAnalysis() {
       const res = await base44.functions.invoke("searchConsoleAnalysis", {});
       setData(res.data);
     } catch (e) {
-      setError(e.message || "Error al cargar datos");
+      setError(e.message || t('seo.analysis.loadErrorFallback'));
     } finally {
       setLoading(false);
     }
@@ -66,7 +69,7 @@ export default function SEOAnalysis() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-500 font-medium">Analizando Search Console…</p>
+        <p className="text-gray-500 font-medium">{t('seo.analysis.analyzing')}</p>
       </div>
     </div>
   );
@@ -77,13 +80,13 @@ export default function SEOAnalysis() {
         <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Search className="w-6 h-6 text-red-500" />
         </div>
-        <p className="text-red-500 font-semibold mb-2">Error al cargar datos SEO</p>
+        <p className="text-red-500 font-semibold mb-2">{t('seo.analysis.loadErrorTitle')}</p>
         <p className="text-gray-500 text-sm mb-4">
           {error.includes("429") || error.includes("500")
-            ? "Esta función solo está disponible en producción (misautonomos.es). El entorno de preview bloquea las llamadas a Google Search Console."
+            ? t('seo.analysis.previewBlocked')
             : error}
         </p>
-        <Button onClick={load} variant="outline">Reintentar</Button>
+        <Button onClick={load} variant="outline">{t('common.retry')}</Button>
       </Card>
     </div>
   );
@@ -101,10 +104,10 @@ export default function SEOAnalysis() {
   }));
 
   const TABS = [
-    { id: "keywords", label: "Keywords profesionales" },
-    { id: "pages", label: "Páginas" },
-    { id: "trends", label: "Tendencia" },
-    { id: "other", label: "Otras keywords" },
+    { id: "keywords", label: t('seo.analysis.tabs.keywords') },
+    { id: "pages", label: t('seo.analysis.tabs.pages') },
+    { id: "trends", label: t('seo.analysis.tabs.trends') },
+    { id: "other", label: t('seo.analysis.tabs.other') },
   ];
 
   return (
@@ -116,25 +119,25 @@ export default function SEOAnalysis() {
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-2">
               <Search className="w-7 h-7 text-blue-600" />
-              Análisis SEO Orgánico
+              {t('seo.analysis.title')}
             </h1>
             <p className="text-gray-500 mt-1 text-sm">
               <span className="font-medium text-blue-700">{siteUrl}</span>
-              {" · "}Últimos 90 días ({dateRange.start} → {dateRange.end})
+              {" · "}{t('seo.analysis.dateRange', { start: dateRange.start, end: dateRange.end })}
             </p>
           </div>
           <Button variant="outline" onClick={load} className="gap-2 self-start">
             <RefreshCw className="w-4 h-4" />
-            Actualizar
+            {t('seo.analysis.refresh')}
           </Button>
         </div>
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <MetricCard icon={MousePointer} label="Clics totales" value={totals.clicks.toLocaleString()} color="blue" />
-          <MetricCard icon={Eye} label="Impresiones totales" value={totals.impressions.toLocaleString()} color="purple" />
-          <MetricCard icon={Target} label="Keywords profesionales" value={`${professionalKeywords.rows.length}`} sub={`${profShare}% de los clics`} color="emerald" />
-          <MetricCard icon={Award} label="Pos. media (prof.)" value={`#${professionalKeywords.avgPosition}`} sub={`CTR: ${professionalKeywords.avgCtr}%`} color="amber" />
+          <MetricCard icon={MousePointer} label={t('seo.analysis.kpi.totalClicks')} value={totals.clicks.toLocaleString()} color="blue" />
+          <MetricCard icon={Eye} label={t('seo.analysis.kpi.totalImpressions')} value={totals.impressions.toLocaleString()} color="purple" />
+          <MetricCard icon={Target} label={t('seo.analysis.kpi.proKeywords')} value={`${professionalKeywords.rows.length}`} sub={t('seo.analysis.kpi.proKeywordsSub', { share: profShare })} color="emerald" />
+          <MetricCard icon={Award} label={t('seo.analysis.kpi.avgPosition')} value={`#${professionalKeywords.avgPosition}`} sub={t('seo.analysis.kpi.avgPositionSub', { ctr: professionalKeywords.avgCtr })} color="amber" />
         </div>
 
         {/* Pro vs Other split */}
@@ -143,30 +146,30 @@ export default function SEOAnalysis() {
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span className="font-semibold text-gray-800">Keywords de contratación profesional</span>
+                <span className="font-semibold text-gray-800">{t('seo.analysis.proKeywordsTitle')}</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-xl font-bold text-blue-700">{professionalKeywords.totals.clicks}</div>
-                  <div className="text-xs text-gray-500">Clics</div>
+                  <div className="text-xs text-gray-500">{t('seo.analysis.clicks')}</div>
                 </div>
                 <div>
                   <div className="text-xl font-bold text-blue-700">{professionalKeywords.totals.impressions}</div>
-                  <div className="text-xs text-gray-500">Impresiones</div>
+                  <div className="text-xs text-gray-500">{t('seo.analysis.impressions')}</div>
                 </div>
                 <div>
                   <div className="text-xl font-bold text-blue-700">{professionalKeywords.avgCtr}%</div>
-                  <div className="text-xs text-gray-500">CTR medio</div>
+                  <div className="text-xs text-gray-500">{t('seo.analysis.avgCtr')}</div>
                 </div>
                 <div>
                   <div className="text-xl font-bold text-blue-700">#{professionalKeywords.avgPosition}</div>
-                  <div className="text-xs text-gray-500">Posición media</div>
+                  <div className="text-xs text-gray-500">{t('seo.analysis.avgPositionLabel')}</div>
                 </div>
               </div>
               {/* Progress bar */}
               <div className="mt-4">
                 <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>Cuota de clics</span>
+                  <span>{t('seo.analysis.clickShare')}</span>
                   <span>{profShare}%</span>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -180,20 +183,20 @@ export default function SEOAnalysis() {
             <CardContent className="p-5">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-3 h-3 rounded-full bg-gray-400" />
-                <span className="font-semibold text-gray-800">Otras keywords (marca/navegacional)</span>
+                <span className="font-semibold text-gray-800">{t('seo.analysis.otherKeywordsTitle')}</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-xl font-bold text-gray-700">{otherKeywords.totals.clicks}</div>
-                  <div className="text-xs text-gray-500">Clics</div>
+                  <div className="text-xs text-gray-500">{t('seo.analysis.clicks')}</div>
                 </div>
                 <div>
                   <div className="text-xl font-bold text-gray-700">{otherKeywords.totals.impressions}</div>
-                  <div className="text-xs text-gray-500">Impresiones</div>
+                  <div className="text-xs text-gray-500">{t('seo.analysis.impressions')}</div>
                 </div>
               </div>
               <div className="mt-4 p-3 bg-amber-50 rounded-xl text-sm text-amber-800">
-                💡 <strong>Insight:</strong> El {profShare}% de los clics orgánicos provienen de búsquedas de contratación profesional — el segmento más valioso.
+                <Trans i18nKey="seo.analysis.insight" values={{ share: profShare }} components={{ strong: <strong /> }} />
               </div>
             </CardContent>
           </Card>
@@ -201,15 +204,15 @@ export default function SEOAnalysis() {
 
         {/* Tabs */}
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 overflow-x-auto">
-          {TABS.map(t => (
+          {TABS.map(tabDef => (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={tabDef.id}
+              onClick={() => setTab(tabDef.id)}
               className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                tab === t.id ? "bg-white text-blue-700 shadow-sm" : "text-gray-600 hover:text-gray-900"
+                tab === tabDef.id ? "bg-white text-blue-700 shadow-sm" : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              {t.label}
+              {tabDef.label}
             </button>
           ))}
         </div>
@@ -218,19 +221,19 @@ export default function SEOAnalysis() {
         {tab === "keywords" && (
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2 pt-5 px-6">
-              <h2 className="font-bold text-gray-900">Keywords de contratación de profesionales</h2>
-              <p className="text-sm text-gray-500">{professionalKeywords.rows.length} queries · últimos 90 días</p>
+              <h2 className="font-bold text-gray-900">{t('seo.analysis.proKeywordsTableTitle')}</h2>
+              <p className="text-sm text-gray-500">{t('seo.analysis.queriesCount', { total: professionalKeywords.rows.length })}</p>
             </CardHeader>
             <CardContent className="px-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Query</th>
-                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Clics</th>
-                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Impresiones</th>
+                      <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('seo.analysis.table.query')}</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('seo.analysis.clicks')}</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('seo.analysis.impressions')}</th>
                       <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">CTR</th>
-                      <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Posición</th>
+                      <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('seo.analysis.table.position')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -256,19 +259,19 @@ export default function SEOAnalysis() {
         {tab === "pages" && (
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2 pt-5 px-6">
-              <h2 className="font-bold text-gray-900">Rendimiento por página</h2>
-              <p className="text-sm text-gray-500">Top {topPages.length} páginas por clics</p>
+              <h2 className="font-bold text-gray-900">{t('seo.analysis.pagesTitle')}</h2>
+              <p className="text-sm text-gray-500">{t('seo.analysis.pagesSubtitle', { total: topPages.length })}</p>
             </CardHeader>
             <CardContent className="px-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Página</th>
-                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Clics</th>
-                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Impresiones</th>
+                      <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('seo.analysis.table.page')}</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('seo.analysis.clicks')}</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('seo.analysis.impressions')}</th>
                       <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">CTR</th>
-                      <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Posición</th>
+                      <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('seo.analysis.table.position')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -298,7 +301,7 @@ export default function SEOAnalysis() {
           <div className="space-y-4">
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-0 pt-5 px-6">
-                <h2 className="font-bold text-gray-900">Evolución de clics e impresiones (últimos 30 días)</h2>
+                <h2 className="font-bold text-gray-900">{t('seo.analysis.trendsTitle')}</h2>
               </CardHeader>
               <CardContent className="pt-4">
                 <ResponsiveContainer width="100%" height={280}>
@@ -310,8 +313,8 @@ export default function SEOAnalysis() {
                       contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "12px" }}
                     />
                     <Legend />
-                    <Line type="monotone" dataKey="clicks" stroke="#2563eb" strokeWidth={2} dot={false} name="Clics" />
-                    <Line type="monotone" dataKey="impressions" stroke="#8b5cf6" strokeWidth={2} dot={false} name="Impresiones" />
+                    <Line type="monotone" dataKey="clicks" stroke="#2563eb" strokeWidth={2} dot={false} name={t('seo.analysis.clicks')} />
+                    <Line type="monotone" dataKey="impressions" stroke="#8b5cf6" strokeWidth={2} dot={false} name={t('seo.analysis.impressions')} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -319,7 +322,7 @@ export default function SEOAnalysis() {
 
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-0 pt-5 px-6">
-                <h2 className="font-bold text-gray-900">Posición media diaria</h2>
+                <h2 className="font-bold text-gray-900">{t('seo.analysis.dailyPositionTitle')}</h2>
               </CardHeader>
               <CardContent className="pt-4">
                 <ResponsiveContainer width="100%" height={220}>
@@ -329,9 +332,9 @@ export default function SEOAnalysis() {
                     <YAxis reversed tick={{ fontSize: 11, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
                     <Tooltip
                       contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "12px" }}
-                      formatter={(v) => [`#${parseFloat(v).toFixed(1)}`, "Posición"]}
+                      formatter={(v) => [`#${parseFloat(v).toFixed(1)}`, t('seo.analysis.table.position')]}
                     />
-                    <Line type="monotone" dataKey="position" stroke="#f59e0b" strokeWidth={2} dot={false} name="Posición" />
+                    <Line type="monotone" dataKey="position" stroke="#f59e0b" strokeWidth={2} dot={false} name={t('seo.analysis.table.position')} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -343,21 +346,21 @@ export default function SEOAnalysis() {
         {tab === "other" && (
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-2 pt-5 px-6">
-              <h2 className="font-bold text-gray-900">Otras keywords (marca / navegacional)</h2>
+              <h2 className="font-bold text-gray-900">{t('seo.analysis.otherKeywordsTabTitle')}</h2>
             </CardHeader>
             <CardContent className="px-0">
               {otherKeywords.rows.length === 0 ? (
-                <div className="px-6 py-8 text-center text-gray-400">No hay otras keywords en este período</div>
+                <div className="px-6 py-8 text-center text-gray-400">{t('seo.analysis.noOtherKeywords')}</div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-100">
-                        <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Query</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Clics</th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Impresiones</th>
+                        <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">{t('seo.analysis.table.query')}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{t('seo.analysis.clicks')}</th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{t('seo.analysis.impressions')}</th>
                         <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">CTR</th>
-                        <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Posición</th>
+                        <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase">{t('seo.analysis.table.position')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -383,14 +386,14 @@ export default function SEOAnalysis() {
           <CardContent className="p-6">
             <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              Insights clave
+              {t('seo.analysis.insightsTitle')}
             </h3>
             <ul className="space-y-2 text-sm text-blue-800">
-              <li>• <strong>"buscar autónomos"</strong> es la keyword líder con {professionalKeywords.rows[0]?.clicks || 0} clics — foco principal de SEO.</li>
-              <li>• CTR medio del <strong>{professionalKeywords.avgCtr}%</strong> en keywords profesionales — bien por encima del 2-3% del sector.</li>
-              <li>• Posición media <strong>#{professionalKeywords.avgPosition}</strong> — keywords en zona de primera página, potencial de mejora hacia top 5.</li>
-              <li>• <strong>{profShare}%</strong> de los clics orgánicos provienen de intención de contratación — tráfico muy cualificado.</li>
-              <li>• Oportunidad: keywords con muchas impresiones y 0 clics necesitan mejora de título/meta description.</li>
+              <li><Trans i18nKey="seo.analysis.insights.leader" values={{ clicks: professionalKeywords.rows[0]?.clicks || 0 }} components={{ strong: <strong /> }} /></li>
+              <li><Trans i18nKey="seo.analysis.insights.ctr" values={{ ctr: professionalKeywords.avgCtr }} components={{ strong: <strong /> }} /></li>
+              <li><Trans i18nKey="seo.analysis.insights.position" values={{ position: professionalKeywords.avgPosition }} components={{ strong: <strong /> }} /></li>
+              <li><Trans i18nKey="seo.analysis.insights.share" values={{ share: profShare }} components={{ strong: <strong /> }} /></li>
+              <li>{t('seo.analysis.insights.opportunity')}</li>
             </ul>
           </CardContent>
         </Card>

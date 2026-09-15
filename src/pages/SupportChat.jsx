@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Headphones, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/components/ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import InboxTabs from "@/components/messages/InboxTabs";
 
 export default function SupportChat() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
@@ -112,7 +112,7 @@ export default function SupportChat() {
         <button
           onClick={() => navigate(-1)}
           className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
-          aria-label="Volver"
+          aria-label={t('common.back')}
         >
           <ArrowLeft className="w-5 h-5 text-gray-700" />
         </button>
@@ -120,10 +120,10 @@ export default function SupportChat() {
           <Headphones className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900">{t("supportChat.supportTeam") || "Soporte MisAutónomos"}</p>
+          <p className="font-semibold text-gray-900">{t("supportChat.supportTeam")}</p>
           <p className="text-xs text-green-600 flex items-center gap-1">
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full" /> 
-            En línea · Responde en menos de 1h
+            {t('support.chat.onlineStatus')}
           </p>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function SupportChat() {
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Escribe un mensaje..."
+            placeholder={t('messages.write_message')}
             className="flex-1 rounded-full bg-gray-50 border-gray-200 focus:ring-0 focus:border-gray-300"
             disabled={sendMutation.isPending}
           />

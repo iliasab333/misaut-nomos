@@ -82,9 +82,8 @@ export default function GuestContactModal({ professional, onClose }) {
               <Trans
                 i18nKey="messages.guestContact.sentDescription"
                 values={{ name: professional?.business_name || t('messages.guestContact.professionalFallbackCapital'), email }}
-              >
-                {'{{name}} te responderá a '}<span className="font-medium text-slate-700">{'{{email}}'}</span>.
-              </Trans>
+                components={{ email: <span className="font-medium text-slate-700" /> }}
+              />
             </p>
             <button
               type="button"

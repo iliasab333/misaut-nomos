@@ -22,7 +22,7 @@ const METRIC_STYLES = {
   },
   rating: {
     icon: Star,
-    labelKey: "dashboard.metrics.rating",
+    labelKey: "pricing.socialProof.avgRating",
     gradient: "from-amber-500 to-orange-500",
     soft: "bg-amber-50",
     text: "text-amber-700",

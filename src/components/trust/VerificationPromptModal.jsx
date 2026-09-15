@@ -65,9 +65,7 @@ export default function VerificationPromptModal({ profile }) {
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">{t('verification.modal.title')}</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              <Trans i18nKey="verification.modal.body">
-                Tu perfil está activo, pero los clientes priorizan los perfiles verificados. Verificar tu identidad solo tarda <strong>2 minutos</strong>.
-              </Trans>
+              <Trans i18nKey="verification.modal.body" components={{ strong: <strong /> }} />
             </p>
           </div>
 

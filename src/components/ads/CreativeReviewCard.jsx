@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { CheckCircle, MessageSquare, ZoomIn, X, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Lightbox para ver imágenes a tamaño completo
 function Lightbox({ urls, startIndex, onClose }) {
+  const { t } = useTranslation();
   const [current, setCurrent] = useState(startIndex);
 
   const prev = () => setCurrent(i => (i - 1 + urls.length) % urls.length);
@@ -44,7 +46,7 @@ function Lightbox({ urls, startIndex, onClose }) {
 
       <img
         src={urls[current]}
-        alt={`Creatividad ${current + 1}`}
+        alt={t('ads.creativeReview.creativeAlt', { number: current + 1 })}
         className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg"
         onClick={e => e.stopPropagation()}
       />
@@ -64,6 +66,7 @@ function Lightbox({ urls, startIndex, onClose }) {
 }
 
 export default function CreativeReviewCard({ briefing, onReviewed }) {
+  const { t } = useTranslation();
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [showChangesForm, setShowChangesForm] = useState(false);
   const [changesText, setChangesText] = useState("");
@@ -76,8 +79,8 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
         <CardContent className="p-6 flex items-center gap-3">
           <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0" />
           <div>
-            <p className="font-semibold text-green-900">Creatividades aprobadas</p>
-            <p className="text-sm text-green-700">Has aprobado el contenido. Estamos lanzando tu campaña.</p>
+            <p className="font-semibold text-green-900">{t('ads.creativeReview.approvedTitle')}</p>
+            <p className="text-sm text-green-700">{t('ads.creativeReview.approvedText')}</p>
           </div>
         </CardContent>
       </Card>
@@ -108,11 +111,11 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
         `
       });
 
-      toast.success("✅ ¡Campaña aprobada! La lanzaremos en las próximas horas.");
+      toast.success(t('ads.creativeReview.approveSuccess'));
       onReviewed?.();
     } catch (error) {
       console.error("Error al aprobar:", error);
-      toast.error("Error al aprobar. Inténtalo de nuevo.");
+      toast.error(t('ads.creativeReview.approveError'));
     } finally {
       setSubmitting(false);
     }
@@ -120,7 +123,7 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
 
   const handleRequestChanges = async () => {
     if (!changesText.trim()) {
-      toast.error("Describe qué cambios necesitas.");
+      toast.error(t('ads.creativeReview.describeChanges'));
       return;
     }
     setSubmitting(true);
@@ -147,13 +150,13 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
         `
       });
 
-      toast.success("✅ Solicitud enviada. Nuestro equipo la revisará pronto.");
+      toast.success(t('ads.creativeReview.changesSent'));
       setShowChangesForm(false);
       setChangesText("");
       onReviewed?.();
     } catch (error) {
       console.error("Error al solicitar cambios:", error);
-      toast.error("Error al enviar. Inténtalo de nuevo.");
+      toast.error(t('ads.creativeReview.sendError'));
     } finally {
       setSubmitting(false);
     }
@@ -173,10 +176,10 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-500" />
-            <CardTitle className="text-base font-semibold">Revisa tu campaña</CardTitle>
+            <CardTitle className="text-base font-semibold">{t('ads.creativeReview.title')}</CardTitle>
           </div>
           <p className="text-sm text-gray-500 mt-1">
-            Hemos preparado las creatividades. Revísalas y danos el visto bueno para lanzar.
+            {t('ads.creativeReview.subtitle')}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -184,7 +187,7 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
           {/* Imágenes */}
           {briefing.ads_creative_urls?.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Creatividades</p>
+              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{t('ads.campaign.creativesLabel')}</p>
               <div className="grid grid-cols-2 gap-3">
                 {briefing.ads_creative_urls.map((url, idx) => (
                   <div
@@ -194,7 +197,7 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
                   >
                     <img
                       src={url}
-                      alt={`Creatividad ${idx + 1}`}
+                      alt={t('ads.creativeReview.creativeAlt', { number: idx + 1 })}
                       className="w-full h-44 object-cover transition-transform group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
@@ -206,14 +209,14 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-gray-400 mt-1.5 text-center">Toca una imagen para verla a tamaño completo</p>
+              <p className="text-xs text-gray-400 mt-1.5 text-center">{t('ads.creativeReview.tapToZoom')}</p>
             </div>
           )}
 
           {/* Copy del anuncio */}
           {briefing.ads_copy && (
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Texto del anuncio</p>
+              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{t('ads.creativeReview.adTextLabel')}</p>
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                 <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{briefing.ads_copy}</p>
               </div>
@@ -225,12 +228,12 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
               <p className="text-sm font-semibold text-amber-900 flex items-center gap-2">
                 <MessageSquare className="w-4 h-4" />
-                ¿Qué cambiarías?
+                {t('ads.creativeReview.whatWouldYouChange')}
               </p>
               <Textarea
                 value={changesText}
                 onChange={e => setChangesText(e.target.value)}
-                placeholder="Ej: Cambiar el color del fondo, usar otra foto, ajustar el texto del titular..."
+                placeholder={t('ads.creativeReview.changesPlaceholder')}
                 rows={4}
                 className="bg-white border-amber-200 focus:border-amber-400 text-sm"
               />
@@ -240,7 +243,7 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
                   disabled={submitting || !changesText.trim()}
                   className="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium"
                 >
-                  {submitting ? "Enviando..." : "Enviar solicitud"}
+                  {submitting ? t('ads.shared.sending') : t('ads.creativeReview.sendRequest')}
                 </Button>
                 <Button
                   variant="outline"
@@ -248,7 +251,7 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
                   disabled={submitting}
                   className="text-sm"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
               </div>
             </div>
@@ -263,7 +266,7 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3"
               >
                 <CheckCircle className="w-5 h-5 mr-2" />
-                {submitting ? "Procesando..." : "✓ Aprobar y lanzar"}
+                {submitting ? t('ads.creativeReview.processing') : t('ads.creativeReview.approveAndLaunch')}
               </Button>
               <Button
                 variant="outline"
@@ -272,7 +275,7 @@ export default function CreativeReviewCard({ briefing, onReviewed }) {
                 className="flex-1 border-gray-300 text-gray-700 font-medium py-3"
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
-                Pedir cambios
+                {t('ads.creativeReview.requestChanges')}
               </Button>
             </div>
           )}

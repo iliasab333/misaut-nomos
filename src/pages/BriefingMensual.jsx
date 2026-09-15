@@ -299,9 +299,11 @@ export default function BriefingMensualPage() {
           </p>
           {isEditMode && (
             <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-              <Trans i18nKey="ads.briefing.editingNotice" values={{ month: currentMonthLabel }}>
-                ✏️ <strong>Editando tu briefing de {{ month: currentMonthLabel }}.</strong> Puedes actualizar cualquier campo antes del día 5 del mes.
-              </Trans>
+              <Trans
+                i18nKey="ads.briefing.editingNotice"
+                values={{ month: currentMonthLabel }}
+                components={{ strong: <strong /> }}
+              />
             </div>
           )}
         </div>
@@ -315,9 +317,8 @@ export default function BriefingMensualPage() {
                 <Trans
                   i18nKey="ads.briefing.recommendation.text"
                   values={{ platform: platformLabels[recommendedPlatform.platform], reason: recommendedPlatform.reason }}
-                >
-                  <strong>Recomendación:</strong> Según tu cuestionario, tus clientes suelen estar en <strong>{{ platform: platformLabels[recommendedPlatform.platform] }}</strong>. {{ reason: recommendedPlatform.reason }}
-                </Trans>
+                  components={{ strong: <strong /> }}
+                />
               </div>
             </div>
           )}

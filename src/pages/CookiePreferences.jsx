@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import i18n from '@/i18n';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Cookie, Check, AlertCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { useLanguage } from '@/components/ui/LanguageSwitcher';
 import { getCookieConsent, revokeAnalyticsCookies } from '@/services/cookieConsent';
 import { toast } from 'sonner';
 
+const SUPPORT_EMAIL = 'hola@misautonomos.com';
+
 function CookieCategory({ title, description, checked, onChange, disabled }) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-start justify-between gap-3 p-4 border border-gray-100 rounded-lg hover:border-gray-200 transition-colors">
       <div className="flex-1">
@@ -17,14 +20,14 @@ function CookieCategory({ title, description, checked, onChange, disabled }) {
       <div>
         {disabled ? (
           <span className="text-xs bg-gray-100 text-gray-500 px-3 py-1.5 rounded font-medium whitespace-nowrap flex-shrink-0">
-            Siempre activo
+            {t('cookies.alwaysActive')}
           </span>
         ) : (
-          <button 
+          <button
             onClick={onChange}
             className={`relative inline-flex w-12 h-7 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-gray-900' : 'bg-gray-200'}`}
             aria-pressed={checked}
-            aria-label={`${title}: ${checked ? 'activado' : 'desactivado'}`}
+            aria-label={checked ? t('cookies.preferences.toggleOn', { title }) : t('cookies.preferences.toggleOff', { title })}
           >
             <span className={`inline-block w-5 h-5 bg-white rounded-full shadow transition-transform mt-1 ml-0.5 ${checked ? 'translate-x-5' : 'translate-x-0'}`}/>
           </button>
@@ -35,7 +38,7 @@ function CookieCategory({ title, description, checked, onChange, disabled }) {
 }
 
 export default function CookiePreferencesPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [prefs, setPrefs] = useState({ essential: true, analytics: false, marketing: false });
   const [loading, setLoading] = useState(false);
 
@@ -49,9 +52,9 @@ export default function CookiePreferencesPage() {
   const updatePrefs = async (newPrefs) => {
     setLoading(true);
     setPrefs(newPrefs);
-    
+
     const consentId = localStorage.getItem('consent_id');
-    
+
     // Guardar en BD
     try {
       await base44.entities.CookieConsent.create({
@@ -67,21 +70,21 @@ export default function CookiePreferencesPage() {
     } catch(e) {
       // Non-blocking
     }
-    
+
     // Guardar en localStorage
     localStorage.setItem('cookie_consent', JSON.stringify({
       ...newPrefs,
       timestamp: new Date().toISOString(),
       version: 'cookies-v1'
     }));
-    
+
     // Si desactiva analíticas, borrar cookies _ga*
     if (!newPrefs.analytics && prefs.analytics) {
       revokeAnalyticsCookies();
     }
-    
+
     setLoading(false);
-    toast.success(t('cookies.settingsSaved') || 'Preferencias guardadas');
+    toast.success(t('cookies.settingsSaved'));
   };
 
   const handleAnalyticsChange = () => {
@@ -105,42 +108,42 @@ export default function CookiePreferencesPage() {
             <Cookie className="w-5 h-5 text-amber-600" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {t('cookies.preferencesTitle') || 'Preferencias de cookies'}
+            {t('cookies.preferencesTitle')}
           </h1>
         </div>
         <p className="text-gray-600 mb-8">
-          Gestiona qué cookies aceptas en MisAutónomos. Puedes cambiar tus preferencias en cualquier momento.
+          {t('cookies.preferences.intro')}
         </p>
 
         {/* Info Box */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">Cookies esenciales</p>
-            <p>Siempre están activas para que la plataforma funcione correctamente. No necesitan tu consentimiento.</p>
+            <p className="font-medium mb-1">{t('cookies.preferences.essentialTitle')}</p>
+            <p>{t('cookies.preferences.essentialBody')}</p>
           </div>
         </div>
 
         {/* Preferences */}
         <div className="space-y-4 mb-8">
-          <CookieCategory 
-            title={t('cookies.essential') || 'Esenciales'}
-            description={t('cookies.essentialDesc') || 'Necesarias para el funcionamiento básico (sesión, idioma, seguridad). No se pueden desactivar.'}
+          <CookieCategory
+            title={t('cookies.essential')}
+            description={t('cookies.essentialDesc')}
             checked={true}
             disabled={true}
           />
-          
-          <CookieCategory 
-            title={t('cookies.analytics') || 'Analíticas'}
-            description={t('cookies.analyticsDesc') || 'Nos ayudan a entender cómo usas la plataforma para mejorarla (Google Analytics, estadísticas anónimas).'}
+
+          <CookieCategory
+            title={t('cookies.analytics')}
+            description={t('cookies.analyticsDesc')}
             checked={prefs.analytics}
             onChange={handleAnalyticsChange}
             disabled={false}
           />
-          
-          <CookieCategory 
-            title={t('cookies.marketing') || 'Marketing'}
-            description={t('cookies.marketingDesc') || 'Permiten mostrarte anuncios relevantes en otras webs según tus intereses.'}
+
+          <CookieCategory
+            title={t('cookies.marketing')}
+            description={t('cookies.marketingDesc')}
             checked={prefs.marketing}
             onChange={handleMarketingChange}
             disabled={false}
@@ -154,7 +157,7 @@ export default function CookiePreferencesPage() {
             disabled={loading}
             className="text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
           >
-            Rechazar todas las opcionales
+            {t('cookies.preferences.rejectOptional')}
           </button>
           <button
             onClick={() => updatePrefs({ essential: true, analytics: true, marketing: true })}
@@ -162,31 +165,31 @@ export default function CookiePreferencesPage() {
             className="text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 active:bg-gray-950 py-3 px-6 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <Check className="w-4 h-4" />
-            Aceptar todas
+            {t('cookies.acceptAll')}
           </button>
         </div>
 
         {/* Additional Info */}
         <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Más información</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">{t('cookies.moreInfo')}</h3>
           <ul className="space-y-2 text-sm">
             <li>
               <Link to="/cookies" className="text-blue-600 hover:underline font-medium">
-                → Política de cookies completa
+                {t('cookies.preferences.fullPolicyLink')}
               </Link>
-              <p className="text-gray-600 text-xs mt-1">Detalle de todas las cookies, proveedores y duraciones</p>
+              <p className="text-gray-600 text-xs mt-1">{t('cookies.preferences.fullPolicyHint')}</p>
             </li>
             <li className="mt-3">
               <Link to="/privacidad" className="text-blue-600 hover:underline font-medium">
-                → Política de privacidad
+                {t('cookies.preferences.privacyLink')}
               </Link>
-              <p className="text-gray-600 text-xs mt-1">Cómo tratamos tus datos personales</p>
+              <p className="text-gray-600 text-xs mt-1">{t('cookies.preferences.privacyHint')}</p>
             </li>
             <li className="mt-3">
-              <a href="mailto:hola@misautonomos.com" className="text-blue-600 hover:underline font-medium">
-                → Contacto: hola@misautonomos.com
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="text-blue-600 hover:underline font-medium">
+                {t('cookies.preferences.contactLink', { email: SUPPORT_EMAIL })}
               </a>
-              <p className="text-gray-600 text-xs mt-1">¿Preguntas sobre cookies o privacidad?</p>
+              <p className="text-gray-600 text-xs mt-1">{t('cookies.preferences.contactHint')}</p>
             </li>
           </ul>
         </div>

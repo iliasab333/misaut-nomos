@@ -288,9 +288,10 @@ export default function AdminBusinessDashboard({ users, profiles, subscriptions,
         <div>
           <p className="text-xs font-medium text-amber-900">{t("admin.business.slackAlert.title")}</p>
           <p className="text-[11px] text-amber-700 mt-0.5">
-            <Trans i18nKey="admin.business.slackAlert.description">
-              Las métricas se calculan en tiempo real. Para recibir alertas en Slack, añade la variable de entorno <code className="bg-amber-100 px-1 rounded">SLACK_WEBHOOK_URL</code>.
-            </Trans>
+            <Trans
+              i18nKey="admin.business.slackAlert.description"
+              components={{ 1: <code className="bg-amber-100 px-1 rounded" /> }}
+            />
           </p>
         </div>
         <a href="https://api.slack.com/messaging/webhooks" target="_blank" rel="noreferrer" className="text-xs text-amber-900 underline font-medium whitespace-nowrap">

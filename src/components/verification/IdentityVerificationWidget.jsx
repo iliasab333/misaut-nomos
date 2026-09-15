@@ -15,9 +15,9 @@ export function VerifiedBadge({ size = "sm", showLabel = true }) {
     md: "w-5 h-5",
   };
   return (
-    <span className="inline-flex items-center gap-1 text-emerald-700 font-medium" title={t('verification.badge.verifiedIdentity')}>
+    <span className="inline-flex items-center gap-1 text-emerald-700 font-medium" title={t('proProfile.badges.identityVerified')}>
       <ShieldCheck className={`${sizeMap[size]} text-emerald-500 fill-emerald-100`} />
-      {showLabel && <span className="text-xs">{t('verification.badge.verified')}</span>}
+      {showLabel && <span className="text-xs">{t('proProfile.badges.verified')}</span>}
     </span>
   );
 }
@@ -221,7 +221,7 @@ export default function IdentityVerificationWidget({ user }) {
 
         <Button onClick={handleSubmit} disabled={step === "submitting"} className="w-full bg-blue-600 hover:bg-blue-700">
           {step === "submitting" ? (
-            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('verification.form.sending')}</>
+            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('reviews.form.sending')}</>
           ) : (
             <><CheckCircle className="w-4 h-4 mr-2" /> {t('verification.form.submit')}</>
           )}
@@ -236,7 +236,7 @@ export default function IdentityVerificationWidget({ user }) {
       <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
         <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
         <div>
-          <p className="text-sm font-semibold text-emerald-800">{t('verification.badge.verifiedIdentity')}</p>
+          <p className="text-sm font-semibold text-emerald-800">{t('proProfile.badges.identityVerified')}</p>
           <p className="text-xs text-emerald-600">{t('verification.approved.subtitle')}</p>
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function IdentityVerificationWidget({ user }) {
       <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3">
         <div className="flex items-center gap-2">
           <ShieldX className="w-5 h-5 text-red-600" />
-          <p className="text-sm font-semibold text-red-800">{t('verification.rejected.title')}</p>
+          <p className="text-sm font-semibold text-red-800">{t('verification.toast.rejected')}</p>
         </div>
         {verification.rejection_reason && (
           <p className="text-xs text-red-700 bg-red-100 rounded-lg px-3 py-2">

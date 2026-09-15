@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search as SearchIcon,
@@ -75,6 +76,7 @@ function CategoryChipSkeleton() {
 
 // ── Hero ─────────────────────────────────────────────────────────────────
 export default function LandingHero() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [category, setCategory] = useState("");
   const [provincia, setProvincia] = useState("");
@@ -168,7 +170,7 @@ export default function LandingHero() {
             style={{ backgroundColor: NAVY_SOFT, color: NAVY }}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            Verificados · Sin comisiones · Contacto directo
+            {t('landing.hero.eyebrow')}
           </div>
         </div>
 
@@ -182,14 +184,14 @@ export default function LandingHero() {
             fontSize: "clamp(1.6rem, 5.6vw, 3.5rem)",
           }}
         >
-          Encuentra al autónomo
-          <br className="hidden sm:block" />
-          {" "}que necesitas{" "}
-          <span style={{ color: GOLD }}>cerca de ti</span>
+          <Trans
+            i18nKey="landing.hero.title"
+            components={{ 1: <br className="hidden sm:block" />, 3: <span style={{ color: GOLD }} /> }}
+          />
         </h1>
 
         <p className="text-center text-slate-600 mt-2 md:mt-5 max-w-xl mx-auto text-[14px] md:text-lg leading-snug md:leading-relaxed">
-          Filtra por servicio y zona. Contactas directo con el profesional.
+          {t('landing.hero.subtitle')}
         </p>
 
         {/* Panel de búsqueda guiada */}
@@ -205,19 +207,19 @@ export default function LandingHero() {
             <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 md:items-end">
               <NativeSelect
                 id="hero-category"
-                label="¿Qué necesitas?"
+                label={t('landing.hero.whatLabel')}
                 value={category}
                 onChange={setCategory}
-                placeholder={loadingCategories ? "Cargando categorías…" : "Elige un servicio"}
+                placeholder={loadingCategories ? t('landing.hero.loadingCategories') : t('landing.hero.chooseService')}
                 options={categoryOptions}
                 disabled={loadingCategories || categoryOptions.length === 0}
               />
               <NativeSelect
                 id="hero-provincia"
-                label="¿Dónde?"
+                label={t('landing.hero.whereLabel')}
                 value={provincia}
                 onChange={(v) => { setProvincia(v); setCiudad(""); }}
-                placeholder="Provincia"
+                placeholder={t('provinceField')}
                 options={provinciaOptions}
               />
               <button
@@ -229,7 +231,7 @@ export default function LandingHero() {
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = NAVY)}
               >
                 <SearchIcon className="w-4 h-4" />
-                Buscar
+                {t('common.search')}
               </button>
             </div>
 
@@ -238,10 +240,10 @@ export default function LandingHero() {
               <div className="mt-3">
                 <NativeSelect
                   id="hero-ciudad"
-                  label={`Ciudad en ${provincia} (opcional)`}
+                  label={t('landing.hero.cityLabel', { province: provincia })}
                   value={ciudad}
                   onChange={setCiudad}
-                  placeholder="Toda la provincia"
+                  placeholder={t('landing.hero.wholeProvince')}
                   options={ciudadOptions}
                 />
               </div>
@@ -257,7 +259,7 @@ export default function LandingHero() {
                 className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 underline underline-offset-2 focus:outline-none focus-visible:text-slate-900"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
-                Buscar por palabra clave
+                {t('landing.hero.keywordSearch')}
               </button>
             ) : (
               <form onSubmit={handleFreeTextSubmit} className="flex gap-2 w-full">
@@ -266,14 +268,14 @@ export default function LandingHero() {
                   type="text"
                   value={freeText}
                   onChange={(e) => setFreeText(e.target.value)}
-                  placeholder="Ej. instalar aire acondicionado, cambiar persiana…"
+                  placeholder={t('landing.hero.keywordPlaceholder')}
                   className="flex-1 h-10 rounded-lg border border-slate-200 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                 />
                 <button
                   type="submit"
                   className="h-10 rounded-lg border border-slate-200 text-slate-700 font-medium px-4 text-sm hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00255C]/20"
                 >
-                  Buscar
+                  {t('common.search')}
                 </button>
               </form>
             )}
@@ -284,7 +286,7 @@ export default function LandingHero() {
         <div className="mt-12 md:mt-16">
           <div className="flex items-end justify-between mb-4">
             <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500">
-              Servicios disponibles
+              {t('landing.hero.servicesTitle')}
             </h2>
             <button
               type="button"
@@ -292,7 +294,7 @@ export default function LandingHero() {
               className="hidden sm:inline-flex items-center gap-1 text-sm font-medium hover:underline focus:outline-none focus-visible:underline"
               style={{ color: NAVY }}
             >
-              Ver todos los profesionales
+              {t('landing.hero.viewAll')}
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -341,7 +343,7 @@ export default function LandingHero() {
             className="sm:hidden mt-4 inline-flex items-center gap-1 text-sm font-medium"
             style={{ color: NAVY }}
           >
-            Ver todos los profesionales
+            {t('landing.hero.viewAll')}
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -361,9 +363,9 @@ export default function LandingHero() {
                 <Building2 className="w-5 h-5" />
               </span>
               <div>
-                <p className="font-semibold text-slate-900">¿Eres autónomo?</p>
+                <p className="font-semibold text-slate-900">{t('landing.cta_pro_title')}</p>
                 <p className="text-sm text-slate-600">
-                  Aparece en los resultados de tu zona. Contacto directo, sin comisiones.
+                  {t('landing.hero.proBannerText')}
                 </p>
               </div>
             </div>
@@ -375,7 +377,7 @@ export default function LandingHero() {
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = GOLD_HOVER)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = GOLD)}
             >
-              Hazte autónomo · Gratis
+              {t('nav.becomeProFree')}
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -385,15 +387,15 @@ export default function LandingHero() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
           <span className="inline-flex items-center gap-1.5">
             <BadgeCheck className="w-3.5 h-3.5" style={{ color: NAVY }} />
-            Identidad verificada
+            {t('landing.hero.trustVerified')}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5" style={{ color: NAVY }} />
-            Sin comisiones
+            {t('landing.feature_no_fees')}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <SearchIcon className="w-3.5 h-3.5" style={{ color: NAVY }} />
-            Contacto directo
+            {t('landing.feature_direct_contact')}
           </span>
         </div>
       </div>

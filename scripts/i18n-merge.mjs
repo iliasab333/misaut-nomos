@@ -55,6 +55,10 @@ function flatten(obj, prefix = '', out = new Map()) {
   return out;
 }
 
+// Devuelve null si va bien, o el mensaje del problema. NO lanza: las
+// colisiones de forma son un error de datos como cualquier otro y tienen que
+// salir junto al resto, no abortar el script a medio camino dejando al que lo
+// ejecuta sin ver los demás problemas.
 function setPath(obj, path, value) {
   const keys = path.split('.');
   let cur = obj;
@@ -62,11 +66,17 @@ function setPath(obj, path, value) {
     const k = keys[i];
     if (cur[k] === undefined) cur[k] = {};
     else if (typeof cur[k] !== 'object' || cur[k] === null) {
-      throw new Error(`"${keys.slice(0, i + 1).join('.')}" es un string pero "${path}" quiere anidar debajo`);
+      return `"${keys.slice(0, i + 1).join('.')}" ya es texto, pero "${path}" quiere colgar claves debajo. Renombra una de las dos.`;
     }
     cur = cur[k];
   }
-  cur[keys[keys.length - 1]] = value;
+  // El caso simétrico: "a.b" existe como objeto y llega "a.b" como string.
+  const last = keys[keys.length - 1];
+  if (cur[last] !== undefined && typeof cur[last] === 'object' && cur[last] !== null) {
+    return `"${path}" ya tiene claves colgando, pero se le quiere asignar texto. Renombra una de las dos.`;
+  }
+  cur[last] = value;
+  return null;
 }
 
 const errors = [];
@@ -138,11 +148,22 @@ if (errors.length) {
 
 // Reconstruimos los objetos anidados desde el mapa plano fusionado, para que
 // el orden sea estable (claves existentes primero, nuevas después, en el
-// orden en que llegaron).
+// orden en que llegaron). Aquí aparecen las colisiones de FORMA: una parte
+// que cuelga "a.b.c" de una "a.b" que ya es texto. Se recogen todas antes de
+// decidir; nada se escribe si hay alguna.
+const shapeErrors = [];
 for (const lang of langs) {
   const out = {};
-  for (const [path, value] of flatLocales[lang]) setPath(out, path, value);
+  for (const [path, value] of flatLocales[lang]) {
+    const problem = setPath(out, path, value);
+    if (problem) shapeErrors.push(`[${lang}] ${problem} (la aporta ${origin[lang].get(path) || `${lang}.json`})`);
+  }
   locales[lang] = out;
+}
+if (shapeErrors.length) {
+  console.error(`✗ ${shapeErrors.length} colisión(es) de forma. No se ha escrito nada.\n`);
+  for (const e of shapeErrors) console.error(`  · ${e}`);
+  process.exit(1);
 }
 
 console.log(`Partes: ${partFiles.length} (${partFiles.join(', ')})`);

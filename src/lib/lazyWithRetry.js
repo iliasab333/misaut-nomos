@@ -19,6 +19,7 @@
 // esto la concentra en un sitio y la hace igual en las 82 rutas.
 
 import { lazy } from 'react';
+import { ensureAppLocale } from '@/i18n';
 
 const RELOAD_FLAG = 'ma.chunk-reloaded';
 
@@ -60,6 +61,27 @@ export function lazyWithRetry(factory) {
       // (evita un flash del ErrorBoundary).
       return new Promise(() => {});
     }
+  });
+}
+
+// Página que además necesita el bundle de traducciones de aplicación
+// (admin, CRM, facturación, presupuestos… — ver src/i18n/namespaces.js).
+//
+// Encadena las dos descargas en la MISMA promesa que React.lazy espera, así
+// que el <Suspense> de las rutas no pinta la página hasta tener sus textos.
+// Es lo que evita el destello de claves crudas («admin.users.title») que
+// tendría cualquier solución basada en cargar el bundle en un useEffect.
+//
+// Las dos peticiones salen a la vez (Promise.all, no secuencial): el chunk de
+// la página y el del idioma viajan en paralelo.
+//
+//   const CRM = lazyApp(() => import('./pages/CRM.jsx'));
+//
+// Una página pública normal sigue usando `lazyWithRetry`.
+export function lazyApp(factory) {
+  return lazyWithRetry(async () => {
+    const [mod] = await Promise.all([factory(), ensureAppLocale()]);
+    return mod;
   });
 }
 

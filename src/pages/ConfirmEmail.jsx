@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { supabase } from '@/api/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Mail, RefreshCw, CheckCircle, ArrowLeft, Loader2 } from 'lucide-react';
@@ -11,6 +12,7 @@ import { emailRedirectFor } from '@/lib/native/auth';
 export default function ConfirmEmailPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const email = params.get('email') || '';
@@ -41,11 +43,11 @@ export default function ConfirmEmailPage() {
       });
       if (error) throw error;
       setStatus('ok');
-      setMessage('Te hemos reenviado el email. Revisa tu bandeja (y la carpeta de Promociones o Spam).');
+      setMessage(t('auth.confirmEmail.resent'));
       setCooldown(30);
     } catch (e) {
       setStatus('error');
-      setMessage(e?.message || 'No hemos podido reenviar el email. Inténtalo de nuevo en un minuto.');
+      setMessage(e?.message || t('auth.confirmEmail.resendError'));
     } finally {
       setResending(false);
     }
@@ -60,7 +62,7 @@ export default function ConfirmEmailPage() {
         return;
       }
       setStatus('error');
-      setMessage('Aún no vemos tu confirmación. Abre el email y pulsa el botón; después vuelve aquí.');
+      setMessage(t('auth.confirmEmail.notConfirmedYet'));
     } finally {
       setChecking(false);
     }
@@ -75,32 +77,32 @@ export default function ConfirmEmailPage() {
           className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"
         >
           <ArrowLeft className="w-4 h-4" />
-          Cambiar de email
+          {t('auth.confirmEmail.changeEmail')}
         </button>
 
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8 text-center">
           <div className="mx-auto w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-4">
             <Mail className="w-7 h-7 text-blue-700" aria-hidden="true" />
           </div>
-          <h1 className="text-xl font-bold text-slate-900 mb-2">Confirma tu email</h1>
+          <h1 className="text-xl font-bold text-slate-900 mb-2">{t('auth.confirmEmail.title')}</h1>
           <p className="text-sm text-slate-600 mb-1">
-            Te hemos enviado un enlace a
+            {t('auth.confirmEmail.sentTo')}
           </p>
           {email ? (
             <p className="text-sm font-semibold text-slate-900 mb-4 break-all">{email}</p>
           ) : (
-            <p className="text-sm text-slate-500 mb-4">tu correo electrónico</p>
+            <p className="text-sm text-slate-500 mb-4">{t('auth.confirmEmail.yourEmail')}</p>
           )}
 
           <div className="text-left bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm text-slate-600 mb-5">
-            <p className="mb-2 font-medium text-slate-800">Cómo continuar:</p>
+            <p className="mb-2 font-medium text-slate-800">{t('auth.confirmEmail.howToContinue')}</p>
             <ol className="list-decimal pl-5 space-y-1.5">
-              <li>Abre el email de <strong>MisAutónomos</strong>.</li>
-              <li>Pulsa el botón <strong>"Confirmar mi cuenta"</strong>.</li>
-              <li>Volverás aquí y podrás publicar tu perfil.</li>
+              <li><Trans i18nKey="auth.confirmEmail.stepOpen" components={{ strong: <strong /> }} /></li>
+              <li><Trans i18nKey="auth.confirmEmail.stepClick" components={{ strong: <strong /> }} /></li>
+              <li>{t('auth.confirmEmail.stepReturn')}</li>
             </ol>
             <p className="mt-3 text-xs text-slate-500">
-              ¿No lo ves? Revisa la carpeta <strong>Promociones</strong> o <strong>Spam</strong>. A veces tarda hasta 2 minutos en llegar.
+              <Trans i18nKey="auth.confirmEmail.spamHint" components={{ strong: <strong /> }} />
             </p>
           </div>
 
@@ -123,9 +125,9 @@ export default function ConfirmEmailPage() {
             style={{ backgroundColor: '#0f172a' }}
           >
             {checking ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Comprobando…</>
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('auth.confirmEmail.checking')}</>
             ) : (
-              <><CheckCircle className="w-4 h-4 mr-2" /> Ya lo he confirmado</>
+              <><CheckCircle className="w-4 h-4 mr-2" /> {t('auth.confirmEmail.confirmed')}</>
             )}
           </Button>
 
@@ -137,19 +139,19 @@ export default function ConfirmEmailPage() {
             className="w-full h-11 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium"
           >
             {resending ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Reenviando…</>
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('auth.confirmEmail.resending')}</>
             ) : cooldown > 0 ? (
-              <>Reenviar el email en {cooldown} s</>
+              <>{t('auth.confirmEmail.resendIn', { seconds: cooldown })}</>
             ) : (
-              <><RefreshCw className="w-4 h-4 mr-2" /> Reenviar el email</>
+              <><RefreshCw className="w-4 h-4 mr-2" /> {t('auth.confirmEmail.resend')}</>
             )}
           </Button>
         </div>
 
         <p className="text-center text-xs text-slate-500 mt-6">
-          ¿Ya tienes cuenta?{' '}
+          {t('auth.footer.haveAccount')}{' '}
           <Link to="/login" className="text-blue-700 hover:underline font-medium">
-            Inicia sesión
+            {t('auth.login_title')}
           </Link>
         </p>
       </div>

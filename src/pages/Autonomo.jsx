@@ -44,7 +44,7 @@ import ReviewSection from "../components/profile/ReviewSection";
 import SEOHead from "../components/seo/SEOHead";
 import { LocalBusinessSchema, FAQPageSchema, ProfessionalPersonSchema, BreadcrumbSchema, MerchantListingSchema } from "../components/seo/StructuredData";
 import { toast } from "sonner";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import { useProfileTranslation } from "../components/profile/useProfileTranslation";
 import { ActionButtonsProfile } from "../components/profile/ActionButtons";
 import { generateSlug, isSlugDirty } from "../utils/slugUtils";
@@ -63,7 +63,7 @@ function cleanOldSlug(slug) {
 export default function AutonomoPage() {
   const navigate = useNavigate();
   const params = useParams();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
@@ -255,7 +255,7 @@ export default function AutonomoPage() {
         });
         if (favs[0]) await base44.entities.Favorite.delete(favs[0].id);
         setIsFavorite(false);
-        toast.success(t('removedFromFavorites') || "Eliminado de favoritos");
+        toast.success(t('favorites.toast.removed'));
       } else {
         await base44.entities.Favorite.create({
           client_id: user.id,
@@ -263,10 +263,10 @@ export default function AutonomoPage() {
           business_name: profile.business_name
         });
         setIsFavorite(true);
-        toast.success(t('addedToFavorites') || "Añadido a favoritos");
+        toast.success(t('favorites.toast.added'));
       }
     } catch (error) {
-      toast.error("Error al gestionar favoritos");
+      toast.error(t('search.favoritesError'));
     }
   };
 
@@ -344,7 +344,7 @@ export default function AutonomoPage() {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     setCopiedPhone(true);
-    toast.success("Número copiado");
+    toast.success(t('proProfile.phoneModal.copied'));
     setTimeout(() => setCopiedPhone(false), 2000);
   };
 
@@ -399,13 +399,13 @@ export default function AutonomoPage() {
           <CardContent className="p-8 text-center">
             <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {t('profileNotFound') || 'Perfil no encontrado'}
+              {t('profileNotFound')}
             </h2>
             <p className="text-gray-600 mb-6">
-              {t('profileNotFoundDescription') || 'El profesional que buscas no existe o ya no está disponible.'}
+              {t('profileNotFoundDesc')}
             </p>
             <Button onClick={() => navigate('/buscar')} className="text-white" style={{ background: '#00255C' }}>
-              {t('backToSearch') || 'Volver a búsqueda'}
+              {t('backToSearch')}
             </Button>
           </CardContent>
         </Card>
@@ -421,15 +421,15 @@ export default function AutonomoPage() {
   const canonicalUrl = `https://misautonomos.es/autonomo/${canonicalSlug}`;
 
   // Título SEO optimizado (máx 60 caracteres ideal)
-  const categoryName = profile.categories?.[0] || 'Profesional';
-  const locationName = profile.ciudad || profile.provincia || 'España';
-  const seoTitle = `${profile.business_name} - ${categoryName} en ${locationName} | MisAutónomos`;
+  const categoryName = profile.categories?.[0] || t('search.profile.seo.defaultCategory');
+  const locationName = profile.ciudad || profile.provincia || t('search.profile.seo.defaultLocation');
+  const seoTitle = t('search.profile.seo.title', { name: profile.business_name, category: categoryName, location: locationName });
 
   // Descripción SEO optimizada (máx 160 caracteres ideal)
-  const ratingText = profile.average_rating > 0 ? `★${profile.average_rating.toFixed(1)} (${profile.total_reviews} opiniones). ` : '';
-  const experienceText = profile.years_experience > 0 ? `${profile.years_experience} años de experiencia. ` : '';
-  const baseDescription = profile.descripcion_corta || `Servicios de ${categoryName.toLowerCase()} en ${locationName}`;
-  const seoDescription = `${ratingText}${experienceText}${baseDescription}. Contacta gratis con ${profile.business_name}.`.slice(0, 160);
+  const ratingText = profile.average_rating > 0 ? t('search.profile.seo.rating', { rating: profile.average_rating.toFixed(1), count: profile.total_reviews }) : '';
+  const experienceText = profile.years_experience > 0 ? t('search.profile.seo.experience', { years: profile.years_experience }) : '';
+  const baseDescription = profile.descripcion_corta || t('search.profile.seo.services', { category: categoryName.toLowerCase(), location: locationName });
+  const seoDescription = t('search.profile.seo.description', { rating: ratingText, experience: experienceText, base: baseDescription, name: profile.business_name }).slice(0, 160);
 
   // Keywords dinámicas
   const seoKeywords = [
@@ -508,7 +508,7 @@ export default function AutonomoPage() {
             className="hover:bg-white mb-2 text-gray-700 hover:text-gray-900 font-medium"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('backToSearch') || 'Volver a búsqueda'}
+            {t('backToSearch')}
           </Button>
           
           {/* CABECERA */}
@@ -541,7 +541,7 @@ export default function AutonomoPage() {
                       }
                     }}
                     className="cursor-pointer flex-shrink-0"
-                    aria-label={`Foto de ${profile.business_name || 'profesional'}`}
+                    aria-label={t('search.profile.photoOf', { name: profile.business_name || t('search.profile.professionalFallback') })}
                   >
                     <InitialsAvatar
                       name={profile.business_name || ""}
@@ -558,9 +558,9 @@ export default function AutonomoPage() {
               <h1 className="text-xl font-bold text-gray-900 mb-1">{profile.business_name}</h1>
               {(profile.categories?.[0] || profile.ciudad) && (
                 <p className="text-sm text-gray-600 mb-1">
-                  {profile.categories?.[0]}
-                  {profile.categories?.[0] && profile.ciudad && ' en '}
-                  {profile.ciudad}
+                  {profile.categories?.[0] && profile.ciudad
+                    ? t('category.heading.inCity', { category: profile.categories[0], city: profile.ciudad })
+                    : (profile.categories?.[0] || profile.ciudad)}
                 </p>
               )}
 
@@ -572,7 +572,7 @@ export default function AutonomoPage() {
                 )}
                 {profile.is_ads_plus && (
                   <Badge className="text-[11px] font-semibold uppercase tracking-[0.06em] border" style={{ background: '#FBF4DA', color: '#7B5400', borderColor: '#EFD68A' }}>
-                    Destacado
+                    {t('search.card.featured')}
                   </Badge>
                 )}
                 {isVerified && (
@@ -580,7 +580,7 @@ export default function AutonomoPage() {
                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                     </svg>
-                    Verificado
+                    {t('proProfile.badges.verified')}
                   </Badge>
                 )}
                 {profile.total_reviews > 0 && (
@@ -611,14 +611,14 @@ export default function AutonomoPage() {
                   onClick={async () => {
                     haptic('light');
                     await shareUrl({
-                      title: profile?.business_name || 'Profesional verificado',
-                      text: `${profile?.business_name || 'Este profesional'} en MisAutónomos${profile?.ciudad ? ' · ' + profile.ciudad : ''}`,
+                      title: profile?.business_name || t('search.profile.share.defaultTitle'),
+                      text: t('search.profile.share.text', { name: profile?.business_name || t('search.profile.share.thisProfessional') }) + (profile?.ciudad ? ' · ' + profile.ciudad : ''),
                       url: typeof window !== 'undefined' ? window.location.href : 'https://misautonomos.es',
-                      dialogTitle: 'Compartir perfil',
+                      dialogTitle: t('profile_page.share_profile'),
                     });
                   }}
-                  aria-label="Compartir perfil"
-                  title="Compartir"
+                  aria-label={t('profile_page.share_profile')}
+                  title={t('search.profile.share.button')}
                   className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   <Share2 className="w-4 h-4" />
@@ -626,8 +626,8 @@ export default function AutonomoPage() {
                 <button
                   type="button"
                   onClick={() => { haptic('light'); handleToggleFavorite(); }}
-                  aria-label={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-                  title={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+                  aria-label={isFavorite ? t('favorites.page.remove') : t('search.card.saveFavorite')}
+                  title={isFavorite ? t('favorites.page.remove') : t('search.card.saveFavorite')}
                   className={`inline-flex items-center gap-1.5 px-3 h-9 rounded-full border text-sm font-medium transition-colors ${
                     isFavorite
                       ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
@@ -635,7 +635,7 @@ export default function AutonomoPage() {
                   }`}
                 >
                   <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-                  {isFavorite ? 'Guardado' : 'Guardar'}
+                  {isFavorite ? t('profile_page.saved_favorite') : t('profile_page.save_favorite')}
                 </button>
               </div>
             </div>
@@ -651,7 +651,7 @@ export default function AutonomoPage() {
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#001A45')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = '#00255C')}
                 >
-                  <MessageCircle className="w-4 h-4" /> Enviar mensaje
+                  <MessageCircle className="w-4 h-4" /> {t('proProfile.contact.sendMessage')}
                 </button>
               )}
               {showWhatsApp && (
@@ -664,7 +664,7 @@ export default function AutonomoPage() {
                   onMouseLeave={(e) => (e.currentTarget.style.background = '#1FAD4F')}
                 >
                   <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                  WhatsApp
+                  {t('profile_page.whatsapp')}
                 </button>
               )}
               {showPhone && (
@@ -675,7 +675,7 @@ export default function AutonomoPage() {
                 >
                   <Phone className="w-4 h-4" style={{ color: '#00255C' }} />
                   <span className="hidden md:inline">{profile.telefono_contacto}</span>
-                  <span className="md:hidden">Llamar</span>
+                  <span className="md:hidden">{t('profile_page.call')}</span>
                 </button>
               )}
             </div>
@@ -695,13 +695,13 @@ export default function AutonomoPage() {
                 {profile.years_experience > 0 && (
                   <Badge className="bg-blue-50 text-blue-700 border-0 px-3 py-1.5 text-sm font-medium">
                     <Briefcase className="w-3.5 h-3.5 mr-1.5" />
-                    {profile.years_experience} {profile.years_experience === 1 ? 'año' : 'años'} de experiencia
+                    {t('profile_page.years_of_experience', { count: profile.years_experience })}
                   </Badge>
                 )}
                 {profile.tarifa_base > 0 && (
                   <Badge className="bg-blue-50 text-blue-700 border-0 px-3 py-1.5 text-sm font-medium">
                     <Euro className="w-3.5 h-3.5 mr-1.5" />
-                    desde {profile.tarifa_base}€/hora
+                    {t('profile_page.from_price', { price: profile.tarifa_base })}
                   </Badge>
                 )}
               </div>
@@ -713,7 +713,7 @@ export default function AutonomoPage() {
             <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
               <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-blue-600" />
-                Servicios ofrecidos
+                {t('profile_page.services')}
               </h3>
               <div className="space-y-3">
                 {displayProfile.services_offered.map((service) => (
@@ -746,17 +746,17 @@ export default function AutonomoPage() {
             <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
               <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-green-600" />
-                Disponibilidad
+                {t('profile_page.availability')}
               </h3>
               <div className="space-y-2">
                 <p className="text-sm text-gray-700">
-                  {displayProfile.disponibilidad_tipo === "ambos" && "Disponible todos los días"}
-                  {displayProfile.disponibilidad_tipo === "laborables" && "Disponible de lunes a viernes"}
-                  {displayProfile.disponibilidad_tipo === "festivos" && "Disponible fines de semana y festivos"}
+                  {displayProfile.disponibilidad_tipo === "ambos" && t('profile_page.available_every_day')}
+                  {displayProfile.disponibilidad_tipo === "laborables" && t('proProfile.availability.summaryWeekdays')}
+                  {displayProfile.disponibilidad_tipo === "festivos" && t('proProfile.availability.summaryWeekends')}
                 </p>
                 <p className="text-sm text-gray-600 flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5" />
-                  Horario: {displayProfile.horario_apertura} - {displayProfile.horario_cierre}
+                  {t('proProfile.availability.scheduleRange', { from: displayProfile.horario_apertura, to: displayProfile.horario_cierre })}
                 </p>
               </div>
             </Card>
@@ -767,7 +767,7 @@ export default function AutonomoPage() {
             <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
               <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-indigo-600" />
-                Portfolio de trabajos
+                {t('search.profile.portfolioTitle')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {displayProfile.portfolio_items.map((item) => (
@@ -790,7 +790,7 @@ export default function AutonomoPage() {
                         />
                         {item.images.length > 1 && (
                           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                            +{item.images.length - 1} fotos
+                            {t('search.profile.morePhotos', { count: item.images.length - 1 })}
                           </div>
                         )}
                       </div>
@@ -860,7 +860,7 @@ export default function AutonomoPage() {
           {/* GALERÍA */}
           {profile.photos && profile.photos.length > 0 && (
             <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">{t('workGalleryTitle') || 'Galería de trabajos'}</h3>
+              <h3 className="text-sm font-bold text-gray-900 mb-3">{t('workGalleryTitle')}</h3>
               <div className="grid grid-cols-3 gap-2">
                 {profile.photos.map((photo, idx) => (
                 <div 
@@ -871,7 +871,7 @@ export default function AutonomoPage() {
                     setSelectedImageIndex(idx);
                   }}
                 >
-                  <img src={photo} alt={`Trabajo ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                  <img src={photo} alt={t('proProfile.gallery.workAlt', { number: idx + 1 })} className="w-full h-full object-cover" loading="lazy" />
                   </div>
                 ))}
               </div>
@@ -881,31 +881,31 @@ export default function AutonomoPage() {
           {/* REDES SOCIALES */}
           {(profile.website || profile.social_links?.facebook || profile.social_links?.instagram || profile.social_links?.linkedin || profile.social_links?.tiktok) && (
             <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">{t('socialNetworks') || 'Redes sociales'}</h3>
+              <h3 className="text-sm font-bold text-gray-900 mb-3">{t('socialNetworks')}</h3>
               <div className="flex flex-wrap gap-2">
                 {profile.website && (
                   <a href={formatSocialLink(profile.website, 'website')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Globe className="w-4 h-4 mr-2" />Web</Button>
+                    <Button variant="outline" size="sm"><Globe className="w-4 h-4 mr-2" />{t('proProfile.social.web')}</Button>
                   </a>
                 )}
                 {profile.social_links?.instagram && (
                   <a href={formatSocialLink(profile.social_links.instagram, 'instagram')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Instagram className="w-4 h-4 mr-2 text-pink-600" />Instagram</Button>
+                    <Button variant="outline" size="sm"><Instagram className="w-4 h-4 mr-2 text-pink-600" />{t('proProfile.social.instagram')}</Button>
                   </a>
                 )}
                 {profile.social_links?.facebook && (
                   <a href={formatSocialLink(profile.social_links.facebook, 'facebook')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Facebook className="w-4 h-4 mr-2 text-blue-600" />Facebook</Button>
+                    <Button variant="outline" size="sm"><Facebook className="w-4 h-4 mr-2 text-blue-600" />{t('proProfile.social.facebook')}</Button>
                   </a>
                 )}
                 {profile.social_links?.linkedin && (
                   <a href={formatSocialLink(profile.social_links.linkedin, 'linkedin')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Linkedin className="w-4 h-4 mr-2 text-blue-700" />LinkedIn</Button>
+                    <Button variant="outline" size="sm"><Linkedin className="w-4 h-4 mr-2 text-blue-700" />{t('proProfile.social.linkedin')}</Button>
                   </a>
                 )}
                 {profile.social_links?.tiktok && (
                   <a href={formatSocialLink(profile.social_links.tiktok, 'tiktok')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Music className="w-4 h-4 mr-2 text-black" />TikTok</Button>
+                    <Button variant="outline" size="sm"><Music className="w-4 h-4 mr-2 text-black" />{t('proProfile.social.tiktok')}</Button>
                   </a>
                 )}
               </div>
@@ -924,19 +924,19 @@ export default function AutonomoPage() {
                       <Star key={s} className={`w-5 h-5 ${s <= Math.round(profile.average_rating) ? "fill-amber-400 text-amber-400" : "text-gray-200"}`} />
                     ))}
                   </div>
-                  <p className="text-sm text-gray-500">{profile.total_reviews} reseña{profile.total_reviews !== 1 ? 's' : ''}</p>
+                  <p className="text-sm text-gray-500">{t('search.profile.reviewsCount', { count: profile.total_reviews })}</p>
                 </div>
               </div>
             ) : null}
 
             <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
               <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-              {t('clientReviews') || 'Opiniones de clientes'}
+              {t('clientReviews')}
             </h3>
 
             {reviews.length === 0 && (
               <div className="bg-gray-50 rounded-xl p-4 mb-4 text-sm text-gray-500 text-center">
-                Aún no tiene reseñas — sé el primero en dejarla tras contactar
+                {t('search.profile.noReviews')}
               </div>
             )}
 
@@ -949,7 +949,7 @@ export default function AutonomoPage() {
       <Dialog open={showPhoneModal} onOpenChange={setShowPhoneModal}>
         <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
-            <DialogTitle>{t('phoneNumberTitle')}</DialogTitle>
+            <DialogTitle>{t('proProfile.phoneModal.title')}</DialogTitle>
             <DialogDescription>{profile.business_name}</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
@@ -957,7 +957,7 @@ export default function AutonomoPage() {
               <p className="text-3xl font-bold text-blue-700">{profile.telefono_contacto}</p>
             </div>
             <Button onClick={() => copyToClipboard(profile.telefono_contacto)} variant="outline" className="w-full">
-              {copiedPhone ? <><Check className="w-4 h-4 mr-2 text-green-600" />{t('copied')}</> : <><Copy className="w-4 h-4 mr-2" />{t('copyNumber')}</>}
+              {copiedPhone ? <><Check className="w-4 h-4 mr-2 text-green-600" />{t('reviews.request.copied')}</> : <><Copy className="w-4 h-4 mr-2" />{t('proProfile.phoneModal.copyButton')}</>}
             </Button>
           </div>
         </DialogContent>
@@ -967,7 +967,7 @@ export default function AutonomoPage() {
         <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="w-6 h-6 text-green-600" />WhatsApp
+              <MessageCircle className="w-6 h-6 text-green-600" />{t('profile_page.whatsapp')}
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
@@ -981,7 +981,7 @@ export default function AutonomoPage() {
               }}
               className="w-full bg-green-600 hover:bg-green-700 h-12"
             >
-              <MessageCircle className="w-5 h-5 mr-2" />{t('openWhatsApp')}
+              <MessageCircle className="w-5 h-5 mr-2" />{t('search.card.openWhatsApp')}
             </Button>
           </div>
         </DialogContent>
@@ -1021,7 +1021,7 @@ export default function AutonomoPage() {
             </>
           )}
           
-          <img src={selectedImage} alt={t('enlargedView')} className="max-w-full max-h-full object-contain rounded-xl" onClick={(e) => e.stopPropagation()} />
+          <img src={selectedImage} alt={t('proProfile.gallery.enlargedAlt')} className="max-w-full max-h-full object-contain rounded-xl" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
 

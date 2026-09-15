@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bookmark, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ import { Input } from "@/components/ui/input";
 
 export default function SavedSearches({ user, currentFilters, resultsCount, onLoadSearch }) {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [showSaveDialog, setShowSaveDialog] = React.useState(false);
   const [searchName, setSearchName] = React.useState("");
 
@@ -42,7 +44,7 @@ export default function SavedSearches({ user, currentFilters, resultsCount, onLo
       queryClient.invalidateQueries({ queryKey: ['savedSearches'] });
       setShowSaveDialog(false);
       setSearchName("");
-      toast.success("Búsqueda guardada");
+      toast.success(t('search.saved.savedToast'));
     },
   });
 
@@ -52,7 +54,7 @@ export default function SavedSearches({ user, currentFilters, resultsCount, onLo
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['savedSearches'] });
-      toast.success("Búsqueda eliminada");
+      toast.success(t('search.saved.deletedToast'));
     },
   });
 
@@ -72,7 +74,7 @@ export default function SavedSearches({ user, currentFilters, resultsCount, onLo
             <Card key={search.id} className="p-3 flex items-center gap-3 bg-purple-50 border-purple-200 flex-shrink-0">
               <button
                 onClick={() => onLoadSearch(search.filters)}
-                aria-label={`Cargar búsqueda: ${search.search_name}`}
+                aria-label={t('search.saved.loadAria', { name: search.search_name })}
                 className="flex items-center gap-2 hover:text-purple-700 transition-colors"
               >
                 <Bookmark className="w-4 h-4 text-purple-600" aria-hidden="true" />
@@ -84,7 +86,7 @@ export default function SavedSearches({ user, currentFilters, resultsCount, onLo
               <Button
                 variant="ghost"
                 size="icon"
-                aria-label={`Eliminar búsqueda guardada: ${search.search_name}`}
+                aria-label={t('search.saved.deleteAria', { name: search.search_name })}
                 className="h-6 w-6 hover:bg-red-100 hover:text-red-600"
                 onClick={() => deleteMutation.mutate(search.id)}
               >
@@ -103,44 +105,44 @@ export default function SavedSearches({ user, currentFilters, resultsCount, onLo
           className="border-purple-300 text-purple-700 hover:bg-purple-50"
         >
           <Bookmark className="w-4 h-4 mr-2" />
-          Guardar esta búsqueda
+          {t('search.saved.saveThis')}
         </Button>
       )}
 
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Guardar búsqueda</DialogTitle>
+            <DialogTitle>{t('search.saved.title')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <Input
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
-              placeholder="Ej: Electricistas en Madrid"
+              placeholder={t('search.saved.namePlaceholder')}
               autoFocus
             />
             <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
-              <p className="font-medium mb-1">Se guardarán estos filtros:</p>
+              <p className="font-medium mb-1">{t('search.saved.filtersIntro')}</p>
               <ul className="space-y-1 text-xs">
-                {currentFilters.category !== "all" && <li>• Categoría: {currentFilters.category}</li>}
-                {currentFilters.provincia !== "all" && <li>• Provincia: {currentFilters.provincia}</li>}
-                {currentFilters.ciudad !== "all" && <li>• Ciudad: {currentFilters.ciudad}</li>}
-                {currentFilters.minRating > 0 && <li>• Valoración mínima: {currentFilters.minRating}⭐</li>}
-                {currentFilters.availability !== "all" && <li>• Disponibilidad: {currentFilters.availability}</li>}
+                {currentFilters.category !== "all" && <li>{t('search.saved.filterCategory', { value: currentFilters.category })}</li>}
+                {currentFilters.provincia !== "all" && <li>{t('search.saved.filterProvince', { value: currentFilters.provincia })}</li>}
+                {currentFilters.ciudad !== "all" && <li>{t('search.saved.filterCity', { value: currentFilters.ciudad })}</li>}
+                {currentFilters.minRating > 0 && <li>{t('search.saved.filterMinRating', { value: currentFilters.minRating })}</li>}
+                {currentFilters.availability !== "all" && <li>{t('search.saved.filterAvailability', { value: currentFilters.availability })}</li>}
               </ul>
-              <p className="mt-2 text-purple-700 font-medium">{resultsCount} resultados encontrados</p>
+              <p className="mt-2 text-purple-700 font-medium">{t('search.saved.resultsFound', { count: resultsCount })}</p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={() => saveMutation.mutate({ name: searchName })}
               disabled={!searchName.trim() || saveMutation.isPending}
               className="bg-purple-600 hover:bg-purple-700"
             >
-              Guardar búsqueda
+              {t('search.saved.title')}
             </Button>
           </DialogFooter>
         </DialogContent>

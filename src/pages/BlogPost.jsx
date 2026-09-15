@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { Helmet } from 'react-helmet-async';
 import { Clock, ArrowLeft, Twitter, Linkedin, Copy, Check } from 'lucide-react';
@@ -8,6 +9,7 @@ import NewsletterSignup from '@/components/NewsletterSignup';
 
 export default function BlogPostPage() {
   const { slug } = useParams();
+  const { t } = useTranslation();
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
   const [toc, setToc] = useState([]);
@@ -64,12 +66,12 @@ export default function BlogPostPage() {
 
   if (post === false) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <p className="text-gray-500">Artículo no encontrado</p>
-      <Link to="/blog" className="text-sm text-blue-600 hover:underline">← Volver al blog</Link>
+      <p className="text-gray-500">{t('blog.post.notFound')}</p>
+      <Link to="/blog" className="text-sm text-blue-600 hover:underline">{t('blog.post.backToBlogArrow')}</Link>
     </div>
   );
 
-  const metaTitle = post.meta_title_es || `${post.title_es} | Blog MisAutónomos`;
+  const metaTitle = post.meta_title_es || t('blog.post.metaTitle', { title: post.title_es });
   const metaDesc = post.meta_description_es || post.excerpt_es || '';
   const ogImage = post.og_image || post.featured_image || '';
   const shareText = post.title_es;
@@ -107,7 +109,7 @@ export default function BlogPostPage() {
         {ogImage && <meta name="twitter:image" content={ogImage} />}
         {post.publish_date && <meta property="article:published_time" content={post.publish_date} />}
         {post.author_name && <meta property="article:author" content={post.author_name} />}
-        {post.tags?.map(t => <meta key={t} property="article:tag" content={t} />)}
+        {post.tags?.map(tag => <meta key={tag} property="article:tag" content={tag} />)}
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
@@ -126,7 +128,7 @@ export default function BlogPostPage() {
       {/* Back link */}
       <div className="max-w-3xl mx-auto px-4 pt-6">
         <Link to="/blog" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800">
-          <ArrowLeft className="w-4 h-4" /> Volver al blog
+          <ArrowLeft className="w-4 h-4" /> {t('blog.post.backToBlog')}
         </Link>
       </div>
 
@@ -152,14 +154,14 @@ export default function BlogPostPage() {
                 {post.author_name?.[0] || 'M'}
               </div>
             )}
-            <span className="font-medium text-gray-700">{post.author_name || 'Equipo MisAutónomos'}</span>
+            <span className="font-medium text-gray-700">{post.author_name || t('blog.post.defaultAuthor')}</span>
           </div>
           <span className="text-gray-300">·</span>
           {post.publish_date && (
             <span>{new Date(post.publish_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
           )}
           <span className="text-gray-300">·</span>
-          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{post.read_time_minutes} min lectura</span>
+          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{t('blog.post.readTime', { minutes: post.read_time_minutes })}</span>
         </div>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-10">
@@ -167,7 +169,7 @@ export default function BlogPostPage() {
             {/* Mobile TOC */}
             {toc.length > 2 && (
               <details className="lg:hidden mb-6 bg-gray-50 rounded-lg p-4">
-                <summary className="font-semibold text-sm cursor-pointer">Tabla de contenidos</summary>
+                <summary className="font-semibold text-sm cursor-pointer">{t('blog.post.toc')}</summary>
                 <ul className="mt-3 space-y-1 text-sm">
                   {toc.map(item => (
                     <li key={item.id} className={item.level === 3 ? 'ml-4' : ''}>
@@ -187,7 +189,7 @@ export default function BlogPostPage() {
 
             {/* Share */}
             <div className="mt-10 pt-6 border-t border-gray-100">
-              <p className="text-sm font-medium text-gray-700 mb-3">¿Te ha resultado útil? Compártelo:</p>
+              <p className="text-sm font-medium text-gray-700 mb-3">{t('blog.post.share')}</p>
               <div className="flex gap-2">
                 <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700">
                   <Twitter className="w-4 h-4" />
@@ -211,16 +213,16 @@ export default function BlogPostPage() {
 
             {/* CTA marca navy/gold */}
             <div className="mt-6 rounded-2xl p-6" style={{ background: '#00255C', color: 'white' }}>
-              <h3 className="text-lg font-semibold">¿Eres autónomo? Apareces donde te buscan</h3>
+              <h3 className="text-lg font-semibold">{t('blog.post.cta.title')}</h3>
               <p className="text-sm text-white/80 mt-1">
-                Crea tu perfil en minutos, recibe clientes y gestiona todo desde un sitio. Sin comisiones.
+                {t('blog.post.cta.body')}
               </p>
               <Link
                 to="/para-autonomos"
                 className="inline-block mt-4 text-sm font-semibold px-5 py-2 rounded-lg"
                 style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
               >
-                Cómo funciona para autónomos
+                {t('blog.post.cta.button')}
               </Link>
             </div>
           </div>
@@ -229,7 +231,7 @@ export default function BlogPostPage() {
           {toc.length > 2 && (
             <aside className="hidden lg:block">
               <div className="sticky top-20">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Contenidos</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">{t('blog.post.tocShort')}</p>
                 <ul className="space-y-2 text-sm border-l-2 border-gray-100">
                   {toc.map(item => (
                     <li key={item.id} className={item.level === 3 ? 'ml-3' : ''}>
@@ -247,7 +249,7 @@ export default function BlogPostPage() {
         {/* Related articles */}
         {related.length > 0 && (
           <section className="mt-16 pt-10 border-t border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Artículos relacionados</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">{t('blog.post.related')}</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {related.map(r => (
                 <Link key={r.id} to={`/blog/${r.slug}`} className="group">
@@ -257,7 +259,7 @@ export default function BlogPostPage() {
                     </div>
                   )}
                   <h3 className="font-semibold text-gray-900 text-sm group-hover:text-gray-700 line-clamp-2">{r.title_es}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{r.read_time_minutes} min lectura</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('blog.post.readTime', { minutes: r.read_time_minutes })}</p>
                 </Link>
               ))}
             </div>

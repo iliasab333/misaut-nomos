@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Trash2, Loader2, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/api/supabaseClient';
@@ -16,6 +17,7 @@ export default function DeleteAccountButton({
   className?: string;
   redirectTo?: string;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState('');
   const [busy, setBusy] = useState(false);
@@ -28,7 +30,7 @@ export default function DeleteAccountButton({
 
   const doDelete = async () => {
     if (confirm.trim().toUpperCase() !== 'ELIMINAR') {
-      toast.error('Escribe ELIMINAR para confirmar');
+      toast.error(t('account.delete.confirmPrompt'));
       return;
     }
     setBusy(true);
@@ -36,7 +38,7 @@ export default function DeleteAccountButton({
       const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' });
       if (error) {
         console.error('[DeleteAccount] edge function error:', error);
-        toast.error(error.message || 'No se ha podido eliminar la cuenta.');
+        toast.error(error.message || t('account.delete.error'));
         return;
       }
       try {
@@ -44,11 +46,11 @@ export default function DeleteAccountButton({
       } catch {
         /* noop */
       }
-      toast.success('Cuenta eliminada.');
+      toast.success(t('account.delete.success'));
       window.location.href = redirectTo;
     } catch (e: any) {
       console.error('[DeleteAccount] exception:', e);
-      toast.error(e?.message || 'No se ha podido eliminar la cuenta.');
+      toast.error(e?.message || t('account.delete.error'));
     } finally {
       setBusy(false);
     }
@@ -65,7 +67,7 @@ export default function DeleteAccountButton({
         }
       >
         <Trash2 className="w-4 h-4" />
-        Eliminar mi cuenta
+        {t('account.delete.button')}
       </button>
 
       {open && (
@@ -81,8 +83,8 @@ export default function DeleteAccountButton({
                   <AlertTriangle className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-slate-900">¿Eliminar tu cuenta?</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">Esta acción es permanente y no se puede deshacer.</p>
+                  <h2 className="font-semibold text-slate-900">{t('account.delete.title')}</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">{t('account.delete.subtitle')}</p>
                 </div>
               </div>
               <button
@@ -90,22 +92,22 @@ export default function DeleteAccountButton({
                 onClick={close}
                 disabled={busy}
                 className="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-50"
-                aria-label="Cerrar"
+                aria-label={t('common.close')}
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="p-5 space-y-3 text-sm text-slate-700">
-              <p>Al continuar perderás:</p>
+              <p>{t('account.delete.loseIntro')}</p>
               <ul className="list-disc list-inside text-xs text-slate-600 space-y-0.5">
-                <li>Tu perfil profesional y datos públicos.</li>
-                <li>Todas tus conversaciones, valoraciones y tickets.</li>
-                <li>Suscripciones activas (sin reembolso del periodo en curso).</li>
+                <li>{t('account.delete.loseProfile')}</li>
+                <li>{t('account.delete.loseConversations')}</li>
+                <li>{t('account.delete.loseSubscriptions')}</li>
               </ul>
               <label className="block pt-1">
                 <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">
-                  Escribe ELIMINAR para confirmar
+                  {t('account.delete.confirmPrompt')}
                 </span>
                 <input
                   type="text"
@@ -124,7 +126,7 @@ export default function DeleteAccountButton({
                 disabled={busy}
                 className="h-10 px-4 rounded-lg text-sm font-semibold border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
               >
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -134,7 +136,7 @@ export default function DeleteAccountButton({
                 style={{ background: '#B91C1C' }}
               >
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                Eliminar definitivamente
+                {t('account.delete.confirm')}
               </button>
             </div>
           </div>

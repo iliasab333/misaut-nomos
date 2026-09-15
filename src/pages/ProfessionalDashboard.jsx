@@ -157,7 +157,7 @@ export default function ProfessionalDashboardPage() {
         label: t('dashboard.average_rating'),
         value: avg ? avg.toFixed(1) : '—',
         sub: reviews
-          ? t('dashboard.pro.stats.reviewsCount', { count: reviews })
+          ? t('dashboard.pro.stats.reviewsCount', { count: reviews, n: fmt(reviews) })
           : t('dashboard.pro.stats.noReviews'),
         icon: Star,
         accent: GOLD,
@@ -180,7 +180,7 @@ export default function ProfessionalDashboardPage() {
     const c = data?.completeness || {};
     return [
       { key: 'photo', label: t('dashboard.pro.completeness.photo'), done: !!c.has_photo },
-      { key: 'desc', label: t('dashboard.completion.items.description'), done: !!c.has_description },
+      { key: 'desc', label: t('premium.dashboard.checks.fullDescription'), done: !!c.has_description },
       { key: 'photos3', label: t('dashboard.pro.completeness.workPhotos'), done: !!c.has_3_work_photos },
     ];
   }, [data, t]);
@@ -229,7 +229,7 @@ export default function ProfessionalDashboardPage() {
                 style={{ background: `${NAVY}10`, color: NAVY }}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                {t('verification.badge.verified')}
+                {t('proProfile.badges.verified')}
               </span>
             )}
           </motion.div>
@@ -391,7 +391,7 @@ function CompletenessCard({ percent, items, isComplete, onCta }) {
               className="text-[10px] font-bold uppercase tracking-[0.1em]"
               style={{ color: NAVY }}
             >
-              {t('dashboard.completion.title')}
+              {t('premium.dashboard.completeness.title')}
             </span>
           </div>
           <p className="text-xs text-slate-500">
@@ -472,19 +472,19 @@ function QuickActions({ navigate, unread, pendingReviews }) {
   const items = [
     {
       key: 'profile',
-      label: t('dashboard.pro.quickActions.profile'),
+      label: t('nav.myProfile'),
       icon: User,
       onClick: () => navigate('/mi-perfil'),
     },
     {
       key: 'stats',
-      label: t('dashboard.pro.quickActions.stats'),
+      label: t('nav.statistics'),
       icon: BarChart3,
       onClick: () => navigate('/mis-estadisticas'),
     },
     {
       key: 'reviews',
-      label: t('dashboard.pro.quickActions.reviews'),
+      label: t('nav.reviews'),
       icon: Star,
       onClick: () => navigate('/mis-valoraciones'),
       badge: pendingReviews > 0 ? pendingReviews : null,

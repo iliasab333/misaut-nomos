@@ -72,9 +72,7 @@ export default function PlanAdsPage() {
               {t('ads.plan.heroBadge')}
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
-              <Trans i18nKey="ads.plan.heroTitle">
-                Clientes nuevos cada mes,<br className="hidden md:block" /> sin pensar en marketing
-              </Trans>
+              <Trans i18nKey="ads.plan.heroTitle" components={{ br: <br className="hidden md:block" /> }} />
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
               {t('ads.plan.heroSubtitle')}

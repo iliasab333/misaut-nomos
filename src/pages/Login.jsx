@@ -9,33 +9,37 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Mail, Lock, User as UserIcon, Eye, EyeOff, Briefcase, Search as SearchIcon, ShieldCheck, Apple } from 'lucide-react';
 import { signInWithGoogle, signInWithApple, emailRedirectFor, passwordResetRedirect, isNative, isIOS } from '@/lib/native/auth';
+import { useTranslation } from 'react-i18next';
 
 const MODES = { SIGN_IN: 'signin', SIGN_UP: 'signup' };
 const ROLES = { PROFESIONAL: 'profesional', CLIENTE: 'cliente' };
+// Lockup de marca: va literal (no se traduce), en dos tonos.
+const BRAND = { prefix: 'mis', suffix: 'autónomos' };
 
-// Traduce los errores típicos de Supabase a un mensaje claro en español.
-function spanishAuthError(error) {
+// Traduce los errores típicos de Supabase a un mensaje claro en el idioma
+// del usuario. Recibe `t` porque vive fuera del componente.
+function authErrorMessage(t, error) {
   const raw = (error?.message || '').toLowerCase();
-  if (!raw) return 'Ha ocurrido un error. Inténtalo de nuevo.';
+  if (!raw) return t('auth.errors.generic');
   if (raw.includes('invalid login credentials') || raw.includes('invalid email or password')) {
-    return 'Email o contraseña incorrectos.';
+    return t('auth.errors.invalidCredentials');
   }
   if (raw.includes('email not confirmed')) {
-    return 'Tu email aún no está confirmado. Revisa tu bandeja de entrada.';
+    return t('auth.errors.emailNotConfirmed');
   }
   if (raw.includes('user already registered') || raw.includes('already registered') || raw.includes('already been registered')) {
-    return 'Este email ya está registrado. Inicia sesión en su lugar.';
+    return t('auth.errors.alreadyRegistered');
   }
   if (raw.includes('password should be at least')) {
-    return 'La contraseña debe tener al menos 6 caracteres.';
+    return t('auth.errors.passwordTooShort');
   }
   if (raw.includes('rate limit') || raw.includes('too many')) {
-    return 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
+    return t('auth.errors.rateLimit');
   }
   if (raw.includes('unable to validate email')) {
-    return 'El email no es válido.';
+    return t('auth.errors.invalidEmail');
   }
-  return error?.message || 'Ha ocurrido un error. Inténtalo de nuevo.';
+  return error?.message || t('auth.errors.generic');
 }
 
 // Destino post-registro según el rol elegido en la pestaña Crear cuenta.
@@ -70,6 +74,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { refreshUser } = useAuth();
+  const { t } = useTranslation();
 
   const urlParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
 
@@ -143,7 +148,7 @@ export default function LoginPage() {
     setError('');
     setInfo('');
     if (!email || !password) {
-      setError('Introduce tu email y contraseña.');
+      setError(t('auth.validation.emailAndPassword'));
       return;
     }
     setSubmitting(true);
@@ -153,14 +158,14 @@ export default function LoginPage() {
         password,
       });
       if (signInError) {
-        setError(spanishAuthError(signInError));
+        setError(authErrorMessage(t,signInError));
         return;
       }
       await refreshUser();
       const dest = nextUrl || await defaultDestinationForCurrentUser();
       navigate(dest, { replace: true });
     } catch (err) {
-      setError(spanishAuthError(err));
+      setError(authErrorMessage(t,err));
     } finally {
       setSubmitting(false);
     }
@@ -171,15 +176,15 @@ export default function LoginPage() {
     setError('');
     setInfo('');
     if (!name.trim()) {
-      setError('Introduce tu nombre.');
+      setError(t('auth.validation.nameRequired'));
       return;
     }
     if (!email) {
-      setError('Introduce tu email.');
+      setError(t('auth.validation.emailRequired'));
       return;
     }
     if (!password || password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
+      setError(t('auth.errors.passwordTooShort'));
       return;
     }
     setSubmitting(true);
@@ -193,7 +198,7 @@ export default function LoginPage() {
         },
       });
       if (signUpError) {
-        setError(spanishAuthError(signUpError));
+        setError(authErrorMessage(t,signUpError));
         return;
       }
       if (data?.session) {
@@ -205,7 +210,7 @@ export default function LoginPage() {
       // Enviamos al usuario a la pantalla dedicada (contador + reenviar).
       navigate(`/confirma-email?email=${encodeURIComponent(email.trim())}`, { replace: true });
     } catch (err) {
-      setError(spanishAuthError(err));
+      setError(authErrorMessage(t,err));
     } finally {
       setSubmitting(false);
     }
@@ -215,7 +220,7 @@ export default function LoginPage() {
     setError('');
     setInfo('');
     if (!email) {
-      setError('Introduce tu email arriba para enviarte el enlace de recuperación.');
+      setError(t('auth.validation.emailForReset'));
       return;
     }
     setResetting(true);
@@ -224,12 +229,12 @@ export default function LoginPage() {
         redirectTo: passwordResetRedirect(),
       });
       if (resetError) {
-        setError(spanishAuthError(resetError));
+        setError(authErrorMessage(t,resetError));
         return;
       }
-      setInfo('Te hemos enviado un email con instrucciones para restablecer tu contraseña.');
+      setInfo(t('auth.reset.sent'));
     } catch (err) {
-      setError(spanishAuthError(err));
+      setError(authErrorMessage(t,err));
     } finally {
       setResetting(false);
     }
@@ -242,12 +247,12 @@ export default function LoginPage() {
     try {
       const res = await signInWithGoogle();
       if (res?.error) {
-        setError(spanishAuthError(res.error));
+        setError(authErrorMessage(t,res.error));
         setGoogleLoading(false);
       }
       // En nativo el resultado llega por deep-link; el AuthStateChange redirige.
     } catch (err) {
-      setError(spanishAuthError(err));
+      setError(authErrorMessage(t,err));
       setGoogleLoading(false);
     }
   };
@@ -259,7 +264,7 @@ export default function LoginPage() {
     try {
       const res = await signInWithApple();
       if (res?.error) {
-        setError(spanishAuthError(res.error));
+        setError(authErrorMessage(t,res.error));
         setAppleLoading(false);
         return;
       }
@@ -276,14 +281,14 @@ export default function LoginPage() {
         setAppleLoading(false);
         return;
       }
-      setError(spanishAuthError(err));
+      setError(authErrorMessage(t,err));
       setAppleLoading(false);
     }
   };
 
   const primarySignUpLabel = role === ROLES.PROFESIONAL
-    ? 'Crear cuenta como autónomo'
-    : 'Crear cuenta como cliente';
+    ? t('auth.signup.asPro')
+    : t('auth.signup.asClient');
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-start sm:items-center justify-center px-4 py-3 sm:py-12">
@@ -302,13 +307,13 @@ export default function LoginPage() {
             />
             <span className="text-[22px] sm:text-[26px] leading-none tracking-tight">
               <span className="notranslate" translate="no" style={{ display: 'contents' }}>
-                <span style={{ color: '#00255C', fontWeight: 500 }}>mis</span>
-                <span style={{ color: '#0f172a', fontWeight: 700 }}>autónomos</span>
+                <span style={{ color: '#00255C', fontWeight: 500 }}>{BRAND.prefix}</span>
+                <span style={{ color: '#0f172a', fontWeight: 700 }}>{BRAND.suffix}</span>
               </span>
             </span>
           </Link>
           <p className="hidden sm:block mt-3 text-sm text-slate-500">
-            Conecta con los mejores autónomos de España
+            {t('auth.tagline')}
           </p>
         </div>
 
@@ -325,7 +330,7 @@ export default function LoginPage() {
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              Iniciar sesión
+              {t('nav.login')}
             </button>
             <button
               type="button"
@@ -336,7 +341,7 @@ export default function LoginPage() {
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              Crear cuenta
+              {t('auth.signup.tab')}
             </button>
           </div>
 
@@ -346,21 +351,21 @@ export default function LoginPage() {
               + email directamente. */}
           {!isSignIn && !rolePreselected && (
             <div className="mb-5">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">¿Cómo quieres empezar?</h3>
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">{t('auth.role.title')}</h3>
               <div className="grid grid-cols-2 gap-3">
                 <RoleCard
                   active={role === ROLES.PROFESIONAL}
                   onClick={() => setRole(ROLES.PROFESIONAL)}
                   icon={<Briefcase className="w-5 h-5" />}
-                  title="Soy autónomo"
-                  subtitle="Date de alta y consigue clientes"
+                  title={t('nav.iAmPro')}
+                  subtitle={t('auth.role.proSubtitle')}
                 />
                 <RoleCard
                   active={role === ROLES.CLIENTE}
                   onClick={() => setRole(ROLES.CLIENTE)}
                   icon={<SearchIcon className="w-5 h-5" />}
-                  title="Busco profesionales"
-                  subtitle="Encuentra y contacta autónomos"
+                  title={t('auth.role.client')}
+                  subtitle={t('auth.role.clientSubtitle')}
                 />
               </div>
             </div>
@@ -368,14 +373,14 @@ export default function LoginPage() {
           {!isSignIn && rolePreselected && (
             <p className="text-xs text-slate-500 mb-4 text-center">
               {role === ROLES.PROFESIONAL
-                ? 'Creas tu cuenta como autónomo. ¿Buscas profesionales? '
-                : 'Creas tu cuenta como cliente. ¿Eres autónomo? '}
+                ? t('auth.role.preselectedPro')
+                : t('auth.role.preselectedClient')}{' '}
               <button
                 type="button"
                 onClick={() => setRole(role === ROLES.PROFESIONAL ? ROLES.CLIENTE : ROLES.PROFESIONAL)}
                 className="text-blue-700 hover:underline font-medium"
               >
-                Cambiar
+                {t('auth.role.switch')}
               </button>
             </p>
           )}
@@ -393,11 +398,11 @@ export default function LoginPage() {
               style={{ backgroundColor: '#000000' }}
             >
               {appleLoading ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Conectando…</>
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('auth.social.connecting')}</>
               ) : (
                 <>
                   <Apple className="w-4 h-4 mr-2" />
-                  <span>{isSignIn ? 'Continuar con Apple' : 'Registrarse con Apple'}</span>
+                  <span>{isSignIn ? t('auth.social.continueApple') : t('auth.social.signupApple')}</span>
                 </>
               )}
             </Button>
@@ -410,11 +415,11 @@ export default function LoginPage() {
             className="w-full h-11 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium mb-4"
           >
             {googleLoading ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Conectando...</>
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('auth.social.connecting')}</>
             ) : (
               <>
                 <GoogleIcon />
-                <span className="ml-2">{isSignIn ? 'Continuar con Google' : 'Registrarse con Google'}</span>
+                <span className="ml-2">{isSignIn ? t('auth.continue_with_google') : t('auth.social.signupGoogle')}</span>
               </>
             )}
           </Button>
@@ -425,14 +430,14 @@ export default function LoginPage() {
               <div className="w-full border-t border-slate-200"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 text-slate-400">o {isSignIn ? 'inicia sesión' : 'crea tu cuenta'} con email</span>
+              <span className="bg-white px-3 text-slate-400">{isSignIn ? t('auth.separator.signIn') : t('auth.separator.signUp')}</span>
             </div>
           </div>
 
           <form onSubmit={isSignIn ? handleSignIn : handleSignUp} className="space-y-4" noValidate>
             {!isSignIn && (
               <div>
-                <Label htmlFor="name" className="text-slate-700">Nombre</Label>
+                <Label htmlFor="name" className="text-slate-700">{t('auth.name')}</Label>
                 <div className="relative mt-1">
                   <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
@@ -443,7 +448,7 @@ export default function LoginPage() {
                     enterKeyHint="next"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Tu nombre"
+                    placeholder={t('auth.name_placeholder')}
                     className="pl-9 h-11"
                     disabled={submitting}
                   />
@@ -452,7 +457,7 @@ export default function LoginPage() {
             )}
 
             <div>
-              <Label htmlFor="email" className="text-slate-700">Email</Label>
+              <Label htmlFor="email" className="text-slate-700">{t('auth.email')}</Label>
               <div className="relative mt-1">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
@@ -465,7 +470,7 @@ export default function LoginPage() {
                   enterKeyHint={isSignIn ? 'go' : 'next'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@email.com"
+                  placeholder={t('auth.email_placeholder')}
                   className="pl-9 h-11"
                   disabled={submitting}
                 />
@@ -474,7 +479,7 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-slate-700">Contraseña</Label>
+                <Label htmlFor="password" className="text-slate-700">{t('auth.password')}</Label>
                 {isSignIn && (
                   <button
                     type="button"
@@ -482,7 +487,7 @@ export default function LoginPage() {
                     disabled={resetting || submitting}
                     className="text-xs text-blue-700 hover:text-blue-800 hover:underline disabled:opacity-50"
                   >
-                    {resetting ? 'Enviando...' : '¿Has olvidado tu contraseña?'}
+                    {resetting ? t('auth.reset.sending') : t('auth.reset.link')}
                   </button>
                 )}
               </div>
@@ -495,7 +500,7 @@ export default function LoginPage() {
                   enterKeyHint="go"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={isSignIn ? 'Tu contraseña' : 'Mínimo 6 caracteres'}
+                  placeholder={isSignIn ? t('auth.passwordPlaceholder') : t('auth.passwordMinPlaceholder')}
                   className="pl-9 pr-10 h-11"
                   disabled={submitting}
                 />
@@ -503,7 +508,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -529,9 +534,9 @@ export default function LoginPage() {
               style={{ backgroundColor: '#0f172a' }}
             >
               {submitting ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {isSignIn ? 'Entrando...' : 'Creando cuenta...'}</>
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {isSignIn ? t('auth.submitting.signIn') : t('auth.submitting.signUp')}</>
               ) : (
-                isSignIn ? 'Iniciar sesión' : primarySignUpLabel
+                isSignIn ? t('nav.login') : primarySignUpLabel
               )}
             </Button>
           </form>
@@ -542,19 +547,19 @@ export default function LoginPage() {
         <div className="mt-6 flex flex-col items-center gap-3">
           <p className="inline-flex items-center gap-1.5 text-xs text-slate-500">
             <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-            Profesionales verificados cerca de ti
+            {t('auth.footer.trust')}
           </p>
           <p className="text-xs text-slate-500">
             {isSignIn ? (
-              <>¿No tienes cuenta?{' '}
+              <>{t('auth.footer.noAccount')}{' '}
                 <button onClick={() => switchMode(MODES.SIGN_UP)} className="text-blue-700 hover:underline font-medium">
-                  Crear una
+                  {t('auth.footer.createOne')}
                 </button>
               </>
             ) : (
-              <>¿Ya tienes cuenta?{' '}
+              <>{t('auth.footer.haveAccount')}{' '}
                 <button onClick={() => switchMode(MODES.SIGN_IN)} className="text-blue-700 hover:underline font-medium">
-                  Inicia sesión
+                  {t('auth.login_title')}
                 </button>
               </>
             )}

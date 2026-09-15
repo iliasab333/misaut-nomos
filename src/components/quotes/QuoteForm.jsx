@@ -12,10 +12,9 @@ import { Plus, Trash2, Loader2, FileText, Send, AlertTriangle, Download } from "
 // solicitar la descarga para que no entre en el chunk del entry.
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 
 const IVA_OPTIONS = [0, 4, 10, 21];
-
-const DEFAULT_LEGAL = "Este presupuesto tiene una validez de 30 días desde la fecha de emisión. Los precios incluyen todos los materiales y mano de obra salvo indicación contraria.";
 
 function calcTotals(items, applyRet, retPct) {
   let subtotal = 0;
@@ -36,14 +35,25 @@ function calcTotals(items, applyRet, retPct) {
   return { items: newItems, subtotal, totalIva, totalRet, total };
 }
 
+// Valores guardados en la BD (no cambian). Las unidades con palabra tienen
+// etiqueta visible vía t(); los símbolos (h, m², kg…) se pintan tal cual.
 const UNIT_OPTIONS = ['ud', 'h', 'm²', 'm³', 'm', 'kg', 'día', 'semana', 'mes', 'lote'];
+const UNIT_LABEL_KEYS = {
+  ud: 'quotes.form.units.unit',
+  'día': 'quotes.form.units.day',
+  semana: 'quotes.form.units.week',
+  mes: 'quotes.form.units.month',
+  lote: 'quotes.form.units.batch',
+};
 
 function newItem() {
   return { id: crypto.randomUUID(), concept: "", description: "", quantity: 1, unit: "ud", unit_price: 0, discount_percent: 0, iva_percent: 21, subtotal: 0, iva_amount: 0, total: 0 };
 }
 
 export default function QuoteForm({ open, onClose, onSaved, user, initialQuote = null }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const defaultLegal = t('quotes.form.defaultLegalText');
   const today = new Date().toISOString().split('T')[0];
   const validUntil = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
 
@@ -88,7 +98,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
     total: 0,
     payment_conditions: "",
     notes: "",
-    legal_text: DEFAULT_LEGAL,
+    legal_text: defaultLegal,
     status: "borrador",
   });
 
@@ -111,7 +121,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
         emisor_logo_url: sets[0].logo_url || "",
         aplica_retencion: sets[0].aplica_retencion || false,
         porcentaje_retencion: sets[0].porcentaje_retencion || 15,
-        legal_text: sets[0].texto_legal || DEFAULT_LEGAL,
+        legal_text: sets[0].texto_legal || defaultLegal,
       } : prev);
     }
   };
@@ -170,7 +180,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
 
   const handleSave = async (sendNow = false) => {
     if (!form.client_name || !form.title) {
-      toast.error("Completa cliente y título");
+      toast.error(t('quotes.form.validationError'));
       return;
     }
     setSaving(true);
@@ -216,11 +226,11 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
         await sendViaChat(saved || { ...payload, id: form.id });
       }
 
-      toast.success(sendNow ? "Presupuesto enviado por chat al cliente" : "Presupuesto guardado");
+      toast.success(sendNow ? t('quotesPage.sentSuccessfully') : t('quotes.form.saved'));
       onSaved?.(saved);
       onClose();
     } catch (err) {
-      toast.error("Error al guardar: " + err.message);
+      toast.error(t('quotes.form.saveError', { message: err.message }));
     } finally {
       setSaving(false);
     }
@@ -281,7 +291,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
 
   const handlePreviewPDF = async () => {
     if (!form.client_name || !form.title) {
-      toast.error("Completa al menos el cliente y el título para previsualizar");
+      toast.error(t('quotes.form.previewValidationError'));
       return;
     }
     const { downloadQuotePDFWithLogo } = await import('@/services/quotePdfGenerator');
@@ -295,16 +305,16 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
         disabled={saving}
         className="flex-1 md:flex-none px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
       >
-        Cancelar
+        {t('common.cancel')}
       </button>
       <button
         onClick={handlePreviewPDF}
         disabled={saving}
         className="hidden md:flex flex-1 md:flex-none px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 items-center justify-center gap-1.5"
-        title="Ver PDF con logo"
+        title={t('quotes.form.previewPdfTitle')}
       >
         <Download className="w-3.5 h-3.5" />
-        Ver PDF
+        {t('quotes.form.previewPdf')}
       </button>
       <button
         onClick={() => handleSave(false)}
@@ -312,7 +322,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
         className="flex-1 md:flex-none px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 flex items-center justify-center gap-1.5"
       >
         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
-        Guardar borrador
+        {t('quotes.form.saveDraft')}
       </button>
       <button
         onClick={() => handleSave(true)}
@@ -320,7 +330,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
         className="flex-1 md:flex-none px-4 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 disabled:opacity-50 flex items-center justify-center gap-1.5"
       >
         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-        Guardar y enviar
+        {t('quotes.form.saveAndSend')}
       </button>
     </>
   );
@@ -329,19 +339,19 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
     <ResponsiveModal
       isOpen={open}
       onClose={onClose}
-      title={initialQuote ? "Editar presupuesto" : "Nuevo presupuesto"}
+      title={initialQuote ? t('quotes.form.editTitle') : t('quotesPage.newQuote')}
       footer={modalFooter}
     >
         <div className="space-y-6">
           {/* ── A) CLIENTE ─── */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">Datos del cliente</h3>
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">{t('clientData')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="md:col-span-2">
-                <Label className="text-xs text-gray-600 mb-1 block">Seleccionar cliente existente (CRM)</Label>
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.form.selectExistingClient')}</Label>
                 <Select value={form.client_contact_id || ""} onValueChange={handleClientSelect}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona un cliente..." />
+                    <SelectValue placeholder={t('quotes.form.selectClientPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {clients.map(c => (
@@ -352,55 +362,58 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
                 {clients.length === 0 && (
                   <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" />
-                    Puedes rellenar los datos manualmente o <button onClick={() => { onClose(); navigate('/mis-clientes'); }} className="text-blue-600 underline ml-1">añadir clientes al CRM</button>
+                    <Trans
+                      i18nKey="quotes.form.noClientsHint"
+                      components={{ 1: <button onClick={() => { onClose(); navigate('/mis-clientes'); }} className="text-blue-600 underline ml-1" /> }}
+                    />
                   </p>
                 )}
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Nombre *</Label>
-                <Input value={form.client_name} onChange={e => setForm(p => ({ ...p, client_name: e.target.value }))} placeholder="Nombre del cliente" />
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.form.nameLabel')}</Label>
+                <Input value={form.client_name} onChange={e => setForm(p => ({ ...p, client_name: e.target.value }))} placeholder={t('quotes.form.namePlaceholder')} />
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">NIF/CIF</Label>
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.form.nifLabel')}</Label>
                 <Input value={form.client_nif} onChange={e => setForm(p => ({ ...p, client_nif: e.target.value }))} placeholder="B12345678" />
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Email</Label>
-                <Input value={form.client_email} onChange={e => setForm(p => ({ ...p, client_email: e.target.value }))} placeholder="cliente@email.com" />
+                <Label className="text-xs text-gray-600 mb-1 block">{t('emailField')}</Label>
+                <Input value={form.client_email} onChange={e => setForm(p => ({ ...p, client_email: e.target.value }))} placeholder={t('quotes.form.emailPlaceholder')} />
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Teléfono</Label>
+                <Label className="text-xs text-gray-600 mb-1 block">{t('phoneField')}</Label>
                 <Input value={form.client_phone} onChange={e => setForm(p => ({ ...p, client_phone: e.target.value }))} placeholder="+34 600 000 000" />
               </div>
               <div className="md:col-span-2">
-                <Label className="text-xs text-gray-600 mb-1 block">Dirección</Label>
-                <Input value={form.client_address} onChange={e => setForm(p => ({ ...p, client_address: e.target.value }))} placeholder="Calle, número, ciudad..." />
+                <Label className="text-xs text-gray-600 mb-1 block">{t('clientAddress')}</Label>
+                <Input value={form.client_address} onChange={e => setForm(p => ({ ...p, client_address: e.target.value }))} placeholder={t('quotes.form.addressPlaceholder')} />
               </div>
             </div>
           </section>
 
           {/* ── B) DATOS DEL PRESUPUESTO ─── */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">Datos del presupuesto</h3>
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">{t('quotes.form.quoteData')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="md:col-span-2">
-                <Label className="text-xs text-gray-600 mb-1 block">Título *</Label>
-                <Input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="Ej: Reforma integral cocina" />
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.form.titleLabel')}</Label>
+                <Input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder={t('quotes.form.titlePlaceholder')} />
               </div>
               <div className="md:col-span-2">
-                <Label className="text-xs text-gray-600 mb-1 block">Descripción</Label>
-                <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Describe el trabajo a realizar..." />
+                <Label className="text-xs text-gray-600 mb-1 block">{t('description')}</Label>
+                <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} placeholder={t('quotes.form.descriptionPlaceholder')} />
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Fecha de emisión</Label>
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.fields.issueDate')}</Label>
                 <Input type="date" value={form.issue_date} onChange={e => setForm(p => ({ ...p, issue_date: e.target.value }))} />
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Válido hasta</Label>
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.fields.validUntil')}</Label>
                 <Input type="date" value={form.valid_until} onChange={e => setForm(p => ({ ...p, valid_until: e.target.value }))} />
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Días estimados de trabajo</Label>
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.form.estimatedDaysLabel')}</Label>
                 <Input type="number" value={form.estimated_days} onChange={e => setForm(p => ({ ...p, estimated_days: Number(e.target.value) }))} min={1} />
               </div>
             </div>
@@ -409,9 +422,9 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
           {/* ── C) CONCEPTOS ─── */}
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Conceptos</h3>
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">{t('quotes.form.itemsTitle')}</h3>
               <Button type="button" onClick={addItem} variant="outline" size="sm" className="h-7 text-xs">
-                <Plus className="w-3 h-3 mr-1" />Añadir línea
+                <Plus className="w-3 h-3 mr-1" />{t('addLine')}
               </Button>
             </div>
 
@@ -419,13 +432,13 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
               <table className="w-full text-sm min-w-[640px]">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 w-[30%]">Concepto</th>
-                    <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-[8%]">Cant.</th>
-                    <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-[8%]">Unidad</th>
-                    <th className="px-2 py-2 text-right text-xs font-medium text-gray-600 w-[12%]">Precio</th>
-                    <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-[7%]">Dto%</th>
-                    <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-[9%]">IVA%</th>
-                    <th className="px-2 py-2 text-right text-xs font-medium text-gray-600 w-[11%]">Total</th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-600 w-[30%]">{t('quotes.table.concept')}</th>
+                    <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-[8%]">{t('qty')}</th>
+                    <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-[8%]">{t('quotes.table.unit')}</th>
+                    <th className="px-2 py-2 text-right text-xs font-medium text-gray-600 w-[12%]">{t('quotes.table.price')}</th>
+                    <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-[7%]">{t('quotes.table.discountPercent')}</th>
+                    <th className="px-2 py-2 text-center text-xs font-medium text-gray-600 w-[9%]">{t('quotes.table.vatPercent')}</th>
+                    <th className="px-2 py-2 text-right text-xs font-medium text-gray-600 w-[11%]">{t('total')}</th>
                     <th className="w-[5%]"></th>
                   </tr>
                 </thead>
@@ -433,7 +446,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
                   {form.items.map((item, idx) => (
                     <tr key={item.id || idx} className="border-t border-gray-50">
                       <td className="px-2 py-1.5">
-                        <Input value={item.concept} onChange={e => updateItem(idx, 'concept', e.target.value)} placeholder="Descripción del concepto" className="h-8 text-sm border-gray-200" />
+                        <Input value={item.concept} onChange={e => updateItem(idx, 'concept', e.target.value)} placeholder={t('quotes.form.conceptPlaceholder')} className="h-8 text-sm border-gray-200" />
                       </td>
                       <td className="px-2 py-1.5">
                         <Input type="number" value={item.quantity} min={0} step="0.01" onChange={e => updateItem(idx, 'quantity', e.target.value)} className="h-8 text-sm text-center border-gray-200" />
@@ -444,7 +457,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {UNIT_OPTIONS.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                            {UNIT_OPTIONS.map(u => <SelectItem key={u} value={u}>{UNIT_LABEL_KEYS[u] ? t(UNIT_LABEL_KEYS[u]) : u}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </td>
@@ -485,11 +498,11 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
           <section>
             <div className="max-w-sm ml-auto space-y-2 bg-gray-50 rounded-xl p-4">
               <div className="flex justify-between text-sm text-gray-600">
-                <span>Subtotal:</span>
+                <span>{t('quotes.table.subtotal')}</span>
                 <span className="font-medium">{parseFloat(form.subtotal || 0).toFixed(2)}€</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
-                <span>IVA:</span>
+                <span>{t('quotes.table.vat')}</span>
                 <span className="font-medium">{parseFloat(form.total_iva || 0).toFixed(2)}€</span>
               </div>
               <div className="flex items-center justify-between text-sm text-gray-600">
@@ -499,7 +512,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
                     onCheckedChange={v => recalcOnRetChange('aplica_retencion', v)}
                     className="scale-75"
                   />
-                  <span>Retención IRPF</span>
+                  <span>{t('quotes.form.irpfRetention')}</span>
                 </div>
                 {form.aplica_retencion && (
                   <div className="flex items-center gap-1">
@@ -517,7 +530,7 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
                 )}
               </div>
               <div className="flex justify-between text-base font-bold border-t pt-2 text-gray-900">
-                <span>TOTAL:</span>
+                <span>{t('quotes.table.grandTotal')}</span>
                 <span>{parseFloat(form.total || 0).toFixed(2)}€</span>
               </div>
             </div>
@@ -525,18 +538,18 @@ export default function QuoteForm({ open, onClose, onSaved, user, initialQuote =
 
           {/* ── E) CONDICIONES Y NOTAS ─── */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">Condiciones y notas</h3>
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">{t('quotes.form.conditionsAndNotes')}</h3>
             <div className="space-y-3">
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Condiciones de pago</Label>
-                <Textarea value={form.payment_conditions} onChange={e => setForm(p => ({ ...p, payment_conditions: e.target.value }))} rows={2} placeholder="Ej: 50% al inicio, 50% al finalizar el trabajo" />
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.fields.paymentConditions')}</Label>
+                <Textarea value={form.payment_conditions} onChange={e => setForm(p => ({ ...p, payment_conditions: e.target.value }))} rows={2} placeholder={t('quotes.form.paymentConditionsPlaceholder')} />
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Notas adicionales</Label>
-                <Textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} rows={2} placeholder="Información adicional para el cliente..." />
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.form.additionalNotes')}</Label>
+                <Textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} rows={2} placeholder={t('quotes.form.notesPlaceholder')} />
               </div>
               <div>
-                <Label className="text-xs text-gray-600 mb-1 block">Texto legal</Label>
+                <Label className="text-xs text-gray-600 mb-1 block">{t('quotes.form.legalText')}</Label>
                 <Textarea value={form.legal_text} onChange={e => setForm(p => ({ ...p, legal_text: e.target.value }))} rows={2} />
               </div>
             </div>

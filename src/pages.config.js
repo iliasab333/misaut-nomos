@@ -1,69 +1,81 @@
-// pages.config.js - Code-split por ruta con React.lazy()
-// CAMBIO: todas las páginas excepto Search (main page) son lazy-loaded
-// Esto reduce el bundle inicial de ~600KB a ~150KB gzip
-import { lazy } from 'react';
+// pages.config.js — code-split por ruta.
+//
+// Dos envoltorios, y la diferencia importa:
+//   lazyWithRetry — página pública. Sólo su chunk.
+//   lazyApp       — página que usa textos de pantallas internas (admin, CRM,
+//                   facturación…). Encadena la descarga de `<lang>.app.json`
+//                   a la del chunk, así que el <Suspense> espera a las dos y
+//                   la página nunca pinta claves crudas.
+//
+// Cuál lleva cada página NO se decide a ojo: sale de qué namespaces alcanza,
+// siguiendo sus imports (ver src/i18n/namespaces.js). Una página pública que
+// importa un componente con textos internos necesita lazyApp igual.
+//
+// Los dos hacen además el reload único ante chunk caducado tras un
+// redespliegue (ver src/lib/lazyWithRetry.js).
+import { lazyWithRetry, lazyApp } from '@/lib/lazyWithRetry';
 import __Layout from './Layout.jsx';
 
 // Search es lazy: el bundle inicial se reduce ~250 KB gzip (antes era único).
 // El componente se monta dentro del <Suspense> de AuthenticatedApp en App.jsx.
-const Search = lazy(() => import('./pages/Search'));
+const Search = lazyWithRetry(() => import('./pages/Search'));
 
 // 🔴 PÁGINAS ADMIN — muy pesadas, solo las usa el admin
-const AdminDashboard     = lazy(() => import('./pages/AdminDashboard'));
-const AdminFAQ           = lazy(() => import('./pages/AdminFAQ'));
-const AdminMessagesStats = lazy(() => import('./pages/AdminMessagesStats'));
-const AdminPayments      = lazy(() => import('./pages/AdminPayments'));
-const AdminTickets       = lazy(() => import('./pages/AdminTickets'));
+const AdminDashboard     = lazyApp(() => import('./pages/AdminDashboard'));
+const AdminFAQ           = lazyApp(() => import('./pages/AdminFAQ'));
+const AdminMessagesStats = lazyApp(() => import('./pages/AdminMessagesStats'));
+const AdminPayments      = lazyApp(() => import('./pages/AdminPayments'));
+const AdminTickets       = lazyApp(() => import('./pages/AdminTickets'));
 
 // 🟠 PÁGINAS PRO — pesadas, solo usuarios profesionales
-const Calendar           = lazy(() => import('./pages/Calendar'));
-const CRM                = lazy(() => import('./pages/CRM'));
-const CRMAutomations     = lazy(() => import('./pages/CRMAutomations'));
-const Invoices           = lazy(() => import('./pages/Invoices'));
-const Jobs               = lazy(() => import('./pages/Jobs'));
-const MisClientes        = lazy(() => import('./pages/MisClientes'));
-const MiVisibilidad      = lazy(() => import('./pages/MiVisibilidad'));
-const Presupuestos       = lazy(() => import('./pages/Presupuestos'));
-const ProfessionalDashboard = lazy(() => import('./pages/ProfessionalDashboard'));
-const Projects           = lazy(() => import('./pages/Projects'));
-const ProjectDetail      = lazy(() => import('./pages/ProjectDetail'));
-const QuoteRequests      = lazy(() => import('./pages/QuoteRequests'));
+const Calendar           = lazyApp(() => import('./pages/Calendar'));
+const CRM                = lazyApp(() => import('./pages/CRM'));
+const CRMAutomations     = lazyApp(() => import('./pages/CRMAutomations'));
+const Invoices           = lazyApp(() => import('./pages/Invoices'));
+const Jobs               = lazyApp(() => import('./pages/Jobs'));
+const MisClientes        = lazyApp(() => import('./pages/MisClientes'));
+const MiVisibilidad      = lazyApp(() => import('./pages/MiVisibilidad'));
+const Presupuestos       = lazyApp(() => import('./pages/Presupuestos'));
+const ProfessionalDashboard = lazyApp(() => import('./pages/ProfessionalDashboard'));
+const Projects           = lazyApp(() => import('./pages/Projects'));
+const ProjectDetail      = lazyApp(() => import('./pages/ProjectDetail'));
+const QuoteRequests      = lazyApp(() => import('./pages/QuoteRequests'));
 
 // 🟡 PÁGINAS DE USUARIO — carga on-demand
-const Autonomo           = lazy(() => import('./pages/Autonomo'));
-const Categoria          = lazy(() => import('./pages/Categoria'));
-const ClientDetail       = lazy(() => import('./pages/ClientDetail'));
-const ClientOnboarding   = lazy(() => import('./pages/ClientOnboarding'));
-const ConfirmEmail       = lazy(() => import('./pages/ConfirmEmail'));
-const DashboardProInfo   = lazy(() => import('./pages/DashboardProInfo'));
-const Favorites          = lazy(() => import('./pages/Favorites'));
-const Messages           = lazy(() => import('./pages/Messages'));
-const MyProfile          = lazy(() => import('./pages/MyProfile'));
-const Notifications      = lazy(() => import('./pages/Notifications'));
-const Onboarding         = lazy(() => import('./pages/Onboarding'));
-const PayInvoice         = lazy(() => import('./pages/PayInvoice'));
-const PaymentSuccess     = lazy(() => import('./pages/PaymentSuccess'));
-const PricingPlans       = lazy(() => import('./pages/PricingPlans'));
-const ProfessionalProfile = lazy(() => import('./pages/ProfessionalProfile'));
-const ProfileOnboarding  = lazy(() => import('./pages/ProfileOnboarding'));
-const RequestQuote       = lazy(() => import('./pages/RequestQuote'));
-const SubscriptionManagement = lazy(() => import('./pages/SubscriptionManagement'));
-const TicketDetail       = lazy(() => import('./pages/TicketDetail'));
-const Tickets            = lazy(() => import('./pages/Tickets'));
-const UserTypeSelection  = lazy(() => import('./pages/UserTypeSelection'));
+const Autonomo           = lazyWithRetry(() => import('./pages/Autonomo'));
+const Categoria          = lazyWithRetry(() => import('./pages/Categoria'));
+const ClientDetail       = lazyApp(() => import('./pages/ClientDetail'));
+const ClientOnboarding   = lazyApp(() => import('./pages/ClientOnboarding'));
+const ConfirmEmail       = lazyWithRetry(() => import('./pages/ConfirmEmail'));
+const DashboardProInfo   = lazyWithRetry(() => import('./pages/DashboardProInfo'));
+const Favorites          = lazyWithRetry(() => import('./pages/Favorites'));
+const Messages           = lazyApp(() => import('./pages/Messages'));
+const MyProfile          = lazyApp(() => import('./pages/MyProfile'));
+const Notifications      = lazyWithRetry(() => import('./pages/Notifications'));
+const Onboarding         = lazyApp(() => import('./pages/Onboarding'));
+const PayInvoice         = lazyApp(() => import('./pages/PayInvoice'));
+const PaymentSuccess     = lazyApp(() => import('./pages/PaymentSuccess'));
+const PricingPlans       = lazyWithRetry(() => import('./pages/PricingPlans'));
+const ProfessionalProfile = lazyWithRetry(() => import('./pages/ProfessionalProfile'));
+const ProfileOnboarding  = lazyApp(() => import('./pages/ProfileOnboarding'));
+const RequestQuote       = lazyApp(() => import('./pages/RequestQuote'));
+const SubscriptionManagement = lazyApp(() => import('./pages/SubscriptionManagement'));
+const TicketDetail       = lazyApp(() => import('./pages/TicketDetail'));
+const Tickets            = lazyApp(() => import('./pages/Tickets'));
+const UserTypeSelection  = lazyApp(() => import('./pages/UserTypeSelection'));
 
 // 🟢 PÁGINAS ESTÁTICAS — ligeras, pero no críticas
-const CookiePolicy       = lazy(() => import('./pages/CookiePolicy'));
-const CookiePreferences  = lazy(() => import('./pages/CookiePreferences'));
-const FAQ                = lazy(() => import('./pages/FAQ'));
-const FAQDetail          = lazy(() => import('./pages/FAQDetail'));
-const HelpCenter         = lazy(() => import('./pages/HelpCenter'));
-const Home               = lazy(() => import('./pages/Home'));
-const LegalNotice        = lazy(() => import('./pages/LegalNotice'));
-const PrivacyPolicy      = lazy(() => import('./pages/PrivacyPolicy'));
-const TermsConditions    = lazy(() => import('./pages/TermsConditions'));
-const Referrals          = lazy(() => import('./pages/Referrals'));
-const ReferralRedirect   = lazy(() => import('./pages/ReferralRedirect'));
+const CookiePolicy       = lazyWithRetry(() => import('./pages/CookiePolicy'));
+const CookiePreferences  = lazyWithRetry(() => import('./pages/CookiePreferences'));
+const FAQ                = lazyWithRetry(() => import('./pages/FAQ'));
+const FAQDetail          = lazyWithRetry(() => import('./pages/FAQDetail'));
+const HelpCenter         = lazyApp(() => import('./pages/HelpCenter'));
+const Home               = lazyWithRetry(() => import('./pages/Home'));
+const LegalNotice        = lazyWithRetry(() => import('./pages/LegalNotice'));
+const PrivacyPolicy      = lazyWithRetry(() => import('./pages/PrivacyPolicy'));
+const TermsConditions    = lazyWithRetry(() => import('./pages/TermsConditions'));
+const Referrals          = lazyApp(() => import('./pages/Referrals'));
+const ReferralRedirect   = lazyApp(() => import('./pages/ReferralRedirect'));
 
 export const PAGES = {
     "AdminDashboard": AdminDashboard,

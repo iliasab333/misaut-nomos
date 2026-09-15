@@ -66,12 +66,35 @@ function walk(dir, out = []) {
 // También i18n.t('clave').
 const KEY_RE = /\b(?:i18n\.)?t\(\s*(['"`])([^'"`$\n]+)\1/g;
 
+// Los comentarios NO cuentan: los ficheros del sistema de diseño enseñan su
+// uso con ejemplos (`<Modal title={t('…')}>` en la cabecera de Modal.jsx) y
+// esos no son claves que nadie vaya a resolver en runtime. Quitamos el
+// contenido de los comentarios conservando la longitud de la línea, para que
+// los números de línea del informe sigan siendo los del fichero.
+function stripComments(lines) {
+  let inBlock = false;
+  return lines.map((line) => {
+    let out = '';
+    for (let i = 0; i < line.length; i++) {
+      if (inBlock) {
+        if (line[i] === '*' && line[i + 1] === '/') { inBlock = false; out += '  '; i++; }
+        else out += ' ';
+        continue;
+      }
+      if (line[i] === '/' && line[i + 1] === '*') { inBlock = true; out += '  '; i++; continue; }
+      if (line[i] === '/' && line[i + 1] === '/') { out += ' '.repeat(line.length - i); break; }
+      out += line[i];
+    }
+    return out;
+  });
+}
+
 const result = {};
 let total = 0;
 for (const file of only || walk(join(ROOT, 'src'))) {
   if (!existsSync(file)) { console.error(`(no existe: ${relative(ROOT, file)})`); continue; }
   const src = readFileSync(file, 'utf8');
-  const lines = src.split('\n');
+  const lines = stripComments(src.split('\n'));
   const found = [];
   lines.forEach((line, i) => {
     for (const m of line.matchAll(KEY_RE)) {

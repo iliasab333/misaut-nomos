@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Mail, MessageSquare, ShieldCheck, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import SEOHead from '@/components/seo/SEOHead';
 import { base44 } from '@/api/base44Client';
@@ -16,6 +17,7 @@ function FieldLabel({ htmlFor, children }) {
 }
 
 export default function Contacto() {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: '', email: '', topic: 'general', message: '' });
   const [status, setStatus] = useState({ state: 'idle', msg: '' });
 
@@ -23,9 +25,9 @@ export default function Contacto() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim()) return setStatus({ state: 'error', msg: 'Introduce tu nombre.' });
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) return setStatus({ state: 'error', msg: 'Introduce un email válido.' });
-    if (form.message.trim().length < 10) return setStatus({ state: 'error', msg: 'Cuéntanos un poco más (mínimo 10 caracteres).' });
+    if (!form.name.trim()) return setStatus({ state: 'error', msg: t('contact.validation.nameRequired') });
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) return setStatus({ state: 'error', msg: t('contact.validation.emailInvalid') });
+    if (form.message.trim().length < 10) return setStatus({ state: 'error', msg: t('contact.validation.messageTooShort') });
     setStatus({ state: 'sending', msg: '' });
     try {
       await base44.functions.invoke('contactForm', {
@@ -39,15 +41,15 @@ export default function Contacto() {
       // La función puede no existir: caemos a mailto como red de seguridad,
       // pero NO bloqueamos el feedback positivo si la red ya recibió la solicitud.
     }
-    setStatus({ state: 'sent', msg: 'Mensaje recibido. Te contestamos a ' + form.email.trim() + '.' });
+    setStatus({ state: 'sent', msg: t('contact.form.sent', { email: form.email.trim() }) });
     setForm({ name: '', email: '', topic: 'general', message: '' });
   };
 
   return (
     <>
       <SEOHead
-        title="Contacto · MisAutónomos"
-        description="¿Dudas, sugerencias o ayuda? Escríbenos a hola@misautonomos.es o usa el formulario. Respondemos en 24 h laborables."
+        title={t('contact.seo.title')}
+        description={t('contact.seo.description')}
       />
 
       <main className="bg-white text-slate-900">
@@ -58,16 +60,16 @@ export default function Contacto() {
               className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
               style={{ backgroundColor: 'rgba(0,37,92,0.06)', color: NAVY }}
             >
-              <MessageSquare className="w-3.5 h-3.5" /> Estamos para ayudarte
+              <MessageSquare className="w-3.5 h-3.5" /> {t('contact.hero.eyebrow')}
             </div>
             <h1
               className="mt-5 font-semibold tracking-tight"
               style={{ color: NAVY, fontSize: 'clamp(2rem, 5vw, 3rem)', lineHeight: 1.06, letterSpacing: '-0.025em' }}
             >
-              Habla con nosotros
+              {t('contact.hero.title')}
             </h1>
             <p className="mt-4 max-w-xl mx-auto text-slate-600 text-[16px] md:text-lg leading-relaxed">
-              Dudas sobre la plataforma, alta como autónomo, problemas con un perfil o sugerencias. Te contestamos en menos de 24 h laborables.
+              {t('contact.hero.subtitle')}
             </p>
           </div>
         </section>
@@ -81,30 +83,30 @@ export default function Contacto() {
                 onSubmit={handleSubmit}
                 className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6"
               >
-                <h2 className="font-semibold text-slate-900 mb-1">Envíanos un mensaje</h2>
-                <p className="text-sm text-slate-500 mb-5">Solo los campos imprescindibles. Sin spam.</p>
+                <h2 className="font-semibold text-slate-900 mb-1">{t('contact.form.title')}</h2>
+                <p className="text-sm text-slate-500 mb-5">{t('contact.form.subtitle')}</p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <FieldLabel htmlFor="cf-name">Nombre</FieldLabel>
+                    <FieldLabel htmlFor="cf-name">{t('auth.name')}</FieldLabel>
                     <input
                       id="cf-name"
                       type="text"
                       value={form.name}
                       onChange={update('name')}
-                      placeholder="Tu nombre"
+                      placeholder={t('auth.name_placeholder')}
                       className="w-full h-11 rounded-xl border border-slate-200 px-3 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                       autoComplete="name"
                     />
                   </div>
                   <div>
-                    <FieldLabel htmlFor="cf-email">Email</FieldLabel>
+                    <FieldLabel htmlFor="cf-email">{t('auth.email')}</FieldLabel>
                     <input
                       id="cf-email"
                       type="email"
                       value={form.email}
                       onChange={update('email')}
-                      placeholder="tu@email.com"
+                      placeholder={t('auth.email_placeholder')}
                       className="w-full h-11 rounded-xl border border-slate-200 px-3 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                       autoComplete="email"
                     />
@@ -112,29 +114,29 @@ export default function Contacto() {
                 </div>
 
                 <div className="mt-4">
-                  <FieldLabel htmlFor="cf-topic">Asunto</FieldLabel>
+                  <FieldLabel htmlFor="cf-topic">{t('contact.form.topic')}</FieldLabel>
                   <select
                     id="cf-topic"
                     value={form.topic}
                     onChange={update('topic')}
                     className="w-full h-11 rounded-xl border border-slate-200 px-3 text-[15px] text-slate-900 bg-white focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                   >
-                    <option value="general">Información general</option>
-                    <option value="autonomo">Soy autónomo — alta / perfil</option>
-                    <option value="cliente">Soy cliente — necesito un servicio</option>
-                    <option value="incidencia">Reportar una incidencia</option>
-                    <option value="prensa">Prensa / colaboración</option>
+                    <option value="general">{t('contact.form.topics.general')}</option>
+                    <option value="autonomo">{t('contact.form.topics.pro')}</option>
+                    <option value="cliente">{t('contact.form.topics.client')}</option>
+                    <option value="incidencia">{t('contact.form.topics.issue')}</option>
+                    <option value="prensa">{t('contact.form.topics.press')}</option>
                   </select>
                 </div>
 
                 <div className="mt-4">
-                  <FieldLabel htmlFor="cf-msg">Mensaje</FieldLabel>
+                  <FieldLabel htmlFor="cf-msg">{t('contact.form.message')}</FieldLabel>
                   <textarea
                     id="cf-msg"
                     value={form.message}
                     onChange={update('message')}
                     rows={5}
-                    placeholder="Cuéntanos en qué te podemos ayudar."
+                    placeholder={t('contact.form.messagePlaceholder')}
                     className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15 resize-y"
                   />
                 </div>
@@ -160,10 +162,14 @@ export default function Contacto() {
                     style={{ backgroundColor: NAVY }}
                   >
                     <Send className="w-4 h-4" />
-                    {status.state === 'sending' ? 'Enviando…' : 'Enviar mensaje'}
+                    {status.state === 'sending' ? t('contact.form.sending') : t('proProfile.contact.sendMessage')}
                   </button>
                   <p className="text-xs text-slate-500">
-                    O escríbenos a <a href={`mailto:${SUPPORT_EMAIL}`} className="font-medium underline underline-offset-2" style={{ color: NAVY }}>{SUPPORT_EMAIL}</a>
+                    <Trans
+                      i18nKey="contact.form.orEmail"
+                      values={{ email: SUPPORT_EMAIL }}
+                      components={{ link: <a href={`mailto:${SUPPORT_EMAIL}`} className="font-medium underline underline-offset-2" style={{ color: NAVY }} /> }}
+                    />
                   </p>
                 </div>
               </form>
@@ -174,20 +180,20 @@ export default function Contacto() {
                   <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl" style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: NAVY }}>
                     <Mail className="w-4 h-4" />
                   </span>
-                  <h3 className="mt-3 font-semibold text-slate-900">Email</h3>
+                  <h3 className="mt-3 font-semibold text-slate-900">{t('auth.email')}</h3>
                   <p className="text-sm text-slate-600 mt-1">
                     <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:underline" style={{ color: NAVY }}>{SUPPORT_EMAIL}</a>
                   </p>
-                  <p className="text-xs text-slate-500 mt-2">Respuesta en menos de 24 h laborables.</p>
+                  <p className="text-xs text-slate-500 mt-2">{t('contact.aside.responseTime')}</p>
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-5">
                   <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl" style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: NAVY }}>
                     <ShieldCheck className="w-4 h-4" />
                   </span>
-                  <h3 className="mt-3 font-semibold text-slate-900">Soporte de cuenta</h3>
+                  <h3 className="mt-3 font-semibold text-slate-900">{t('contact.aside.supportTitle')}</h3>
                   <p className="text-sm text-slate-600 mt-1">
-                    Si ya tienes cuenta, escríbenos desde el panel para que podamos atenderte más rápido.
+                    {t('contact.aside.supportBody')}
                   </p>
                 </div>
 
@@ -195,16 +201,16 @@ export default function Contacto() {
                   className="rounded-2xl p-5 text-white"
                   style={{ background: NAVY }}
                 >
-                  <h3 className="font-semibold">¿Eres autónomo?</h3>
+                  <h3 className="font-semibold">{t('landing.cta_pro_title')}</h3>
                   <p className="text-sm text-white/80 mt-1">
-                    Date de alta gratis y aparece donde te busca tu cliente.
+                    {t('contact.aside.proBody')}
                   </p>
                   <a
                     href="/para-autonomos"
                     className="mt-4 inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl text-sm font-semibold w-full"
                     style={{ backgroundColor: GOLD, color: NAVY }}
                   >
-                    Ver cómo funciona
+                    {t('contact.aside.proCta')}
                   </a>
                 </div>
               </aside>

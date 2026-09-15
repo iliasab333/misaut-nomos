@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -24,11 +25,6 @@ const STATUS_COLORS = {
   skipped:   'bg-gray-100 text-gray-500',
 };
 
-const STATUS_LABELS = {
-  sent: 'Enviado', delivered: 'Entregado', opened: 'Abierto', clicked: 'Clic',
-  bounced: 'Rebotado', spam: 'Spam', failed: 'Fallido', queued: 'Pendiente', skipped: 'Omitido'
-};
-
 function fmtDate(dt) {
   if (!dt) return '—';
   try { return format(new Date(dt), 'dd MMM HH:mm', { locale: es }); } catch { return '—'; }
@@ -40,10 +36,23 @@ function pct(num, denom) {
 }
 
 export default function CampaignMetrics() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedCampaign, setSelectedCampaign] = useState('all');
   const [backfilling, setBackfilling] = useState(false);
   const [showBackfillConfirm, setShowBackfillConfirm] = useState(false);
+
+  const statusLabels = {
+    sent: t('admin.campaigns.metrics.status.sent'),
+    delivered: t('admin.campaigns.metrics.status.delivered'),
+    opened: t('admin.campaigns.metrics.status.opened'),
+    clicked: t('admin.campaigns.metrics.status.clicked'),
+    bounced: t('admin.campaigns.metrics.status.bounced'),
+    spam: t('admin.campaigns.metrics.status.spam'),
+    failed: t('admin.campaigns.metrics.status.failed'),
+    queued: t('admin.campaigns.metrics.status.queued'),
+    skipped: t('admin.campaigns.metrics.status.skipped'),
+  };
 
   // Cargar todos los EmailLog válidos (con resend_message_id, excluir queued puros)
   const { data: allLogs = [], isLoading, refetch } = useQuery({
@@ -93,11 +102,20 @@ export default function CampaignMetrics() {
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ['campaignMetrics'] });
     refetch();
-    toast.success('Datos actualizados');
+    toast.success(t('admin.campaigns.metrics.refreshed'));
   };
 
   const handleExportCSV = () => {
-    const headers = ['Email', 'Estado', 'Enviado', 'Entregado', 'Abierto', 'Clic', 'Campaign', 'Resend ID'];
+    const headers = [
+      t('emailField'),
+      t('admin.campaigns.shared.table.status'),
+      t('admin.campaigns.metrics.table.sentAt'),
+      t('admin.campaigns.metrics.table.deliveredAt'),
+      t('admin.campaigns.metrics.table.openedAt'),
+      t('admin.campaigns.metrics.table.clickedAt'),
+      t('admin.campaigns.metrics.table.campaign'),
+      t('admin.campaigns.metrics.table.resendId'),
+    ];
     const rows = tableRows.map(l => [
       l.to_email,
       l.status,
@@ -124,10 +142,10 @@ export default function CampaignMetrics() {
     try {
       const res = await base44.functions.invoke('backfillEmailStatusFromResend', {});
       const data = res?.data || res;
-      toast.success(`Backfill completado: ${data.updated} actualizados, ${data.failed} errores`);
+      toast.success(t('admin.campaigns.metrics.backfillDone', { updated: data.updated, failed: data.failed }));
       handleRefresh();
     } catch (e) {
-      toast.error('Error en backfill: ' + e.message);
+      toast.error(t('admin.campaigns.metrics.backfillError', { message: e.message }));
     } finally {
       setBackfilling(false);
     }
@@ -152,16 +170,16 @@ export default function CampaignMetrics() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <BarChart3 className="w-5 h-5 text-blue-600 flex-shrink-0" />
-          <h3 className="font-bold text-gray-900">Métricas de campañas</h3>
+          <h3 className="font-bold text-gray-900">{t('admin.campaigns.metrics.title')}</h3>
         </div>
 
         <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
           <SelectTrigger className="w-52">
-            <SelectValue placeholder="Seleccionar campaña" />
+            <SelectValue placeholder={t('admin.campaigns.metrics.selectCampaign')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todas</SelectItem>
-            <SelectItem value="transactional">Transaccionales (sin campaña)</SelectItem>
+            <SelectItem value="all">{t('admin.campaigns.metrics.allCampaigns')}</SelectItem>
+            <SelectItem value="transactional">{t('admin.campaigns.metrics.transactionalOnly')}</SelectItem>
             {campaignIds.map(id => (
               <SelectItem key={id} value={id}>{id}</SelectItem>
             ))}
@@ -170,12 +188,12 @@ export default function CampaignMetrics() {
 
         <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-1.5">
           <RefreshCw className="w-3.5 h-3.5" />
-          Refrescar
+          {t('admin.campaigns.metrics.refresh')}
         </Button>
 
         <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!tableRows.length} className="gap-1.5">
           <Download className="w-3.5 h-3.5" />
-          Exportar CSV
+          {t('admin.campaigns.metrics.exportCsv')}
         </Button>
 
         <Button
@@ -186,36 +204,36 @@ export default function CampaignMetrics() {
           className="gap-1.5 border-orange-200 text-orange-700 hover:bg-orange-50"
         >
           {backfilling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-          {backfilling ? 'Sincronizando...' : 'Backfill desde Resend'}
+          {backfilling ? t('admin.campaigns.metrics.syncing') : t('admin.campaigns.metrics.backfill')}
         </Button>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <KPICard label="Total enviados" value={kpis.total} icon={Mail} color="text-gray-900" />
+        <KPICard label={t('admin.campaigns.metrics.kpi.totalSent')} value={kpis.total} icon={Mail} color="text-gray-900" />
         <KPICard
-          label="Entregados"
+          label={t('admin.campaigns.metrics.kpi.delivered')}
           value={kpis.delivered}
           sub={pct(kpis.delivered, kpis.total)}
           icon={CheckCircle}
           color="text-blue-600"
         />
         <KPICard
-          label="Abiertos"
+          label={t('admin.campaigns.metrics.kpi.opened')}
           value={kpis.opened}
-          sub={`${pct(kpis.opened, kpis.delivered)} de entregados`}
+          sub={t('admin.campaigns.metrics.kpi.ofDelivered', { pct: pct(kpis.opened, kpis.delivered) })}
           icon={Eye}
           color="text-green-600"
         />
         <KPICard
-          label="Clicks"
+          label={t('admin.campaigns.metrics.kpi.clicks')}
           value={kpis.clicked}
-          sub={`${pct(kpis.clicked, kpis.opened)} de abiertos`}
+          sub={t('admin.campaigns.metrics.kpi.ofOpened', { pct: pct(kpis.clicked, kpis.opened) })}
           icon={MousePointer}
           color="text-purple-600"
         />
         <KPICard
-          label="Rebotes / Spam"
+          label={t('admin.campaigns.metrics.kpi.bouncesSpam')}
           value={`${kpis.bounced} / ${kpis.spam}`}
           sub={pct(kpis.bounced + kpis.spam, kpis.total)}
           icon={AlertTriangle}
@@ -226,19 +244,19 @@ export default function CampaignMetrics() {
       {/* Tasas adicionales */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="p-3 text-center">
-          <p className="text-xs text-gray-500">Tasa entrega</p>
+          <p className="text-xs text-gray-500">{t('admin.campaigns.metrics.rates.delivery')}</p>
           <p className="text-xl font-bold text-blue-600">{pct(kpis.delivered, kpis.total)}</p>
         </Card>
         <Card className="p-3 text-center">
-          <p className="text-xs text-gray-500">Tasa apertura</p>
+          <p className="text-xs text-gray-500">{t('admin.campaigns.metrics.rates.open')}</p>
           <p className="text-xl font-bold text-green-600">{pct(kpis.opened, kpis.delivered)}</p>
         </Card>
         <Card className="p-3 text-center">
-          <p className="text-xs text-gray-500">Tasa click</p>
+          <p className="text-xs text-gray-500">{t('admin.campaigns.metrics.rates.click')}</p>
           <p className="text-xl font-bold text-purple-600">{pct(kpis.clicked, kpis.delivered)}</p>
         </Card>
         <Card className="p-3 text-center">
-          <p className="text-xs text-gray-500">CTR (click/apertura)</p>
+          <p className="text-xs text-gray-500">{t('admin.campaigns.metrics.rates.ctr')}</p>
           <p className="text-xl font-bold text-indigo-600">{pct(kpis.clicked, kpis.opened)}</p>
         </Card>
       </div>
@@ -248,27 +266,27 @@ export default function CampaignMetrics() {
         {isLoading ? (
           <div className="flex items-center justify-center py-12 gap-2 text-gray-400">
             <Loader2 className="w-5 h-5 animate-spin" />
-            <span>Cargando...</span>
+            <span>{t('common.loading')}</span>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-600">Email</th>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-600">Estado</th>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-600">Enviado</th>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-600">Entregado</th>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-600">Abierto</th>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-600">Clic</th>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-600">Resend ID</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-600">{t('emailField')}</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-600">{t('admin.campaigns.shared.table.status')}</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-600">{t('admin.campaigns.metrics.table.sentAt')}</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-600">{t('admin.campaigns.metrics.table.deliveredAt')}</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-600">{t('admin.campaigns.metrics.table.openedAt')}</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-600">{t('admin.campaigns.metrics.table.clickedAt')}</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-600">{t('admin.campaigns.metrics.table.resendId')}</th>
                 </tr>
               </thead>
               <tbody>
                 {tableRows.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-10 text-center text-gray-400">
-                      Sin datos para este filtro
+                      {t('admin.campaigns.metrics.empty')}
                     </td>
                   </tr>
                 ) : (
@@ -277,7 +295,7 @@ export default function CampaignMetrics() {
                       <td className="py-2.5 px-3 text-gray-800 font-medium">{log.to_email}</td>
                       <td className="py-2.5 px-3">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${STATUS_COLORS[log.status] || 'bg-gray-100 text-gray-700'}`}>
-                          {STATUS_LABELS[log.status] || log.status}
+                          {statusLabels[log.status] || log.status}
                         </span>
                       </td>
                       <td className="py-2.5 px-3 text-gray-500">{fmtDate(log.sent_at || log.created_date)}</td>
@@ -302,18 +320,17 @@ export default function CampaignMetrics() {
           <Card className="w-full max-w-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <Shield className="w-6 h-6 text-orange-500" />
-              <h3 className="font-bold text-gray-900">Confirmar Backfill</h3>
+              <h3 className="font-bold text-gray-900">{t('admin.campaigns.metrics.backfillConfirm.title')}</h3>
             </div>
             <p className="text-sm text-gray-600 mb-5">
-              Esto consultará la API de Resend para cada email con status="sent" y actualizará su estado.
-              Puede tardar varios minutos. ¿Continuar?
+              {t('admin.campaigns.metrics.backfillConfirm.body')}
             </p>
             <div className="flex gap-3">
               <Button className="flex-1 bg-orange-600 hover:bg-orange-700 text-white" onClick={handleBackfill}>
-                Sí, ejecutar
+                {t('admin.campaigns.metrics.backfillConfirm.confirm')}
               </Button>
               <Button variant="outline" className="flex-1" onClick={() => setShowBackfillConfirm(false)}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
             </div>
           </Card>

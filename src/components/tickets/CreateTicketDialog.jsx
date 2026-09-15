@@ -20,20 +20,21 @@ import {
 } from "@/components/ui/select";
 import { Paperclip, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
+// Mapa explícito tipo → clave i18n (la etiqueta se resuelve con t() en render).
 const typeConfig = {
-  soporte_cliente: { text_es: "Soporte Cliente", text_en: "Client Support" },
-  soporte_autonomo: { text_es: "Soporte Autónomo", text_en: "Professional Support" },
-  reclamo: { text_es: "Reclamo", text_en: "Complaint" },
-  problema_trabajo: { text_es: "Problema con trabajo", text_en: "Job Issue" },
-  problema_pago: { text_es: "Problema de pago", text_en: "Payment Issue" },
-  consulta_general: { text_es: "Consulta general", text_en: "General Query" }
+  soporte_cliente: "tickets.types.clientSupport",
+  soporte_autonomo: "tickets.types.proSupport",
+  reclamo: "tickets.types.complaint",
+  problema_trabajo: "tickets.types.jobIssue",
+  problema_pago: "tickets.types.paymentIssue",
+  consulta_general: "tickets.types.generalQuery"
 };
 
 export default function CreateTicketDialog({ open, onClose, user, relatedProfessionalId = null }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { language } = useLanguage();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("consulta_general");
@@ -122,13 +123,13 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
     onSuccess: (data) => {
       console.log('🎉 Ticket creado exitosamente:', data);
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      toast.success(language === 'es' ? '✅ Ticket creado correctamente' : '✅ Ticket created successfully');
+      toast.success(t('tickets.create.created'));
       resetForm();
       onClose();
     },
     onError: (error) => {
       console.error('❌ Error creando ticket:', error);
-      toast.error(language === 'es' ? 'Error al crear el ticket: ' + error.message : 'Error creating ticket: ' + error.message);
+      toast.error(t('tickets.create.createError', { message: error.message }));
     }
   });
 
@@ -150,9 +151,9 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setAttachments([...attachments, file_url]);
-      toast.success(language === 'es' ? 'Archivo adjunto' : 'File attached');
+      toast.success(t('tickets.create.fileAttached'));
     } catch (error) {
-      toast.error(language === 'es' ? 'Error subiendo archivo' : 'Error uploading file');
+      toast.error(t('tickets.toast.uploadError'));
     } finally {
       setUploadingFile(false);
     }
@@ -167,12 +168,12 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
     console.log('Usuario:', user);
 
     if (!title.trim() || !description.trim()) {
-      toast.error(language === 'es' ? 'Completa título y descripción' : 'Complete title and description');
+      toast.error(t('tickets.create.fillTitleDescription'));
       return;
     }
 
     if (!user || !user.id) {
-      toast.error(language === 'es' ? 'Error: Usuario no autenticado' : 'Error: User not authenticated');
+      toast.error(t('tickets.create.notAuthenticated'));
       console.error('❌ Usuario no disponible:', user);
       return;
     }
@@ -187,7 +188,7 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
       assigned_to_id: assignedToId || null,
       assigned_to_name: selectedProfessional?.business_name || null,
       related_professional_id: assignedToId || null,
-      tags: tags ? tags.split(',').map(t => t.trim()).filter(t => t) : [],
+      tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
       attachments: attachments || []
     };
 
@@ -200,17 +201,17 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {language === 'es' ? 'Crear Nuevo Ticket' : 'Create New Ticket'}
+            {t('tickets.create.title')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-2 block">
-              {language === 'es' ? 'Título *' : 'Title *'}
+              {t('crm.detail.titleRequired')}
             </label>
             <Input
-              placeholder={language === 'es' ? "Describe brevemente el problema..." : "Briefly describe the issue..."}
+              placeholder={t('tickets.create.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -218,10 +219,10 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
 
           <div>
             <label className="text-sm font-medium mb-2 block">
-              {language === 'es' ? 'Descripción *' : 'Description *'}
+              {t('tickets.create.descriptionLabel')}
             </label>
             <Textarea
-              placeholder={language === 'es' ? "Explica detalladamente el problema..." : "Explain the issue in detail..."}
+              placeholder={t('tickets.create.descriptionPlaceholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
@@ -231,16 +232,16 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">
-                {language === 'es' ? 'Tipo de ticket' : 'Ticket type'}
+                {t('tickets.create.typeLabel')}
               </label>
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(typeConfig).map(([key, config]) => (
+                  {Object.entries(typeConfig).map(([key, labelKey]) => (
                     <SelectItem key={key} value={key}>
-                      {language === 'es' ? config.text_es : config.text_en}
+                      {t(labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -249,17 +250,17 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
 
             <div>
               <label className="text-sm font-medium mb-2 block">
-                {language === 'es' ? 'Prioridad' : 'Priority'}
+                {t('admin.soporte.filter.priority')}
               </label>
               <Select value={priority} onValueChange={setPriority}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="baja">{language === 'es' ? 'Baja' : 'Low'}</SelectItem>
-                  <SelectItem value="media">{language === 'es' ? 'Media' : 'Medium'}</SelectItem>
-                  <SelectItem value="alta">{language === 'es' ? 'Alta' : 'High'}</SelectItem>
-                  <SelectItem value="urgente">{language === 'es' ? 'Urgente' : 'Urgent'}</SelectItem>
+                  <SelectItem value="baja">{t('admin.soporte.priority.low')}</SelectItem>
+                  <SelectItem value="media">{t('projects.priority.medium')}</SelectItem>
+                  <SelectItem value="alta">{t('admin.soporte.priority.high')}</SelectItem>
+                  <SelectItem value="urgente">{t('admin.soporte.priority.urgent')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -268,14 +269,14 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
           {professionals.length > 0 && (
             <div>
               <label className="text-sm font-medium mb-2 block">
-                {language === 'es' ? 'Relacionado con profesional (opcional)' : 'Related to professional (optional)'}
+                {t('tickets.create.relatedPro')}
               </label>
               <Select value={assignedToId} onValueChange={setAssignedToId}>
                 <SelectTrigger>
-                  <SelectValue placeholder={language === 'es' ? "Seleccionar profesional..." : "Select professional..."} />
+                  <SelectValue placeholder={t('tickets.create.selectPro')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={null}>{language === 'es' ? 'Ninguno' : 'None'}</SelectItem>
+                  <SelectItem value={null}>{t('calendar.taskForm.noClient')}</SelectItem>
                   {professionals.map((prof) => (
                     <SelectItem key={prof.user_id} value={prof.user_id}>
                       {prof.business_name}
@@ -288,10 +289,10 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
 
           <div>
             <label className="text-sm font-medium mb-2 block">
-              {language === 'es' ? 'Etiquetas (separadas por comas)' : 'Tags (comma separated)'}
+              {t('tickets.create.tagsLabel')}
             </label>
             <Input
-              placeholder={language === 'es' ? "urgente, pago, problema técnico" : "urgent, payment, technical issue"}
+              placeholder={t('tickets.create.tagsPlaceholder')}
               value={tags}
               onChange={(e) => setTags(e.target.value)}
             />
@@ -299,12 +300,12 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
 
           <div>
             <label className="text-sm font-medium mb-2 block">
-              {language === 'es' ? 'Archivos adjuntos' : 'Attachments'}
+              {t('tickets.create.attachments')}
             </label>
             <div className="flex flex-wrap gap-2 mb-2">
               {attachments.map((url, idx) => (
                 <div key={idx} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
-                  <span className="text-xs">Archivo {idx + 1}</span>
+                  <span className="text-xs">{t('tickets.detail.fileN', { index: idx + 1 })}</span>
                   <button
                     onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
                     className="text-red-600 hover:text-red-700"
@@ -331,14 +332,14 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
               ) : (
                 <Paperclip className="w-4 h-4 mr-2" />
               )}
-              {language === 'es' ? 'Adjuntar archivo' : 'Attach file'}
+              {t('messages.attach_file')}
             </Button>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            {language === 'es' ? 'Cancelar' : 'Cancel'}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -348,7 +349,7 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
             {createTicketMutation.isPending && (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             )}
-            {language === 'es' ? 'Crear Ticket' : 'Create Ticket'}
+            {t('tickets.create.submit')}
           </Button>
         </DialogFooter>
       </DialogContent>

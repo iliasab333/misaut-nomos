@@ -87,7 +87,7 @@ export default function OnboardingTutorial({ open, onClose }) {
               className="flex-1"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
-              {t('onboarding.nav.previous')}
+              {t('home.whyTrust.previous')}
             </Button>
           )}
           

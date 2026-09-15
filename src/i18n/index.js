@@ -96,6 +96,46 @@ async function loadLocaleAsync(code) {
   }
 }
 
+// ── Bundle de aplicación ─────────────────────────────────────────────────
+//
+// Las pantallas internas (admin, CRM, facturación, presupuestos…) suman 2.956
+// claves: 127 kB que un visitante de la home no necesita. Viven en
+// `<lang>.app.json` y sólo se descargan cuando se abre una página que las usa.
+//
+// Quien dispara la carga es `lazyApp()` (src/lib/lazyWithRetry.js): encadena
+// esta promesa a la del chunk de la página, de modo que el <Suspense> que ya
+// envuelve las rutas espera a las dos cosas. Por eso nunca se ve una clave
+// cruda: cuando la página pinta, sus textos ya están dentro.
+//
+// Se recuerda por idioma. Si el usuario ya estaba dentro de la app y cambia de
+// idioma, `changeLanguage` vuelve a pedir el bundle de aplicación del idioma
+// nuevo antes de conmutar.
+const appLoaded = new Set();
+const appPending = new Map();
+
+export function ensureAppLocale(code = i18n.language) {
+  const short = (code || DEFAULT_LANG).split('-')[0];
+  if (!ALL_CODES.includes(short) || appLoaded.has(short)) return Promise.resolve();
+  if (appPending.has(short)) return appPending.get(short);
+
+  const p = import(`./locales/${short}.app.json`)
+    .then((mod) => {
+      i18n.addResourceBundle(short, 'translation', mod?.default || mod, true, true);
+      appLoaded.add(short);
+    })
+    .catch((e) => {
+      // Que falle el bundle de aplicación no puede tumbar la página: se
+      // pintarán claves crudas en esa pantalla, que es feo pero navegable, y
+      // el error queda en consola. Lo quitamos de `appPending` para que un
+      // segundo intento (otra navegación) vuelva a pedirlo.
+      console.error(`[i18n] Falla al cargar el bundle de aplicación "${short}":`, e);
+      appPending.delete(short);
+    });
+
+  appPending.set(short, p);
+  return p;
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -150,7 +190,14 @@ if (detected !== DEFAULT_LANG && ALL_CODES.includes(detected)) {
 const originalChangeLanguage = i18n.changeLanguage.bind(i18n);
 i18n.changeLanguage = async (code, ...rest) => {
   const short = (code || DEFAULT_LANG).split('-')[0];
-  if (ALL_CODES.includes(short)) await loadLocaleAsync(short);
+  if (ALL_CODES.includes(short)) {
+    // Si el usuario ya tenía cargado el bundle de aplicación del idioma
+    // anterior, está DENTRO de una pantalla interna: pedimos también el del
+    // idioma nuevo antes de conmutar. Sin esto, cambiar de idioma en el CRM
+    // dejaba media pantalla en claves crudas hasta la siguiente navegación.
+    const needApp = appLoaded.size > 0;
+    await Promise.all([loadLocaleAsync(short), needApp ? ensureAppLocale(short) : null]);
+  }
   return originalChangeLanguage(code, ...rest);
 };
 

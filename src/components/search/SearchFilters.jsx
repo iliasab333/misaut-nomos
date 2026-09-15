@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Filter, Star, Clock, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,17 +10,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useLanguage } from "../ui/LanguageSwitcher";
 
-export default function SearchFilters({ 
-  filters, 
+export default function SearchFilters({
+  filters,
   onFilterChange,
   availableCities,
   categories,
   provinces,
   isMobile = false
 }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const activeFiltersCount = [
@@ -53,7 +53,7 @@ export default function SearchFilters({
         </div>
         {/* Mobile: native <select> — iOS system picker, zero animation */}
         <div className="md:hidden w-full relative">
-          <label htmlFor="select-categoria-mobile" className="sr-only">Categoría</label>
+          <label htmlFor="select-categoria-mobile" className="sr-only">{t('search.filterPanel.category')}</label>
           <select
             id="select-categoria-mobile"
             value={filters.category}
@@ -87,7 +87,7 @@ export default function SearchFilters({
         </div>
         {/* Mobile: native <select> */}
         <div className="md:hidden w-full relative">
-          <label htmlFor="select-provincia-mobile" className="sr-only">Provincia</label>
+          <label htmlFor="select-provincia-mobile" className="sr-only">{t('provinceField')}</label>
           <select
             id="select-provincia-mobile"
             value={filters.provincia}
@@ -107,7 +107,7 @@ export default function SearchFilters({
         <div className="hidden md:block w-full md:w-[200px]">
           <Select value={filters.ciudad} onValueChange={(val) => onFilterChange({ ...filters, ciudad: val })} disabled={filters.provincia === "all"}>
             <SelectTrigger className="h-11 border-2 border-gray-200 text-sm rounded-lg font-medium hover:border-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <SelectValue placeholder={filters.provincia === "all" ? "Primero selecciona provincia" : t('allCities')} />
+              <SelectValue placeholder={filters.provincia === "all" ? t('search.filterPanel.selectProvinceFirst') : t('allCities')} />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
               <SelectItem value="all">{t('allCities')}</SelectItem>
@@ -119,7 +119,7 @@ export default function SearchFilters({
         </div>
         {/* Mobile: native <select> */}
         <div className="md:hidden w-full relative">
-          <label htmlFor="select-ciudad-mobile" className="sr-only">Ciudad</label>
+          <label htmlFor="select-ciudad-mobile" className="sr-only">{t('cityField')}</label>
           <select
             id="select-ciudad-mobile"
             value={filters.ciudad}
@@ -127,7 +127,7 @@ export default function SearchFilters({
             disabled={filters.provincia === "all"}
             className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 pr-10 text-slate-900 text-base font-normal focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <option value="all">{filters.provincia === "all" ? "Primero selecciona provincia" : t('allCities')}</option>
+            <option value="all">{filters.provincia === "all" ? t('search.filterPanel.selectProvinceFirst') : t('allCities')}</option>
             {availableCities.map((ciudad) => (
               <option key={ciudad} value={ciudad}>{ciudad}</option>
             ))}
@@ -143,7 +143,7 @@ export default function SearchFilters({
               className="h-11 px-4 border-2 border-gray-200 hover:border-blue-300 relative"
             >
               <Filter className="w-4 h-4 mr-2" />
-              Filtros avanzados
+              {t('search.filters_advanced')}
               {activeFiltersCount > 3 && (
                 <Badge className="ml-2 bg-blue-600 text-white h-5 min-w-5 rounded-full px-1.5">
                   {activeFiltersCount - 3}
@@ -156,7 +156,7 @@ export default function SearchFilters({
               <div>
                 <label className="text-sm font-medium flex items-center gap-2 mb-2">
                   <Star className="w-4 h-4 text-yellow-500" />
-                  Valoración mínima
+                  {t('search.filterPanel.minRating')}
                 </label>
                 <div className="space-y-2">
                   <Slider
@@ -167,9 +167,9 @@ export default function SearchFilters({
                     className="w-full"
                   />
                   <div className="flex items-center justify-between text-xs text-gray-600">
-                    <span>Todas</span>
+                    <span>{t('search.filterPanel.anyRating')}</span>
                     <Badge variant="outline" className="bg-yellow-50">
-                      {filters.minRating > 0 ? `${filters.minRating}+ ⭐` : 'Sin filtro'}
+                      {filters.minRating > 0 ? t('search.filterPanel.ratingPlus', { rating: filters.minRating }) : t('search.filterPanel.noFilter')}
                     </Badge>
                   </div>
                 </div>
@@ -178,17 +178,17 @@ export default function SearchFilters({
               <div>
                 <label className="text-sm font-medium flex items-center gap-2 mb-2">
                   <Clock className="w-4 h-4 text-blue-500" />
-                  Disponibilidad
+                  {t('availability')}
                 </label>
                 <Select value={filters.availability} onValueChange={(val) => onFilterChange({ ...filters, availability: val })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Todas las disponibilidades" />
+                    <SelectValue placeholder={t('search.filterPanel.anyAvailability')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todas las disponibilidades</SelectItem>
-                    <SelectItem value="laborables">Solo días laborables</SelectItem>
-                    <SelectItem value="festivos">Fines de semana y festivos</SelectItem>
-                    <SelectItem value="ambos">Disponible toda la semana</SelectItem>
+                    <SelectItem value="all">{t('search.filterPanel.anyAvailability')}</SelectItem>
+                    <SelectItem value="laborables">{t('search.filterPanel.weekdaysOnly')}</SelectItem>
+                    <SelectItem value="festivos">{t('proProfile.availability.weekends')}</SelectItem>
+                    <SelectItem value="ambos">{t('search.filterPanel.allWeek')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -205,7 +205,7 @@ export default function SearchFilters({
                 className="w-full"
                 size="sm"
               >
-                Limpiar filtros avanzados
+                {t('search.filterPanel.clearAdvanced')}
               </Button>
             </div>
           </PopoverContent>
@@ -224,7 +224,7 @@ export default function SearchFilters({
             })}
             className="text-xs text-gray-500 hover:text-gray-700 h-11 md:ml-auto whitespace-nowrap"
           >
-            ✕ Limpiar todos ({activeFiltersCount})
+            {t('search.filterPanel.clearAll', { count: activeFiltersCount })}
           </Button>
         )}
       </div>

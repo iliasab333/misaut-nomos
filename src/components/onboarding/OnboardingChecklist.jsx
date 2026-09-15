@@ -11,8 +11,8 @@ export default function OnboardingChecklist({ currentStep, formData }) {
       id: 1,
       title: t('professionalIdentity'),
       items: [
-        { label: t('onboarding.checklist.professionalName'), check: formData.business_name?.length >= 2 },
-        { label: t('onboarding.checklist.nifCif'), check: formData.cif_nif?.length === 9 },
+        { label: t('premium.dashboard.checks.businessName'), check: formData.business_name?.length >= 2 },
+        { label: t('crm.detail.nifCif'), check: formData.cif_nif?.length === 9 },
         { label: t('emailContact'), check: formData.email_contacto?.includes('@') },
         { label: t('phoneLabel'), check: formData.telefono_contacto?.replace(/\D/g, '').length >= 9 }
       ]
@@ -32,8 +32,8 @@ export default function OnboardingChecklist({ currentStep, formData }) {
       items: [
         { label: t('province'), check: !!formData.provincia },
         { label: t('cityLabel'), check: !!formData.ciudad },
-        { label: t('onboarding.checklist.paymentMethods'), check: formData.formas_pago?.length > 0 },
-        { label: t('dashboard.completion.items.workPhotos'), check: formData.photos?.length > 0 },
+        { label: t('proProfile.sections.paymentMethods'), check: formData.formas_pago?.length > 0 },
+        { label: t('premium.dashboard.checks.workPhotos'), check: formData.photos?.length > 0 },
         { label: t('onboarding.checklist.consents'), check: formData.acepta_terminos && formData.acepta_politica_privacidad && formData.consiente_contacto_clientes }
       ]
     }

@@ -569,7 +569,7 @@ export default function ProfileOnboardingPage() {
 
   const uploadFileToBackend = async (file) => {
     if (file.size > 5 * 1024 * 1024) {
-      toast.error(t('onboarding.toasts.imageTooLarge'));
+      toast.error(t('proProfile.picture.tooLarge'));
       return null;
     }
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -701,8 +701,8 @@ export default function ProfileOnboardingPage() {
           <Card className="shadow-xl border-0 bg-white rounded-2xl overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pb-8">
             <div className="text-center mb-4">
-              <h1 className="text-3xl font-bold mb-2">{t('onboarding.header.title')}</h1>
-              <p className="text-blue-100">{t('onboarding.header.step', { current: currentStep, total: 3 })}</p>
+              <h1 className="text-3xl font-bold mb-2">{t('subscription.onboarding.success.stepCompleteProfile')}</h1>
+              <p className="text-blue-100">{t('subscription.onboarding.progress.step', { current: currentStep, total: 3 })}</p>
             </div>
             <div className="w-full bg-blue-400/30 rounded-full h-2">
               <div 
@@ -1146,7 +1146,7 @@ export default function ProfileOnboardingPage() {
                         <div key={idx} className="relative group">
                           <img
                             src={photo}
-                            alt={t('onboarding.portfolio.photoAlt', { number: idx + 1 })}
+                            alt={t('proProfile.portfolio.photoAlt', { number: idx + 1 })}
                             className="w-full h-24 object-cover rounded-lg border-2 border-green-200"
                           />
                           <button
@@ -1160,7 +1160,7 @@ export default function ProfileOnboardingPage() {
                           </button>
                           {idx === 0 && (
                             <div className="absolute bottom-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded font-semibold">
-                              {t('onboarding.portfolio.main')}
+                              {t('proProfile.gallery.mainPhoto')}
                             </div>
                           )}
                           <div className="absolute top-1 left-1 bg-green-500 text-white p-1 rounded-full">
@@ -1292,9 +1292,10 @@ export default function ProfileOnboardingPage() {
                       className="w-5 h-5 mt-0.5 text-green-600 rounded border-gray-300 focus:ring-2 focus:ring-green-500 pointer-events-none"
                     />
                     <span className="text-sm text-gray-700 flex-1">
-                      <Trans i18nKey="onboarding.consents.acceptTerms">
-                        Acepto los <a href="/terminos" target="_blank" className="text-blue-600 underline font-medium" onClick={(e) => e.stopPropagation()}>Términos y Condiciones</a> de uso de la plataforma
-                      </Trans>
+                      <Trans
+                        i18nKey="onboarding.consents.acceptTerms"
+                        components={{ terms: <a href="/terminos" target="_blank" className="text-blue-600 underline font-medium" onClick={(e) => e.stopPropagation()} /> }}
+                      />
                       {fieldErrors.acepta_terminos && (
                         <span className="block text-red-500 font-semibold mt-1">{fieldErrors.acepta_terminos}</span>
                       )}
@@ -1316,9 +1317,10 @@ export default function ProfileOnboardingPage() {
                       className="w-5 h-5 mt-0.5 text-green-600 rounded border-gray-300 focus:ring-2 focus:ring-green-500 pointer-events-none"
                     />
                     <span className="text-sm text-gray-700 flex-1">
-                      <Trans i18nKey="onboarding.consents.acceptPrivacy">
-                        Acepto la <a href="/privacidad" target="_blank" className="text-blue-600 underline font-medium" onClick={(e) => e.stopPropagation()}>Política de Privacidad</a> y tratamiento de datos
-                      </Trans>
+                      <Trans
+                        i18nKey="onboarding.consents.acceptPrivacy"
+                        components={{ privacy: <a href="/privacidad" target="_blank" className="text-blue-600 underline font-medium" onClick={(e) => e.stopPropagation()} /> }}
+                      />
                     </span>
                   </div>
 
@@ -1353,7 +1355,7 @@ export default function ProfileOnboardingPage() {
                   disabled={saving}
                 >
                   <ChevronLeft className="w-5 h-5 mr-2" />
-                  {t('onboarding.nav.previous')}
+                  {t('home.whyTrust.previous')}
                 </Button>
               )}
 

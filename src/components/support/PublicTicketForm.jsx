@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Send, Loader2, CheckCircle, Mail, User, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
-export default function PublicTicketForm({ language = 'es' }) {
+// `language` llegaba como prop desde HelpCenter; ahora el idioma lo lleva
+// i18next, así que la prop se ignora.
+export default function PublicTicketForm() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -22,11 +26,11 @@ export default function PublicTicketForm({ language = 'es' }) {
   const [ticketNumber, setTicketNumber] = useState("");
 
   const ticketTypes = [
-    { value: "consulta_general", label_es: "Consulta general", label_en: "General inquiry" },
-    { value: "soporte_cliente", label_es: "Soy cliente y necesito ayuda", label_en: "I'm a client and need help" },
-    { value: "soporte_autonomo", label_es: "Soy autónomo y necesito ayuda", label_en: "I'm a professional and need help" },
-    { value: "problema_pago", label_es: "Problema con pago/facturación", label_en: "Payment/billing issue" },
-    { value: "reclamo", label_es: "Reclamación", label_en: "Complaint" },
+    { value: "consulta_general", label: t('tickets.types.generalQuery') },
+    { value: "soporte_cliente", label: t('tickets.public.types.clientHelp') },
+    { value: "soporte_autonomo", label: t('tickets.public.types.proHelp') },
+    { value: "problema_pago", label: t('tickets.public.types.paymentBilling') },
+    { value: "reclamo", label: t('supportChat.ticketTypeComplaint') },
   ];
 
   const generateTicketNumber = () => {
@@ -39,14 +43,14 @@ export default function PublicTicketForm({ language = 'es' }) {
     e.preventDefault();
     
     if (!formData.name.trim() || !formData.email.trim() || !formData.title.trim() || !formData.description.trim()) {
-      toast.error(language === 'es' ? "Por favor completa todos los campos" : "Please fill in all fields");
+      toast.error(t('tickets.public.fillAllFields'));
       return;
     }
 
     // Validar email básico
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast.error(language === 'es' ? "Email inválido" : "Invalid email");
+      toast.error(t('tickets.public.invalidEmail'));
       return;
     }
 
@@ -76,21 +80,17 @@ export default function PublicTicketForm({ language = 'es' }) {
       try {
         await base44.integrations.Core.SendEmail({
           to: formData.email,
-          subject: language === 'es' 
-            ? `Ticket recibido: ${newTicketNumber} - MisAutónomos` 
-            : `Ticket received: ${newTicketNumber} - MisAutónomos`,
-          body: language === 'es'
-            ? `Hola ${formData.name},\n\nHemos recibido tu consulta. Tu número de ticket es: ${newTicketNumber}\n\nAsunto: ${formData.title}\n\nNos pondremos en contacto contigo lo antes posible.\n\nGracias,\nEquipo MisAutónomos`
-            : `Hello ${formData.name},\n\nWe have received your inquiry. Your ticket number is: ${newTicketNumber}\n\nSubject: ${formData.title}\n\nWe will contact you as soon as possible.\n\nThank you,\nMisAutónomos Team`
+          subject: t('tickets.public.emailSubject', { number: newTicketNumber }),
+          body: t('tickets.public.emailBody', { name: formData.name, number: newTicketNumber, title: formData.title })
         });
       } catch (emailError) {
         console.error("Error sending confirmation email:", emailError);
       }
 
-      toast.success(language === 'es' ? "¡Ticket enviado correctamente!" : "Ticket submitted successfully!");
+      toast.success(t('tickets.public.sentToast'));
     } catch (error) {
       console.error("Error creating ticket:", error);
-      toast.error(language === 'es' ? "Error al enviar el ticket" : "Error submitting ticket");
+      toast.error(t('tickets.public.sendError'));
     } finally {
       setSubmitting(false);
     }
@@ -104,23 +104,19 @@ export default function PublicTicketForm({ language = 'es' }) {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
-            {language === 'es' ? '¡Ticket enviado!' : 'Ticket submitted!'}
+            {t('tickets.public.sentTitle')}
           </h3>
           <p className="text-gray-600 mb-4">
-            {language === 'es' 
-              ? 'Hemos recibido tu consulta. Te responderemos lo antes posible.'
-              : 'We have received your inquiry. We will respond as soon as possible.'}
+            {t('tickets.public.sentBody')}
           </p>
           <div className="bg-white rounded-lg p-4 inline-block mb-4">
             <p className="text-sm text-gray-600 mb-1">
-              {language === 'es' ? 'Número de ticket:' : 'Ticket number:'}
+              {t('tickets.public.ticketNumber')}
             </p>
             <p className="text-xl font-mono font-bold text-blue-600">{ticketNumber}</p>
           </div>
           <p className="text-sm text-gray-500">
-            {language === 'es' 
-              ? 'Guarda este número para futuras referencias. Recibirás una confirmación en tu email.'
-              : 'Save this number for future reference. You will receive a confirmation email.'}
+            {t('tickets.public.saveNumber')}
           </p>
           <Button 
             onClick={() => {
@@ -130,7 +126,7 @@ export default function PublicTicketForm({ language = 'es' }) {
             variant="outline"
             className="mt-4"
           >
-            {language === 'es' ? 'Enviar otro ticket' : 'Submit another ticket'}
+            {t('tickets.public.sendAnother')}
           </Button>
         </CardContent>
       </Card>
@@ -142,12 +138,10 @@ export default function PublicTicketForm({ language = 'es' }) {
       <CardHeader className="pb-4">
         <CardTitle className="text-xl flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-blue-600" />
-          {language === 'es' ? 'Enviar consulta' : 'Submit inquiry'}
+          {t('tickets.public.sendInquiry')}
         </CardTitle>
         <p className="text-sm text-gray-600">
-          {language === 'es' 
-            ? 'Completa el formulario y nos pondremos en contacto contigo'
-            : 'Fill out the form and we will contact you'}
+          {t('tickets.public.subtitle')}
         </p>
       </CardHeader>
       <CardContent>
@@ -156,32 +150,32 @@ export default function PublicTicketForm({ language = 'es' }) {
             <div>
               <Label className="flex items-center gap-2">
                 <User className="w-4 h-4" />
-                {language === 'es' ? 'Tu nombre *' : 'Your name *'}
+                {t('tickets.public.nameLabel')}
               </Label>
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder={language === 'es' ? "Ej: Juan Pérez" : "E.g.: John Smith"}
+                placeholder={t('tickets.public.namePlaceholder')}
                 className="mt-1"
               />
             </div>
             <div>
               <Label className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                {language === 'es' ? 'Tu email *' : 'Your email *'}
+                {t('tickets.public.emailLabel')}
               </Label>
               <Input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="email@ejemplo.com"
+                placeholder={t('tickets.public.emailPlaceholder')}
                 className="mt-1"
               />
             </div>
           </div>
 
           <div>
-            <Label>{language === 'es' ? 'Tipo de consulta *' : 'Inquiry type *'}</Label>
+            <Label>{t('tickets.public.typeLabel')}</Label>
             <Select 
               value={formData.type} 
               onValueChange={(value) => setFormData({ ...formData, type: value })}
@@ -192,7 +186,7 @@ export default function PublicTicketForm({ language = 'es' }) {
               <SelectContent>
                 {ticketTypes.map((type) => (
                   <SelectItem key={type.value} value={type.value}>
-                    {language === 'es' ? type.label_es : type.label_en}
+                    {type.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -200,23 +194,21 @@ export default function PublicTicketForm({ language = 'es' }) {
           </div>
 
           <div>
-            <Label>{language === 'es' ? 'Asunto *' : 'Subject *'}</Label>
+            <Label>{t('tickets.public.subjectLabel')}</Label>
             <Input
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder={language === 'es' ? "Describe brevemente tu consulta" : "Briefly describe your inquiry"}
+              placeholder={t('tickets.public.subjectPlaceholder')}
               className="mt-1"
             />
           </div>
 
           <div>
-            <Label>{language === 'es' ? 'Mensaje *' : 'Message *'}</Label>
+            <Label>{t('tickets.public.messageLabel')}</Label>
             <Textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder={language === 'es' 
-                ? "Explica tu consulta con el mayor detalle posible..."
-                : "Explain your inquiry in as much detail as possible..."}
+              placeholder={t('tickets.public.messagePlaceholder')}
               className="mt-1 h-32"
             />
           </div>
@@ -229,20 +221,18 @@ export default function PublicTicketForm({ language = 'es' }) {
             {submitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {language === 'es' ? 'Enviando...' : 'Sending...'}
+                {t('reviews.form.sending')}
               </>
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                {language === 'es' ? 'Enviar consulta' : 'Submit inquiry'}
+                {t('tickets.public.sendInquiry')}
               </>
             )}
           </Button>
 
           <p className="text-xs text-gray-500 text-center">
-            {language === 'es' 
-              ? 'Al enviar, aceptas que procesemos tus datos para responder a tu consulta.'
-              : 'By submitting, you agree that we process your data to respond to your inquiry.'}
+            {t('tickets.public.consent')}
           </p>
         </form>
       </CardContent>

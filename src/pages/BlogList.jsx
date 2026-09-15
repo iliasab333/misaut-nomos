@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { Clock, Search, Sparkles, ArrowRight } from 'lucide-react';
 import NewsletterSignup from '@/components/NewsletterSignup';
@@ -7,25 +8,30 @@ import SEOHead from '@/components/seo/SEOHead';
 
 const NAVY = '#00255C';
 const GOLD = '#F5C13D';
+const BRAND = 'MisAutónomos';
 
+// Categorías del blog: id (valor en BD) → clave de traducción de la etiqueta.
+// Mapa explícito y cerrado: es lo que permite t(labelKey) sin claves dinámicas.
 const CATEGORIES = [
-  { id: 'autonomos', label: 'Para autónomos' },
-  { id: 'clientes', label: 'Para clientes' },
-  { id: 'legal_fiscal', label: 'Legal y fiscal' },
-  { id: 'herramientas', label: 'Herramientas' },
-  { id: 'actualidad', label: 'Actualidad' },
+  { id: 'autonomos', labelKey: 'footer.for_pros' },
+  { id: 'clientes', labelKey: 'footer.for_clients' },
+  { id: 'legal_fiscal', labelKey: 'blog.editor.category.legalFiscal' },
+  { id: 'herramientas', labelKey: 'blog.editor.category.tools' },
+  { id: 'actualidad', labelKey: 'blog.editor.category.news' },
 ];
 
-const CATEGORY_LABEL = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.label]));
+const CATEGORY_LABEL_KEY = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.labelKey]));
 
 export function CategoryBadge({ category }) {
+  const { t } = useTranslation();
   if (!category) return null;
+  const labelKey = CATEGORY_LABEL_KEY[category];
   return (
     <span
       className="inline-flex items-center text-[11px] font-semibold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full"
       style={{ backgroundColor: 'rgba(0,37,92,0.06)', color: NAVY }}
     >
-      {CATEGORY_LABEL[category] || category}
+      {labelKey ? t(labelKey) : category}
     </span>
   );
 }
@@ -36,6 +42,7 @@ function formatDate(dateStr, opts = { day: 'numeric', month: 'long', year: 'nume
 }
 
 function PostCard({ post }) {
+  const { t } = useTranslation();
   return (
     <Link
       to={`/blog/${post.slug}`}
@@ -52,7 +59,7 @@ function PostCard({ post }) {
         ) : (
           <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F4F6FB 0%, #E7ECF6 100%)' }}>
             <span className="text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: NAVY, opacity: 0.4 }}>
-              MisAutónomos
+              {BRAND}
             </span>
           </div>
         )}
@@ -67,7 +74,7 @@ function PostCard({ post }) {
         )}
         <div className="mt-4 pt-4 flex items-center gap-3 text-xs text-slate-500 border-t border-slate-100">
           {post.read_time_minutes ? (
-            <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" />{post.read_time_minutes} min</span>
+            <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" />{t('blog.list.readTime', { minutes: post.read_time_minutes })}</span>
           ) : null}
           {post.publish_date && (<><span>·</span><span>{formatDate(post.publish_date, { day: 'numeric', month: 'short', year: 'numeric' })}</span></>)}
         </div>
@@ -77,6 +84,7 @@ function PostCard({ post }) {
 }
 
 export default function BlogListPage() {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState([]);
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
@@ -123,8 +131,8 @@ export default function BlogListPage() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <SEOHead
-        title="Blog MisAutónomos · Guías y consejos para autónomos en España"
-        description="Fiscalidad, herramientas y mejores prácticas para autónomos. También consejos para clientes que contratan profesionales."
+        title={t('blog.list.seo.title')}
+        description={t('blog.list.seo.description')}
         structuredData={blogSchema}
       />
 
@@ -132,23 +140,23 @@ export default function BlogListPage() {
       <section style={{ background: '#FBFCFE' }}>
         <div className="max-w-5xl mx-auto px-4 pt-14 pb-10 md:pt-20 md:pb-12">
           <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium" style={{ backgroundColor: 'rgba(0,37,92,0.06)', color: NAVY }}>
-            <Sparkles className="w-3.5 h-3.5" /> Blog
+            <Sparkles className="w-3.5 h-3.5" /> {t('nav.blog')}
           </div>
           <h1
             className="mt-5 font-semibold tracking-tight"
             style={{ color: NAVY, fontSize: 'clamp(2rem, 5.4vw, 3rem)', lineHeight: 1.06, letterSpacing: '-0.025em' }}
           >
-            Lo que importa para autónomos y para quienes los contratan
+            {t('blog.list.hero.title')}
           </h1>
           <p className="mt-4 max-w-2xl text-slate-600 text-[16px] md:text-lg leading-relaxed">
-            Sin paja. Guías cortas, fiscalidad explicada en humano y herramientas que de verdad usamos.
+            {t('blog.list.hero.subtitle')}
           </p>
 
           <div className="relative mt-7 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Buscar artículos..."
+              placeholder={t('blog.list.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
@@ -169,7 +177,7 @@ export default function BlogListPage() {
               }`}
               style={category === 'all' ? { borderColor: NAVY } : { borderColor: 'transparent' }}
             >
-              Todos
+              {t('blog.list.allCategories')}
             </button>
             {CATEGORIES.map((c) => (
               <button
@@ -181,7 +189,7 @@ export default function BlogListPage() {
                 }`}
                 style={category === c.id ? { borderColor: NAVY } : { borderColor: 'transparent' }}
               >
-                {c.label}
+                {t(c.labelKey)}
               </button>
             ))}
           </div>
@@ -207,7 +215,7 @@ export default function BlogListPage() {
           ) : filtered.length === 0 ? (
             <div className="rounded-2xl border border-slate-200 p-10 text-center bg-white">
               <p className="text-slate-500 text-sm">
-                No hay artículos que coincidan con tu búsqueda.
+                {t('blog.list.empty')}
               </p>
             </div>
           ) : (
@@ -236,7 +244,7 @@ export default function BlogListPage() {
                       <div className="flex items-center gap-2">
                         <CategoryBadge category={featured.category} />
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,193,61,0.16)', color: '#7B5400' }}>
-                          Destacado
+                          {t('blog.list.featured')}
                         </span>
                       </div>
                       <h2 className="mt-4 text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em', lineHeight: 1.12 }}>
@@ -246,11 +254,11 @@ export default function BlogListPage() {
                         <p className="mt-3 text-slate-600 line-clamp-3 leading-relaxed">{featured.excerpt_es}</p>
                       )}
                       <div className="mt-5 flex items-center gap-3 text-xs text-slate-500">
-                        {featured.read_time_minutes ? <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" />{featured.read_time_minutes} min</span> : null}
+                        {featured.read_time_minutes ? <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" />{t('blog.list.readTime', { minutes: featured.read_time_minutes })}</span> : null}
                         {featured.publish_date && (<><span>·</span><span>{formatDate(featured.publish_date)}</span></>)}
                       </div>
                       <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold" style={{ color: NAVY }}>
-                        Leer el artículo <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        {t('blog.list.readArticle')} <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </span>
                     </div>
                   </div>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 
 export default function SearchAutocomplete({ value, onChange, onSelect }) {
+  const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -90,7 +92,7 @@ export default function SearchAutocomplete({ value, onChange, onSelect }) {
             setShowSuggestions(true);
           }}
           onFocus={() => value && setShowSuggestions(true)}
-          placeholder="Buscar profesional, servicio..."
+          placeholder={t('searchPlaceholder')}
           className="pl-10 h-11 border-2 border-gray-200 rounded-lg w-full"
         />
         {loading && (

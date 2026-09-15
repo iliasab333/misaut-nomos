@@ -7,41 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Users, MapPin, Target, TrendingUp, Star } from "lucide-react";
-
-const STEPS = [
-  {
-    id: 1,
-    title: "Tipo de cliente",
-    subtitle: "¿A quién vendes tus servicios?",
-    icon: Users
-  },
-  {
-    id: 2,
-    title: "Perfil del cliente ideal",
-    subtitle: "¿Cómo es tu cliente perfecto?",
-    icon: Target
-  },
-  {
-    id: 3,
-    title: "Dónde están tus clientes",
-    subtitle: "¿En qué redes sociales están?",
-    icon: MapPin
-  },
-  {
-    id: 4,
-    title: "Cómo consigues clientes hoy",
-    subtitle: "¿Qué canales usas actualmente?",
-    icon: TrendingUp
-  },
-  {
-    id: 5,
-    title: "Tus objetivos",
-    subtitle: "¿Qué quieres conseguir en 6 meses?",
-    icon: Star
-  }
-];
+import { useTranslation } from "react-i18next";
 
 export default function InsightsOnboarding({ onComplete, user }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   
@@ -69,6 +38,15 @@ export default function InsightsOnboarding({ onComplete, user }) {
     differentiation: ""
   });
 
+  // Antes constante de módulo (STEPS): dentro del componente para que pase por t().
+  const STEPS = [
+    { id: 1, title: t('ads.insights.steps.clientTypeTitle'), subtitle: t('ads.insights.steps.clientTypeSubtitle'), icon: Users },
+    { id: 2, title: t('ads.insights.steps.idealProfileTitle'), subtitle: t('ads.insights.steps.idealProfileSubtitle'), icon: Target },
+    { id: 3, title: t('ads.insights.steps.whereTitle'), subtitle: t('ads.insights.steps.whereSubtitle'), icon: MapPin },
+    { id: 4, title: t('ads.insights.steps.channelsTitle'), subtitle: t('ads.insights.steps.channelsSubtitle'), icon: TrendingUp },
+    { id: 5, title: t('ads.insights.steps.goalsTitle'), subtitle: t('ads.insights.steps.goalsSubtitle'), icon: Star }
+  ];
+
   const handleNext = () => {
     if (step < 5) setStep(step + 1);
   };
@@ -79,7 +57,7 @@ export default function InsightsOnboarding({ onComplete, user }) {
 
   const handleSubmit = async () => {
     if (!user?.id) {
-      toast.error("Error: no hay sesión de usuario. Recarga la página.");
+      toast.error(t('ads.shared.noSessionError'));
       return;
     }
     setSaving(true);
@@ -121,11 +99,11 @@ export default function InsightsOnboarding({ onComplete, user }) {
       });
       
       console.log('[InsightsOnboarding] ✅ ClientInsights creado para professional_id:', user.id);
-      toast.success("✅ Perfil de cliente guardado");
+      toast.success(t('ads.insights.saved'));
       onComplete();
     } catch (error) {
       console.error("Error saving insights:", error);
-      toast.error(`Error al guardar: ${error?.message || 'Inténtalo de nuevo.'}`);
+      toast.error(t('ads.insights.saveError', { message: error?.message || t('ads.insights.saveErrorFallback') }));
     } finally {
       setSaving(false);
     }
@@ -137,12 +115,12 @@ export default function InsightsOnboarding({ onComplete, user }) {
         return (
           <div className="space-y-4">
             <div>
-              <Label className="text-base">¿Qué tipo de clientes tienes?</Label>
+              <Label className="text-base">{t('ads.insights.clientTypeQuestion')}</Label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
                 {[
-                  { id: 'particulares', label: 'Particulares', desc: 'B2C' },
-                  { id: 'empresas', label: 'Empresas', desc: 'B2B' },
-                  { id: 'ambos', label: 'Ambos', desc: 'B2B + B2C' }
+                  { id: 'particulares', label: t('ads.insights.clientType.individuals'), desc: 'B2C' },
+                  { id: 'empresas', label: t('ads.insights.clientType.companies'), desc: 'B2B' },
+                  { id: 'ambos', label: t('ads.insights.both'), desc: 'B2B + B2C' }
                 ].map(option => (
                   <button
                     key={option.id}
@@ -162,35 +140,35 @@ export default function InsightsOnboarding({ onComplete, user }) {
             </div>
 
             <div>
-              <Label>Ticket medio aproximado (€)</Label>
+              <Label>{t('ads.insights.avgTicketLabel')}</Label>
               <select
                 value={formData.average_ticket}
                 onChange={(e) => setFormData({ ...formData, average_ticket: e.target.value })}
                 className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
               >
-                <option value="">Selecciona</option>
-                <option value="<50">Menos de 50€</option>
+                <option value="">{t('ads.insights.select')}</option>
+                <option value="<50">{t('ads.insights.ticket.under50')}</option>
                 <option value="50-100">50€ - 100€</option>
                 <option value="100-250">100€ - 250€</option>
                 <option value="250-500">250€ - 500€</option>
                 <option value="500-1000">500€ - 1000€</option>
-                <option value="1000+">Más de 1000€</option>
+                <option value="1000+">{t('ads.insights.ticket.over1000')}</option>
               </select>
             </div>
 
             <div>
-              <Label>Facturación mensual estimada (opcional)</Label>
+              <Label>{t('ads.insights.revenueLabel')}</Label>
               <select
                 value={formData.monthly_revenue}
                 onChange={(e) => setFormData({ ...formData, monthly_revenue: e.target.value })}
                 className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
               >
-                <option value="">Selecciona</option>
-                <option value="<1000">Menos de 1.000€</option>
+                <option value="">{t('ads.insights.select')}</option>
+                <option value="<1000">{t('ads.insights.revenue.under1000')}</option>
                 <option value="1000-2500">1.000€ - 2.500€</option>
                 <option value="2500-5000">2.500€ - 5.000€</option>
                 <option value="5000-10000">5.000€ - 10.000€</option>
-                <option value="10000+">Más de 10.000€</option>
+                <option value="10000+">{t('ads.insights.revenue.over10000')}</option>
               </select>
             </div>
           </div>
@@ -200,7 +178,7 @@ export default function InsightsOnboarding({ onComplete, user }) {
         return (
           <div className="space-y-4">
             <div>
-              <Label className="text-base">Edad de tus clientes ideales</Label>
+              <Label className="text-base">{t('ads.insights.ageLabel')}</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
                 {[
                   '18-25', '25-35', '35-45', '45-55', '55-65', '65+'
@@ -232,12 +210,12 @@ export default function InsightsOnboarding({ onComplete, user }) {
             </div>
 
             <div>
-              <Label>Sexo predominante</Label>
+              <Label>{t('ads.insights.genderLabel')}</Label>
               <div className="grid grid-cols-3 gap-2 mt-2">
                 {[
-                  { id: 'hombres', label: 'Hombres' },
-                  { id: 'mujeres', label: 'Mujeres' },
-                  { id: 'ambos', label: 'Ambos' }
+                  { id: 'hombres', label: t('ads.insights.gender.men') },
+                  { id: 'mujeres', label: t('ads.insights.gender.women') },
+                  { id: 'ambos', label: t('ads.insights.both') }
                 ].map(option => (
                   <button
                     key={option.id}
@@ -256,12 +234,12 @@ export default function InsightsOnboarding({ onComplete, user }) {
             </div>
 
             <div>
-              <Label>Intereses / Hobbies de tus clientes</Label>
-              <p className="text-xs text-gray-500 mt-1">Ej: deporte, cocina, tecnología, viajes...</p>
+              <Label>{t('ads.insights.interestsLabel')}</Label>
+              <p className="text-xs text-gray-500 mt-1">{t('ads.insights.interestsHint')}</p>
               <Input
                 value={formData.ideal_interests.join(", ")}
                 onChange={(e) => setFormData({ ...formData, ideal_interests: e.target.value.split(",").map(i => i.trim()).filter(Boolean) })}
-                placeholder="Ej: deporte, cocina, tecnología"
+                placeholder={t('ads.insights.interestsPlaceholder')}
                 className="mt-2"
               />
             </div>
@@ -272,7 +250,7 @@ export default function InsightsOnboarding({ onComplete, user }) {
         return (
           <div className="space-y-4">
             <div>
-              <Label className="text-base">¿En qué redes suelen estar tus clientes?</Label>
+              <Label className="text-base">{t('ads.insights.networksQuestion')}</Label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                 {[
                   { id: 'instagram', label: 'Instagram' },
@@ -310,18 +288,18 @@ export default function InsightsOnboarding({ onComplete, user }) {
             </div>
 
             <div>
-              <Label>¿Qué ámbito geográfico cubres?</Label>
+              <Label>{t('ads.insights.scopeLabel')}</Label>
               <select
                 value={formData.geographic_scope}
                 onChange={(e) => setFormData({ ...formData, geographic_scope: e.target.value })}
                 className="w-full mt-2 px-3 py-2 border border-gray-200 rounded-lg text-sm"
               >
-                <option value="">Selecciona</option>
-                <option value="local">Local (mi ciudad/barrio)</option>
-                <option value="provincial">Provincial</option>
-                <option value="regional">Regional (comunidad autónoma)</option>
-                <option value="nacional">Nacional</option>
-                <option value="online">Online (sin límite geográfico)</option>
+                <option value="">{t('ads.insights.select')}</option>
+                <option value="local">{t('ads.insights.scope.local')}</option>
+                <option value="provincial">{t('ads.insights.scope.provincial')}</option>
+                <option value="regional">{t('ads.insights.scope.regional')}</option>
+                <option value="nacional">{t('ads.insights.scope.national')}</option>
+                <option value="online">{t('ads.insights.scope.online')}</option>
               </select>
             </div>
           </div>
@@ -331,19 +309,19 @@ export default function InsightsOnboarding({ onComplete, user }) {
         return (
           <div className="space-y-4">
             <div>
-              <Label className="text-base">¿Cómo consigues clientes actualmente?</Label>
+              <Label className="text-base">{t('ads.insights.channelsQuestion')}</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                 {[
-                  { id: 'word_of_mouth', label: 'Boca a boca' },
+                  { id: 'word_of_mouth', label: t('ads.insights.channel.wordOfMouth') },
                   { id: 'google', label: 'Google Search' },
                   { id: 'instagram', label: 'Instagram' },
                   { id: 'facebook', label: 'Facebook' },
                   { id: 'tiktok', label: 'TikTok' },
                   { id: 'linkedin', label: 'LinkedIn' },
                   { id: 'misautonomos', label: 'MisAutónomos' },
-                  { id: 'website', label: 'Mi web' },
-                  { id: 'physical_store', label: 'Tienda física' },
-                  { id: 'other', label: 'Otro' }
+                  { id: 'website', label: t('ads.insights.channel.website') },
+                  { id: 'physical_store', label: t('ads.insights.channel.physicalStore') },
+                  { id: 'other', label: t('ads.insights.channel.other') }
                 ].map(channel => (
                   <label
                     key={channel.id}
@@ -372,11 +350,11 @@ export default function InsightsOnboarding({ onComplete, user }) {
             </div>
 
             <div>
-              <Label>¿Qué es lo más difícil para ti ahora?</Label>
+              <Label>{t('ads.insights.challengeLabel')}</Label>
               <Textarea
                 value={formData.biggest_challenge}
                 onChange={(e) => setFormData({ ...formData, biggest_challenge: e.target.value })}
-                placeholder="Ej: Conseguir nuevos clientes, fidelizar, aumentar ticket medio..."
+                placeholder={t('ads.insights.challengePlaceholder')}
                 rows={3}
                 className="mt-2"
               />
@@ -388,14 +366,14 @@ export default function InsightsOnboarding({ onComplete, user }) {
         return (
           <div className="space-y-4">
             <div>
-              <Label className="text-base">¿Cuál es tu objetivo los próximos 6 meses?</Label>
+              <Label className="text-base">{t('ads.insights.goalQuestion')}</Label>
               <div className="space-y-2 mt-2">
                 {[
-                  { id: 'new_clients', label: 'Conseguir nuevos clientes' },
-                  { id: 'loyalty', label: 'Fidelizar clientes actuales' },
-                  { id: 'increase_ticket', label: 'Subir ticket medio' },
-                  { id: 'expand_zone', label: 'Expandir zona de servicio' },
-                  { id: 'new_services', label: 'Lanzar nuevos servicios' }
+                  { id: 'new_clients', label: t('ads.insights.goal.newClients') },
+                  { id: 'loyalty', label: t('ads.insights.goal.loyalty') },
+                  { id: 'increase_ticket', label: t('ads.insights.goal.increaseTicket') },
+                  { id: 'expand_zone', label: t('ads.insights.goal.expandZone') },
+                  { id: 'new_services', label: t('ads.insights.goal.newServices') }
                 ].map(goal => (
                   <label
                     key={goal.id}
@@ -419,12 +397,12 @@ export default function InsightsOnboarding({ onComplete, user }) {
             </div>
 
             <div>
-              <Label>¿Qué te diferencia de la competencia?</Label>
-              <p className="text-xs text-gray-500 mt-1">1-2 frases cortas</p>
+              <Label>{t('ads.insights.differentiationLabel')}</Label>
+              <p className="text-xs text-gray-500 mt-1">{t('ads.insights.differentiationHint')}</p>
               <Textarea
                 value={formData.differentiation}
                 onChange={(e) => setFormData({ ...formData, differentiation: e.target.value })}
-                placeholder="Ej: Atiendo urgencias 24/7, doy garantía de 2 años, uso materiales premium..."
+                placeholder={t('ads.insights.differentiationPlaceholder')}
                 rows={2}
                 className="mt-2"
               />
@@ -441,7 +419,7 @@ export default function InsightsOnboarding({ onComplete, user }) {
     <div className="bg-white rounded-2xl border border-gray-100 p-6">
       {/* Progress bar */}
       <div className="flex items-center justify-between mb-5">
-        <span className="text-xs font-medium text-gray-500">Paso {step} de 5</span>
+        <span className="text-xs font-medium text-gray-500">{t('ads.insights.stepOf', { step })}</span>
         <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map(n => (
             <div
@@ -472,7 +450,7 @@ export default function InsightsOnboarding({ onComplete, user }) {
           className="text-sm"
         >
           <ChevronLeft className="w-4 h-4 mr-1" />
-          Atrás
+          {t('ads.insights.back')}
         </Button>
         {step < 5 ? (
           <Button
@@ -480,7 +458,7 @@ export default function InsightsOnboarding({ onComplete, user }) {
             onClick={handleNext}
             className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium"
           >
-            Siguiente
+            {t('common.next')}
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         ) : (
@@ -490,7 +468,7 @@ export default function InsightsOnboarding({ onComplete, user }) {
             disabled={saving}
             className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
           >
-            {saving ? "Guardando..." : "Finalizar"}
+            {saving ? t('ads.insights.saving') : t('ads.insights.finish')}
           </Button>
         )}
       </div>

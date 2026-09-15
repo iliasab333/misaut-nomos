@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
   Users,
@@ -29,74 +30,23 @@ const COVERAGE_CITIES = [
   'Zaragoza', 'Alicante', 'Murcia', 'Palma', 'Granada', 'A Coruña',
 ];
 
-const CLIENT_STEPS = [
-  {
-    n: '01',
-    icon: SearchIcon,
-    title: 'Filtra por servicio y zona',
-    body: 'Eliges la categoría (electricista, fontanero, …) y la ciudad. Sin tener que rellenar formularios largos.',
-  },
-  {
-    n: '02',
-    icon: Users,
-    title: 'Compara perfiles verificados',
-    body: 'Ves fotos de trabajos, precios orientativos, valoraciones reales y zona de trabajo. Sin perfiles falsos.',
-  },
-  {
-    n: '03',
-    icon: MessageSquare,
-    title: 'Contacta directamente',
-    body: 'Chat, teléfono o WhatsApp con el autónomo. Sin intermediarios. Sin esperar llamadas comerciales.',
-  },
-];
-
-const PRO_STEPS = [
-  {
-    n: '01',
-    icon: FilePlus2,
-    title: 'Crea tu perfil en 10 minutos',
-    body: 'Servicios, zona, precios orientativos, fotos de trabajos. Verificamos tu identidad y publicamos.',
-  },
-  {
-    n: '02',
-    icon: MapPin,
-    title: 'Apareces en búsquedas de tu zona',
-    body: 'Sales en /categoria/<oficio>-en-<ciudad>. Sin pelearte por SEO ni gastar en anuncios tú.',
-  },
-  {
-    n: '03',
-    icon: MessageSquare,
-    title: 'Recibes clientes reales',
-    body: 'Los clientes te escriben por chat, teléfono o WhatsApp. Tú decides a quién respondes.',
-  },
-];
-
-const TRUST_POINTS = [
-  {
-    icon: BadgeCheck,
-    title: 'Identidad verificada',
-    body: 'Validamos DNI/NIE, teléfono y oficio antes de publicar cada perfil. Insignia visible.',
-  },
-  {
-    icon: Wallet,
-    title: 'Sin comisiones',
-    body: 'Ni los autónomos pagan por contacto recibido, ni los clientes pagan por buscar.',
-  },
-  {
-    icon: Star,
-    title: 'Reseñas reales',
-    body: 'Solo dejan opinión los clientes que han contactado al autónomo. Cero opiniones anónimas.',
-  },
-  {
-    icon: Megaphone,
-    title: 'Promoción incluida',
-    body: 'Invertimos en redes y Google para llevarte clientes en tu zona, sin coste para el autónomo.',
-  },
-];
-
 function StepTabs() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState('cliente');
-  const steps = tab === 'cliente' ? CLIENT_STEPS : PRO_STEPS;
+
+  // Antes constantes de módulo (CLIENT_STEPS, PRO_STEPS): viven aquí para que
+  // se retraduzcan al cambiar de idioma.
+  const clientSteps = [
+    { n: '01', icon: SearchIcon, title: t('landing.howItWorks.client.filter.title'), body: t('landing.howItWorks.client.filter.body') },
+    { n: '02', icon: Users, title: t('landing.howItWorks.client.compare.title'), body: t('landing.howItWorks.client.compare.body') },
+    { n: '03', icon: MessageSquare, title: t('landing.howItWorks.client.contact.title'), body: t('landing.howItWorks.client.contact.body') },
+  ];
+  const proSteps = [
+    { n: '01', icon: FilePlus2, title: t('landing.howItWorks.pro.createProfile.title'), body: t('landing.howItWorks.pro.createProfile.body') },
+    { n: '02', icon: MapPin, title: t('landing.howItWorks.pro.appear.title'), body: t('landing.howItWorks.pro.appear.body') },
+    { n: '03', icon: MessageSquare, title: t('landing.howItWorks.pro.receiveClients.title'), body: t('landing.howItWorks.pro.receiveClients.body') },
+  ];
+  const steps = tab === 'cliente' ? clientSteps : proSteps;
 
   return (
     <div>
@@ -110,7 +60,7 @@ function StepTabs() {
               : 'text-slate-500 hover:text-slate-700'
           }`}
         >
-          Soy cliente
+          {t('nav.sign_up_client')}
         </button>
         <button
           type="button"
@@ -121,7 +71,7 @@ function StepTabs() {
               : 'text-slate-500 hover:text-slate-700'
           }`}
         >
-          Soy autónomo
+          {t('nav.iAmPro')}
         </button>
       </div>
 
@@ -174,11 +124,22 @@ function CoverageGrid() {
 }
 
 export default function Landing() {
+  const { t } = useTranslation();
+
+  // Antes constante de módulo (TRUST_POINTS): vive aquí para que se retraduzca
+  // al cambiar de idioma.
+  const trustPoints = [
+    { icon: BadgeCheck, title: t('landing.hero.trustVerified'), body: t('landing.trust.verified.body') },
+    { icon: Wallet, title: t('landing.feature_no_fees'), body: t('landing.trust.noFees.body') },
+    { icon: Star, title: t('landing.trust.reviews.title'), body: t('landing.trust.reviews.body') },
+    { icon: Megaphone, title: t('landing.trust.promotion.title'), body: t('landing.trust.promotion.body') },
+  ];
+
   return (
     <>
       <SEOHead
-        title="MisAutónomos · Autónomos verificados en tu zona, sin comisiones"
-        description="Encuentra y contacta autónomos verificados en España. Filtra por servicio y ciudad, contacto directo, sin intermediarios."
+        title={t('landing.seo.title')}
+        description={t('landing.seo.description')}
       />
 
       <main className="bg-white text-slate-900">
@@ -188,9 +149,9 @@ export default function Landing() {
         {/* CÓMO FUNCIONA — banda blanca con tabs cliente/autónomo */}
         <section className="bg-white border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">Cómo funciona</h2>
+            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">{t('footer.how_it_works')}</h2>
             <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900 max-w-2xl mb-6">
-              Tres pasos. Sin trampa.
+              {t('landing.howItWorks.title')}
             </p>
             <StepTabs />
           </div>
@@ -199,15 +160,15 @@ export default function Landing() {
         {/* CONFIANZA — banda suave navy soft */}
         <section style={{ background: 'hsl(var(--brand-surface))' }}>
           <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">Por qué confiar</h2>
+            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">{t('landing.trust.eyebrow')}</h2>
             <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900 max-w-2xl">
-              Reglas claras. Verificación real.
+              {t('landing.trust.title')}
             </p>
             <div
               className="mt-10 grid gap-4 md:gap-5"
               style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}
             >
-              {TRUST_POINTS.map(({ icon: Icon, title, body }) => (
+              {trustPoints.map(({ icon: Icon, title, body }) => (
                 <article key={title} className="rounded-2xl bg-white border border-slate-200 p-5">
                   <span
                     className="inline-flex items-center justify-center w-10 h-10 rounded-xl"
@@ -234,13 +195,13 @@ export default function Landing() {
         {/* COBERTURA POR CIUDAD — banda blanca */}
         <section className="bg-white border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">Cobertura</h2>
+            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">{t('landing.coverage.eyebrow')}</h2>
             <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900 max-w-2xl mb-8">
-              Ciudades donde ya hay autónomos activos.
+              {t('landing.coverage.title')}
             </p>
             <CoverageGrid />
             <p className="mt-6 text-xs text-slate-500">
-              ¿Tu ciudad no aparece? Empezamos por las áreas con más demanda y crecemos cada mes.
+              {t('landing.coverage.note')}
             </p>
           </div>
         </section>
@@ -252,11 +213,11 @@ export default function Landing() {
               className="font-semibold tracking-tight"
               style={{ fontSize: 'clamp(1.7rem, 4.4vw, 2.5rem)', lineHeight: 1.1, color: '#ffffff' }}
             >
-              <span style={{ color: '#ffffff' }}>¿Eres autónomo?</span>{' '}
-              <span style={{ color: GOLD }}>Aparece en tu zona.</span>
+              <span style={{ color: '#ffffff' }}>{t('landing.cta_pro_title')}</span>{' '}
+              <span style={{ color: GOLD }}>{t('landing.finalCta.title')}</span>
             </h2>
             <p className="mt-4 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.88)' }}>
-              Te damos de alta en minutos. Sin tarjeta. Sin comisiones. Contacto directo con los clientes.
+              {t('landing.finalCta.body')}
             </p>
             <div className="mt-8 flex justify-center">
               <Link
@@ -264,7 +225,7 @@ export default function Landing() {
                 className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl font-semibold"
                 style={{ backgroundColor: GOLD, color: NAVY }}
               >
-                Hazte autónomo · Gratis
+                {t('nav.becomeProFree')}
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

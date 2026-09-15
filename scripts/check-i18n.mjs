@@ -26,22 +26,62 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 import { LANGS, DEFAULT_LANG } from '../src/i18n/langs.js';
+import { APP_NAMESPACES, PUBLIC_NAMESPACES, isLegacyFlat } from '../src/i18n/namespaces.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LOCALES_DIR = join(ROOT, 'src', 'i18n', 'locales');
 const VERBOSE = process.argv.includes('--verbose');
 
+// Cada idioma vive en DOS ficheros (ver src/i18n/namespaces.js): el público,
+// que va de entrada, y el de aplicación, que sólo piden las pantallas
+// internas. Para comparar idiomas los tratamos como uno solo — lo que importa
+// es que `en` tenga TODAS las claves de `es`, esté donde esté cada una.
 const localePath = (code) => join(LOCALES_DIR, `${code}.json`);
+const appPath = (code) => join(LOCALES_DIR, `${code}.app.json`);
 
-function readLocale(code) {
-  const file = localePath(code);
+function readJson(file, label) {
   if (!existsSync(file)) return null;
   try {
     return JSON.parse(readFileSync(file, 'utf8'));
   } catch (e) {
-    console.error(`✗ ${code}.json no es JSON válido: ${e.message}`);
+    console.error(`✗ ${label} no es JSON válido: ${e.message}`);
     process.exit(1);
   }
+}
+
+function readLocale(code) {
+  const pub = readJson(localePath(code), `${code}.json`);
+  if (!pub) return null;
+  const app = readJson(appPath(code), `${code}.app.json`) || {};
+  // Un namespace no puede estar en los dos ficheros: si lo estuviera, el
+  // addResourceBundle del bundle de aplicación pisaría en silencio lo que ya
+  // hubiera cargado el público, y la clave que gana dependería del orden de
+  // llegada por red. Eso es un bug que sólo se ve en producción y con mala
+  // conexión, así que se para aquí.
+  const dup = Object.keys(app).filter((ns) => ns in pub);
+  if (dup.length) {
+    console.error(`✗ ${code}: ${dup.length} namespace(s) en ${code}.json Y ${code}.app.json: ${dup.join(', ')}`);
+    process.exit(1);
+  }
+  return { ...pub, ...app };
+}
+
+// El reparto tiene que estar completo y sin solapes, o el split se vuelve
+// impredecible. Se comprueba una vez, sobre el idioma fuente.
+function checkNamespaceSplit(source) {
+  const problems = [];
+  const overlap = APP_NAMESPACES.filter((n) => PUBLIC_NAMESPACES.includes(n));
+  if (overlap.length) problems.push(`en las dos listas: ${overlap.join(', ')}`);
+  const known = new Set([...APP_NAMESPACES, ...PUBLIC_NAMESPACES]);
+  const unclassified = Object.entries(source)
+    .filter(([ns, v]) => !isLegacyFlat(v) && !known.has(ns))
+    .map(([ns]) => ns);
+  if (unclassified.length) {
+    problems.push(`sin clasificar en src/i18n/namespaces.js: ${unclassified.join(', ')}`);
+  }
+  const ghost = [...known].filter((ns) => !(ns in source));
+  if (ghost.length) problems.push(`listados pero inexistentes: ${ghost.join(', ')}`);
+  return problems;
 }
 
 // Aplana a `{ "a.b.c": "valor" }` y anota el tipo, para poder comparar forma
@@ -72,7 +112,18 @@ if (!source) {
 }
 const sourceFlat = flatten(source);
 
-console.log(`i18n: fuente de verdad ${DEFAULT_LANG}.json — ${sourceFlat.size} claves\n`);
+const splitProblems = checkNamespaceSplit(source);
+if (splitProblems.length) {
+  console.error('✗ reparto público/aplicación roto:');
+  for (const p of splitProblems) console.error(`    · ${p}`);
+  console.error('\ni18n: FALLO.');
+  process.exit(1);
+}
+
+console.log(
+  `i18n: fuente de verdad ${DEFAULT_LANG} — ${sourceFlat.size} claves ` +
+    `(${PUBLIC_NAMESPACES.length} namespaces públicos + ${APP_NAMESPACES.length} de aplicación)\n`,
+);
 
 const ready = LANGS.filter((l) => l.ready && l.code !== DEFAULT_LANG);
 const pending = LANGS.filter((l) => !l.ready);

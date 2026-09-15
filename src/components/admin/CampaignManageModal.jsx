@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { X, Send, Paperclip, Loader2, Save, Upload, ExternalLink, CheckCircle, AlertCircle, Image } from 'lucide-react';
@@ -6,40 +7,19 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const TABS = [
-  { id: 'briefing', label: '📋 Briefing cliente' },
-  { id: 'material', label: '🎨 Material campaña' },
-  { id: 'chat', label: '💬 Chat' },
-  { id: 'metrics', label: '📊 Métricas' },
-  { id: 'notes', label: '🔒 Notas internas' },
-];
-
-const GOAL_LABELS = {
-  more_calls: 'Más llamadas',
-  more_leads: 'Más leads',
-  brand_awareness: 'Notoriedad de marca',
-  website_traffic: 'Tráfico web',
-  more_quotes: 'Más presupuestos',
-};
-
 const PLATFORM_LABELS = {
   instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok',
   google_search: 'Google Search', linkedin: 'LinkedIn',
 };
 
-const SOURCE_LABELS = {
-  boca_a_boca: 'Boca a boca', redes_sociales: 'Redes sociales',
-  google: 'Google', anuncios: 'Anuncios pagados', otros: 'Otros',
-};
-
-const MONTH_NAMES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-function formatMonthYear(my) {
+function formatMonthYear(monthNames, my) {
   if (!my) return '—';
   const [year, month] = my.split('-');
-  return `${MONTH_NAMES[parseInt(month) - 1]} ${year}`;
+  return `${monthNames[parseInt(month) - 1]} ${year}`;
 }
 
 export default function CampaignManageModal({ briefing, users = [], onClose, onUpdated }) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('briefing');
   const [adminUser, setAdminUser] = useState(null);
 
@@ -48,6 +28,29 @@ export default function CampaignManageModal({ briefing, users = [], onClose, onU
     document.body.classList.add('modal-open');
     return () => document.body.classList.remove('modal-open');
   }, []);
+
+  const tabs = [
+    { id: 'briefing', label: t('admin.campaigns.manage.tabs.briefing') },
+    { id: 'material', label: t('admin.campaigns.manage.tabs.material') },
+    { id: 'chat', label: t('admin.campaigns.manage.tabs.chat') },
+    { id: 'metrics', label: t('admin.campaigns.manage.tabs.metrics') },
+    { id: 'notes', label: t('admin.campaigns.manage.tabs.notes') },
+  ];
+
+  const monthNames = [
+    t('admin.campaigns.manage.months.january'),
+    t('admin.campaigns.manage.months.february'),
+    t('admin.campaigns.manage.months.march'),
+    t('admin.campaigns.manage.months.april'),
+    t('admin.campaigns.manage.months.may'),
+    t('admin.campaigns.manage.months.june'),
+    t('admin.campaigns.manage.months.july'),
+    t('admin.campaigns.manage.months.august'),
+    t('admin.campaigns.manage.months.september'),
+    t('admin.campaigns.manage.months.october'),
+    t('admin.campaigns.manage.months.november'),
+    t('admin.campaigns.manage.months.december'),
+  ];
 
   const professional = users.find(u => u.id === briefing.professional_id);
 
@@ -58,7 +61,10 @@ export default function CampaignManageModal({ briefing, users = [], onClose, onU
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div>
             <h2 className="text-white font-bold text-lg">
-              Campaña {formatMonthYear(briefing.month_year)} — {briefing.professional_name || professional?.full_name || '?'}
+              {t('admin.campaigns.manage.header.title', {
+                monthYear: formatMonthYear(monthNames, briefing.month_year),
+                name: briefing.professional_name || professional?.full_name || '?',
+              })}
             </h2>
             <p className="text-blue-200 text-xs mt-0.5">{professional?.email || briefing.professional_id}</p>
           </div>
@@ -69,7 +75,7 @@ export default function CampaignManageModal({ briefing, users = [], onClose, onU
 
         {/* Tabs */}
         <div className="border-b border-gray-200 bg-gray-50 flex overflow-x-auto flex-shrink-0">
-          {TABS.map(tab => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -109,26 +115,43 @@ export default function CampaignManageModal({ briefing, users = [], onClose, onU
 
 // ─── PESTAÑA 1: Briefing del cliente ───────────────────────────────────────
 function BriefingTab({ briefing, professional, onGoToChat }) {
+  const { t } = useTranslation();
   const [lightboxUrl, setLightboxUrl] = useState(null);
+
+  const goalLabels = {
+    more_calls: t('admin.campaigns.manage.goals.moreCalls'),
+    more_leads: t('admin.campaigns.manage.goals.moreLeads'),
+    brand_awareness: t('admin.campaigns.manage.goals.brandAwareness'),
+    website_traffic: t('admin.campaigns.manage.goals.websiteTraffic'),
+    more_quotes: t('admin.campaigns.manage.goals.moreQuotes'),
+  };
+
+  const sourceLabels = {
+    boca_a_boca: t('admin.campaigns.manage.sources.wordOfMouth'),
+    redes_sociales: t('socialNetworks'),
+    google: 'Google',
+    anuncios: t('admin.campaigns.manage.sources.paidAds'),
+    otros: t('admin.campaigns.manage.sources.other'),
+  };
 
   return (
     <div className="p-6 space-y-6">
       {lightboxUrl && (
         <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center" onClick={() => setLightboxUrl(null)}>
-          <img src={lightboxUrl} alt="preview" className="max-w-[90vw] max-h-[90vh] rounded-xl" />
+          <img src={lightboxUrl} alt={t('admin.campaigns.manage.briefing.previewAlt')} className="max-w-[90vw] max-h-[90vh] rounded-xl" />
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InfoBlock label="Plataforma" value={PLATFORM_LABELS[briefing.platform] || briefing.platform} />
-        <InfoBlock label="Objetivo" value={GOAL_LABELS[briefing.goal] || briefing.goal} />
-        <InfoBlock label="Zona de servicio" value={briefing.service_area} />
-        <InfoBlock label="Oferta especial" value={briefing.special_offer} />
+        <InfoBlock label={t('admin.campaigns.manage.briefing.platform')} value={PLATFORM_LABELS[briefing.platform] || briefing.platform} />
+        <InfoBlock label={t('admin.campaigns.manage.briefing.goal')} value={goalLabels[briefing.goal] || briefing.goal} />
+        <InfoBlock label={t('admin.campaigns.manage.briefing.serviceArea')} value={briefing.service_area} />
+        <InfoBlock label={t('admin.campaigns.manage.briefing.specialOffer')} value={briefing.special_offer} />
       </div>
 
       {briefing.top_services?.length > 0 && (
         <div>
-          <label className="text-xs font-semibold text-gray-500 uppercase">Servicios a promocionar</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase">{t('admin.campaigns.manage.briefing.topServices')}</label>
           <div className="flex flex-wrap gap-2 mt-2">
             {briefing.top_services.map((s, i) => (
               <span key={i} className="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full font-medium">{s}</span>
@@ -137,20 +160,20 @@ function BriefingTab({ briefing, professional, onGoToChat }) {
         </div>
       )}
 
-      <InfoBlock label="Perfil del cliente ideal" value={briefing.client_profile} multiline />
-      <InfoBlock label="Testimonios y casos de éxito" value={briefing.best_testimonials} multiline />
-      <InfoBlock label="Notas adicionales" value={briefing.additional_notes} multiline />
+      <InfoBlock label={t('admin.campaigns.manage.briefing.clientProfile')} value={briefing.client_profile} multiline />
+      <InfoBlock label={t('admin.campaigns.manage.briefing.testimonials')} value={briefing.best_testimonials} multiline />
+      <InfoBlock label={t('admin.campaigns.manage.briefing.additionalNotes')} value={briefing.additional_notes} multiline />
 
       {briefing.client_sources_now?.length > 0 && (
         <div>
-          <label className="text-xs font-semibold text-gray-500 uppercase">Cómo consigue clientes actualmente</label>
-          <p className="text-sm text-gray-700 mt-1">{briefing.client_sources_now.map(s => SOURCE_LABELS[s] || s).join(', ')}</p>
+          <label className="text-xs font-semibold text-gray-500 uppercase">{t('admin.campaigns.manage.briefing.clientSources')}</label>
+          <p className="text-sm text-gray-700 mt-1">{briefing.client_sources_now.map(s => sourceLabels[s] || s).join(', ')}</p>
         </div>
       )}
 
       {briefing.images_provided?.length > 0 && (
         <div>
-          <label className="text-xs font-semibold text-gray-500 uppercase mb-2 block">Imágenes aportadas por el cliente</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase mb-2 block">{t('admin.campaigns.manage.briefing.imagesProvided')}</label>
           <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
             {briefing.images_provided.map((url, i) => (
               <div key={i} className="relative group cursor-pointer" onClick={() => setLightboxUrl(url)}>
@@ -166,7 +189,7 @@ function BriefingTab({ briefing, professional, onGoToChat }) {
 
       {briefing.video_url && (
         <div>
-          <label className="text-xs font-semibold text-gray-500 uppercase mb-2 block">Video</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase mb-2 block">{t('admin.campaigns.manage.briefing.video')}</label>
           {briefing.video_url.includes('youtube') || briefing.video_url.includes('youtu.be') || briefing.video_url.includes('vimeo') ? (
             <div className="aspect-video rounded-xl overflow-hidden bg-gray-100">
               <iframe
@@ -187,7 +210,7 @@ function BriefingTab({ briefing, professional, onGoToChat }) {
         onClick={onGoToChat}
         className="mt-2 px-4 py-2 bg-blue-50 text-blue-700 text-sm font-semibold rounded-lg hover:bg-blue-100 transition-colors"
       >
-        💬 Pedir más info al cliente →
+        {t('admin.campaigns.manage.briefing.askMoreInfo')}
       </button>
     </div>
   );
@@ -195,6 +218,7 @@ function BriefingTab({ briefing, professional, onGoToChat }) {
 
 // ─── PESTAÑA 2: Material de campaña ─────────────────────────────────────────
 function MaterialTab({ briefing, professional, onUpdated }) {
+  const { t } = useTranslation();
   const [adsCopy, setAdsCopy] = useState(briefing.ads_copy || '');
   const [creativeUrls, setCreativeUrls] = useState(briefing.ads_creative_urls || []);
   const [budgetTier, setBudgetTier] = useState(briefing.budget_tier || 'standard');
@@ -216,9 +240,9 @@ function MaterialTab({ briefing, professional, onUpdated }) {
         return file_url;
       }));
       setCreativeUrls(prev => [...prev, ...urls]);
-      toast.success(`${urls.length} imagen(es) subida(s)`);
+      toast.success(t('admin.campaigns.manage.material.imagesUploaded', { n: urls.length }));
     } catch {
-      toast.error('Error al subir imágenes');
+      toast.error(t('admin.campaigns.manage.material.uploadError'));
     } finally {
       setUploadingImage(false);
     }
@@ -237,9 +261,9 @@ function MaterialTab({ briefing, professional, onUpdated }) {
         admin_updated_at: new Date().toISOString(),
       });
       onUpdated(updated);
-      toast.success('Material guardado');
+      toast.success(t('admin.campaigns.manage.material.saved'));
     } catch {
-      toast.error('Error al guardar');
+      toast.error(t('admin.campaigns.manage.saveError'));
     } finally {
       setSaving(false);
     }
@@ -247,7 +271,7 @@ function MaterialTab({ briefing, professional, onUpdated }) {
 
   const handleSendToClient = async () => {
     if (!adsCopy && creativeUrls.length === 0) {
-      toast.error('Añade el copy o imágenes antes de enviar');
+      toast.error(t('admin.campaigns.manage.material.copyOrImagesRequired'));
       return;
     }
     setSendingToClient(true);
@@ -283,15 +307,15 @@ function MaterialTab({ briefing, professional, onUpdated }) {
         conversation_id: `briefing_${briefing.id}`,
         sender_id: adminUser.id,
         recipient_id: briefing.professional_id,
-        content: `🎨 Hemos preparado el material de tu campaña. Revísalo y apruébalo en "Mi campaña".\n\n${adsCopy ? `Copy: ${adsCopy.substring(0, 150)}...` : ''}`,
-        professional_name: 'Equipo MisAutónomos',
+        content: `${t('admin.campaigns.manage.material.materialReadyMessage')}\n\n${adsCopy ? t('admin.campaigns.manage.material.copyPreview', { copy: adsCopy.substring(0, 150) }) : ''}`,
+        professional_name: t('admin.campaigns.manage.teamName'),
         client_name: briefing.professional_name || professional?.full_name,
       });
 
       onUpdated(updated);
-      toast.success('Material enviado al cliente para aprobación ✅');
+      toast.success(t('admin.campaigns.manage.material.sentToClient'));
     } catch (err) {
-      toast.error('Error al enviar: ' + err.message);
+      toast.error(t('admin.campaigns.manage.sendError', { message: err.message }));
     } finally {
       setSendingToClient(false);
     }
@@ -301,19 +325,19 @@ function MaterialTab({ briefing, professional, onUpdated }) {
     <div className="p-6 space-y-6">
       {/* Copy */}
       <div>
-        <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">Copy del anuncio</label>
+        <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">{t('admin.campaigns.manage.material.adCopy')}</label>
         <textarea
           value={adsCopy}
           onChange={e => setAdsCopy(e.target.value)}
           rows={6}
-          placeholder="Escribe aquí el texto del anuncio..."
+          placeholder={t('admin.campaigns.manage.material.adCopyPlaceholder')}
           className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {/* Creatividades */}
       <div>
-        <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">Creatividades</label>
+        <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">{t('admin.campaigns.manage.material.creatives')}</label>
         {creativeUrls.length > 0 && (
           <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-3">
             {creativeUrls.map((url, i) => (
@@ -334,32 +358,32 @@ function MaterialTab({ briefing, professional, onUpdated }) {
           className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors w-full justify-center"
         >
           {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-          {uploadingImage ? 'Subiendo...' : 'Subir imágenes de campaña'}
+          {uploadingImage ? t('admin.campaigns.manage.material.uploading') : t('admin.campaigns.manage.material.uploadImages')}
         </button>
       </div>
 
       {/* Presupuesto y fechas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">Presupuesto</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">{t('admin.campaigns.manage.material.budget')}</label>
           <select value={budgetTier} onChange={e => setBudgetTier(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-            <option value="standard">Estándar — 30€</option>
-            <option value="boosted">Boosted — 100€</option>
+            <option value="standard">{t('admin.campaigns.manage.material.budgetStandard')}</option>
+            <option value="boosted">{t('admin.campaigns.manage.material.budgetBoosted')}</option>
           </select>
         </div>
         <div>
-          <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">Fecha inicio</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">{t('admin.campaigns.manage.material.startDate')}</label>
           <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">Fecha fin</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">{t('admin.campaigns.manage.material.endDate')}</label>
           <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
       </div>
 
       <div>
-        <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">ID campaña externa (Meta/TikTok)</label>
-        <input type="text" value={campaignIdExternal} onChange={e => setCampaignIdExternal(e.target.value)} placeholder="ej: 23857291..." className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+        <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">{t('admin.campaigns.manage.material.externalCampaignId')}</label>
+        <input type="text" value={campaignIdExternal} onChange={e => setCampaignIdExternal(e.target.value)} placeholder={t('admin.campaigns.manage.material.externalCampaignIdPlaceholder')} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
       </div>
 
       {/* Acciones */}
@@ -370,7 +394,7 @@ function MaterialTab({ briefing, professional, onUpdated }) {
           className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 disabled:opacity-50 transition-colors"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Guardar cambios
+          {t('admin.campaigns.manage.material.saveChanges')}
         </button>
         <button
           onClick={handleSendToClient}
@@ -378,7 +402,7 @@ function MaterialTab({ briefing, professional, onUpdated }) {
           className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
           {sendingToClient ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          Enviar al cliente para aprobación
+          {t('admin.campaigns.manage.material.sendForApproval')}
         </button>
       </div>
     </div>
@@ -387,6 +411,7 @@ function MaterialTab({ briefing, professional, onUpdated }) {
 
 // ─── PESTAÑA 3: Chat ─────────────────────────────────────────────────────────
 function ChatTab({ briefing, professional, adminUser }) {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [uploadingAttach, setUploadingAttach] = useState(false);
@@ -420,7 +445,7 @@ function ChatTab({ briefing, professional, adminUser }) {
       }));
       setAttachments(prev => [...prev, ...uploaded]);
     } catch {
-      toast.error('Error al subir archivo');
+      toast.error(t('admin.campaigns.manage.chat.attachError'));
     } finally {
       setUploadingAttach(false);
     }
@@ -435,7 +460,7 @@ function ChatTab({ briefing, professional, adminUser }) {
         sender_id: adminUser.id,
         recipient_id: briefing.professional_id,
         content: message.trim(),
-        professional_name: 'Equipo MisAutónomos',
+        professional_name: t('admin.campaigns.manage.teamName'),
         client_name: briefing.professional_name || professional?.full_name,
         attachments,
       });
@@ -447,7 +472,7 @@ function ChatTab({ briefing, professional, adminUser }) {
           data: {
             professionalEmail: professional.email,
             professionalName: briefing.professional_name || professional?.full_name,
-            adminName: adminUser.full_name || 'El equipo MisAutónomos',
+            adminName: adminUser.full_name || t('admin.campaigns.manage.teamNameFallback'),
             messagePreview: message.trim().substring(0, 200),
             monthYear: briefing.month_year,
           }
@@ -457,9 +482,9 @@ function ChatTab({ briefing, professional, adminUser }) {
       setMessage('');
       setAttachments([]);
       refetch();
-      toast.success('Mensaje enviado');
+      toast.success(t('admin.campaigns.manage.chat.sent'));
     } catch (err) {
-      toast.error('Error al enviar: ' + err.message);
+      toast.error(t('admin.campaigns.manage.sendError', { message: err.message }));
     } finally {
       setSending(false);
     }
@@ -471,7 +496,7 @@ function ChatTab({ briefing, professional, adminUser }) {
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
         {messages.length === 0 && (
           <div className="text-center text-gray-400 text-sm py-8">
-            No hay mensajes aún. Escribe el primero.
+            {t('admin.campaigns.manage.chat.empty')}
           </div>
         )}
         {messages.map(msg => {
@@ -479,14 +504,14 @@ function ChatTab({ briefing, professional, adminUser }) {
           return (
             <div key={msg.id} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${isAdmin ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-900'}`}>
-                {!isAdmin && <p className="text-xs font-semibold text-blue-600 mb-1">{msg.client_name || 'Profesional'}</p>}
+                {!isAdmin && <p className="text-xs font-semibold text-blue-600 mb-1">{msg.client_name || t('professionalLabel')}</p>}
                 {msg.content && <p className="text-sm whitespace-pre-wrap">{msg.content}</p>}
                 {msg.attachments?.length > 0 && (
                   <div className="mt-2 space-y-1">
                     {msg.attachments.map((att, i) => (
                       <a key={i} href={att.url} target="_blank" rel="noopener noreferrer"
                         className={`flex items-center gap-1 text-xs underline ${isAdmin ? 'text-blue-200' : 'text-blue-600'}`}>
-                        <Paperclip className="w-3 h-3" /> {att.name || 'Archivo'}
+                        <Paperclip className="w-3 h-3" /> {att.name || t('admin.campaigns.manage.chat.attachmentFallback')}
                       </a>
                     ))}
                   </div>
@@ -524,7 +549,7 @@ function ChatTab({ briefing, professional, adminUser }) {
           value={message}
           onChange={e => setMessage(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder="Escribe un mensaje al profesional..."
+          placeholder={t('admin.campaigns.manage.chat.placeholder')}
           rows={2}
           className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -542,6 +567,7 @@ function ChatTab({ briefing, professional, adminUser }) {
 
 // ─── PESTAÑA 4: Métricas ─────────────────────────────────────────────────────
 function MetricsTab({ briefing, onUpdated }) {
+  const { t } = useTranslation();
   const budget = briefing.budget_tier === 'boosted' ? 100 : 30;
   const [metrics, setMetrics] = useState({
     reach: briefing.campaign_metrics?.reach || 0,
@@ -564,9 +590,9 @@ function MetricsTab({ briefing, onUpdated }) {
         admin_updated_at: new Date().toISOString(),
       });
       onUpdated(updated);
-      toast.success('Métricas actualizadas');
+      toast.success(t('admin.campaigns.manage.metrics.updated'));
     } catch {
-      toast.error('Error al guardar métricas');
+      toast.error(t('admin.campaigns.manage.metrics.saveError'));
     } finally {
       setSaving(false);
     }
@@ -593,7 +619,7 @@ function MetricsTab({ briefing, onUpdated }) {
       {/* Presupuesto */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
         <div className="flex justify-between mb-2">
-          <span className="text-sm font-semibold text-gray-700">Presupuesto gastado</span>
+          <span className="text-sm font-semibold text-gray-700">{t('admin.campaigns.manage.metrics.budgetSpent')}</span>
           <span className="text-sm font-bold text-gray-900">{metrics.spent_eur?.toFixed(2)}€ / {budget}€ ({spentPct.toFixed(0)}%)</span>
         </div>
         <div className="h-3 bg-white rounded-full overflow-hidden border border-blue-100">
@@ -603,13 +629,13 @@ function MetricsTab({ briefing, onUpdated }) {
 
       {/* Campos */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <MetricInput label="Alcance" field="reach" />
-        <MetricInput label="Impresiones" field="impressions" />
-        <MetricInput label="Clics" field="clicks" />
-        <MetricInput label="Conversiones" field="conversions" />
-        <MetricInput label="Leads generados" field="leads_generated" />
+        <MetricInput label={t('admin.campaigns.manage.metrics.reach')} field="reach" />
+        <MetricInput label={t('admin.campaigns.manage.metrics.impressions')} field="impressions" />
+        <MetricInput label={t('admin.campaigns.manage.metrics.clicks')} field="clicks" />
+        <MetricInput label={t('admin.campaigns.manage.metrics.conversions')} field="conversions" />
+        <MetricInput label={t('admin.campaigns.manage.metrics.leadsGenerated')} field="leads_generated" />
         <MetricInput label="CPC" field="cpc" prefix="€" />
-        <MetricInput label="Gasto total" field="spent_eur" prefix="€" />
+        <MetricInput label={t('admin.campaigns.manage.metrics.totalSpent')} field="spent_eur" prefix="€" />
       </div>
 
       <button
@@ -618,7 +644,7 @@ function MetricsTab({ briefing, onUpdated }) {
         className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
       >
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        Actualizar métricas
+        {t('admin.campaigns.manage.metrics.update')}
       </button>
     </div>
   );
@@ -626,6 +652,7 @@ function MetricsTab({ briefing, onUpdated }) {
 
 // ─── PESTAÑA 5: Notas internas ───────────────────────────────────────────────
 function NotesTab({ briefing, onUpdated }) {
+  const { t } = useTranslation();
   const [adminNotes, setAdminNotes] = useState(briefing.admin_notes || '');
   const [saving, setSaving] = useState(false);
 
@@ -637,9 +664,9 @@ function NotesTab({ briefing, onUpdated }) {
         admin_updated_at: new Date().toISOString(),
       });
       onUpdated(updated);
-      toast.success('Notas guardadas');
+      toast.success(t('admin.campaigns.manage.notes.saved'));
     } catch {
-      toast.error('Error al guardar');
+      toast.error(t('admin.campaigns.manage.saveError'));
     } finally {
       setSaving(false);
     }
@@ -648,13 +675,13 @@ function NotesTab({ briefing, onUpdated }) {
   return (
     <div className="p-6 space-y-4">
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
-        🔒 Estas notas son solo visibles para el equipo de administración. El profesional nunca las verá.
+        {t('admin.campaigns.manage.notes.privacyNotice')}
       </div>
       <textarea
         value={adminNotes}
         onChange={e => setAdminNotes(e.target.value)}
         rows={12}
-        placeholder="Notas internas sobre esta campaña..."
+        placeholder={t('admin.campaigns.manage.notes.placeholder')}
         className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <button
@@ -663,7 +690,7 @@ function NotesTab({ briefing, onUpdated }) {
         className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 disabled:opacity-50 transition-colors"
       >
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        Guardar notas
+        {t('admin.campaigns.manage.notes.save')}
       </button>
     </div>
   );

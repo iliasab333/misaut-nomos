@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Gift, ArrowRight, Star, Users, CheckCircle } from "lucide-react";
+import { useTranslation, Trans } from "react-i18next";
 
 export default function ReferralRedirect() {
   const { code } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [invalid, setInvalid] = useState(false);
@@ -57,20 +59,20 @@ export default function ReferralRedirect() {
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Gift className="w-8 h-8 text-gray-400" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">Código no encontrado</h1>
-          <p className="text-gray-500 text-sm mb-6">Este enlace de referido no es válido o ha expirado.</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">{t('referrals.redirect.notFoundTitle')}</h1>
+          <p className="text-gray-500 text-sm mb-6">{t('referrals.redirect.notFoundText')}</p>
           <button
             onClick={() => navigate("/precios")}
             className="bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors"
           >
-            Ver MisAutónomos
+            {t('referrals.redirect.viewSite')}
           </button>
         </div>
       </div>
     );
   }
 
-  const referrerName = profile?.business_name || "Un profesional";
+  const referrerName = profile?.business_name || t('referrals.redirect.defaultReferrer');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 flex flex-col items-center justify-center px-4 py-12">
@@ -94,7 +96,7 @@ export default function ReferralRedirect() {
           <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
             <Gift className="w-9 h-9 text-white" />
           </div>
-          <p className="text-white/90 font-medium text-sm">Invitación personal de</p>
+          <p className="text-white/90 font-medium text-sm">{t('referrals.redirect.invitationFrom')}</p>
           <h1 className="text-white font-extrabold text-xl mt-1">{referrerName}</h1>
         </div>
 
@@ -102,20 +104,19 @@ export default function ReferralRedirect() {
           {/* Mensaje principal */}
           <div className="text-center mb-6">
             <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
-              🎁 1 mes gratis para los dos
+              {t('referrals.redirect.headline')}
             </h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-              <strong>{referrerName}</strong> te invita a unirte a MisAutónomos.
-              Si te registras como autónomo, <strong>los dos os lleváis 1 mes gratis</strong> en el plan.
+              <Trans i18nKey="referrals.redirect.inviteText" values={{ name: referrerName }} components={{ strong: <strong /> }} />
             </p>
           </div>
 
           {/* Beneficios */}
           <div className="space-y-3 mb-6">
             {[
-              { icon: Users, text: "Consigue clientes en tu zona fácilmente" },
-              { icon: Star, text: "Destaca tu perfil frente a la competencia" },
-              { icon: CheckCircle, text: "1 mes gratis al activar con este enlace" },
+              { icon: Users, text: t('referrals.redirect.benefits.clients') },
+              { icon: Star, text: t('referrals.redirect.benefits.standOut') },
+              { icon: CheckCircle, text: t('referrals.redirect.benefits.freeMonth') },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -128,7 +129,7 @@ export default function ReferralRedirect() {
 
           {/* Código */}
           <div className="bg-amber-50 border-2 border-amber-200 rounded-xl px-4 py-3 text-center mb-6">
-            <p className="text-xs text-amber-700 font-medium mb-1">Código de referido aplicado</p>
+            <p className="text-xs text-amber-700 font-medium mb-1">{t('referrals.redirect.codeApplied')}</p>
             <p className="text-2xl font-extrabold text-gray-900 tracking-widest">{code}</p>
           </div>
 
@@ -137,19 +138,19 @@ export default function ReferralRedirect() {
             onClick={handleCTA}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-95 text-white font-bold text-base py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-opacity"
           >
-            Empezar gratis
+            {t('referrals.redirect.startFree')}
             <ArrowRight className="w-5 h-5" />
           </button>
 
           <p className="text-center text-xs text-gray-400 mt-3">
-            Sin tarjeta de crédito · Cancela cuando quieras
+            {t('referrals.redirect.noCard')}
           </p>
         </div>
       </div>
 
       {/* Footer */}
       <p className="text-white/60 text-xs mt-8 text-center">
-        © {new Date().getFullYear()} MisAutónomos · La plataforma de autónomos españoles
+        {t('referrals.redirect.footer', { year: new Date().getFullYear() })}
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import './App.css'
+import { lazyWithRetry, lazyApp } from '@/lib/lazyWithRetry';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -14,7 +15,8 @@ import { routerBasename } from '@/i18n';
 import ScrollToTop from '@/lib/ScrollToTop';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import { Suspense, lazy, React, Component, useEffect } from 'react';
+import { Suspense, React, Component, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Reload SEGURO ante fallos de import dinámico:
 //  - Solo se recarga UNA vez por sesión, usando un flag en sessionStorage que
@@ -29,6 +31,55 @@ function isChunkLoadError(error) {
     msg.includes('Failed to fetch dynamically imported module') ||
     msg.includes('Importing a module script failed') ||
     msg.includes('error loading dynamically imported module')
+  );
+}
+
+// La pantalla de error vive en un componente de función: ErrorBoundary tiene
+// que ser una clase (getDerivedStateFromError) y una clase no puede llamar
+// hooks. `useTranslation` funciona aquí sin provider porque `@/i18n`
+// (importado arriba) registra la instancia global al cargarse.
+function ErrorFallback({ error, onLogout }) {
+  const { t } = useTranslation();
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+      <div className="max-w-lg w-full bg-white rounded-2xl border border-red-100 p-6 shadow-lg">
+        <h2 className="font-semibold text-gray-900 text-lg">{t('errors.boundary.title')}</h2>
+        <p className="text-sm text-gray-500 mt-2">{t('errors.boundary.subtitle')}</p>
+
+        {/* MOSTRAR ERROR REAL - TEMPORAL PARA DEBUGGING */}
+        {error && (
+          <details className="mt-4 bg-red-50 rounded-lg p-3 text-xs">
+            <summary className="font-medium text-red-900 cursor-pointer">{t('errors.boundary.details')}</summary>
+            <pre className="mt-2 overflow-auto text-red-800 whitespace-pre-wrap max-h-64">
+              {error.message || t('errors.boundary.unknown')}
+              {'\n\n'}
+              {error.stack?.split('\n').slice(0, 8).join('\n')}
+            </pre>
+          </details>
+        )}
+
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={() => window.location.reload()}
+            className="flex-1 bg-gray-900 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-gray-800 transition"
+          >
+            {t('errors.boundary.reload')}
+          </button>
+          <button
+            onClick={() => { window.location.href = '/'; }}
+            className="flex-1 bg-gray-100 text-gray-700 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200 transition"
+          >
+            {t('errors.boundary.goHome')}
+          </button>
+          <button
+            onClick={onLogout}
+            className="flex-1 bg-red-50 text-red-700 text-sm font-medium py-2.5 rounded-lg hover:bg-red-100 transition"
+          >
+            {t('nav.logout')}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -71,47 +122,7 @@ class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-          <div className="max-w-lg w-full bg-white rounded-2xl border border-red-100 p-6 shadow-lg">
-            <h2 className="font-semibold text-gray-900 text-lg">Algo salió mal</h2>
-            <p className="text-sm text-gray-500 mt-2">Por favor, recarga la página o intenta de nuevo.</p>
-            
-            {/* MOSTRAR ERROR REAL - TEMPORAL PARA DEBUGGING */}
-            {this.state.error && (
-              <details className="mt-4 bg-red-50 rounded-lg p-3 text-xs">
-                <summary className="font-medium text-red-900 cursor-pointer">Ver detalles del error</summary>
-                <pre className="mt-2 overflow-auto text-red-800 whitespace-pre-wrap max-h-64">
-                  {this.state.error.message || 'Error desconocido'}
-                  {'\n\n'}
-                  {this.state.error.stack?.split('\n').slice(0, 8).join('\n')}
-                </pre>
-              </details>
-            )}
-            
-            <div className="flex gap-2 mt-4">
-              <button 
-                onClick={() => window.location.reload()} 
-                className="flex-1 bg-gray-900 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-gray-800 transition"
-              >
-                Recargar
-              </button>
-              <button 
-                onClick={() => { window.location.href = '/'; }} 
-                className="flex-1 bg-gray-100 text-gray-700 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200 transition"
-              >
-                Ir al inicio
-              </button>
-              <button 
-                onClick={this.handleLogout} 
-                className="flex-1 bg-red-50 text-red-700 text-sm font-medium py-2.5 rounded-lg hover:bg-red-100 transition"
-              >
-                Cerrar sesión
-              </button>
-            </div>
-          </div>
-        </div>
-      );
+      return <ErrorFallback error={this.state.error} onLogout={this.handleLogout} />;
     }
 
     return this.props.children;
@@ -119,46 +130,46 @@ class ErrorBoundary extends Component {
 }
 
 // Lazy load de páginas pesadas (admin, invoicing, CRM)
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const AdminPayments = lazy(() => import('./pages/AdminPayments'));
-const AdminTickets = lazy(() => import('./pages/AdminTickets'));
-const AdminFAQ = lazy(() => import('./pages/AdminFAQ'));
-const AdminMessagesStats = lazy(() => import('./pages/AdminMessagesStats'));
-const AdminSupport = lazy(() => import('./pages/AdminSupport'));
-const AdminNewsletter = lazy(() => import('./pages/AdminNewsletter'));
-const AdminReferrals = lazy(() => import('./pages/AdminReferrals'));
-const AdminGifts = lazy(() => import('./pages/AdminGifts'));
-const AdminEmails = lazy(() => import('./pages/AdminEmails'));
-const AdminUsuarios = lazy(() => import('./pages/AdminUsuarios'));
-const AdminOutreachWhatsApp = lazy(() => import('./pages/AdminOutreachWhatsApp'));
-const AdminSoporte = lazy(() => import('./pages/AdminSoporte'));
-const BajaNewsletter = lazy(() => import('./pages/BajaNewsletter'));
-const EmailUnsubscribe = lazy(() => import('./pages/EmailUnsubscribe'));
-const SEOAnalysis = lazy(() => import('./pages/SEOAnalysis'));
-const BlogList = lazy(() => import('./pages/BlogList'));
-const BlogPost = lazy(() => import('./pages/BlogPost'));
-const AdminBlog = lazy(() => import('./pages/AdminBlog'));
-const Invoices = lazy(() => import('./pages/Invoices'));
-const MisClientes = lazy(() => import('./pages/MisClientes'));
-const CRMAutomations = lazy(() => import('./pages/CRMAutomations'));
-const Projects = lazy(() => import('./pages/Projects'));
-const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
-const Calendar = lazy(() => import('./pages/Calendar'));
-const Jobs = lazy(() => import('./pages/Jobs'));
-const SupportChat = lazy(() => import('./pages/SupportChat.jsx'));
-const Soporte = lazy(() => import('./pages/Soporte'));
-const SoporteTicket = lazy(() => import('./pages/SoporteTicket'));
-const MiCampana = lazy(() => import('./pages/MiCampana'));
-const BriefingMensual = lazy(() => import('./pages/BriefingMensual'));
-const PlanAds = lazy(() => import('./pages/PlanAds'));
-const AcceptQuote = lazy(() => import('./pages/AcceptQuote'));
-const LeaveReview = lazy(() => import('./pages/LeaveReview'));
-const MisEstadisticas = lazy(() => import('./pages/MisEstadisticas'));
-const MisValoraciones = lazy(() => import('./pages/MisValoraciones'));
-const Login = lazy(() => import('./pages/Login'));
-const ParaAutonomos = lazy(() => import('./pages/ParaAutonomos'));
-const Landing = lazy(() => import('./pages/Landing'));
-const Contacto = lazy(() => import('./pages/Contacto'));
+const AdminDashboard = lazyApp(() => import('./pages/AdminDashboard'));
+const AdminPayments = lazyApp(() => import('./pages/AdminPayments'));
+const AdminTickets = lazyApp(() => import('./pages/AdminTickets'));
+const AdminFAQ = lazyApp(() => import('./pages/AdminFAQ'));
+const AdminMessagesStats = lazyApp(() => import('./pages/AdminMessagesStats'));
+const AdminSupport = lazyApp(() => import('./pages/AdminSupport'));
+const AdminNewsletter = lazyApp(() => import('./pages/AdminNewsletter'));
+const AdminReferrals = lazyApp(() => import('./pages/AdminReferrals'));
+const AdminGifts = lazyApp(() => import('./pages/AdminGifts'));
+const AdminEmails = lazyApp(() => import('./pages/AdminEmails'));
+const AdminUsuarios = lazyApp(() => import('./pages/AdminUsuarios'));
+const AdminOutreachWhatsApp = lazyApp(() => import('./pages/AdminOutreachWhatsApp'));
+const AdminSoporte = lazyApp(() => import('./pages/AdminSoporte'));
+const BajaNewsletter = lazyWithRetry(() => import('./pages/BajaNewsletter'));
+const EmailUnsubscribe = lazyWithRetry(() => import('./pages/EmailUnsubscribe'));
+const SEOAnalysis = lazyApp(() => import('./pages/SEOAnalysis'));
+const BlogList = lazyWithRetry(() => import('./pages/BlogList'));
+const BlogPost = lazyWithRetry(() => import('./pages/BlogPost'));
+const AdminBlog = lazyApp(() => import('./pages/AdminBlog'));
+const Invoices = lazyApp(() => import('./pages/Invoices'));
+const MisClientes = lazyApp(() => import('./pages/MisClientes'));
+const CRMAutomations = lazyApp(() => import('./pages/CRMAutomations'));
+const Projects = lazyApp(() => import('./pages/Projects'));
+const ProjectDetail = lazyApp(() => import('./pages/ProjectDetail'));
+const Calendar = lazyApp(() => import('./pages/Calendar'));
+const Jobs = lazyApp(() => import('./pages/Jobs'));
+const SupportChat = lazyApp(() => import('./pages/SupportChat.jsx'));
+const Soporte = lazyApp(() => import('./pages/Soporte'));
+const SoporteTicket = lazyApp(() => import('./pages/SoporteTicket'));
+const MiCampana = lazyApp(() => import('./pages/MiCampana'));
+const BriefingMensual = lazyApp(() => import('./pages/BriefingMensual'));
+const PlanAds = lazyApp(() => import('./pages/PlanAds'));
+const AcceptQuote = lazyApp(() => import('./pages/AcceptQuote'));
+const LeaveReview = lazyWithRetry(() => import('./pages/LeaveReview'));
+const MisEstadisticas = lazyApp(() => import('./pages/MisEstadisticas'));
+const MisValoraciones = lazyWithRetry(() => import('./pages/MisValoraciones'));
+const Login = lazyWithRetry(() => import('./pages/Login'));
+const ParaAutonomos = lazyWithRetry(() => import('./pages/ParaAutonomos'));
+const Landing = lazyWithRetry(() => import('./pages/Landing'));
+const Contacto = lazyWithRetry(() => import('./pages/Contacto'));
 
 // Sin spinner de carga — renderizar directamente
 const PageLoader = () => null;

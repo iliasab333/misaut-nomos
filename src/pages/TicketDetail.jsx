@@ -29,21 +29,22 @@ import {
   FileText,
   Loader2
 } from "lucide-react";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import SEOHead from "../components/seo/SEOHead";
 
+// Mapa explícito estado → clave i18n (la etiqueta se resuelve con t() en render).
 const statusConfig = {
-  abierto: { icon: Clock, color: "bg-blue-500", text_es: "Abierto", text_en: "Open" },
-  en_progreso: { icon: AlertCircle, color: "bg-amber-500", text_es: "En progreso", text_en: "In progress" },
-  resuelto: { icon: CheckCircle, color: "bg-green-500", text_es: "Resuelto", text_en: "Resolved" },
-  cerrado: { icon: XCircle, color: "bg-gray-500", text_es: "Cerrado", text_en: "Closed" }
+  abierto: { icon: Clock, color: "bg-blue-500", key: "admin.soporte.status.open" },
+  en_progreso: { icon: AlertCircle, color: "bg-amber-500", key: "tickets.status.inProgress" },
+  resuelto: { icon: CheckCircle, color: "bg-green-500", key: "admin.soporte.status.resolved" },
+  cerrado: { icon: XCircle, color: "bg-gray-500", key: "admin.soporte.status.closed" }
 };
 
 export default function TicketDetailPage() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { language } = useLanguage();
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   
@@ -53,6 +54,7 @@ export default function TicketDetailPage() {
   
   const urlParams = new URLSearchParams(window.location.search);
   const ticketId = urlParams.get("id");
+  const locale = i18n.language;
 
   useEffect(() => {
     loadUser();
@@ -144,7 +146,7 @@ export default function TicketDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['ticketEvents', ticketId] });
       setMessageContent("");
       scrollToBottom();
-      toast.success(language === 'es' ? 'Mensaje enviado' : 'Message sent');
+      toast.success(t('admin.campaigns.manage.chat.sent'));
     },
   });
 
@@ -199,7 +201,7 @@ export default function TicketDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       queryClient.invalidateQueries({ queryKey: ['ticketEvents', ticketId] });
-      toast.success(language === 'es' ? 'Estado actualizado' : 'Status updated');
+      toast.success(t('statusUpdated'));
     },
   });
 
@@ -231,16 +233,16 @@ export default function TicketDetailPage() {
 
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] });
       queryClient.invalidateQueries({ queryKey: ['ticketEvents', ticketId] });
-      toast.success(language === 'es' ? 'Archivo subido' : 'File uploaded');
+      toast.success(t('tickets.detail.fileUploaded'));
     } catch (error) {
-      toast.error(language === 'es' ? 'Error subiendo archivo' : 'Error uploading file');
+      toast.error(t('tickets.toast.uploadError'));
     } finally {
       setUploadingFile(false);
     }
   };
 
   const getStatusLabel = (status) => {
-    return language === 'es' ? statusConfig[status]?.text_es : statusConfig[status]?.text_en;
+    return statusConfig[status] ? t(statusConfig[status].key) : undefined;
   };
 
   if (loadingTicket || !user) {
@@ -257,10 +259,10 @@ export default function TicketDetailPage() {
         <Card className="max-w-md p-8 text-center">
           <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">
-            {language === 'es' ? 'Ticket no encontrado' : 'Ticket not found'}
+            {t('tickets.detail.notFound')}
           </h2>
           <Button onClick={() => navigate(createPageUrl("Tickets"))}>
-            {language === 'es' ? 'Volver a tickets' : 'Back to tickets'}
+            {t('tickets.detail.backToTickets')}
           </Button>
         </Card>
       </div>
@@ -272,7 +274,7 @@ export default function TicketDetailPage() {
   return (
     <>
       <SEOHead 
-        title={`Ticket ${ticket.ticket_number} - MisAutónomos`}
+        title={t('tickets.detail.seoTitle', { number: ticket.ticket_number })}
         description={ticket.title}
         noindex={true}
       />
@@ -285,7 +287,7 @@ export default function TicketDetailPage() {
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {language === 'es' ? 'Volver a tickets' : 'Back to tickets'}
+            {t('tickets.detail.backToTickets')}
           </Button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -315,7 +317,7 @@ export default function TicketDetailPage() {
                   {ticket.attachments && ticket.attachments.length > 0 && (
                     <div className="mt-4 pt-4 border-t">
                       <p className="text-sm font-medium text-gray-700 mb-2">
-                        {language === 'es' ? 'Archivos adjuntos:' : 'Attachments:'}
+                        {t('tickets.detail.attachments')}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {ticket.attachments.map((url, idx) => (
@@ -327,7 +329,7 @@ export default function TicketDetailPage() {
                             className="text-sm text-blue-600 hover:underline flex items-center gap-1"
                           >
                             <FileText className="w-4 h-4" />
-                            {language === 'es' ? 'Archivo' : 'File'} {idx + 1}
+                            {t('tickets.detail.fileN', { index: idx + 1 })}
                           </a>
                         ))}
                       </div>
@@ -339,7 +341,7 @@ export default function TicketDetailPage() {
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    {language === 'es' ? 'Conversación' : 'Conversation'}
+                    {t('tickets.detail.conversation')}
                   </h2>
                   
                   <div className="space-y-4 mb-4 max-h-96 overflow-y-auto">
@@ -356,14 +358,14 @@ export default function TicketDetailPage() {
                                 {msg.sender_name}
                               </span>
                               {isAdmin && (
-                                <Badge variant="secondary" className="text-xs">Admin</Badge>
+                                <Badge variant="secondary" className="text-xs">{t('admin.usersTable.adminBadge')}</Badge>
                               )}
                             </div>
                             <p className={`text-sm ${isOwn ? 'text-white' : 'text-gray-800'}`}>
                               {msg.content}
                             </p>
                             <p className={`text-xs mt-2 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
-                              {new Date(msg.created_date).toLocaleString(language === 'es' ? 'es-ES' : 'en-US')}
+                              {new Date(msg.created_date).toLocaleString(locale)}
                             </p>
                             {msg.attachments && msg.attachments.length > 0 && (
                               <div className="mt-2">
@@ -376,7 +378,7 @@ export default function TicketDetailPage() {
                                     className={`text-xs flex items-center gap-1 ${isOwn ? 'text-blue-100 hover:text-white' : 'text-blue-600 hover:underline'}`}
                                   >
                                     <FileText className="w-3 h-3" />
-                                    Archivo adjunto {idx + 1}
+                                    {t('tickets.detail.attachmentN', { index: idx + 1 })}
                                   </a>
                                 ))}
                               </div>
@@ -391,7 +393,7 @@ export default function TicketDetailPage() {
                   {ticket.status !== 'cerrado' && (
                     <div className="space-y-3">
                       <Textarea
-                        placeholder={language === 'es' ? "Escribe tu mensaje..." : "Write your message..."}
+                        placeholder={t('tickets.detail.messagePlaceholder')}
                         value={messageContent}
                         onChange={(e) => setMessageContent(e.target.value)}
                         rows={3}
@@ -421,7 +423,7 @@ export default function TicketDetailPage() {
                             ) : (
                               <Paperclip className="w-4 h-4 mr-2" />
                             )}
-                            {language === 'es' ? 'Adjuntar' : 'Attach'}
+                            {t('tickets.detail.attach')}
                           </Button>
                         </div>
                         <Button
@@ -434,7 +436,7 @@ export default function TicketDetailPage() {
                           ) : (
                             <Send className="w-4 h-4 mr-2" />
                           )}
-                          {language === 'es' ? 'Enviar' : 'Send'}
+                          {t('messages.send')}
                         </Button>
                       </div>
                     </div>
@@ -447,13 +449,13 @@ export default function TicketDetailPage() {
               <Card>
                 <CardContent className="p-6">
                   <h3 className="font-semibold text-gray-900 mb-4">
-                    {language === 'es' ? 'Información del Ticket' : 'Ticket Information'}
+                    {t('tickets.detail.info')}
                   </h3>
                   
                   <div className="space-y-4">
                     <div>
                       <label className="text-sm text-gray-600 block mb-1">
-                        {language === 'es' ? 'Estado' : 'Status'}
+                        {t('admin.soporte.filter.status')}
                       </label>
                       {user.role === 'admin' ? (
                         <Select
@@ -488,7 +490,7 @@ export default function TicketDetailPage() {
                             ) : (
                               <XCircle className="w-4 h-4 mr-2" />
                             )}
-                            {language === 'es' ? 'Cerrar ticket' : 'Close ticket'}
+                            {t('tickets.detail.closeTicket')}
                           </Button>
                         </div>
                       ) : (
@@ -501,18 +503,16 @@ export default function TicketDetailPage() {
 
                     <div>
                       <label className="text-sm text-gray-600 block mb-1">
-                        {language === 'es' ? 'Tipo' : 'Type'}
+                        {t('admin.soporte.filter.type')}
                       </label>
                       <Badge variant="outline" className="w-full justify-center py-2">
-                        {language === 'es' 
-                          ? typeConfig[ticket.type]?.text_es 
-                          : typeConfig[ticket.type]?.text_en}
+                        {typeConfig[ticket.type] ? t(typeConfig[ticket.type]) : null}
                       </Badge>
                     </div>
 
                     <div>
                       <label className="text-sm text-gray-600 block mb-1">
-                        {language === 'es' ? 'Creado por' : 'Created by'}
+                        {t('tickets.detail.createdBy')}
                       </label>
                       <p className="text-sm font-medium text-gray-900">
                         {ticket.creator_name}
@@ -522,7 +522,7 @@ export default function TicketDetailPage() {
                     {ticket.assigned_to_name && (
                       <div>
                         <label className="text-sm text-gray-600 block mb-1">
-                          {language === 'es' ? 'Asignado a' : 'Assigned to'}
+                          {t('tickets.detail.assignedTo')}
                         </label>
                         <p className="text-sm font-medium text-gray-900">
                           {ticket.assigned_to_name}
@@ -532,18 +532,18 @@ export default function TicketDetailPage() {
 
                     <div>
                       <label className="text-sm text-gray-600 block mb-1">
-                        {language === 'es' ? 'Creado' : 'Created'}
+                        {t('tickets.detail.created')}
                       </label>
                       <p className="text-sm text-gray-900 flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        {new Date(ticket.created_date).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US')}
+                        {new Date(ticket.created_date).toLocaleDateString(locale)}
                       </p>
                     </div>
 
                     {ticket.tags && ticket.tags.length > 0 && (
                       <div>
                         <label className="text-sm text-gray-600 block mb-2">
-                          {language === 'es' ? 'Etiquetas' : 'Tags'}
+                          {t('tickets.detail.tags')}
                         </label>
                         <div className="flex flex-wrap gap-1">
                           {ticket.tags.map((tag, idx) => (
@@ -561,7 +561,7 @@ export default function TicketDetailPage() {
               <Card>
                 <CardContent className="p-6">
                   <h3 className="font-semibold text-gray-900 mb-4">
-                    {language === 'es' ? 'Cronología' : 'Timeline'}
+                    {t('tickets.detail.timeline')}
                   </h3>
                   
                   <div className="space-y-3">
@@ -578,7 +578,7 @@ export default function TicketDetailPage() {
                             {event.description}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {new Date(event.created_date).toLocaleString(language === 'es' ? 'es-ES' : 'en-US')}
+                            {new Date(event.created_date).toLocaleString(locale)}
                           </p>
                         </div>
                       </div>
@@ -594,11 +594,12 @@ export default function TicketDetailPage() {
   );
 }
 
+// Mapa explícito tipo → clave i18n.
 const typeConfig = {
-  soporte_cliente: { text_es: "Soporte Cliente", text_en: "Client Support" },
-  soporte_autonomo: { text_es: "Soporte Autónomo", text_en: "Professional Support" },
-  reclamo: { text_es: "Reclamo", text_en: "Complaint" },
-  problema_trabajo: { text_es: "Problema con trabajo", text_en: "Job Issue" },
-  problema_pago: { text_es: "Problema de pago", text_en: "Payment Issue" },
-  consulta_general: { text_es: "Consulta general", text_en: "General Query" }
+  soporte_cliente: "tickets.types.clientSupport",
+  soporte_autonomo: "tickets.types.proSupport",
+  reclamo: "tickets.types.complaint",
+  problema_trabajo: "tickets.types.jobIssue",
+  problema_pago: "tickets.types.paymentIssue",
+  consulta_general: "tickets.types.generalQuery"
 };

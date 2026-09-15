@@ -46,7 +46,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { toast } from "sonner";
 import SEOHead from "../components/seo/SEOHead";
 import { ServiceSchema, BreadcrumbSchema } from "../components/seo/StructuredData";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+import { Trans, useTranslation } from "react-i18next";
 import { useProfileTranslation } from "../components/profile/useProfileTranslation";
 import { PROVINCIAS, CIUDADES_POR_PROVINCIA } from "../components/utils/locationsData";
 import SearchAutocomplete from "../components/search/SearchAutocomplete";
@@ -84,6 +84,7 @@ const QUICK_CATEGORIES = [
 
 const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite, professionalUser, currentUserId, currentUser, priority }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [guestModal, setGuestModal] = useState(false);
 
@@ -177,11 +178,11 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
               <h3 className="font-semibold text-slate-900 text-[15px] leading-snug truncate">
-                {profile.business_name || "Sin nombre"}
+                {profile.business_name || t('favorites.page.unnamed')}
               </h3>
               {isVerified && (
-                <span title="Identidad verificada">
-                  <BadgeCheck className="w-4 h-4 flex-shrink-0" style={{ color: '#00255C' }} aria-label="Identidad verificada" />
+                <span title={t('proProfile.badges.identityVerified')}>
+                  <BadgeCheck className="w-4 h-4 flex-shrink-0" style={{ color: '#00255C' }} aria-label={t('proProfile.badges.identityVerified')} />
                 </span>
               )}
             </div>
@@ -200,10 +201,10 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
             <span
               className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.06em] border px-1.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0"
               style={{ color: '#7B5400', backgroundColor: '#FBF4DA', borderColor: '#EFD68A' }}
-              title="Profesional destacado"
+              title={t('search.card.featuredTitle')}
             >
               <Star className="w-2.5 h-2.5 fill-current" />
-              Destacado
+              {t('search.card.featured')}
             </span>
           )}
           {/* Botón Favorito: solo para clientes logueados, esquina sup. derecha.
@@ -212,8 +213,8 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
-              aria-label={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-              title={isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+              aria-label={isFavorite ? t('favorites.page.remove') : t('search.card.addFavorite')}
+              title={isFavorite ? t('favorites.page.remove') : t('search.card.saveFavorite')}
               className="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-full border border-slate-200 bg-white hover:bg-rose-50 transition-colors"
             >
               <Heart
@@ -241,7 +242,7 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
               </span>
             </div>
           ) : (
-            <span className="text-[12px] text-slate-400">Sin valoraciones aún</span>
+            <span className="text-[12px] text-slate-400">{t('noReviewsYet')}</span>
           )}
           {profile.tarifa_base > 0 && (
             <span className="text-[13px] font-semibold text-slate-900">
@@ -261,10 +262,10 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
             style={{ backgroundColor: '#00255C' }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#001A45')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00255C')}
-            aria-label={`Contactar con ${profile.business_name}`}
+            aria-label={t('proProfile.contact.contactWith', { name: profile.business_name })}
           >
             <MessageSquare className="w-4 h-4" />
-            Contactar
+            {t('profile_card.contact')}
           </button>
 
           {(hasWhatsapp || hasPhone) && (
@@ -279,12 +280,12 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
                   style={{ backgroundColor: '#1FAD4F' }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#168D40')}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1FAD4F')}
-                  aria-label={`Abrir WhatsApp de ${profile.business_name}`}
+                  aria-label={t('search.card.openWhatsAppOf', { name: profile.business_name })}
                 >
                   <svg viewBox="0 0 24 24" fill="white" width="14" height="14" aria-hidden="true">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                   </svg>
-                  WhatsApp
+                  {t('profile_card.whatsapp')}
                 </a>
               ) : (
                 <span aria-hidden="true" />
@@ -295,7 +296,7 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
                     href={`tel:${profile.telefono_contacto}`}
                     onClick={(e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); }}
                     className="inline-flex items-center justify-center gap-1.5 h-10 rounded-lg text-[12px] font-semibold border border-slate-200 bg-white text-slate-900 hover:bg-slate-50 transition-colors truncate"
-                    aria-label={`Llamar al ${profile.telefono_contacto}`}
+                    aria-label={t('search.card.callNumber', { phone: profile.telefono_contacto })}
                   >
                     <Phone className="w-3.5 h-3.5" style={{ color: '#00255C' }} />
                     {profile.telefono_contacto}
@@ -305,10 +306,10 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
                     type="button"
                     onClick={(e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); setPhoneRevealed(true); }}
                     className="inline-flex items-center justify-center gap-1.5 h-10 rounded-lg text-[13px] font-semibold border border-slate-200 bg-white text-slate-900 hover:bg-slate-50 transition-colors"
-                    aria-label="Ver teléfono"
+                    aria-label={t('search.card.showPhone')}
                   >
                     <Phone className="w-3.5 h-3.5" style={{ color: '#00255C' }} />
-                    Llamar
+                    {t('profile_card.call')}
                   </button>
                 )
               ) : (
@@ -330,7 +331,7 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
 
 export default function SearchPage() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -478,12 +479,12 @@ export default function SearchPage() {
       const existing = favorites.filter(fav => fav.professional_id === profile.user_id);
       if (existing.length > 0) {
         await base44.entities.Favorite.delete(existing[0].id);
-        toast.success("Eliminado de favoritos");
+        toast.success(t('favorites.toast.removed'));
       } else {
         await base44.entities.Favorite.create({ client_id: user.id, professional_id: profile.user_id, business_name: profile.business_name });
-        toast.success("Añadido a favoritos");
+        toast.success(t('favorites.toast.added'));
       }
-    } catch { toast.error("Error al gestionar favoritos"); }
+    } catch { toast.error(t('search.favoritesError')); }
   };
 
   const isInitialLoading = loadingProfiles || loadingCategories;
@@ -509,14 +510,14 @@ export default function SearchPage() {
       <SEOHead
         title={
           filters.category !== "all" && filters.provincia !== "all"
-            ? `${filters.category} en ${filters.provincia} - MisAutónomos`
+            ? t('search.seo.titleCategoryProvince', { category: filters.category, province: filters.provincia })
             : filters.category !== "all"
-            ? `${filters.category} en España - MisAutónomos`
+            ? t('search.seo.titleCategory', { category: filters.category })
             : filters.provincia !== "all"
-            ? `Autónomos en ${filters.provincia} - MisAutónomos`
-            : "Buscar Autónomos Profesionales - MisAutónomos"
+            ? t('search.seo.titleProvince', { province: filters.provincia })
+            : t('search.seo.titleDefault')
         }
-        description={`Encuentra y contacta con profesionales autónomos verificados en España. ${filteredProfiles.length}+ profesionales disponibles.`}
+        description={t('search.seo.description', { count: filteredProfiles.length })}
         keywords="autónomos, profesionales verificados, servicios a domicilio, contactar gratis"
       />
       <ServiceSchema categories={categories.map(c => c.name)} location={filters.provincia !== "all" ? filters.provincia : "España"} />
@@ -532,17 +533,17 @@ export default function SearchPage() {
           <div className="max-w-7xl mx-auto px-4 py-6">
             <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-slate-900">
               {filters.category !== "all" && filters.provincia !== "all"
-                ? `${filters.category} en ${filters.provincia}`
+                ? t('search.heading.categoryProvince', { category: filters.category, province: filters.provincia })
                 : filters.category !== "all"
                 ? filters.category
                 : filters.provincia !== "all"
-                ? `Autónomos en ${filters.provincia}`
-                : "Buscar autónomos"}
+                ? t('search.heading.province', { province: filters.provincia })
+                : t('messages.find_pros_cta')}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
               {hasActiveFilters
-                ? `${filteredProfiles.length} resultado${filteredProfiles.length === 1 ? '' : 's'}`
-                : 'Elige una categoría o ciudad para empezar.'}
+                ? t('search.heading.resultsCount', { count: filteredProfiles.length })
+                : t('search.heading.hint')}
             </p>
           </div>
         </div>
@@ -634,12 +635,16 @@ export default function SearchPage() {
             <div>
               <h2 className="text-lg font-bold text-gray-900">
                 {isInitialLoading ? (
-                  <span className="text-gray-400">Buscando profesionales...</span>
+                  <span className="text-gray-400">{t('search.results.loading')}</span>
                 ) : (
-                  <><span className="text-blue-600">{filteredProfiles.length}</span> profesionales</>
+                  <Trans
+                    i18nKey="search.results.countHeading"
+                    values={{ count: filteredProfiles.length }}
+                    components={{ num: <span className="text-blue-600" /> }}
+                  />
                 )}
               </h2>
-              <p className="text-xs text-gray-600">Verificados · Contacto directo · Sin comisiones</p>
+              <p className="text-xs text-gray-600">{t('search.verified_tag')}</p>
             </div>
             {!isInitialLoading && filteredProfiles.length > 0 && (
               <div className="flex gap-1.5">
@@ -647,7 +652,7 @@ export default function SearchPage() {
                   variant={viewMode === "grid" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("grid")}
-                  aria-label="Vista en cuadrícula"
+                  aria-label={t('search.view.grid')}
                   className={`h-8 w-8 p-0 ${viewMode === "grid" ? "bg-blue-600 border-blue-600" : "border-gray-200"}`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -658,7 +663,7 @@ export default function SearchPage() {
                   variant={viewMode === "map" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode("map")}
-                  aria-label="Vista en mapa"
+                  aria-label={t('search.view.map')}
                   className={`h-8 w-8 p-0 ${viewMode === "map" ? "bg-blue-600 border-blue-600" : "border-gray-200"}`}
                 >
                   <MapPin className="w-4 h-4" aria-hidden="true" />
@@ -703,22 +708,22 @@ export default function SearchPage() {
                 <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <SearchIcon className="w-8 h-8 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No hay profesionales para esta búsqueda</h3>
-                <p className="text-sm text-gray-500 mb-4">Prueba a quitar algún filtro o cambiar la ciudad.</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('search.empty.title')}</h3>
+                <p className="text-sm text-gray-500 mb-4">{t('search.empty.hint')}</p>
                 {hasActiveFilters && (
                   <Button
                     className="text-white"
                     style={{ backgroundColor: '#00255C' }}
                     onClick={() => setFilters({ category: "all", provincia: "all", ciudad: "all", minRating: 0, availability: "all" })}
                   >
-                    Ver todos los profesionales
+                    {t('landing.hero.viewAll')}
                   </Button>
                 )}
               </Card>
               {/* Fix #11: Show related suggestions when no results */}
               {profiles.length > 0 && (
                 <div>
-                  <p className="text-sm text-gray-500 mb-3 font-medium">Quizás te interesen estos profesionales:</p>
+                  <p className="text-sm text-gray-500 mb-3 font-medium">{t('search.empty.suggestions')}</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                     {profiles.slice(0, 4).map((profile) => (
                       <ProfileCard
@@ -738,16 +743,16 @@ export default function SearchPage() {
               {(!user || user.user_type === "client") && (
                 <Card className="p-8 text-center border rounded-2xl overflow-hidden" style={{ borderColor: 'rgba(0,37,92,0.12)', background: '#F8FAFF' }}>
                   <Briefcase className="w-10 h-10 mx-auto mb-3" style={{ color: '#00255C' }} />
-                  <h3 className="text-xl font-bold mb-2 text-slate-900">¿Eres autónomo?</h3>
+                  <h3 className="text-xl font-bold mb-2 text-slate-900">{t('landing.cta_pro_title')}</h3>
                   <p className="text-slate-600 mb-5 text-sm max-w-md mx-auto">
-                    Aparece en los resultados de tu zona. Contacto directo con los clientes, sin comisiones.
+                    {t('search.proCta.body')}
                   </p>
                   <Button
                     onClick={() => navigate('/registro?tipo=autonomo')}
                     className="h-11 px-6 font-semibold rounded-xl"
                     style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
                   >
-                    Hazte autónomo · Gratis
+                    {t('nav.becomeProFree')}
                   </Button>
                 </Card>
               )}
@@ -782,7 +787,7 @@ export default function SearchPage() {
                         size="lg"
                         className="px-10 rounded-2xl border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 font-semibold"
                       >
-                        Cargar más profesionales ({filteredProfiles.length - displayLimit} restantes)
+                        {t('search.load_more', { count: filteredProfiles.length - displayLimit })}
                       </Button>
                     </div>
                   )}
@@ -800,12 +805,11 @@ export default function SearchPage() {
             <div className="mt-14 rounded-3xl overflow-hidden" style={{ background: '#00255C' }}>
               <div className="p-8 md:p-12 text-white text-center">
                 <h3 className="text-3xl md:text-4xl font-extrabold mb-3 tracking-tight">
-                  ¿Eres autónomo?<br />
-                  <span style={{ color: '#F5C13D' }}>Aparece en MisAutónomos</span>
+                  {t('landing.cta_pro_title')}<br />
+                  <span style={{ color: '#F5C13D' }}>{t('search.finalCta.titleHighlight')}</span>
                 </h3>
                 <p className="text-white/80 mb-8 text-base max-w-lg mx-auto leading-relaxed">
-                  Da de alta tu perfil y entra en los resultados de tu zona.
-                  Sin comisiones, sin intermediarios, contacto directo con los clientes.
+                  {t('search.finalCta.body')}
                 </p>
                 <div className="flex justify-center">
                   <Button
@@ -813,7 +817,7 @@ export default function SearchPage() {
                     className="h-12 px-8 text-base font-semibold rounded-xl"
                     style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
                   >
-                    Hazte autónomo · Gratis
+                    {t('nav.becomeProFree')}
                   </Button>
                 </div>
               </div>

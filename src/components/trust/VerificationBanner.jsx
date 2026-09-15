@@ -23,9 +23,7 @@ export default function VerificationBanner({ profile }) {
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-gray-900 text-sm">{t('verification.banner.title')}</p>
         <p className="text-xs text-gray-600 mt-0.5">
-          <Trans i18nKey="verification.banner.body">
-            Los perfiles verificados reciben hasta <strong>3× más contactos</strong>. Solo tarda 2 minutos.
-          </Trans>
+          <Trans i18nKey="verification.banner.body" components={{ strong: <strong /> }} />
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">

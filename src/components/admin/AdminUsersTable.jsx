@@ -20,9 +20,11 @@ function DeleteConfirmModal({ user: targetUser, onConfirm, onCancel, loading }) 
           </div>
           <h3 className="text-lg font-bold text-gray-900">{t("admin.usersTable.deleteModal.title")}</h3>
           <p className="text-sm text-gray-600 mt-1">
-            <Trans i18nKey="admin.usersTable.deleteModal.confirm" values={{ email: targetUser.email }}>
-              ¿Seguro que quieres eliminar a <strong>{{ email: targetUser.email }}</strong>? Se borrarán todos sus datos.
-            </Trans>
+            <Trans
+              i18nKey="admin.usersTable.deleteModal.confirm"
+              values={{ email: targetUser.email }}
+              components={{ 1: <strong /> }}
+            />
           </p>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 text-xs text-red-700 space-y-1">

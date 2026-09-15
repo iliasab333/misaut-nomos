@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -17,6 +18,7 @@ import { es } from "date-fns/locale";
 import { toast } from "sonner";
 
 export default function NotificationsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
@@ -70,7 +72,7 @@ export default function NotificationsPage() {
         professional_id: user.id,
         status: 'pending'
       }, 'due_date', 10);
-      return tasks.filter(t => new Date(t.due_date) >= new Date());
+      return tasks.filter(task => new Date(task.due_date) >= new Date());
     },
     enabled: !!user && user.user_type === 'professionnel',
   });
@@ -119,7 +121,7 @@ export default function NotificationsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Todas marcadas como leídas');
+      toast.success(t('notifications.toast.allRead'));
     }
   });
 
@@ -129,7 +131,7 @@ export default function NotificationsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Notificación eliminada');
+      toast.success(t('notifications.toast.deleted'));
     }
   });
 
@@ -142,7 +144,7 @@ export default function NotificationsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Notificaciones eliminadas');
+      toast.success(t('notifications.toast.deletedMany'));
     }
   });
 
@@ -151,7 +153,7 @@ export default function NotificationsPage() {
       await base44.auth.updateMe({ notification_preferences: prefs });
     },
     onSuccess: () => {
-      toast.success('Preferencias guardadas');
+      toast.success(t('cookies.settingsSaved'));
       setShowSettings(false);
     }
   });
@@ -210,7 +212,7 @@ export default function NotificationsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Notificaciones</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('notifications.title')}</h1>
             <Button 
               variant="outline"
               size="sm"
@@ -218,10 +220,10 @@ export default function NotificationsPage() {
               className="bg-white"
             >
               <Settings className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Configurar</span>
+              <span className="hidden sm:inline">{t('notifications.page.configure')}</span>
             </Button>
           </div>
-          <p className="text-xs md:text-sm text-gray-600">Mantente al día con todas tus actualizaciones</p>
+          <p className="text-xs md:text-sm text-gray-600">{t('notifications.page.subtitle')}</p>
         </div>
 
         {/* Alertas pendientes */}
@@ -232,7 +234,7 @@ export default function NotificationsPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckSquare className="w-4 h-4 text-green-600" />
-                    <h3 className="font-semibold text-sm text-gray-900">Tareas próximas</h3>
+                    <h3 className="font-semibold text-sm text-gray-900">{t('notifications.page.upcomingTasks')}</h3>
                   </div>
                   <p className="text-2xl font-bold text-green-600">{upcomingTasks.length}</p>
                   <Button 
@@ -241,7 +243,7 @@ export default function NotificationsPage() {
                     className="mt-2 h-7 text-xs"
                     onClick={() => navigate(createPageUrl("Calendar"))}
                   >
-                    Ver en calendario →
+                    {t('notifications.page.viewCalendar')}
                   </Button>
                 </CardContent>
               </Card>
@@ -251,7 +253,7 @@ export default function NotificationsPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <FileText className="w-4 h-4 text-orange-600" />
-                    <h3 className="font-semibold text-sm text-gray-900">Facturas a vencer</h3>
+                    <h3 className="font-semibold text-sm text-gray-900">{t('notifications.page.invoicesDue')}</h3>
                   </div>
                   <p className="text-2xl font-bold text-orange-600">{upcomingInvoices.length}</p>
                   <Button 
@@ -260,7 +262,7 @@ export default function NotificationsPage() {
                     className="mt-2 h-7 text-xs"
                     onClick={() => navigate(createPageUrl("Invoices"))}
                   >
-                    Ver facturas →
+                    {t('notifications.page.viewInvoices')}
                   </Button>
                 </CardContent>
               </Card>
@@ -270,7 +272,7 @@ export default function NotificationsPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <FileText className="w-4 h-4 text-blue-600" />
-                    <h3 className="font-semibold text-sm text-gray-900">Presupuestos pendientes</h3>
+                    <h3 className="font-semibold text-sm text-gray-900">{t('notifications.page.pendingQuotes')}</h3>
                   </div>
                   <p className="text-2xl font-bold text-blue-600">{pendingQuotes.length}</p>
                   <Button 
@@ -279,7 +281,7 @@ export default function NotificationsPage() {
                     className="mt-2 h-7 text-xs"
                     onClick={() => navigate(createPageUrl("Presupuestos"))}
                   >
-                    Ver presupuestos →
+                    {t('notifications.page.viewQuotes')}
                   </Button>
                 </CardContent>
               </Card>
@@ -291,13 +293,13 @@ export default function NotificationsPage() {
           <Tabs value={filter} onValueChange={setFilter} className="w-full md:w-auto">
             <TabsList className="grid grid-cols-3 w-full md:w-auto">
               <TabsTrigger value="all">
-                Todas ({notifications.length})
+                {t('notifications.page.tabAll', { count: notifications.length })}
               </TabsTrigger>
               <TabsTrigger value="unread">
-                Nuevas ({unreadCount})
+                {t('notifications.page.tabUnread', { count: unreadCount })}
               </TabsTrigger>
               <TabsTrigger value="read">
-                Leídas ({notifications.length - unreadCount})
+                {t('notifications.page.tabRead', { count: notifications.length - unreadCount })}
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -312,8 +314,8 @@ export default function NotificationsPage() {
                 className="flex-1 md:flex-none bg-white"
               >
                 <CheckCheck className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Marcar todas</span>
-                <span className="sm:hidden">Marcar</span>
+                <span className="hidden sm:inline">{t('notifications.page.markAll')}</span>
+                <span className="sm:hidden">{t('notifications.page.mark')}</span>
               </Button>
             )}
             
@@ -326,8 +328,8 @@ export default function NotificationsPage() {
                 className="flex-1 md:flex-none bg-white"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Eliminar leídas</span>
-                <span className="sm:hidden">Eliminar</span>
+                <span className="hidden sm:inline">{t('notifications.page.deleteRead')}</span>
+                <span className="sm:hidden">{t('common.delete')}</span>
               </Button>
             )}
           </div>
@@ -342,12 +344,12 @@ export default function NotificationsPage() {
             <CardContent className="p-12 text-center">
               <Bell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
               <h2 className="text-xl font-bold text-gray-900 mb-2">
-                {filter === 'unread' ? 'Sin notificaciones nuevas' : 
-                 filter === 'read' ? 'Sin notificaciones leídas' : 
-                 'Sin notificaciones'}
+                {filter === 'unread' ? t('notifications.page.emptyUnread') : 
+                 filter === 'read' ? t('notifications.page.emptyRead') : 
+                 t('notifications.empty')}
               </h2>
               <p className="text-gray-600">
-                Te avisaremos cuando haya novedades
+                {t('notifications.emptyHint')}
               </p>
             </CardContent>
           </Card>
@@ -375,7 +377,7 @@ export default function NotificationsPage() {
                           {notification.title}
                         </h3>
                         {!notification.is_read && (
-                          <Badge className="bg-blue-600 flex-shrink-0 text-xs">Nueva</Badge>
+                          <Badge className="bg-blue-600 flex-shrink-0 text-xs">{t('notifications.page.newBadge')}</Badge>
                         )}
                       </div>
 
@@ -400,7 +402,7 @@ export default function NotificationsPage() {
                               }}
                             >
                               <Check className="w-3 h-3 mr-1" />
-                              Marcar
+                              {t('notifications.page.mark')}
                             </Button>
                           )}
 
@@ -432,19 +434,19 @@ export default function NotificationsPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
-              Configuración de notificaciones
+              {t('notifications.settings.title')}
             </DialogTitle>
           </DialogHeader>
 
           {notifPrefs && (
             <div className="space-y-6 py-4">
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Canales de notificación</h3>
+                <h3 className="font-semibold text-gray-900">{t('notifications.settings.channels')}</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="font-medium">Notificaciones por email</Label>
-                      <p className="text-xs text-gray-500">Recibe alertas en tu correo electrónico</p>
+                      <Label className="font-medium">{t('notifications.settings.email')}</Label>
+                      <p className="text-xs text-gray-500">{t('notifications.settings.emailHint')}</p>
                     </div>
                     <Switch
                       checked={notifPrefs.email_enabled}
@@ -453,8 +455,8 @@ export default function NotificationsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="font-medium">Notificaciones push</Label>
-                      <p className="text-xs text-gray-500">Recibe notificaciones en la plataforma</p>
+                      <Label className="font-medium">{t('notifications.settings.push')}</Label>
+                      <p className="text-xs text-gray-500">{t('notifications.settings.pushHint')}</p>
                     </div>
                     <Switch
                       checked={notifPrefs.push_enabled}
@@ -465,17 +467,17 @@ export default function NotificationsPage() {
               </div>
 
               <div className="border-t pt-6 space-y-4">
-                <h3 className="font-semibold text-gray-900">Tipos de alertas</h3>
+                <h3 className="font-semibold text-gray-900">{t('notifications.settings.alertTypes')}</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label className="font-medium">Nuevos mensajes</Label>
+                    <Label className="font-medium">{t('notifications.settings.newMessages')}</Label>
                     <Switch
                       checked={notifPrefs.new_messages}
                       onCheckedChange={(v) => setNotifPrefs({...notifPrefs, new_messages: v})}
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <Label className="font-medium">Actualizaciones de presupuestos</Label>
+                    <Label className="font-medium">{t('notifications.settings.quoteUpdates')}</Label>
                     <Switch
                       checked={notifPrefs.quote_updates}
                       onCheckedChange={(v) => setNotifPrefs({...notifPrefs, quote_updates: v})}
@@ -484,14 +486,14 @@ export default function NotificationsPage() {
                   {isProfessional && (
                     <>
                       <div className="flex items-center justify-between">
-                        <Label className="font-medium">Recordatorios de tareas</Label>
+                        <Label className="font-medium">{t('notifications.settings.taskReminders')}</Label>
                         <Switch
                           checked={notifPrefs.task_reminders}
                           onCheckedChange={(v) => setNotifPrefs({...notifPrefs, task_reminders: v})}
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <Label className="font-medium">Vencimientos de facturas</Label>
+                        <Label className="font-medium">{t('notifications.settings.invoiceDue')}</Label>
                         <Switch
                           checked={notifPrefs.invoice_reminders}
                           onCheckedChange={(v) => setNotifPrefs({...notifPrefs, invoice_reminders: v})}
@@ -500,7 +502,7 @@ export default function NotificationsPage() {
                     </>
                   )}
                   <div className="flex items-center justify-between">
-                    <Label className="font-medium">Alertas de suscripción</Label>
+                    <Label className="font-medium">{t('notifications.settings.subscriptionAlerts')}</Label>
                     <Switch
                       checked={notifPrefs.subscription_alerts}
                       onCheckedChange={(v) => setNotifPrefs({...notifPrefs, subscription_alerts: v})}
@@ -511,10 +513,10 @@ export default function NotificationsPage() {
 
               {isProfessional && (
                 <div className="border-t pt-6 space-y-4">
-                  <h3 className="font-semibold text-gray-900">Tiempos de recordatorio</h3>
+                  <h3 className="font-semibold text-gray-900">{t('notifications.settings.reminderTimes')}</h3>
                   <div className="space-y-3">
                     <div>
-                      <Label className="text-sm">Recordar tareas con (horas de antelación)</Label>
+                      <Label className="text-sm">{t('notifications.settings.taskHoursBefore')}</Label>
                       <Input
                         type="number"
                         value={notifPrefs.task_reminder_hours_before}
@@ -525,7 +527,7 @@ export default function NotificationsPage() {
                       />
                     </div>
                     <div>
-                      <Label className="text-sm">Recordar facturas con (días de antelación)</Label>
+                      <Label className="text-sm">{t('notifications.settings.invoiceDaysBefore')}</Label>
                       <Input
                         type="number"
                         value={notifPrefs.invoice_reminder_days_before}
@@ -543,7 +545,7 @@ export default function NotificationsPage() {
 
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setShowSettings(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button 
               onClick={() => savePreferencesMutation.mutate(notifPrefs)}
@@ -552,9 +554,9 @@ export default function NotificationsPage() {
               className="bg-blue-600 hover:bg-blue-700"
             >
               {savePreferencesMutation.isPending ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</>
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('reviews.card.saving')}</>
               ) : (
-                "Guardar preferencias"
+                t('cookies.savePreferences')
               )}
             </Button>
           </DialogFooter>

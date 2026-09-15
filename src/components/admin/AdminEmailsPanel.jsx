@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ const TEMPLATE_VARS = {
 };
 
 export default function AdminEmailsPanel() {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState({
     status: 'all',
     category: 'all',
@@ -32,7 +34,7 @@ export default function AdminEmailsPanel() {
   });
   const [testEmail, setTestEmail] = useState('');
   const [testTemplate, setTestTemplate] = useState('welcome');
-  const [testSubject, setTestSubject] = useState('Email de prueba');
+  const [testSubject, setTestSubject] = useState(t('admin.emailsPanel.test.title'));
   const [testVars, setTestVars] = useState(JSON.stringify(TEMPLATE_VARS.welcome, null, 2));
   const [sending, setSending] = useState(false);
   const [showTestModal, setShowTestModal] = useState(false);
@@ -96,7 +98,7 @@ export default function AdminEmailsPanel() {
 
   const handleTestEmail = async () => {
     if (!testEmail) {
-      toast.error('Ingresa un email');
+      toast.error(t('admin.emailsPanel.test.emailRequired'));
       return;
     }
 
@@ -106,7 +108,7 @@ export default function AdminEmailsPanel() {
       try {
         vars = JSON.parse(testVars);
       } catch (e) {
-        toast.error('Variables JSON inválidas');
+        toast.error(t('admin.emailsPanel.test.invalidJson'));
         setSending(false);
         return;
       }
@@ -119,14 +121,14 @@ export default function AdminEmailsPanel() {
         category: 'transactional'
       });
       
-      toast.success('Email de prueba enviado');
+      toast.success(t('admin.emailsPanel.test.sent'));
       setShowTestModal(false);
       setTestEmail('');
-      setTestSubject('Email de prueba');
+      setTestSubject(t('admin.emailsPanel.test.title'));
       setTestTemplate('welcome');
       setTestVars(JSON.stringify(TEMPLATE_VARS.welcome, null, 2));
     } catch (error) {
-      toast.error('Error: ' + error.message);
+      toast.error(t('admin.emailsPanel.test.error', { message: error.message }));
     } finally {
       setSending(false);
     }
@@ -154,15 +156,15 @@ export default function AdminEmailsPanel() {
 
   const getStatusLabel = (status) => {
     const labels = {
-      queued: 'Pendiente',
-      sent: 'Enviado',
-      delivered: 'Entregado',
-      opened: 'Abierto',
-      clicked: 'Clic',
-      bounced: 'Rechazado',
-      spam: 'Spam',
-      failed: 'Fallido',
-      skipped: 'Omitido'
+      queued: t('admin.emailsPanel.status.queued'),
+      sent: t('admin.emailsPanel.status.sent'),
+      delivered: t('admin.emailsPanel.status.delivered'),
+      opened: t('admin.emailsPanel.status.opened'),
+      clicked: t('admin.emailsPanel.status.clicked'),
+      bounced: t('admin.emailsPanel.status.bounced'),
+      spam: t('admin.emailsPanel.status.spam'),
+      failed: t('admin.emailsPanel.status.failed'),
+      skipped: t('admin.emailsPanel.status.skipped')
     };
     return labels[status] || status;
   };
@@ -171,10 +173,10 @@ export default function AdminEmailsPanel() {
     <div className="space-y-6">
       {/* Cabecera */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">📧 Gestión de Emails</h2>
+        <h2 className="text-lg font-bold text-gray-900">{t('admin.emailsPanel.title')}</h2>
         <Button onClick={() => setShowTestModal(true)} className="gap-2">
           <Send className="w-4 h-4" />
-          Email de prueba
+          {t('admin.emailsPanel.test.title')}
         </Button>
       </div>
 
@@ -183,7 +185,7 @@ export default function AdminEmailsPanel() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Últimos 30d</p>
+              <p className="text-sm text-gray-600">{t('admin.emailsPanel.periods.last30d')}</p>
               <p className="text-2xl font-bold text-gray-900">{metrics?.total || 0}</p>
             </div>
             <Mail className="w-8 h-8 text-blue-500" />
@@ -192,7 +194,7 @@ export default function AdminEmailsPanel() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Entrega</p>
+              <p className="text-sm text-gray-600">{t('admin.emailsPanel.metrics.delivery')}</p>
               <p className="text-2xl font-bold text-green-600">{metrics?.deliveryRate || 0}%</p>
             </div>
             <BarChart3 className="w-8 h-8 text-green-500" />
@@ -201,7 +203,7 @@ export default function AdminEmailsPanel() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Apertura</p>
+              <p className="text-sm text-gray-600">{t('admin.emailsPanel.metrics.open')}</p>
               <p className="text-2xl font-bold text-purple-600">{metrics?.openRate || 0}%</p>
             </div>
             <BarChart3 className="w-8 h-8 text-purple-500" />
@@ -210,7 +212,7 @@ export default function AdminEmailsPanel() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Clics</p>
+              <p className="text-sm text-gray-600">{t('admin.emailsPanel.metrics.clicks')}</p>
               <p className="text-2xl font-bold text-indigo-600">{metrics?.clickRate || 0}%</p>
             </div>
             <BarChart3 className="w-8 h-8 text-indigo-500" />
@@ -219,7 +221,7 @@ export default function AdminEmailsPanel() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Rebotes</p>
+              <p className="text-sm text-gray-600">{t('admin.emailsPanel.metrics.bounces')}</p>
               <p className="text-2xl font-bold text-red-600">{metrics?.bounceRate || 0}%</p>
             </div>
             <BarChart3 className="w-8 h-8 text-red-500" />
@@ -231,7 +233,7 @@ export default function AdminEmailsPanel() {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Megaphone className="w-5 h-5 text-orange-500" />
-          <h3 className="text-base font-bold text-gray-900">Campañas</h3>
+          <h3 className="text-base font-bold text-gray-900">{t('admin.emailsPanel.campaignsTitle')}</h3>
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           <CampaignRepescaV1 />
@@ -247,50 +249,50 @@ export default function AdminEmailsPanel() {
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <Filter className="w-4 h-4 text-gray-600" />
-          <span className="font-semibold text-gray-700">Filtros</span>
+          <span className="font-semibold text-gray-700">{t('admin.emailsPanel.filters.title')}</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <Input
-            placeholder="Buscar email..."
+            placeholder={t('admin.emailsPanel.filters.searchPlaceholder')}
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
           />
           <Select value={filters.status} onValueChange={(v) => setFilters({ ...filters, status: v })}>
-            <SelectTrigger><SelectValue placeholder="Estado" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t('admin.emailsPanel.fields.status')} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="sent">Enviados</SelectItem>
-              <SelectItem value="delivered">Entregados</SelectItem>
-              <SelectItem value="opened">Abiertos</SelectItem>
-              <SelectItem value="bounced">Rechazados</SelectItem>
-              <SelectItem value="failed">Fallidos</SelectItem>
+              <SelectItem value="all">{t('admin.emailsPanel.filters.allStatuses')}</SelectItem>
+              <SelectItem value="sent">{t('admin.emailsPanel.filters.statusSent')}</SelectItem>
+              <SelectItem value="delivered">{t('admin.emailsPanel.filters.statusDelivered')}</SelectItem>
+              <SelectItem value="opened">{t('admin.emailsPanel.filters.statusOpened')}</SelectItem>
+              <SelectItem value="bounced">{t('admin.emailsPanel.filters.statusBounced')}</SelectItem>
+              <SelectItem value="failed">{t('admin.emailsPanel.filters.statusFailed')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={filters.category} onValueChange={(v) => setFilters({ ...filters, category: v })}>
-            <SelectTrigger><SelectValue placeholder="Categoría" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t('admin.emailsPanel.fields.category')} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              <SelectItem value="transactional">Transaccional</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
+              <SelectItem value="all">{t('admin.emailsPanel.filters.allCategories')}</SelectItem>
+              <SelectItem value="transactional">{t('admin.emailsPanel.category.transactional')}</SelectItem>
+              <SelectItem value="marketing">{t('admin.emailsPanel.category.marketing')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={filters.template} onValueChange={(v) => setFilters({ ...filters, template: v })}>
-            <SelectTrigger><SelectValue placeholder="Template" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t('admin.emailsPanel.fields.template')} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="welcome">Bienvenida</SelectItem>
-              <SelectItem value="gift_received">Regalo</SelectItem>
-              <SelectItem value="review_request">Reseña</SelectItem>
-              <SelectItem value="generic">Genérico</SelectItem>
+              <SelectItem value="all">{t('admin.emailsPanel.filters.allTemplates')}</SelectItem>
+              <SelectItem value="welcome">{t('admin.emailsPanel.templates.welcome')}</SelectItem>
+              <SelectItem value="gift_received">{t('admin.emailsPanel.templates.giftReceived')}</SelectItem>
+              <SelectItem value="review_request">{t('admin.emailsPanel.templates.reviewRequest')}</SelectItem>
+              <SelectItem value="generic">{t('admin.emailsPanel.templates.generic')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={filters.dateRange} onValueChange={(v) => setFilters({ ...filters, dateRange: v })}>
-            <SelectTrigger><SelectValue placeholder="Período" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t('admin.emailsPanel.fields.period')} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="7">Últimos 7d</SelectItem>
-              <SelectItem value="30">Últimos 30d</SelectItem>
-              <SelectItem value="90">Últimos 90d</SelectItem>
-              <SelectItem value="all">Todo</SelectItem>
+              <SelectItem value="7">{t('admin.emailsPanel.periods.last7d')}</SelectItem>
+              <SelectItem value="30">{t('admin.emailsPanel.periods.last30d')}</SelectItem>
+              <SelectItem value="90">{t('admin.emailsPanel.periods.last90d')}</SelectItem>
+              <SelectItem value="all">{t('admin.emailsPanel.periods.all')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -299,19 +301,19 @@ export default function AdminEmailsPanel() {
       {/* Tabla */}
       <Card className="p-4">
         {isLoading ? (
-          <p className="text-gray-600 py-8 text-center">Cargando...</p>
+          <p className="text-gray-600 py-8 text-center">{t('common.loading')}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Fecha</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Asunto</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Template</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Categoría</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Estado</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Acciones</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">{t('admin.emailsPanel.fields.date')}</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">{t('emailField')}</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">{t('admin.emailsPanel.fields.subject')}</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">{t('admin.emailsPanel.fields.template')}</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">{t('admin.emailsPanel.fields.category')}</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">{t('admin.emailsPanel.fields.status')}</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">{t('admin.emailsPanel.fields.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -330,7 +332,7 @@ export default function AdminEmailsPanel() {
                             ? 'bg-blue-100 text-blue-800' 
                             : 'bg-orange-100 text-orange-800'
                         }`}>
-                          {log.category === 'transactional' ? 'Trans.' : 'Marketing'}
+                          {log.category === 'transactional' ? t('admin.emailsPanel.category.transactionalShort') : t('admin.emailsPanel.category.marketing')}
                         </span>
                       </td>
                       <td className="py-3 px-4">
@@ -347,7 +349,7 @@ export default function AdminEmailsPanel() {
                           className="text-blue-600 hover:text-blue-800 text-xs font-medium flex items-center gap-1"
                         >
                           <Eye className="w-3 h-3" />
-                          Ver
+                          {t('view')}
                         </button>
                       </td>
                     </tr>
@@ -355,7 +357,7 @@ export default function AdminEmailsPanel() {
                 ) : (
                   <tr>
                     <td colSpan="7" className="py-8 text-center text-gray-500">
-                      No hay emails
+                      {t('admin.emailsPanel.table.empty')}
                     </td>
                   </tr>
                 )}
@@ -370,24 +372,24 @@ export default function AdminEmailsPanel() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900">Email de prueba</h3>
+              <h3 className="text-lg font-bold text-gray-900">{t('admin.emailsPanel.test.title')}</h3>
               <button onClick={() => setShowTestModal(false)} className="text-gray-500 hover:text-gray-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Destinatario</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emailsPanel.test.recipient')}</label>
                 <Input
                   type="email"
-                  placeholder="test@example.com"
+                  placeholder={t('admin.emailsPanel.test.recipientPlaceholder')}
                   value={testEmail}
                   onChange={(e) => setTestEmail(e.target.value)}
                   disabled={sending}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Asunto</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emailsPanel.fields.subject')}</label>
                 <Input
                   value={testSubject}
                   onChange={(e) => setTestSubject(e.target.value)}
@@ -395,21 +397,21 @@ export default function AdminEmailsPanel() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Template</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emailsPanel.fields.template')}</label>
                 <Select value={testTemplate} onValueChange={handleTemplateChange} disabled={sending}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="welcome">Bienvenida</SelectItem>
-                    <SelectItem value="gift_received">Regalo</SelectItem>
-                    <SelectItem value="review_request">Reseña</SelectItem>
-                    <SelectItem value="generic">Genérico</SelectItem>
+                    <SelectItem value="welcome">{t('admin.emailsPanel.templates.welcome')}</SelectItem>
+                    <SelectItem value="gift_received">{t('admin.emailsPanel.templates.giftReceived')}</SelectItem>
+                    <SelectItem value="review_request">{t('admin.emailsPanel.templates.reviewRequest')}</SelectItem>
+                    <SelectItem value="generic">{t('admin.emailsPanel.templates.generic')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Variables (JSON)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emailsPanel.test.variables')}</label>
                 <Textarea
                   value={testVars}
                   onChange={(e) => setTestVars(e.target.value)}
@@ -419,10 +421,10 @@ export default function AdminEmailsPanel() {
               </div>
               <div className="flex gap-2">
                 <Button onClick={handleTestEmail} disabled={sending} className="flex-1">
-                  {sending ? 'Enviando...' : 'Enviar'}
+                  {sending ? t('admin.emailsPanel.test.sending') : t('admin.emailsPanel.test.send')}
                 </Button>
                 <Button onClick={() => setShowTestModal(false)} variant="outline" disabled={sending}>
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
               </div>
             </div>
@@ -435,7 +437,7 @@ export default function AdminEmailsPanel() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-2xl p-6 max-h-[80vh] overflow-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900">Detalle del Email</h3>
+              <h3 className="text-lg font-bold text-gray-900">{t('admin.emailsPanel.detail.title')}</h3>
               <button onClick={() => setShowDetailModal(false)} className="text-gray-500 hover:text-gray-700">
                 <X className="w-5 h-5" />
               </button>
@@ -444,7 +446,7 @@ export default function AdminEmailsPanel() {
               {JSON.stringify(selectedLog, null, 2)}
             </pre>
             <Button onClick={() => setShowDetailModal(false)} className="mt-4 w-full">
-              Cerrar
+              {t('common.close')}
             </Button>
           </Card>
         </div>

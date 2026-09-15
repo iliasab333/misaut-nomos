@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy, useCallback, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import {
@@ -73,7 +74,7 @@ const WebsiteSchema = lazy(() => import("@/components/seo/WebsiteSchema").catch(
 import PageTransitions from "@/components/ui/PageTransitions";
 import { setUserId, setUserTags, onesignalLogout } from "@/services/onesignalService";
 
-import LanguageSwitcher, { useLanguage, LanguageProvider } from "@/components/ui/LanguageSwitcher";
+import LanguageSwitcher, { LanguageProvider } from "@/components/ui/LanguageSwitcher";
 import { getEffectivePlan, isAdsPlus } from "@/utils/subscription";
 
 
@@ -85,6 +86,9 @@ const LOGO_48 = '/logo-192.png';
 const LOGO_96 = '/logo-192.png';
 const LOGO_32 = '/logo-192.png';
 const LOGO_64 = '/logo-192.png';
+
+// La marca va literal: no pasa por t().
+const BRAND = 'MisAutónomos';
 
 // Preload para mejorar LCP del header
 if (typeof window !== 'undefined') {
@@ -98,14 +102,15 @@ if (typeof window !== 'undefined') {
 
 // Sidebar optimizado con memo
 const SidebarContentComponent = React.memo(function SidebarContentComponent({ navigationItems, location, user, isProfessional, isAdmin, isClient, unreadCount, language, onChangeLanguage, onLogout }) {
+  const { t } = useTranslation();
   return (
     <Sidebar className="border-r border-gray-200 bg-white shadow-sm hidden lg:flex">
       <SidebarHeader className="border-b border-gray-100 p-6">
-        <HomeLogoLink className="flex items-center gap-3" ariaLabel="Inicio">
+        <HomeLogoLink className="flex items-center gap-3" ariaLabel={t('nav.home')}>
           <img
             src={LOGO_48}
             srcSet={`${LOGO_48} 1x, ${LOGO_96} 2x`}
-            alt="Logo MisAutónomos"
+            alt={t('layout.header.logoAlt')}
             className="w-12 h-12 rounded-lg"
             width="48"
             height="48"
@@ -115,8 +120,8 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
             style={{ width: '48px', height: '48px' }}
           />
           <div>
-            <h2 className="font-bold text-xl text-gray-900 notranslate" translate="no">MisAutónomos</h2>
-            <p className="text-xs text-gray-500">Plataforma de autónomos</p>
+            <h2 className="font-bold text-xl text-gray-900 notranslate" translate="no">{BRAND}</h2>
+            <p className="text-xs text-gray-500">{t('layout.sidebar.tagline')}</p>
           </div>
         </HomeLogoLink>
       </SidebarHeader>
@@ -138,7 +143,7 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
                         <item.icon className="w-5 h-5" aria-hidden="true" />
                         <span className="font-medium">{item.title}</span>
                         {item.badge && (
-                          <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={`${item.badge} mensajes no leídos`}>
+                          <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={t('layout.sidebar.unreadMessages', { count: item.badge })}>
                             {item.badge}
                           </span>
                         )}
@@ -150,7 +155,7 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
                         <item.icon className="w-5 h-5" aria-hidden="true" />
                         <span className="font-medium">{item.title}</span>
                         {item.badge && (
-                          <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={`${item.badge} mensajes no leídos`}>
+                          <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={t('layout.sidebar.unreadMessages', { count: item.badge })}>
                             {item.badge}
                           </span>
                         )}
@@ -169,7 +174,7 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
           <div className="flex items-center gap-3 px-2">
             <Avatar className="w-10 h-10 border-2 border-blue-600 overflow-hidden">
               {user?.profile_picture ? (
-                <AvatarImage src={user.profile_picture} alt="Profile" className="object-cover object-center w-full h-full" />
+                <AvatarImage src={user.profile_picture} alt={t('layout.sidebar.avatarAlt')} className="object-cover object-center w-full h-full" />
               ) : (
                 <AvatarFallback className={`font-semibold text-white ${isAdmin ? 'bg-gradient-to-br from-purple-600 to-purple-800' : 'bg-gradient-to-br from-blue-600 to-blue-800'}`}>
                   {user?.full_name?.charAt(0) || 'U'}
@@ -178,16 +183,16 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-gray-900 text-sm truncate">
-                {user?.full_name || 'Usuario'}
+                {user?.full_name || t('layout.sidebar.defaultUserName')}
               </p>
               {isAdmin && (
                 <span className="inline-flex items-center gap-1 text-[10px] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded font-medium mt-0.5">
                   <Shield className="w-2.5 h-2.5" />
-                  Administrador
+                  {t('layout.sidebar.adminBadge')}
                 </span>
               )}
-              {isProfessional && <p className="text-xs text-gray-500">Profesional</p>}
-              {isClient && <p className="text-xs text-gray-500">Cliente</p>}
+              {isProfessional && <p className="text-xs text-gray-500">{t('professionalLabel')}</p>}
+              {isClient && <p className="text-xs text-gray-500">{t('clientLabel')}</p>}
             </div>
           </div>
 
@@ -200,7 +205,7 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
             size="icon"
             className="h-8 w-8 hover:bg-red-50 hover:text-red-600 transition-colors flex-shrink-0"
             onClick={onLogout}
-            aria-label="Cerrar sesión"
+            aria-label={t('nav.logout')}
             >
               <LogOut className="w-4 h-4 text-gray-600" aria-hidden="true" />
             </Button>
@@ -214,7 +219,9 @@ const SidebarContentComponent = React.memo(function SidebarContentComponent({ na
 const LayoutContent = React.memo(function LayoutContent({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t, language, changeLanguage } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const language = i18n.language.split('-')[0];
+  const changeLanguage = (code) => i18n.changeLanguage(code);
   const [user, setUser] = useState(null);
   const [userPlan, setUserPlan] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -619,7 +626,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
     }
     
-    return "Usuario";
+    return t('layout.sidebar.defaultUserName');
   };
 
   const getProfilePicture = () => {
@@ -632,11 +639,11 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       // existen como página pero quedan fuera del menú hasta tener KPIs y
       // operativa propios. Soporte permanece.
       return [
-        { title: "Métricas", url: "/admin", icon: LayoutDashboard },
-        { title: "Usuarios", url: "/admin/usuarios", icon: Users },
-        { title: "Blog", url: "/admin/blog", icon: BookOpen },
-        { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
-        { title: "Soporte", url: "/admin/soporte", icon: Headphones },
+        { title: t('nav.adminMetrics'), url: "/admin", icon: LayoutDashboard },
+        { title: t('nav.adminUsers'), url: "/admin/usuarios", icon: Users },
+        { title: t('nav.blog'), url: "/admin/blog", icon: BookOpen },
+        { title: t('nav.newsletter'), url: "/admin/newsletter", icon: Mail },
+        { title: t('nav.support'), url: "/admin/soporte", icon: Headphones },
       ];
     }
     
@@ -646,14 +653,14 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       // visibilidad quedan fuera del menú (las páginas siguen existiendo).
       return [
         { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), icon: Home },
-        { title: 'Mi perfil', url: createPageUrl("MyProfile"), icon: User },
-        { title: 'Estadísticas', url: '/mis-estadisticas', icon: BarChart3, prefetch: () => import('./pages/MisEstadisticas') },
-        { title: 'Valoraciones', url: '/mis-valoraciones', icon: Star, prefetch: () => import('./pages/MisValoraciones') },
+        { title: t('nav.myProfile'), url: createPageUrl("MyProfile"), icon: User },
+        { title: t('nav.statistics'), url: '/mis-estadisticas', icon: BarChart3, prefetch: () => import('./pages/MisEstadisticas') },
+        { title: t('nav.reviews'), url: '/mis-valoraciones', icon: Star, prefetch: () => import('./pages/MisValoraciones') },
         { title: t('nav.messages'), url: createPageUrl("Messages"), icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
         userPlan === 'plan_adsplus'
-          ? { title: 'Mi campaña', url: '/mi-campana', icon: Megaphone, badge: null, prefetch: () => import('./pages/MiCampana') }
+          ? { title: t('nav.myCampaign'), url: '/mi-campana', icon: Megaphone, badge: null, prefetch: () => import('./pages/MiCampana') }
           : null,
-        { title: 'Soporte', url: "/soporte", icon: Headphones, prefetch: () => import('./pages/Soporte') },
+        { title: t('nav.support'), url: "/soporte", icon: Headphones, prefetch: () => import('./pages/Soporte') },
       ].filter(Boolean);
     }
     
@@ -705,19 +712,19 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                   style={{ position: 'fixed', left: 0, top: 0, bottom: 0, width: '280px', background: '#fff', zIndex: 9999, overflowY: 'auto', boxShadow: '4px 0 24px rgba(0,0,0,0.18)' }}
                   role="dialog"
                   aria-modal="true"
-                  aria-label="Menú de navegación"
+                  aria-label={t('layout.mobileMenu.ariaLabel')}
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <div className="flex items-center gap-2">
                       <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt="" className="w-8 h-8 rounded" width="32" height="32" />
-                      <span className="font-bold text-gray-900 notranslate" translate="no">MisAutónomos</span>
+                      <span className="font-bold text-gray-900 notranslate" translate="no">{BRAND}</span>
                     </div>
                     <button
                       onClick={() => setMobileMenuOpen(false)}
                       style={{ width: '44px', height: '44px', touchAction: 'manipulation' }}
                       className="flex items-center justify-center rounded-lg hover:bg-gray-100"
-                      aria-label="Cerrar menú"
+                      aria-label={t('layout.mobileMenu.close')}
                     >
                       <X className="w-5 h-5 text-gray-500" />
                     </button>
@@ -738,7 +745,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         </Avatar>
                         <div className="min-w-0">
                           <p className="font-semibold text-gray-900 text-sm truncate">{getDisplayName()}</p>
-                          <p className="text-xs text-gray-500">{isProfessional ? 'Profesional' : 'Cliente'}</p>
+                          <p className="text-xs text-gray-500">{isProfessional ? t('professionalLabel') : t('clientLabel')}</p>
                         </div>
                       </div>
                     )}
@@ -784,7 +791,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                           style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
                         >
                           <BookOpen className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                          <span className="font-medium">Blog</span>
+                          <span className="font-medium">{t('nav.blog')}</span>
                         </Link>
                         <Link
                           to="/precios"
@@ -804,11 +811,11 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                             style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation', background: '#F5C13D', color: '#00255C' }}
                           >
                             <Briefcase className="w-5 h-5" />
-                            Hazte autónomo · Gratis
+                            {t('nav.becomeProFree')}
                           </Link>
                           <button
                             onClick={() => { handleLogin(); setMobileMenuOpen(false); }}
-                            aria-label="Iniciar sesión en MisAutónomos"
+                            aria-label={t('nav.loginAria')}
                             className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold text-gray-700 border-2 border-gray-200 hover:bg-gray-50"
                             style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation' }}
                           >
@@ -825,7 +832,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         <div className="mx-3 mt-2 border-t border-gray-100 pt-2">
                           <button
                           onClick={handleLogout}
-                          aria-label="Cerrar sesión"
+                          aria-label={t('nav.logout')}
                           className="flex items-center gap-3 w-full rounded-xl text-red-600 hover:bg-red-50 active:bg-red-100"
                           style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
                           >
@@ -857,11 +864,11 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                   }}
                   role="dialog"
                   aria-modal="true"
-                  aria-label="Opciones de registro"
+                  aria-label={t('layout.joinModal.ariaLabel')}
                 >
                   <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
-                  <h2 className="text-xl font-bold text-gray-900 text-center mb-2">¿Cómo quieres unirte?</h2>
-                  <p className="text-sm text-gray-500 text-center mb-6">Elige tu perfil para empezar</p>
+                  <h2 className="text-xl font-bold text-gray-900 text-center mb-2">{t('layout.joinModal.title')}</h2>
+                  <p className="text-sm text-gray-500 text-center mb-6">{t('layout.joinModal.subtitle')}</p>
                   <div className="space-y-3">
                     <Link
                       to="/buscar"
@@ -873,8 +880,8 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         <SearchIcon className="w-5 h-5" />
                       </div>
                       <div className="text-left">
-                        <div className="font-bold">Soy cliente</div>
-                        <div className="text-xs text-slate-500">Buscar profesionales (sin registrarse)</div>
+                        <div className="font-bold">{t('nav.sign_up_client')}</div>
+                        <div className="text-xs text-slate-500">{t('layout.joinModal.clientHint')}</div>
                       </div>
                     </Link>
                     <Link
@@ -887,17 +894,17 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         <Briefcase className="w-5 h-5" style={{ color: '#00255C' }} />
                       </div>
                       <div className="text-left">
-                        <div className="font-bold">Soy autónomo</div>
-                        <div className="text-xs" style={{ color: 'rgba(0,37,92,0.7)' }}>Quiero conseguir clientes</div>
+                        <div className="font-bold">{t('nav.iAmPro')}</div>
+                        <div className="text-xs" style={{ color: 'rgba(0,37,92,0.7)' }}>{t('layout.joinModal.proHint')}</div>
                       </div>
                     </Link>
                     <button
                       onClick={() => { handleLogin(); setJoinModalOpen(false); }}
-                      aria-label="Ya tengo cuenta, iniciar sesión"
+                      aria-label={t('layout.joinModal.haveAccountAria')}
                       className="w-full text-center text-sm text-gray-500 py-3 font-medium"
                       style={{ touchAction: 'manipulation' }}
                     >
-                      Ya tengo cuenta → <span className="text-blue-600 font-semibold">Iniciar sesión</span>
+                      <Trans i18nKey="layout.joinModal.haveAccount" components={{ 1: <span className="text-blue-600 font-semibold" /> }} />
                     </button>
                   </div>
                 </div>
@@ -930,7 +937,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     onPointerDown={() => navigate(-1)}
                     style={{ width: '56px', height: '56px', minWidth: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', cursor: 'pointer', background: 'none', border: 'none', padding: 0, margin: '-4px' }}
                     className="inline-flex items-center justify-center rounded-lg flex-shrink-0 active:bg-gray-200"
-                    aria-label="Volver"
+                    aria-label={t('common.back')}
                   >
                     <ArrowLeft className="w-6 h-6 text-gray-700 pointer-events-none" />
                   </button>
@@ -940,16 +947,16 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     onPointerDown={() => setMobileMenuOpen(true)}
                     style={{ width: '56px', height: '56px', minWidth: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', cursor: 'pointer', background: 'none', border: 'none', padding: 0, margin: '-4px' }}
                     className="inline-flex items-center justify-center rounded-lg flex-shrink-0 active:bg-gray-200"
-                    aria-label="Abrir menú"
+                    aria-label={t('layout.mobileMenu.open')}
                   >
                     <Menu className="w-6 h-6 text-gray-700 pointer-events-none" />
                   </button>
                 );
               })()}
 
-              <HomeLogoLink className="flex items-center gap-2" ariaLabel="Inicio">
-                <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt="Logo MisAutónomos" className="w-8 h-8 rounded" width="32" height="32" loading="eager" fetchPriority="high" decoding="async" />
-                <span className="font-bold text-lg text-gray-900 notranslate" translate="no">MisAutónomos</span>
+              <HomeLogoLink className="flex items-center gap-2" ariaLabel={t('nav.home')}>
+                <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt={t('layout.header.logoAlt')} className="w-8 h-8 rounded" width="32" height="32" loading="eager" fetchPriority="high" decoding="async" />
+                <span className="font-bold text-lg text-gray-900 notranslate" translate="no">{BRAND}</span>
               </HomeLogoLink>
 
               <div style={{ width: '56px', height: '56px', margin: '-4px' }} className="flex items-center justify-end flex-shrink-0">
@@ -963,7 +970,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     onPointerDown={() => setJoinModalOpen(true)}
                     style={{ width: '56px', height: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', background: 'none', border: 'none', padding: 0 }}
                     className="flex items-center justify-center rounded-lg text-blue-600"
-                    aria-label="Unirse a MisAutónomos"
+                    aria-label={t('layout.header.joinAria')}
                   >
                     <User className="w-5 h-5" />
                   </button>
@@ -975,11 +982,11 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
               {!user && (
                   <header className="bg-white border-b border-gray-200 px-6 py-4 hidden lg:block sticky top-0 z-20 shadow-sm will-change-transform">
                   <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <HomeLogoLink className="flex items-center gap-3" ariaLabel="Inicio">
+                    <HomeLogoLink className="flex items-center gap-3" ariaLabel={t('nav.home')}>
                       <img
                         src={LOGO_48}
                         srcSet={`${LOGO_48} 1x, ${LOGO_96} 2x`}
-                        alt="Logo MisAutónomos"
+                        alt={t('layout.header.logoAlt')}
                         className="w-12 h-12 rounded-lg"
                         width="48"
                         height="48"
@@ -988,7 +995,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         decoding="async"
                       />
                       <div style={{ minWidth: '150px' }}>
-                        <h1 className="font-bold text-xl text-gray-900 notranslate" translate="no">MisAutónomos</h1>
+                        <h1 className="font-bold text-xl text-gray-900 notranslate" translate="no">{BRAND}</h1>
                         <p className="text-xs text-gray-500">{t('footer.tagline')}</p>
                       </div>
                       </HomeLogoLink>
@@ -999,7 +1006,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                           variant="ghost"
                           className="text-gray-700 hover:text-blue-700 hover:bg-blue-50"
                           onClick={handleLogin}
-                          aria-label="Iniciar sesión en MisAutónomos"
+                          aria-label={t('nav.loginAria')}
                         >
                           <User className="w-4 h-4 mr-2" aria-hidden="true" />
                           {t('nav.login')}
@@ -1009,7 +1016,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         <Link to="/buscar">
                           <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900">
                             <SearchIcon className="w-4 h-4 mr-2" aria-hidden="true" />
-                            Soy cliente
+                            {t('nav.sign_up_client')}
                           </Button>
                         </Link>
                       )}
@@ -1020,7 +1027,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                             style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
                           >
                             <Briefcase className="w-4 h-4 mr-2" aria-hidden="true" />
-                            Hazte autónomo · Gratis
+                            {t('nav.becomeProFree')}
                           </Button>
                         </Link>
                       ) : null}
@@ -1031,7 +1038,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                           size="icon"
                           className="hover:bg-red-50 hover:text-red-600 transition-colors"
                           onClick={handleLogout}
-                          aria-label="Cerrar sesión"
+                          aria-label={t('nav.logout')}
                         >
                           <LogOut className="w-5 h-5" aria-hidden="true" />
                         </Button>
@@ -1064,7 +1071,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                 className="mobile-bottom-nav"
                 data-role="bottom-nav"
                 role="navigation"
-                aria-label="Navegación principal"
+                aria-label={t('layout.bottomNav.ariaLabel')}
                 style={{
                   gridTemplateColumns: (user && isProfessional) ? 'repeat(5, 1fr)' : user ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)',
                   paddingBottom: 'env(safe-area-inset-bottom, 8px)',
@@ -1074,22 +1081,22 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                 {user ? (
                   <>
                     {(isProfessional ? [
-                      { title: 'Inicio', url: createPageUrl("ProfessionalDashboard"), root: createPageUrl("ProfessionalDashboard"), icon: Home },
-                      { title: 'Chats', url: createPageUrl("Messages"), root: '/mensajes', icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
-                      { title: 'Clientes', url: "/mis-clientes", root: '/mis-clientes', icon: Users },
-                      { title: 'Presupuestos', url: "/presupuestos", root: '/presupuestos', icon: FileText },
-                      { title: 'Perfil', url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: User },
+                      { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), root: createPageUrl("ProfessionalDashboard"), icon: Home },
+                      { title: t('nav.chats'), url: createPageUrl("Messages"), root: '/mensajes', icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
+                      { title: t('nav.clients'), url: "/mis-clientes", root: '/mis-clientes', icon: Users },
+                      { title: t('nav.quotes'), url: "/presupuestos", root: '/presupuestos', icon: FileText },
+                      { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: User },
                     ] : [
-                      { title: 'Buscar', url: createPageUrl("Search"), root: '/buscar', icon: SearchIcon },
-                      { title: 'Chats', url: createPageUrl("Messages"), root: '/mensajes', icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
-                      { title: 'Guardados', url: createPageUrl("Favorites"), root: createPageUrl("Favorites"), icon: Heart },
-                      { title: 'Perfil', url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: User },
+                      { title: t('common.search'), url: createPageUrl("Search"), root: '/buscar', icon: SearchIcon },
+                      { title: t('nav.chats'), url: createPageUrl("Messages"), root: '/mensajes', icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
+                      { title: t('nav.saved'), url: createPageUrl("Favorites"), root: createPageUrl("Favorites"), icon: Heart },
+                      { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: User },
                     ]).map((item) => (
                       <Link
                         key={item.title}
                         to={location.pathname === item.url || location.pathname.startsWith(item.url + '?') ? item.root : item.url}
                         className={`mobile-bottom-nav-item ${location.pathname === item.url || location.pathname.startsWith(item.root) ? 'active' : ''}`}
-                        aria-label={`Ir a ${item.title}`}
+                        aria-label={t('layout.bottomNav.goTo', { title: item.title })}
                         aria-current={location.pathname === item.url ? 'page' : undefined}
                         style={{ touchAction: 'manipulation', flex: 1, minWidth: 0 }}
                       >
@@ -1110,20 +1117,20 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     <Link
                       to={createPageUrl("Search")}
                         className={`mobile-bottom-nav-item ${location.pathname === createPageUrl("Search") ? 'active' : ''}`}
-                        aria-label="Buscar profesionales"
+                        aria-label={t('layout.bottomNav.searchAria')}
                       style={{ touchAction: 'manipulation', flex: 1, minWidth: 0 }}
                     >
                       <SearchIcon className="w-5 h-5" />
-                      <span style={{ fontSize: '10px', fontWeight: 500 }}>Buscar</span>
+                      <span style={{ fontSize: '10px', fontWeight: 500 }}>{t('common.search')}</span>
                     </Link>
                     <button
                       onClick={() => setJoinModalOpen(true)}
                       className="mobile-bottom-nav-item"
-                      aria-label="Unirse a MisAutónomos"
+                      aria-label={t('layout.header.joinAria')}
                       style={{ touchAction: 'manipulation', border: 'none', background: 'none', cursor: 'pointer', flex: 1, minWidth: 0 }}
                     >
                       <Briefcase className="w-5 h-5" />
-                      <span style={{ fontSize: '10px', fontWeight: 500 }}>Unirse</span>
+                      <span style={{ fontSize: '10px', fontWeight: 500 }}>{t('layout.bottomNav.join')}</span>
                     </button>
                   </>
                 )}

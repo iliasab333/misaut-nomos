@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Card } from "@/components/ui/card";
@@ -111,6 +112,7 @@ Object.entries(CITY_COORDS).forEach(([city, coords]) => {
 });
 
 export default function MapView({ profiles, onProfileClick }) {
+  const { t } = useTranslation();
   const mapRef = useRef(null);
 
   // Función para buscar coordenadas de una ciudad
@@ -208,7 +210,7 @@ export default function MapView({ profiles, onProfileClick }) {
                   size="sm"
                   className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs"
                 >
-                  Ver perfil
+                  {t('profile_card.view_profile')}
                 </Button>
               </div>
             </Popup>

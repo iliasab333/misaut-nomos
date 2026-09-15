@@ -54,7 +54,7 @@ export default function ProfilePreview({ formData, currentUser }) {
                 <img
                   key={idx}
                   src={photo}
-                  alt={t('onboarding.portfolio.photoAlt', { number: idx + 1 })}
+                  alt={t('proProfile.portfolio.photoAlt', { number: idx + 1 })}
                   className="w-full h-16 object-cover rounded"
                   loading="lazy"
                 />

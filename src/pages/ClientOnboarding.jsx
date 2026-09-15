@@ -338,9 +338,13 @@ export default function ClientOnboardingPage() {
                 style={{ width: '16px', height: '16px', marginTop: '2px', flexShrink: 0, accentColor: '#2563EB' }}
               />
               <label htmlFor="acepta_terminos_client" style={{ fontSize: '13px', color: '#6B7280', lineHeight: '1.5', cursor: 'pointer' }}>
-                <Trans i18nKey="onboarding.client.acceptTerms">
-                  Acepto los <Link to="/terminos" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }}>Términos</Link> y la <Link to="/privacidad" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }}>Política de Privacidad</Link>
-                </Trans>
+                <Trans
+                  i18nKey="onboarding.client.acceptTerms"
+                  components={{
+                    terms: <Link to="/terminos" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }} />,
+                    privacy: <Link to="/privacidad" target="_blank" style={{ color: '#2563EB', textDecoration: 'underline' }} />,
+                  }}
+                />
               </label>
             </div>
             {fieldErrors.terminos && (
@@ -379,12 +383,17 @@ export default function ClientOnboardingPage() {
 
           {/* Link a login */}
           <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px', color: '#6B7280' }}>
-            <Trans i18nKey="onboarding.client.alreadyHaveAccount">
-              ¿Ya tienes cuenta? <button
-                onClick={() => base44.auth.redirectToLogin(createPageUrl("Search"))}
-                style={{ color: '#00255C', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', padding: 0 }}
-              >Inicia sesión</button>
-            </Trans>
+            <Trans
+              i18nKey="onboarding.client.alreadyHaveAccount"
+              components={{
+                login: (
+                  <button
+                    onClick={() => base44.auth.redirectToLogin(createPageUrl("Search"))}
+                    style={{ color: '#00255C', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', padding: 0 }}
+                  />
+                ),
+              }}
+            />
           </p>
         </div>
       </div>

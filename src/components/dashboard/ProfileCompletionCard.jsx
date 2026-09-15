@@ -13,11 +13,11 @@ function computeChecklist(profile, t) {
   if (!profile) return [];
   return [
     { key: "basic", label: t('dashboard.completion.items.basicInfo'), done: !!(profile.business_name && profile.descripcion_corta) },
-    { key: "photo", label: t('dashboard.completion.items.profilePhoto'), done: !!profile.imagen_principal },
+    { key: "photo", label: t('proProfile.picture.alt'), done: !!profile.imagen_principal },
     { key: "categories", label: t('dashboard.completion.items.categories'), done: Array.isArray(profile.categories) && profile.categories.length > 0 },
     { key: "location", label: t('serviceArea'), done: !!(profile.provincia && profile.ciudad) },
-    { key: "description", label: t('dashboard.completion.items.description'), done: !!(profile.description && profile.description.length > 80) },
-    { key: "gallery", label: t('dashboard.completion.items.workPhotos'), done: Array.isArray(profile.photos) && profile.photos.length >= 3 },
+    { key: "description", label: t('premium.dashboard.checks.fullDescription'), done: !!(profile.description && profile.description.length > 80) },
+    { key: "gallery", label: t('premium.dashboard.checks.workPhotos'), done: Array.isArray(profile.photos) && profile.photos.length >= 3 },
     { key: "services", label: t('profile_page.services'), done: Array.isArray(profile.services_offered) && profile.services_offered.length > 0 },
     { key: "contact", label: t('dashboard.completion.items.contactMethods'), done: Array.isArray(profile.metodos_contacto) && profile.metodos_contacto.length > 0 },
   ];
@@ -38,7 +38,7 @@ export default function ProfileCompletionCard({ profile }) {
       : pct >= 70
       ? { label: t('dashboard.completion.status.almost'), color: "from-blue-500 to-cyan-500", text: "text-blue-700" }
       : pct >= 40
-      ? { label: t('dashboard.completion.status.inProgress'), color: "from-amber-500 to-orange-500", text: "text-amber-700" }
+      ? { label: t('projects.status.inProgress'), color: "from-amber-500 to-orange-500", text: "text-amber-700" }
       : { label: t('dashboard.completion.status.starting'), color: "from-rose-500 to-pink-500", text: "text-rose-700" };
 
   return (
@@ -53,7 +53,7 @@ export default function ProfileCompletionCard({ profile }) {
                 {status.label}
               </span>
             </div>
-            <h3 className="text-lg md:text-xl font-bold text-gray-900">{t('dashboard.completion.title')}</h3>
+            <h3 className="text-lg md:text-xl font-bold text-gray-900">{t('premium.dashboard.completeness.title')}</h3>
             <p className="text-sm text-gray-500 mt-0.5">
               {t('dashboard.completion.subtitle')}
             </p>

@@ -37,9 +37,11 @@ export default function PageNotFound({}) {
                             {t('errors.notFound.title')}
                         </h2>
                         <p className="text-slate-600 leading-relaxed">
-                            <Trans i18nKey="errors.notFound.body" values={{ page: pageName }}>
-                                The page <span className="font-medium text-slate-700">"{{ page: pageName }}"</span> could not be found in this application.
-                            </Trans>
+                            <Trans
+                                i18nKey="errors.notFound.body"
+                                values={{ page: pageName }}
+                                components={{ 1: <span className="font-medium text-slate-700" /> }}
+                            />
                         </p>
                     </div>
                     

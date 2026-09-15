@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function NewsletterUnsubscribePage() {
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const [status, setStatus] = useState('loading');
   const [email, setEmail] = useState('');
 
@@ -79,21 +81,21 @@ export default function NewsletterUnsubscribePage() {
             <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
               <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
             </div>
-            <p className="text-gray-600">Procesando...</p>
+            <p className="text-gray-600">{t('newsletter.unsubscribe.processing')}</p>
           </div>
         )}
 
         {status === 'success' && (
           <div className="text-center">
             <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Te has dado de baja</h2>
-            <p className="text-gray-600 mb-4">Ya no recibirás más emails de marketing.</p>
-            <p className="text-sm text-gray-500 mb-6">Seguirás recibiendo notificaciones transaccionales importantes.</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('newsletter.unsubscribe.title')}</h2>
+            <p className="text-gray-600 mb-4">{t('newsletter.unsubscribe.body')}</p>
+            <p className="text-sm text-gray-500 mb-6">{t('newsletter.unsubscribe.transactionalNote')}</p>
             <Button onClick={handleResubscribe} variant="outline" className="w-full mb-2">
-              Reactivar suscripción
+              {t('newsletter.unsubscribe.resubscribe')}
             </Button>
             <a href="/" className="text-blue-600 hover:text-blue-700 text-sm">
-              Volver al inicio
+              {t('newsletter.backHome')}
             </a>
           </div>
         )}
@@ -101,10 +103,10 @@ export default function NewsletterUnsubscribePage() {
         {status === 'resubscribed' && (
           <div className="text-center">
             <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">¡Te has reactivado!</h2>
-            <p className="text-gray-600 mb-6">Volverás a recibir nuestros emails de marketing.</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('newsletter.unsubscribe.resubscribedTitle')}</h2>
+            <p className="text-gray-600 mb-6">{t('newsletter.unsubscribe.resubscribedBody')}</p>
             <a href="/" className="text-blue-600 hover:text-blue-700 text-sm">
-              Volver al inicio
+              {t('newsletter.backHome')}
             </a>
           </div>
         )}
@@ -112,10 +114,10 @@ export default function NewsletterUnsubscribePage() {
         {status === 'error' && (
           <div className="text-center">
             <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Error</h2>
-            <p className="text-gray-600 mb-6">No pudimos procesar tu solicitud. Por favor, intenta de nuevo.</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('common.error')}</h2>
+            <p className="text-gray-600 mb-6">{t('newsletter.unsubscribe.errorBody')}</p>
             <a href="/" className="text-blue-600 hover:text-blue-700 text-sm">
-              Volver al inicio
+              {t('newsletter.backHome')}
             </a>
           </div>
         )}
@@ -123,10 +125,10 @@ export default function NewsletterUnsubscribePage() {
         {status === 'not_found' && (
           <div className="text-center">
             <AlertCircle className="w-12 h-12 text-amber-600 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Email no encontrado</h2>
-            <p className="text-gray-600 mb-6">No pudimos encontrar este email en nuestro sistema.</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('newsletter.unsubscribe.notFoundTitle')}</h2>
+            <p className="text-gray-600 mb-6">{t('newsletter.unsubscribe.notFoundBodyAlt')}</p>
             <a href="/" className="text-blue-600 hover:text-blue-700 text-sm">
-              Volver al inicio
+              {t('newsletter.backHome')}
             </a>
           </div>
         )}

@@ -542,7 +542,7 @@ export default function MyProfilePage() {
         toast.success(t('myProfile.toasts.photoRemoved'));
       } catch (error) {
         console.error("Error removing photo:", error);
-        toast.error(t('myProfile.toasts.errorRemovingPhoto'));
+        toast.error(t('proProfile.picture.removeError'));
       }
     }
   };
@@ -593,7 +593,7 @@ export default function MyProfilePage() {
     
     if (normalizedState === "en_prueba" || normalizedState === "trialing" || normalizedState === "trial_active") {
       return {
-        text: t('myProfile.subscription.trialPeriod'),
+        text: t('subscription.status.trial'),
         badge: "🟡",
         color: "bg-blue-100 text-blue-800 border border-blue-300",
         details: isActive ? t('myProfile.subscription.trialDaysLeft', { days: daysLeft }) : t('myProfile.subscription.trialEnded'),
@@ -617,7 +617,7 @@ export default function MyProfilePage() {
     
     if (normalizedState === "cancelado" || normalizedState === "canceled") {
       return {
-        text: isActive ? t('myProfile.subscription.cancelled') : t('myProfile.subscription.ended'),
+        text: isActive ? t('subscription.reactivate.title') : t('myProfile.subscription.ended'),
         badge: isActive ? "⚪" : "🔴",
         color: isActive 
           ? "bg-yellow-100 text-yellow-800 border border-yellow-300" 
@@ -731,7 +731,7 @@ export default function MyProfilePage() {
               style={{ background: '#00255C' }}
             >
               {updateProfileMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <Save className="w-3.5 h-3.5"/>}
-              <span className="hidden sm:inline">{t('myProfile.header.saveChanges')}</span>
+              <span className="hidden sm:inline">{t('proProfile.form.saveChanges')}</span>
             </button>
           </div>
         </div>
@@ -793,9 +793,7 @@ export default function MyProfilePage() {
             <div className="flex-1">
               <p className="font-bold text-gray-900 text-sm">{t('myProfile.photoBanner.title')}</p>
               <p className="text-xs text-gray-600 mt-0.5">
-                <Trans i18nKey="myProfile.photoBanner.body">
-                  Los perfiles con foto reciben <strong>3× más contactos</strong>. Sube una foto en la pestaña <strong>Trabajos</strong> para activarla.
-                </Trans>
+                <Trans i18nKey="myProfile.photoBanner.body" components={{ strong: <strong /> }} />
               </p>
             </div>
             <button
@@ -1063,7 +1061,7 @@ export default function MyProfilePage() {
                           </div>
                           {review.professional_response && (
                             <div className="mt-3 ml-4 bg-blue-50 border border-blue-100 rounded-lg p-3">
-                              <p className="text-xs font-semibold text-blue-700 mb-1">{t('myProfile.reviews.professionalResponse')}</p>
+                              <p className="text-xs font-semibold text-blue-700 mb-1">{t('reviews.card.professionalResponse')}</p>
                               <p className="text-sm text-gray-700">{review.professional_response}</p>
                             </div>
                           )}
@@ -1118,7 +1116,7 @@ export default function MyProfilePage() {
                           className="mt-1"
                         />
                         {isEditing && profileData.cif_nif && profileData.cif_nif.length > 0 && profileData.cif_nif.length < 8 && (
-                          <p className="text-xs text-amber-600 mt-1">{t('myProfile.business.minEightChars')}</p>
+                          <p className="text-xs text-amber-600 mt-1">{t('subscription.onboarding.password.minChars')}</p>
                         )}
                       </div>
                       <div>
@@ -1398,7 +1396,7 @@ export default function MyProfilePage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base md:text-lg flex items-center gap-2 text-gray-900 font-semibold">
                       <MapPin className="w-5 h-5 text-blue-700" />
-                      {t('myProfile.location.title')}
+                      {t('projects.jobs.form.location')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -1607,7 +1605,7 @@ export default function MyProfilePage() {
                         <div key={idx} className="relative group">
                           <img
                             src={photo}
-                            alt={t('onboarding.portfolio.photoAlt', { number: idx + 1 })}
+                            alt={t('proProfile.portfolio.photoAlt', { number: idx + 1 })}
                             className="w-full h-24 md:h-32 object-cover rounded-lg shadow-md"
                           />
                           {isEditing && (
@@ -1620,7 +1618,7 @@ export default function MyProfilePage() {
                           )}
                           {idx === 0 && (
                             <div className="absolute bottom-1 left-1 md:bottom-2 md:left-2 bg-blue-600 text-white text-xs px-2 py-0.5 md:py-1 rounded font-semibold">
-                              {t('onboarding.portfolio.main')}
+                              {t('proProfile.gallery.mainPhoto')}
                             </div>
                           )}
                         </div>
@@ -1656,7 +1654,7 @@ export default function MyProfilePage() {
                       <div>
                         <Label className="flex items-center gap-2 text-xs text-gray-600">
                           {profileData.social_links?.instagram ? <CheckCircle className="w-3 h-3 text-green-600" /> : <div className="w-3 h-3" />}
-                          {t('myProfile.social.instagram')}
+                          {t('proProfile.social.instagram')}
                         </Label>
                         <Input
                           value={profileData.social_links.instagram}
@@ -1673,7 +1671,7 @@ export default function MyProfilePage() {
                       <div>
                         <Label className="flex items-center gap-2 text-xs text-gray-600">
                           {profileData.social_links?.facebook ? <CheckCircle className="w-3 h-3 text-green-600" /> : <div className="w-3 h-3" />}
-                          {t('myProfile.social.facebook')}
+                          {t('proProfile.social.facebook')}
                         </Label>
                         <Input
                           value={profileData.social_links.facebook}
@@ -1690,7 +1688,7 @@ export default function MyProfilePage() {
                       <div>
                         <Label className="flex items-center gap-2 text-xs text-gray-600">
                           {profileData.social_links?.tiktok ? <CheckCircle className="w-3 h-3 text-green-600" /> : <div className="w-3 h-3" />}
-                          {t('myProfile.social.tiktok')}
+                          {t('proProfile.social.tiktok')}
                         </Label>
                         <Input
                           value={profileData.social_links.tiktok}
@@ -1759,7 +1757,7 @@ export default function MyProfilePage() {
             style={{ background: '#00255C' }}
           >
             {updateProfileMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
-            {t('myProfile.header.saveChanges')}
+            {t('proProfile.form.saveChanges')}
           </button>
         </div>
       </div>

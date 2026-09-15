@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +24,7 @@ import { createPageUrl } from '@/utils';
 import ReactMarkdown from 'react-markdown';
 
 export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', browsingContext = {}, initialProactiveMessage = null }) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState(initialQuery);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +35,9 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
   const [quickOptions, setQuickOptions] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Opción rápida: etiqueta visible + texto que se envía como mensaje del usuario.
+  const quick = (name) => ({ label: t(`assistant.chat.quick.${name}Label`), value: t(`assistant.chat.quick.${name}Value`) });
 
   // Cargar búsquedas guardadas
   useEffect(() => {
@@ -64,22 +69,22 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
     
     // Si viene de ver perfiles, sugerir guardarlo
     if (viewedProfiles?.length >= 2) {
-      return `¡Hola! 👋 Veo que has estado explorando profesionales. ¿Quieres que te ayude a:\n\n• Comparar los perfiles que has visto\n• Encontrar más opciones similares\n• Guardar tus criterios de búsqueda favoritos\n\n¿En qué puedo ayudarte?`;
+      return t('assistant.chat.welcomeProfiles');
     }
     
     // Si tiene búsquedas recientes
     if (searchHistory?.length > 0) {
       const lastSearch = searchHistory[searchHistory.length - 1];
-      return `¡Hola! 👋 Veo que buscaste "${lastSearch.query || lastSearch.category}". ¿Encontraste lo que necesitabas?\n\nPuedo ayudarte a:\n• Refinar la búsqueda\n• Encontrar más opciones\n• Guardar estos criterios para futuras búsquedas`;
+      return t('assistant.chat.welcomeSearch', { query: lastSearch.query || lastSearch.category });
     }
     
     // Si está en una categoría específica
     if (category) {
-      return `¡Hola! 👋 Veo que estás buscando servicios de ${category}. ¿Necesitas ayuda para:\n\n• Encontrar profesionales específicos\n• Comparar opciones\n• Saber qué preguntar a un profesional\n\n¿Cómo puedo ayudarte?`;
+      return t('assistant.chat.welcomeCategory', { category });
     }
     
     // Mensaje por defecto
-    return '¡Hola! 👋 Soy el asistente de MisAutónomos. Puedo ayudarte a:\n\n• Encontrar profesionales en tu zona\n• Responder preguntas sobre servicios\n• Guardar tus búsquedas favoritas\n\n¿Qué necesitas hoy?';
+    return t('assistant.chat.welcomeDefault');
   };
 
   const initializeConversation = async () => {
@@ -104,10 +109,10 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
       
       // Opciones rápidas iniciales
       setQuickOptions([
-        { label: '🔍 Buscar profesionales', value: 'Quiero buscar un profesional' },
-        { label: '💬 Comparar servicios', value: 'Ayúdame a comparar profesionales' },
-        { label: '❓ Tengo una duda', value: 'Tengo una pregunta sobre los servicios' },
-        { label: '⭐ Ver recomendados', value: 'Muéstrame los profesionales mejor valorados' }
+        quick('searchPros'),
+        quick('compare'),
+        quick('question'),
+        quick('topRated'),
       ]);
 
       // Si hay un mensaje proactivo pendiente, añadirlo
@@ -203,7 +208,7 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Lo siento, hubo un error procesando tu mensaje. ¿Puedes intentarlo de nuevo?'
+        content: t('assistant.chat.errorMessage')
       }]);
       setIsLoading(false);
     }
@@ -215,27 +220,27 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
     // Opciones basadas en contexto
     if (lowerQuery.includes('precio') || lowerQuery.includes('cuánto') || lowerQuery.includes('coste')) {
       setQuickOptions([
-        { label: '💰 Ver rango de precios', value: 'Muéstrame el rango de precios típico' },
-        { label: '📋 Solicitar presupuesto', value: 'Quiero solicitar un presupuesto' },
-        { label: '🔍 Ver más profesionales', value: 'Enséñame más opciones' }
+        quick('priceRange'),
+        quick('requestQuote'),
+        quick('morePros'),
       ]);
     } else if (lowerQuery.includes('urgente') || lowerQuery.includes('rápido') || lowerQuery.includes('emergencia')) {
       setQuickOptions([
-        { label: '⚡ Disponibles hoy', value: 'Muéstrame profesionales disponibles hoy' },
-        { label: '📞 Con teléfono', value: 'Quiero contactar por teléfono' },
-        { label: '💬 Enviar mensaje', value: 'Prefiero enviar un mensaje' }
+        quick('availableToday'),
+        quick('withPhone'),
+        quick('sendMessage'),
       ]);
     } else if (suggestedProfessionals.length > 0) {
       setQuickOptions([
-        { label: '👀 Ver más detalles', value: 'Dime más sobre estos profesionales' },
-        { label: '📍 Cambiar ubicación', value: 'Buscar en otra zona' },
-        { label: '⭐ Mejor valorados', value: 'Muéstrame solo los mejor valorados' }
+        quick('moreDetails'),
+        quick('changeLocation'),
+        quick('bestRated'),
       ]);
     } else {
       setQuickOptions([
-        { label: '🔍 Buscar otra cosa', value: 'Buscar otro tipo de servicio' },
-        { label: '❓ Hacer pregunta', value: 'Tengo otra pregunta' },
-        { label: '📞 Soporte', value: 'Necesito ayuda con algo más' }
+        quick('searchOther'),
+        quick('askQuestion'),
+        quick('support'),
       ]);
     }
   };
@@ -326,7 +331,7 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
-                <CardTitle className="text-base">Asistente IA</CardTitle>
+                <CardTitle className="text-base">{t('assistant.chat.title')}</CardTitle>
                 <p className="text-xs text-blue-100">MisAutónomos</p>
               </div>
             </div>
@@ -401,20 +406,20 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
             {suggestedProfessionals.length > 0 && (
               <div className="space-y-2 pt-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500 font-medium">Profesionales recomendados:</p>
+                  <p className="text-xs text-gray-500 font-medium">{t('assistant.chat.recommended')}</p>
                   {!showSavePrompt && (
                     <button 
                       onClick={() => setShowSavePrompt(true)}
                       className="text-xs text-blue-600 hover:text-blue-800 font-medium"
                     >
-                      Guardar búsqueda
+                      {t('assistant.chat.saveSearch')}
                     </button>
                   )}
                 </div>
                 
                 {showSavePrompt && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-                    <p className="text-xs text-blue-800 mb-2">¿Guardar estos criterios de búsqueda?</p>
+                    <p className="text-xs text-blue-800 mb-2">{t('assistant.chat.saveSearchPrompt')}</p>
                     <div className="flex gap-2">
                       <Button 
                         size="sm" 
@@ -425,7 +430,7 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
                           professionals: suggestedProfessionals.map(p => p.id)
                         })}
                       >
-                        Sí, guardar
+                        {t('assistant.chat.saveYes')}
                       </Button>
                       <Button 
                         size="sm" 
@@ -433,7 +438,7 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
                         className="h-7 text-xs"
                         onClick={() => setShowSavePrompt(false)}
                       >
-                        No, gracias
+                        {t('assistant.chat.saveNo')}
                       </Button>
                     </div>
                   </div>
@@ -480,18 +485,18 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
             {/* Búsquedas guardadas */}
             {savedSearches.length > 0 && messages.length <= 1 && (
               <div className="space-y-2 pt-2">
-                <p className="text-xs text-gray-500 font-medium">Tus búsquedas guardadas:</p>
+                <p className="text-xs text-gray-500 font-medium">{t('assistant.chat.savedSearches')}</p>
                 {savedSearches.slice(-3).map((search) => (
                   <button
                     key={search.id}
                     onClick={() => {
-                      const query = search.query || search.category || 'profesionales';
-                      setInputValue(`Buscar ${query}`);
+                      const query = search.query || search.category || t('assistant.chat.professionalsFallback');
+                      setInputValue(t('assistant.chat.searchPrefix', { query }));
                     }}
                     className="w-full text-left bg-gray-50 hover:bg-gray-100 border rounded-lg p-2 text-xs transition-colors"
                   >
                     <span className="font-medium text-gray-700">
-                      {search.query || search.category || 'Búsqueda guardada'}
+                      {search.query || search.category || t('assistant.chat.savedSearchFallback')}
                     </span>
                     <span className="text-gray-400 ml-2">
                       {new Date(search.savedAt).toLocaleDateString('es-ES')}
@@ -504,7 +509,7 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
             {/* Opciones rápidas clicables */}
             {quickOptions.length > 0 && !isLoading && (
               <div className="space-y-2 pt-2">
-                <p className="text-xs text-gray-500 font-medium">Sugerencias rápidas:</p>
+                <p className="text-xs text-gray-500 font-medium">{t('assistant.chat.quickSuggestions')}</p>
                 <div className="flex flex-wrap gap-2">
                   {quickOptions.map((option, idx) => (
                     <button
@@ -530,7 +535,7 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Escribe tu mensaje..."
+              placeholder={t('assistant.chat.inputPlaceholder')}
               className="flex-1 h-11 text-base"
               disabled={isLoading}
             />
@@ -547,7 +552,7 @@ export default function AIAssistantChat({ isOpen, onClose, initialQuery = '', br
             </Button>
           </div>
           <p className="text-xs text-gray-400 text-center mt-2 hidden md:block">
-            Powered by AI • MisAutónomos
+            {t('assistant.chat.poweredBy')}
           </p>
         </div>
       </Card>

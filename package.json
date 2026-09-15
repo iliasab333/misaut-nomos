@@ -12,6 +12,8 @@
     "check:hooks": "node scripts/check-hook-order.mjs $(find src -name '*.jsx' -o -name '*.js' -o -name '*.tsx')",
     "i18n:inventory": "node scripts/i18n-inventory.mjs",
     "i18n:merge": "node scripts/i18n-merge.mjs",
+    "i18n:split": "node scripts/i18n-split.mjs",
+    "i18n:orphans": "node scripts/i18n-orphans.mjs",
     "lint": "eslint .",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview",
