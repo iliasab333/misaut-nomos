@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/api/supabaseClient';
 import SEOHead from '@/components/seo/SEOHead';
-import InboxTabs from '@/components/messages/InboxTabs';
 
 const NAVY = '#00255C';
 const NAVY_SOFT = 'rgba(0,37,92,0.06)';
@@ -244,7 +243,6 @@ export default function Soporte() {
       <SEOHead title={t('support.page.seoTitle')} noindex />
       <main className="min-h-screen bg-white">
         <div className="max-w-3xl mx-auto px-4 md:px-6 py-6 md:py-10">
-          <InboxTabs user={user} unreadChats={0} />
 
           <div className="flex items-end justify-between gap-3 mb-5">
             <div>

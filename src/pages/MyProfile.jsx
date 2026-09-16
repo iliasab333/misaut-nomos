@@ -36,11 +36,9 @@ import { toast } from "sonner";
 import ProfilePictureUpload from "../components/profile/ProfilePictureUpload";
 import ProfileCompleteness from "../components/profile/ProfileCompleteness";
 import { useTranslation, Trans } from "react-i18next";
-import InvoicingSettingsForm from "../components/invoicing/InvoicingSettingsForm";
 import SkillsSection from "../components/profile/SkillsSection";
 import PortfolioSection from "../components/profile/PortfolioSection";
 import FAQSection from "../components/profile/FAQSection";
-import AIAssistantPro from "../components/ai/AIAssistantPro";
 import ServicesSection from "../components/profile/ServicesSection";
 import AvailabilityCalendar from "../components/profile/AvailabilityCalendar";
 import IdentityVerificationWidget from "../components/verification/IdentityVerificationWidget";
@@ -229,15 +227,6 @@ export default function MyProfilePage() {
       return cats.filter(c => c.name).sort((a, b) => a.name.localeCompare(b.name, 'es'));
     },
     staleTime: 1000 * 60 * 30,
-  });
-
-  const { data: invoicingSettings } = useQuery({
-    queryKey: ['invoicingSettings', user?.id],
-    queryFn: async () => {
-      const settings = await base44.entities.InvoicingSettings.filter({ professional_id: user.id });
-      return settings[0] || null;
-    },
-    enabled: !!user && !!profile,
   });
 
   const { data: myReviewsAsClient = [] } = useQuery({
@@ -448,23 +437,6 @@ export default function MyProfilePage() {
     onSuccess: (_, visible) => {
       queryClient.invalidateQueries({ queryKey: ['myProfile'] });
       toast.success(visible ? t('myProfile.toasts.profileNowVisible') : t('myProfile.toasts.profileNowHidden'));
-    },
-  });
-
-  const saveInvoicingSettingsMutation = useMutation({
-    mutationFn: async (data) => {
-      if (invoicingSettings) {
-        return await base44.entities.InvoicingSettings.update(invoicingSettings.id, data);
-      } else {
-        return await base44.entities.InvoicingSettings.create({
-          ...data,
-          professional_id: user.id
-        });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['invoicingSettings']);
-      toast.success(t('myProfile.toasts.invoicingSettingsSaved'));
     },
   });
 
@@ -824,7 +796,6 @@ export default function MyProfilePage() {
               { value: 'portfolio', icon: Camera, label: t('tabPortfolio') },
               { value: 'availability', icon: Clock, label: t('tabAvailability') },
               { value: 'faq', icon: BarChart3, label: t('tabFAQ') },
-              { value: 'invoicing', icon: Euro, label: t('tabInvoicing') },
             ] : [])
           ];
           return (
@@ -1370,21 +1341,6 @@ export default function MyProfilePage() {
                           />
                           <p className="text-xs text-gray-500 mt-1">{profileData.descripcion_corta.length}/220</p>
                           
-                          {isEditing && (
-                            <div className="mt-3">
-                              <AIAssistantPro
-                                type="description"
-                                context={{
-                                  category: profileData.categories[0] || "Servicio profesional",
-                                  experience: profileData.years_experience || "varios",
-                                  location: profileData.ciudad || profileData.provincia || "tu zona"
-                                }}
-                                onApply={(suggestion) => {
-                                  setProfileData({ ...profileData, descripcion_corta: suggestion.slice(0, 220) });
-                                }}
-                              />
-                            </div>
-                          )}
                         </>
                       )}
                     </div>
@@ -1396,7 +1352,7 @@ export default function MyProfilePage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base md:text-lg flex items-center gap-2 text-gray-900 font-semibold">
                       <MapPin className="w-5 h-5 text-blue-700" />
-                      {t('projects.jobs.form.location')}
+                      {t('common.location')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -1468,20 +1424,6 @@ export default function MyProfilePage() {
                         className="mt-1"
                       />
                       
-                      {isEditing && (
-                        <div className="mt-3">
-                          <AIAssistantPro
-                            type="pricing"
-                            context={{
-                              service: profileData.activity_other || profileData.categories[0] || "Servicio profesional",
-                              category: profileData.categories[0] || "Servicio profesional",
-                              location: profileData.ciudad || profileData.provincia || "España",
-                              experience: profileData.years_experience || "media"
-                            }}
-                            onApply={() => {}}
-                          />
-                        </div>
-                      )}
                     </div>
 
                     <div>
@@ -1733,15 +1675,6 @@ export default function MyProfilePage() {
             </TabsContent>
           )}
 
-          {/* ==================== TAB: INVOICING ==================== */}
-          {isProfessional && (
-            <TabsContent value="invoicing">
-              <InvoicingSettingsForm
-                settings={invoicingSettings}
-                onSave={(data) => saveInvoicingSettingsMutation.mutate(data)}
-              />
-            </TabsContent>
-          )}
                 </Tabs>
               </div>
             </div>

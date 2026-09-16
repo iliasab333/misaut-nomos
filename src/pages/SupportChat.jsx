@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Send, Headphones, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import InboxTabs from "@/components/messages/InboxTabs";
 
 export default function SupportChat() {
   const navigate = useNavigate();
@@ -105,7 +104,6 @@ export default function SupportChat() {
     <div className="flex flex-col h-[calc(100dvh-56px)] md:h-[calc(100vh-56px)] bg-white">
       {/* Tabs Mensajes / Soporte */}
       <div className="px-4 pt-3 bg-white border-b border-gray-100">
-        <InboxTabs user={user} unreadChats={0} />
       </div>
       {/* Header */}
       <div className="border-b border-gray-100 px-4 py-3 flex items-center gap-3 bg-white sticky top-0">

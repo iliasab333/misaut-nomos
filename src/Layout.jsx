@@ -101,7 +101,7 @@ if (typeof window !== 'undefined') {
 }
 
 // Sidebar optimizado con memo
-const SidebarContentComponent = React.memo(function SidebarContentComponent({ navigationItems, location, user, isProfessional, isAdmin, isClient, unreadCount, language, onChangeLanguage, onLogout }) {
+const SidebarContentComponent = React.memo(function SidebarContentComponent({ navigationItems, location, user, isProfessional, isAdmin, isClient, language, onChangeLanguage, onLogout }) {
   const { t } = useTranslation();
   return (
     <Sidebar className="border-r border-gray-200 bg-white shadow-sm hidden lg:flex">
@@ -225,7 +225,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
   const [user, setUser] = useState(null);
   const [userPlan, setUserPlan] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [professionalProfile, setProfessionalProfile] = useState(undefined);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
@@ -358,17 +357,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       '/dashboard',
       '/mi-perfil',
       '/perfil',
-      '/visibilidad',
-      '/mis-clientes',
-      '/clientes',
-      '/automatizaciones',
-      '/calendario',
-      '/proyectos',
-      '/facturas',
-      '/presupuestos',
-      '/mi-campana',
-      '/plan-ads',
-      '/trabajos',
     ];
     const needsProfile = PRO_PRIVATE_PREFIXES.some((p) => location.pathname.startsWith(p));
     if (!needsProfile) return;
@@ -521,56 +509,10 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
     }
   }, [location.pathname]);
 
-  const loadUnreadCount = React.useCallback(async () => {
-    if (!user?.id) return;
-
-    try {
-      const messages = await base44.entities.Message.filter({
-        recipient_id: user.id,
-        is_read: false
-      });
-      const count = messages.length;
-      setUnreadCount(count);
-      // Cache reducido a 1 minuto para actualizaciones más frecuentes
-      sessionStorage.setItem('unread_count', JSON.stringify({
-        count,
-        timestamp: Date.now()
-      }));
-    } catch (error) {
-      setUnreadCount(0);
-    }
-  }, [user?.id]);
-
   // Cargar usuario solo una vez al montar
   useEffect(() => {
     loadUser();
   }, [loadUser]);
-
-  // Cargar mensajes no leídos al iniciar y cada 30 segundos
-  useEffect(() => {
-    if (!user) return;
-    loadUnreadCount();
-    const interval = setInterval(loadUnreadCount, 30000);
-    return () => clearInterval(interval);
-  }, [user, loadUnreadCount]);
-
-  // Refrescar badge cuando Messages.jsx marca mensajes como leídos
-  useEffect(() => {
-    const handler = () => loadUnreadCount();
-    window.addEventListener('messages:read', handler);
-    return () => window.removeEventListener('messages:read', handler);
-  }, [loadUnreadCount]);
-
-  // Suscribirse a cambios en tiempo real
-  useEffect(() => {
-    if (!user) return;
-    const unsubscribe = base44.entities.Message.subscribe((event) => {
-      if (event.type === 'create' && event.data?.recipient_id === user.id && !event.data?.is_read) {
-        setUnreadCount(prev => prev + 1);
-      }
-    });
-    return unsubscribe;
-  }, [user]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -588,10 +530,8 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
 
   const handleLogout = () => {
     sessionStorage.removeItem('current_user');
-    sessionStorage.removeItem('unread_count');
     setUser(null);
     setUserPlan(null);
-    setUnreadCount(0);
     setProfessionalProfile(null);
     onesignalLogout();
     base44.auth.logout(createPageUrl("Search"));
@@ -648,26 +588,22 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
     }
     
     if (isProfessional) {
-      // Menú compacto: solo lo que está construido y funcional. Pagos, invita y
-      // gana, facturas, presupuestos, proyectos, clientes/CRM, time-logs y
-      // visibilidad quedan fuera del menú (las páginas siguen existiendo).
+      // Menú del profesional. Es el alcance de khdemlidaba: su ficha, sus
+      // mensajes, sus valoraciones y soporte. La suite de gestión (CRM,
+      // facturación, proyectos, campañas, estadísticas) se retiró: 47
+      // ficheros y 19.616 líneas con cero filas en la base de datos — nadie
+      // creó nunca una factura, un cliente ni un presupuesto.
       return [
         { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), icon: Home },
         { title: t('nav.myProfile'), url: createPageUrl("MyProfile"), icon: User },
-        { title: t('nav.statistics'), url: '/mis-estadisticas', icon: BarChart3, prefetch: () => import('./pages/MisEstadisticas') },
         { title: t('nav.reviews'), url: '/mis-valoraciones', icon: Star, prefetch: () => import('./pages/MisValoraciones') },
-        { title: t('nav.messages'), url: createPageUrl("Messages"), icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
-        userPlan === 'plan_adsplus'
-          ? { title: t('nav.myCampaign'), url: '/mi-campana', icon: Megaphone, badge: null, prefetch: () => import('./pages/MiCampana') }
-          : null,
         { title: t('nav.support'), url: "/soporte", icon: Headphones, prefetch: () => import('./pages/Soporte') },
-      ].filter(Boolean);
+      ];
     }
     
     if (isClient) {
       return [
         { title: t('nav.search_professionals'), url: createPageUrl("Search"), icon: Search },
-        { title: t('nav.messages'), url: createPageUrl("Messages"), icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
         { title: t('nav.favorites'), url: createPageUrl("Favorites"), icon: Heart },
         { title: t('nav.my_profile'), url: createPageUrl("MyProfile"), icon: User },
         { title: t('nav.view_plans'), url: createPageUrl("PricingPlans"), icon: CreditCard },
@@ -677,7 +613,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
     }
     
     return [];
-  }, [isProfessional, isClient, isAdmin, userPlan, unreadCount, t]);
+  }, [isProfessional, isClient, isAdmin, userPlan, t]);
 
   // CAMBIO: bloque <style> eliminado — todas estas reglas ya existen en globals.css.
   // Eliminar el inline style evita: CSS duplicado, conflictos de especificidad y ~20KB extra en el bundle.
@@ -693,7 +629,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                 isProfessional={isProfessional}
                 isAdmin={isAdmin}
                 isClient={isClient}
-                unreadCount={unreadCount}
                 language={language}
                 onChangeLanguage={changeLanguage}
                 onLogout={handleLogout}
@@ -927,8 +862,8 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
               {/* Show back button on child screens, hamburger on root nav tabs */}
               {(() => {
                 const rootPaths = [
-                  '/buscar', '/mensajes', '/favoritos', '/mi-perfil',
-                  '/dashboard', '/mis-clientes', '/presupuestos', '/',
+                  '/buscar', '/favoritos', '/mi-perfil',
+                  '/dashboard', '/',
                 ];
                 const isChildScreen = user && !rootPaths.some(p => location.pathname === p || location.pathname === p + '/');
                 return isChildScreen ? (
@@ -1082,13 +1017,10 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                   <>
                     {(isProfessional ? [
                       { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), root: createPageUrl("ProfessionalDashboard"), icon: Home },
-                      { title: t('nav.chats'), url: createPageUrl("Messages"), root: '/mensajes', icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
-                      { title: t('nav.clients'), url: "/mis-clientes", root: '/mis-clientes', icon: Users },
-                      { title: t('nav.quotes'), url: "/presupuestos", root: '/presupuestos', icon: FileText },
+                      { title: t('nav.reviews'), url: '/mis-valoraciones', root: '/mis-valoraciones', icon: Star },
                       { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: User },
                     ] : [
                       { title: t('common.search'), url: createPageUrl("Search"), root: '/buscar', icon: SearchIcon },
-                      { title: t('nav.chats'), url: createPageUrl("Messages"), root: '/mensajes', icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
                       { title: t('nav.saved'), url: createPageUrl("Favorites"), root: createPageUrl("Favorites"), icon: Heart },
                       { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: User },
                     ]).map((item) => (

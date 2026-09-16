@@ -59,7 +59,7 @@ import { generateSlug } from "../utils/slugUtils";
 import { getProfileSeoUrl } from '@/lib/seoUrl';
 import { optimizeSupabaseImage } from '@/lib/supabaseImage';
 import { trackMetric, trackSearchAppearance } from '@/lib/trackMetric';
-import GuestContactModal from "@/components/messages/GuestContactModal";
+import GuestContactModal from "@/components/GuestContactModal";
 import InitialsAvatar from "@/components/ui/InitialsAvatar";
 
 const useDebounce = (value, delay) => {
@@ -88,53 +88,19 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [guestModal, setGuestModal] = useState(false);
 
-  // Botón "Contactar":
-  //   - Si hay sesión Supabase activa → abre/crea conversación y entra al chat.
-  //     NUNCA redirige a /login con sesión activa.
-  //   - Si no hay sesión → abre modal invitado que llama a contact-professional.
-  const handleContactDirect = async (e) => {
+  // Botón "Contactar": abre el formulario que envía un EMAIL al profesional
+  // (Edge Function `contact-professional`), tenga o no cuenta quien escribe.
+  //
+  // Antes esto creaba una conversación en la tabla `messages` y entraba al
+  // chat interno. Ese chat se retiró —10 mensajes en toda la vida de la web,
+  // el último hace un mes— y con él la asimetría que tenía: el visitante sin
+  // cuenta mandaba un correo y el registrado abría un hilo que el profesional
+  // sólo veía si entraba a mirar. Ahora los dos caminos son el mismo, y el
+  // profesional se entera en su bandeja de correo de siempre.
+  const handleContactDirect = (e) => {
     e.stopPropagation();
     trackMetric(profile.id, 'contact_click');
-
-    // 1) ¿Sesión Supabase activa?
-    const { resolveSelfUserRow } = await import('@/lib/contactProfessional');
-    const { session, userRow } = await resolveSelfUserRow();
-
-    // 2) Sin sesión → invitado.
-    if (!session) {
-      setGuestModal(true);
-      return;
-    }
-
-    // 3) Con sesión: resolvemos mi id de tabla `users` por auth_user_id.
-    //    Si por alguna razón no aparece todavía, dejamos que createMessage
-    //    use el id del callback de auth como fallback (lo veremos en logs).
-    const myUserRowId = userRow?.id || currentUserId || null;
-    if (!myUserRowId || !profile.user_id) {
-      // Edge case raro: tenemos sesión pero no encontramos fila users.
-      // Mejor caer en el modal de invitado (con datos prefill del session.user.email).
-      setGuestModal(true);
-      return;
-    }
-
-    const conversationId = [myUserRowId, profile.user_id].sort().join('_');
-    try {
-      const existing = await base44.entities.Message.filter({ conversation_id: conversationId }, '-created_date', 1);
-      if (!existing || existing.length === 0) {
-        const { createMessage } = await import('@/lib/createMessage');
-        await createMessage({
-          conversation_id: conversationId,
-          sender_id: myUserRowId,
-          recipient_id: profile.user_id,
-          content: 'Hola, me interesa tu servicio. ¿Podemos hablar?',
-          professional_name: profile.business_name || 'Profesional',
-          client_name: currentUser?.full_name || currentUser?.email || session.user.email || '',
-          is_read: false,
-          attachments: [],
-        });
-      }
-    } catch (_e) { /* no bloqueante */ }
-    navigate(`/messages?conv=${conversationId}`);
+    setGuestModal(true);
   };
 
   const formatPhoneForWhatsApp = (phone) => {

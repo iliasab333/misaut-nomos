@@ -131,40 +131,23 @@ class ErrorBoundary extends Component {
 
 // Lazy load de páginas pesadas (admin, invoicing, CRM)
 const AdminDashboard = lazyApp(() => import('./pages/AdminDashboard'));
-const AdminPayments = lazyApp(() => import('./pages/AdminPayments'));
 const AdminTickets = lazyApp(() => import('./pages/AdminTickets'));
 const AdminFAQ = lazyApp(() => import('./pages/AdminFAQ'));
-const AdminMessagesStats = lazyApp(() => import('./pages/AdminMessagesStats'));
 const AdminSupport = lazyApp(() => import('./pages/AdminSupport'));
 const AdminNewsletter = lazyApp(() => import('./pages/AdminNewsletter'));
-const AdminReferrals = lazyApp(() => import('./pages/AdminReferrals'));
-const AdminGifts = lazyApp(() => import('./pages/AdminGifts'));
 const AdminEmails = lazyApp(() => import('./pages/AdminEmails'));
 const AdminUsuarios = lazyApp(() => import('./pages/AdminUsuarios'));
 const AdminOutreachWhatsApp = lazyApp(() => import('./pages/AdminOutreachWhatsApp'));
 const AdminSoporte = lazyApp(() => import('./pages/AdminSoporte'));
 const BajaNewsletter = lazyWithRetry(() => import('./pages/BajaNewsletter'));
 const EmailUnsubscribe = lazyWithRetry(() => import('./pages/EmailUnsubscribe'));
-const SEOAnalysis = lazyApp(() => import('./pages/SEOAnalysis'));
 const BlogList = lazyWithRetry(() => import('./pages/BlogList'));
 const BlogPost = lazyWithRetry(() => import('./pages/BlogPost'));
 const AdminBlog = lazyApp(() => import('./pages/AdminBlog'));
-const Invoices = lazyApp(() => import('./pages/Invoices'));
-const MisClientes = lazyApp(() => import('./pages/MisClientes'));
-const CRMAutomations = lazyApp(() => import('./pages/CRMAutomations'));
-const Projects = lazyApp(() => import('./pages/Projects'));
-const ProjectDetail = lazyApp(() => import('./pages/ProjectDetail'));
-const Calendar = lazyApp(() => import('./pages/Calendar'));
-const Jobs = lazyApp(() => import('./pages/Jobs'));
 const SupportChat = lazyApp(() => import('./pages/SupportChat.jsx'));
 const Soporte = lazyApp(() => import('./pages/Soporte'));
 const SoporteTicket = lazyApp(() => import('./pages/SoporteTicket'));
-const MiCampana = lazyApp(() => import('./pages/MiCampana'));
-const BriefingMensual = lazyApp(() => import('./pages/BriefingMensual'));
-const PlanAds = lazyApp(() => import('./pages/PlanAds'));
-const AcceptQuote = lazyApp(() => import('./pages/AcceptQuote'));
 const LeaveReview = lazyWithRetry(() => import('./pages/LeaveReview'));
-const MisEstadisticas = lazyApp(() => import('./pages/MisEstadisticas'));
 const MisValoraciones = lazyWithRetry(() => import('./pages/MisValoraciones'));
 const Login = lazyWithRetry(() => import('./pages/Login'));
 const ParaAutonomos = lazyWithRetry(() => import('./pages/ParaAutonomos'));
@@ -199,7 +182,6 @@ const LEGACY_REDIRECTS = {
   '/termsconditions': '/terminos',
   '/cookiepolicy': '/cookies',
   '/legalnotice': '/aviso-legal',
-  '/messages': '/mensajes',
   '/favorites': '/favoritos',
   '/myprofile': '/mi-perfil',
   '/tickets': '/soporte',
@@ -238,15 +220,12 @@ const EXPLICIT_301s = {
   '/Autonomo': '/buscar',
   '/autonomo': '/buscar',
   '/Search': '/buscar',
-  '/Messages': '/mensajes',
   '/Favorites': '/favoritos',
   '/Notifications': '/notificaciones',
   '/PricingPlans': '/precios',
   '/MyProfile': '/mi-perfil',
   '/Tickets': '/soporte',
   '/TicketDetail': '/soporte',
-  '/Invoices': '/facturas',
-  '/Jobs': '/trabajos',
   '/FAQ': '/preguntas-frecuentes',
   '/LegalNotice': '/aviso-legal',
   '/PaymentSuccess': '/pago-exitoso',
@@ -338,63 +317,37 @@ const AuthenticatedApp = () => {
           <Route path="/aviso-legal" element={<Pages.LegalNotice />} />
 
           {/* ===== RUTAS DE CLIENTE ===== */}
-          <Route path="/mensajes" element={<Pages.Messages />} />
           <Route path="/favoritos" element={<Pages.Favorites />} />
           <Route path="/mi-perfil" element={<Pages.MyProfile />} />
           <Route path="/soporte" element={<Suspense fallback={<PageLoader />}><Soporte /></Suspense>} />
           <Route path="/soporte/:id" element={<Suspense fallback={<PageLoader />}><SoporteTicket /></Suspense>} />
-          <Route path="/presupuestos" element={<Pages.Presupuestos />} />
-          <Route path="/presupuesto/:quoteId" element={<Suspense fallback={<PageLoader />}><AcceptQuote /></Suspense>} />
           <Route path="/valorar/:token" element={<Suspense fallback={<PageLoader />}><LeaveReview /></Suspense>} />
-          <Route path="/pedir-presupuesto" element={<Pages.RequestQuote />} />
-          <Route path="/solicitudes" element={<Pages.QuoteRequests />} />
           <Route path="/notificaciones" element={<Pages.Notifications />} />
 
           {/* ===== RUTAS DE AUTÓNOMO ===== */}
           {/* Importante: /dashboard/info va ANTES que /dashboard para que matchee primero */}
           <Route path="/dashboard/info" element={<Pages.DashboardProInfo />} />
           <Route path="/dashboard" element={<Pages.ProfessionalDashboard />} />
-          <Route path="/mis-estadisticas" element={<Suspense fallback={<PageLoader />}><MisEstadisticas /></Suspense>} />
           <Route path="/mis-valoraciones" element={<Suspense fallback={<PageLoader />}><MisValoraciones /></Suspense>} />
-          <Route path="/mis-clientes" element={<Suspense fallback={<PageLoader />}><MisClientes /></Suspense>} />
-          <Route path="/visibilidad" element={<Pages.MiVisibilidad />} />
           <Route path="/perfil" element={<Pages.ProfessionalProfile />} />
           <Route path="/perfil/:slug" element={<Pages.ProfessionalProfile />} />
           <Route path="/completar-perfil" element={<Pages.ProfileOnboarding />} />
-          <Route path="/proyectos" element={<Suspense fallback={<PageLoader />}><Projects /></Suspense>} />
-          <Route path="/proyectos/:id" element={<Suspense fallback={<PageLoader />}><ProjectDetail /></Suspense>} />
-          <Route path="/calendario" element={<Suspense fallback={<PageLoader />}><Calendar /></Suspense>} />
-          <Route path="/facturas" element={<Suspense fallback={<PageLoader />}><Invoices /></Suspense>} />
-          <Route path="/pagar" element={<Pages.PayInvoice />} />
-          <Route path="/pagar/:id" element={<Pages.PayInvoice />} />
           {/* /clientes/:id ANTES que /clientes para que matchee primero */}
-          <Route path="/clientes/:id" element={<Pages.ClientDetail />} />
-          <Route path="/clientes" element={<Suspense fallback={<PageLoader />}><MisClientes /></Suspense>} />
-          <Route path="/automatizaciones" element={<Suspense fallback={<PageLoader />}><CRMAutomations /></Suspense>} />
-          <Route path="/trabajos" element={<Suspense fallback={<PageLoader />}><Jobs /></Suspense>} />
           <Route path="/suscripcion" element={<Pages.SubscriptionManagement />} />
           <Route path="/pago-exitoso" element={<Pages.PaymentSuccess />} />
           <Route path="/bienvenida" element={<Pages.Onboarding />} />
           
           {/* ===== RUTAS PLAN ADS+ ===== */}
-          <Route path="/mi-campana" element={<Suspense fallback={<PageLoader />}><MiCampana /></Suspense>} />
-          <Route path="/mi-campana/briefing" element={<Suspense fallback={<PageLoader />}><BriefingMensual /></Suspense>} />
-          <Route path="/plan-ads" element={<Suspense fallback={<PageLoader />}><PlanAds /></Suspense>} />
 
           {/* ===== RUTAS ADMIN ===== */}
           {/* Subrutas admin ANTES que /admin para matchear primero */}
-          <Route path="/admin/pagos" element={<Suspense fallback={<PageLoader />}><AdminPayments /></Suspense>} />
           <Route path="/admin/tickets" element={<Suspense fallback={<PageLoader />}><AdminTickets /></Suspense>} />
           <Route path="/admin/soporte" element={<Suspense fallback={<PageLoader />}><AdminSoporte /></Suspense>} />
           <Route path="/admin/faq" element={<Suspense fallback={<PageLoader />}><AdminFAQ /></Suspense>} />
-          <Route path="/admin/mensajes" element={<Suspense fallback={<PageLoader />}><AdminMessagesStats /></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
           <Route path="/admin/usuarios" element={<Suspense fallback={<PageLoader />}><AdminUsuarios /></Suspense>} />
-          <Route path="/admin/seo" element={<Suspense fallback={<PageLoader />}><SEOAnalysis /></Suspense>} />
           <Route path="/admin/blog" element={<Suspense fallback={<PageLoader />}><AdminBlog /></Suspense>} />
           <Route path="/admin/newsletter" element={<Suspense fallback={<PageLoader />}><AdminNewsletter /></Suspense>} />
-          <Route path="/admin/referidos" element={<Suspense fallback={<PageLoader />}><AdminReferrals /></Suspense>} />
-          <Route path="/admin/regalos" element={<Suspense fallback={<PageLoader />}><AdminGifts /></Suspense>} />
           <Route path="/admin/emails" element={<Suspense fallback={<PageLoader />}><AdminEmails /></Suspense>} />
           <Route path="/admin/outreach-whatsapp" element={<Suspense fallback={<PageLoader />}><AdminOutreachWhatsApp /></Suspense>} />
           <Route path="/newsletter/unsubscribe" element={<Suspense fallback={<PageLoader />}><EmailUnsubscribe /></Suspense>} />
@@ -406,8 +359,6 @@ const AuthenticatedApp = () => {
           <Route path="/blog/:slug" element={<Suspense fallback={<PageLoader />}><BlogPost /></Suspense>} />
 
           {/* ===== REFERIDOS ===== */}
-          <Route path="/r/:code" element={<Pages.ReferralRedirect />} />
-          <Route path="/referidos" element={<Pages.Referrals />} />
 
           {/* ===== REDIRECTS desde URLs ANTIGUAS (PascalCase → español) ===== */}
           {/* El componente LegacyRedirect detecta la URL vieja y redirige con <Navigate replace>. */}

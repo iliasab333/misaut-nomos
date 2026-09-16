@@ -17,6 +17,7 @@ import SEOHead from "../components/seo/SEOHead";
 import { LocalBusinessSchema } from "../components/seo/StructuredData";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import GuestContactModal from "@/components/GuestContactModal";
 
 const cleanPhone = (phone) => {
   if (!phone) return "";
@@ -49,6 +50,7 @@ export default function ProfessionalProfilePage() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [guestModal, setGuestModal] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -106,22 +108,20 @@ export default function ProfessionalProfilePage() {
     } catch {}
   };
 
-  const handleStartChat = async () => {
-    if (!user) { base44.auth.redirectToLogin(); return; }
+  // El mensaje va por EMAIL, no por una bandeja interna.
+  //
+  // Antes esto creaba una fila en `messages` y navegaba a /mensajes. Ese chat
+  // se retiró: 10 mensajes en toda la vida de la web, el último hace un mes, y
+  // khdemlidaba —la referencia de esta refonte— nunca lo tuvo: allí se
+  // contacta por WhatsApp, por teléfono o por el formulario.
+  //
+  // El botón sigue donde estaba y sigue diciendo lo mismo; lo que cambia es
+  // que el profesional recibe un correo (Edge Function `contact-professional`)
+  // en vez de una notificación que tenía que ir a buscar. No hace falta tener
+  // cuenta para escribir, que era la fricción de antes.
+  const handleStartChat = () => {
     trackContactClick();
-    const conversationId = [user.id, professionalId].sort().join("_");
-    const existing = await base44.entities.Message.filter({ conversation_id: conversationId });
-    if (existing.length === 0) {
-      await base44.entities.Message.create({
-        conversation_id: conversationId, sender_id: user.id, recipient_id: professionalId,
-        content: t("proProfile.contact.defaultChatMessage"),
-        professional_name: profile?.business_name, client_name: user.full_name || user.email, is_read: false,
-      });
-      const today = new Date().toISOString().split("T")[0];
-      const m = await base44.entities.ProfileMetrics.filter({ professional_id: professionalId, date: today });
-      if (m.length > 0) await base44.entities.ProfileMetrics.update(m[0].id, { messages_received: (m[0].messages_received || 0) + 1 });
-    }
-    navigate(createPageUrl("Messages") + `?conversation=${conversationId}&professional=${professionalId}`);
+    setGuestModal(true);
   };
 
   const handleShare = () => {
@@ -604,6 +604,13 @@ export default function ProfessionalProfilePage() {
           )}
           <img src={selectedImage} alt={t("proProfile.gallery.enlargedAlt")} className="max-w-full max-h-full object-contain rounded-xl" onClick={(e) => e.stopPropagation()} />
         </div>
+      )}
+
+      {guestModal && (
+        <GuestContactModal
+          professional={profile}
+          onClose={() => setGuestModal(false)}
+        />
       )}
     </>
   );

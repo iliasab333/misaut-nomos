@@ -99,8 +99,10 @@ export default function NotificationCenter({ user }) {
       }
       // Corregir rutas legacy que ya no existen
       const LEGACY_MAP = {
-        '/Messages': '/mensajes',
-        '/messages': '/mensajes',
+        // El chat interno se retiró; una notificación antigua que apuntase
+        // ahí llevaría a un 404. Mejor la portada que un callejón.
+        '/Messages': '/',
+        '/messages': '/',
         '/Notifications': '/notificaciones',
         '/notifications': '/notificaciones',
         '/Dashboard': '/dashboard',

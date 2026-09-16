@@ -51,7 +51,7 @@ import { generateSlug, isSlugDirty } from "../utils/slugUtils";
 import { getProfileSeoUrl } from '@/lib/seoUrl';
 import { slugify } from '@/lib/slugify';
 import CategoryCityLink from "../components/profile/CategoryCityLink";
-import GuestContactModal from "@/components/messages/GuestContactModal";
+import GuestContactModal from "@/components/GuestContactModal";
 
 // Limpiar slug antiguo que puede tener IDs hex al final (ej: -5e8405).
 function cleanOldSlug(slug) {
@@ -270,46 +270,16 @@ export default function AutonomoPage() {
     }
   };
 
-  const handleStartChat = async () => {
+  // El mensaje va por EMAIL, no por una bandeja interna. Ver la nota en
+  // ProfessionalProfile.jsx: el chat interno se retiró y este botón pasa a
+  // abrir el formulario que ya usaban los visitantes sin cuenta.
+  const handleStartChat = () => {
     if (profile?.id) {
       import('@/lib/trackMetric').then(({ trackMetric }) => {
         trackMetric(profile.id, 'contact_click');
       });
     }
-
-    const { resolveSelfUserRow } = await import('@/lib/contactProfessional');
-    const { session, userRow } = await resolveSelfUserRow();
-
-    if (!session) {
-      setGuestModal(true);
-      return;
-    }
-
-    const myUserRowId = userRow?.id || user?.id || null;
-    if (!myUserRowId || !profile?.user_id) {
-      setGuestModal(true);
-      return;
-    }
-
-    const conversationId = [myUserRowId, profile.user_id].sort().join('_');
-
-    try {
-      const existing = await base44.entities.Message.filter({ conversation_id: conversationId }, '-created_date', 1);
-      if (!existing || existing.length === 0) {
-        await base44.entities.Message.create({
-          conversation_id: conversationId,
-          sender_id: myUserRowId,
-          recipient_id: profile.user_id,
-          content: "Hola, me interesa tu servicio. ¿Podemos hablar?",
-          professional_name: profile.business_name || "Profesional",
-          client_name: user?.full_name || user?.email || session.user.email || "",
-          is_read: false,
-          attachments: [],
-        });
-      }
-    } catch {}
-
-    navigate(`/messages?conv=${conversationId}`);
+    setGuestModal(true);
   };
 
   const formatPhoneForWhatsApp = (phone) => {

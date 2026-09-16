@@ -208,7 +208,7 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-2 block">
-              {t('crm.detail.titleRequired')}
+              {t('tickets.create.titleLabel')}
             </label>
             <Input
               placeholder={t('tickets.create.titlePlaceholder')}
@@ -258,7 +258,7 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="baja">{t('admin.soporte.priority.low')}</SelectItem>
-                  <SelectItem value="media">{t('projects.priority.medium')}</SelectItem>
+                  <SelectItem value="media">{t('tickets.priority.medium')}</SelectItem>
                   <SelectItem value="alta">{t('admin.soporte.priority.high')}</SelectItem>
                   <SelectItem value="urgente">{t('admin.soporte.priority.urgent')}</SelectItem>
                 </SelectContent>
@@ -276,7 +276,7 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
                   <SelectValue placeholder={t('tickets.create.selectPro')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={null}>{t('calendar.taskForm.noClient')}</SelectItem>
+                  <SelectItem value={null}>{t('common.none')}</SelectItem>
                   {professionals.map((prof) => (
                     <SelectItem key={prof.user_id} value={prof.user_id}>
                       {prof.business_name}

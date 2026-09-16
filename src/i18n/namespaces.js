@@ -33,22 +33,11 @@
 
 export const APP_NAMESPACES = [
   'admin',
-  'ads',
-  'assistant',
-  'calendar',
-  'crm',
   'dashboard',
-  'invoices',
   'myProfile',
   'onboarding',
   'payments',
   'premium',
-  'projects',
-  'quotes',
-  'quotesPage',  // legacy del es.json de Base44 (objeto, no clave plana)
-  'referrals',
-  'seo',
-  'stats',
   'subscription',
   'support',
   'tickets',

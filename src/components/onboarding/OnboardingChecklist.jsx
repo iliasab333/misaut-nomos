@@ -12,7 +12,7 @@ export default function OnboardingChecklist({ currentStep, formData }) {
       title: t('professionalIdentity'),
       items: [
         { label: t('premium.dashboard.checks.businessName'), check: formData.business_name?.length >= 2 },
-        { label: t('crm.detail.nifCif'), check: formData.cif_nif?.length === 9 },
+        { label: t('onboarding.checklist.nifCifLabel'), check: formData.cif_nif?.length === 9 },
         { label: t('emailContact'), check: formData.email_contacto?.includes('@') },
         { label: t('phoneLabel'), check: formData.telefono_contacto?.replace(/\D/g, '').length >= 9 }
       ]
