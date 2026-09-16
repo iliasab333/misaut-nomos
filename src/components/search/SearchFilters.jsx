@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useCategoryName } from '@/hooks/useCategoryName';
 import { Filter, Star, Clock, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,6 +21,7 @@ export default function SearchFilters({
   isMobile = false
 }) {
   const { t } = useTranslation();
+  const categoryName = useCategoryName();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const activeFiltersCount = [
@@ -40,13 +42,15 @@ export default function SearchFilters({
           <Select value={filters.category} onValueChange={(val) => onFilterChange({ ...filters, category: val })}>
             <SelectTrigger className="h-11 border-2 border-gray-200 text-sm rounded-lg font-medium hover:border-blue-300 transition-colors">
               <SelectValue placeholder={t('allCategories')}>
-                {filters.category === "all" ? t('allCategories') : (t(filters.category) || filters.category)}
+                {filters.category === "all"
+                  ? t('allCategories')
+                  : categoryName(categories.find((c) => c.name === filters.category)?.slug, filters.category)}
               </SelectValue>
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
               <SelectItem value="all">{t('allCategories')}</SelectItem>
               {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.name}>{t(cat.name) || cat.name}</SelectItem>
+                <SelectItem key={cat.id} value={cat.name}>{categoryName(cat.slug, cat.name)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -62,7 +66,7 @@ export default function SearchFilters({
           >
             <option value="all">{t('allCategories')}</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.name}>{cat.name}</option>
+              <option key={cat.id} value={cat.name}>{categoryName(cat.slug, cat.name)}</option>
             ))}
           </select>
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
