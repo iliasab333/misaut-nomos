@@ -1,0 +1,161 @@
+{
+  "name": "ClientContact",
+  "type": "object",
+  "properties": {
+    "professional_id": {
+      "type": "string",
+      "description": "ID del profesional propietario"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Email del cliente"
+    },
+    "client_phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono del cliente"
+    },
+    "client_nif": {
+      "type": "string",
+      "description": "NIF/CIF del cliente"
+    },
+    "company": {
+      "type": "string",
+      "description": "Empresa del cliente"
+    },
+    "address": {
+      "type": "string",
+      "description": "Direcci\u00f3n del cliente"
+    },
+    "city": {
+      "type": "string",
+      "description": "Ciudad del cliente"
+    },
+    "postal_code": {
+      "type": "string",
+      "description": "C\u00f3digo postal"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "lead",
+        "contacted",
+        "negotiating",
+        "client",
+        "inactive",
+        "vip"
+      ],
+      "default": "lead",
+      "description": "Estado del contacto"
+    },
+    "source": {
+      "type": "string",
+      "description": "Origen del contacto"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas sobre el cliente"
+    },
+    "last_contact_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima fecha de contacto"
+    },
+    "next_followup_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Pr\u00f3xima fecha de seguimiento"
+    },
+    "estimated_value": {
+      "type": "number",
+      "description": "Valor estimado del proyecto"
+    },
+    "total_revenue": {
+      "type": "number",
+      "default": 0,
+      "description": "Ingresos totales generados por este cliente"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Etiquetas del contacto para segmentaci\u00f3n"
+    },
+    "segment": {
+      "type": "string",
+      "enum": [
+        "residential",
+        "commercial",
+        "industrial",
+        "government",
+        "other"
+      ],
+      "description": "Segmento de mercado del cliente"
+    },
+    "preferred_contact_method": {
+      "type": "string",
+      "enum": [
+        "email",
+        "phone",
+        "whatsapp",
+        "any"
+      ],
+      "default": "any",
+      "description": "M\u00e9todo de contacto preferido"
+    },
+    "rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Valoraci\u00f3n interna del cliente (1-5 estrellas)"
+    },
+    "birthday": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de cumplea\u00f1os del cliente"
+    }
+  },
+  "required": [
+    "professional_id",
+    "client_name"
+  ],
+  "security": {
+    "read": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "professional_id",
+        "status"
+      ]
+    },
+    {
+      "fields": [
+        "professional_id",
+        "tags"
+      ]
+    },
+    {
+      "fields": [
+        "professional_id",
+        "segment"
+      ]
+    }
+  ]
+}

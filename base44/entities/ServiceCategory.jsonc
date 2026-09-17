@@ -1,0 +1,26 @@
+{
+  "name": "ServiceCategory",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre de la categor\u00eda"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la categor\u00eda"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icono de la categor\u00eda"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Slug limpio para URLs p\u00fablicas (ej: albanil-reformas, sin tildes, sin doble s, sin pluralizaci\u00f3n autom\u00e1tica)",
+      "default": ""
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

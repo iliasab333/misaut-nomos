@@ -1,0 +1,197 @@
+{
+  "name": "OutboundLead",
+  "type": "object",
+  "properties": {
+    "handle": {
+      "type": "string",
+      "description": "Handle Instagram/LinkedIn (sin @)"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "instagram",
+        "linkedin",
+        "facebook",
+        "tiktok",
+        "google_maps",
+        "otro"
+      ],
+      "default": "instagram",
+      "description": "Plataforma de origen del lead"
+    },
+    "profile_url": {
+      "type": "string",
+      "description": "URL completa del perfil"
+    },
+    "display_name": {
+      "type": "string",
+      "default": "",
+      "description": "Nombre o nombre del negocio"
+    },
+    "oficio": {
+      "type": "string",
+      "enum": [
+        "electricista",
+        "fontanero",
+        "reformas",
+        "pintor",
+        "carpintero",
+        "albanil",
+        "climatizacion",
+        "cerrajero",
+        "manitas",
+        "limpieza",
+        "mudanzas",
+        "jardineria",
+        "estetica",
+        "fisioterapeuta",
+        "abogado",
+        "gestor",
+        "consultor",
+        "dise\u00f1ador",
+        "desarrollador",
+        "fotografo",
+        "otro"
+      ],
+      "description": "Oficio principal del aut\u00f3nomo"
+    },
+    "ciudad": {
+      "type": "string",
+      "description": "Ciudad o zona donde opera"
+    },
+    "provincia": {
+      "type": "string",
+      "default": "",
+      "description": "Provincia"
+    },
+    "followers_count": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero aproximado de seguidores (opcional, indica nivel de actividad)"
+    },
+    "ultimo_post_dias": {
+      "type": "number",
+      "default": 0,
+      "description": "D\u00edas desde el \u00faltimo post (filtro de actividad)"
+    },
+    "calidad": {
+      "type": "string",
+      "enum": [
+        "alta",
+        "media",
+        "baja"
+      ],
+      "default": "media",
+      "description": "Calidad del lead (alta=fotos profesionales+activo, media=correcto, baja=poca info)"
+    },
+    "estado": {
+      "type": "string",
+      "enum": [
+        "pendiente",
+        "contactado",
+        "respondido_positivo",
+        "respondido_negativo",
+        "registrado",
+        "suscrito",
+        "descartado",
+        "no_contactable"
+      ],
+      "default": "pendiente",
+      "description": "Estado del lead en el funnel outbound"
+    },
+    "canal_contacto": {
+      "type": "string",
+      "enum": [
+        "dm_instagram",
+        "dm_linkedin",
+        "email",
+        "whatsapp",
+        "comentario_post",
+        "otro"
+      ],
+      "default": "",
+      "description": "Por d\u00f3nde se le contact\u00f3"
+    },
+    "fecha_contacto": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo se contact\u00f3 por primera vez"
+    },
+    "fecha_respuesta": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo respondi\u00f3"
+    },
+    "fecha_registro": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo se registr\u00f3 en MisAut\u00f3nomos (si aplica)"
+    },
+    "user_id_creado": {
+      "type": "string",
+      "default": "",
+      "description": "ID del User creado en MisAut\u00f3nomos si se registr\u00f3"
+    },
+    "mensaje_enviado": {
+      "type": "string",
+      "default": "",
+      "description": "Texto exacto del primer mensaje enviado"
+    },
+    "respuesta_recibida": {
+      "type": "string",
+      "default": "",
+      "description": "Texto de la respuesta del lead"
+    },
+    "notas": {
+      "type": "string",
+      "default": "",
+      "description": "Notas internas, follow-ups, contexto extra"
+    },
+    "campaign_tag": {
+      "type": "string",
+      "default": "outbound_v1",
+      "description": "Etiqueta de la campa\u00f1a outbound (outbound_v1, outbound_oficios, etc.)"
+    },
+    "follow_up_count": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero de follow-ups enviados"
+    },
+    "next_follow_up_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Pr\u00f3ximo follow-up programado"
+    }
+  },
+  "required": [
+    "handle",
+    "platform",
+    "oficio",
+    "ciudad"
+  ],
+  "indexes": [
+    {
+      "fields": [
+        "handle",
+        "platform"
+      ],
+      "unique": true
+    },
+    {
+      "fields": [
+        "estado"
+      ]
+    },
+    {
+      "fields": [
+        "oficio",
+        "ciudad"
+      ]
+    },
+    {
+      "fields": [
+        "campaign_tag"
+      ]
+    }
+  ]
+}

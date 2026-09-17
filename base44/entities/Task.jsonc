@@ -1,0 +1,141 @@
+{
+  "name": "Task",
+  "type": "object",
+  "properties": {
+    "professional_id": {
+      "type": "string",
+      "description": "ID del profesional"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo de la tarea"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la tarea"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha l\u00edmite"
+    },
+    "due_time": {
+      "type": "string",
+      "description": "Hora de la tarea (HH:MM)"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium",
+      "description": "Prioridad"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Estado"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "work",
+        "admin",
+        "client",
+        "other"
+      ],
+      "default": "work",
+      "description": "Categor\u00eda"
+    },
+    "related_client_id": {
+      "type": "string",
+      "description": "ID del cliente relacionado (opcional)"
+    },
+    "related_job_id": {
+      "type": "string",
+      "description": "ID del trabajo relacionado (opcional)"
+    },
+    "related_project_id": {
+      "type": "string",
+      "description": "ID del proyecto relacionado (opcional)"
+    },
+    "is_recurring": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si es una tarea recurrente"
+    },
+    "recurrence_pattern": {
+      "type": "string",
+      "enum": [
+        "none",
+        "daily",
+        "weekly",
+        "biweekly",
+        "monthly"
+      ],
+      "default": "none",
+      "description": "Patr\u00f3n de recurrencia"
+    },
+    "recurrence_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de fin de recurrencia"
+    },
+    "parent_task_id": {
+      "type": "string",
+      "description": "ID de la tarea padre (si es recurrente)"
+    },
+    "notification_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si ya se envi\u00f3 notificaci\u00f3n de recordatorio"
+    }
+  },
+  "required": [
+    "professional_id",
+    "title",
+    "due_date"
+  ],
+  "security": {
+    "read": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "professional_id",
+        "due_date"
+      ]
+    },
+    {
+      "fields": [
+        "professional_id",
+        "status"
+      ]
+    },
+    {
+      "fields": [
+        "parent_task_id"
+      ]
+    }
+  ]
+}

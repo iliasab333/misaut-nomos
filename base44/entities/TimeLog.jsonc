@@ -1,0 +1,84 @@
+{
+  "name": "TimeLog",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "ID de la tarea"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del trabajo realizado"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha del registro"
+    },
+    "hours": {
+      "type": "number",
+      "description": "Horas trabajadas"
+    },
+    "billable": {
+      "type": "boolean",
+      "default": true,
+      "description": "Horas facturables"
+    },
+    "hourly_rate": {
+      "type": "number",
+      "description": "Tarifa por hora"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales"
+    }
+  },
+  "required": [
+    "project_id",
+    "user_id",
+    "date",
+    "hours"
+  ],
+  "security": {
+    "read": {
+      "rule": "resource.user_id == auth.user_id || auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.user_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "resource.user_id == auth.user_id || auth.role == 'admin'"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "project_id",
+        "date"
+      ]
+    },
+    {
+      "fields": [
+        "task_id",
+        "date"
+      ]
+    },
+    {
+      "fields": [
+        "user_id",
+        "date"
+      ]
+    }
+  ]
+}

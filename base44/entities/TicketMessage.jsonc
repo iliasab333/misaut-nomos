@@ -1,0 +1,58 @@
+{
+  "name": "TicketMessage",
+  "type": "object",
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "description": "ID del ticket"
+    },
+    "sender_id": {
+      "type": "string",
+      "description": "ID del remitente"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Nombre del remitente"
+    },
+    "sender_type": {
+      "type": "string",
+      "description": "Tipo de usuario (client/professionnel/admin)"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenido del mensaje"
+    },
+    "is_internal": {
+      "type": "boolean",
+      "default": false,
+      "description": "Mensaje interno (solo visible para admins)"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Archivos adjuntos en este mensaje"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "sender_id",
+    "content"
+  ],
+  "security": {
+    "read": {
+      "rule": "true"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.sender_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "auth.role == 'admin'"
+    }
+  }
+}

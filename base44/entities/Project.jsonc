@@ -1,0 +1,147 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "professional_id": {
+      "type": "string",
+      "description": "ID del profesional/freelancer"
+    },
+    "client_contact_id": {
+      "type": "string",
+      "description": "ID del contacto/cliente"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nombre del proyecto"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del proyecto"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planning",
+        "in_progress",
+        "on_hold",
+        "completed",
+        "cancelled"
+      ],
+      "default": "planning",
+      "description": "Estado del proyecto"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium",
+      "description": "Prioridad del proyecto"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de inicio"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de finalizaci\u00f3n prevista"
+    },
+    "actual_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de finalizaci\u00f3n real"
+    },
+    "budget": {
+      "type": "number",
+      "description": "Presupuesto del proyecto"
+    },
+    "total_hours_estimated": {
+      "type": "number",
+      "description": "Horas estimadas totales",
+      "default": 0
+    },
+    "total_hours_logged": {
+      "type": "number",
+      "description": "Horas registradas totales",
+      "default": 0
+    },
+    "progress_percentage": {
+      "type": "number",
+      "description": "Porcentaje de progreso (0-100)",
+      "default": 0
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "uploaded_at": {
+            "type": "string"
+          }
+        }
+      },
+      "default": [],
+      "description": "Archivos adjuntos del proyecto"
+    },
+    "client_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Visible para el cliente"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas internas del proyecto"
+    },
+    "color": {
+      "type": "string",
+      "default": "#3B82F6",
+      "description": "Color identificativo del proyecto"
+    }
+  },
+  "required": [
+    "professional_id",
+    "name"
+  ],
+  "security": {
+    "read": {
+      "rule": "resource.professional_id == auth.user_id || resource.client_contact_id == auth.user_id || auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "professional_id",
+        "status"
+      ]
+    },
+    {
+      "fields": [
+        "client_contact_id"
+      ]
+    }
+  ]
+}

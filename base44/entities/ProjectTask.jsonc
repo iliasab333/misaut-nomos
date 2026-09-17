@@ -1,0 +1,128 @@
+{
+  "name": "ProjectTask",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto"
+    },
+    "phase_id": {
+      "type": "string",
+      "description": "ID de la fase"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nombre de la tarea"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la tarea"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "blocked"
+      ],
+      "default": "pending",
+      "description": "Estado de la tarea"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium",
+      "description": "Prioridad"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "ID del asignado"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha l\u00edmite"
+    },
+    "completed_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de completado"
+    },
+    "estimated_hours": {
+      "type": "number",
+      "description": "Horas estimadas",
+      "default": 0
+    },
+    "logged_hours": {
+      "type": "number",
+      "description": "Horas registradas",
+      "default": 0
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "uploaded_at": {
+            "type": "string"
+          }
+        }
+      },
+      "default": [],
+      "description": "Archivos adjuntos"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas de la tarea"
+    },
+    "order": {
+      "type": "number",
+      "description": "Orden de la tarea",
+      "default": 0
+    }
+  },
+  "required": [
+    "project_id",
+    "name"
+  ],
+  "security": {
+    "read": {
+      "rule": "true"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "authenticated"
+    },
+    "delete": {
+      "rule": "authenticated"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "project_id",
+        "status"
+      ]
+    },
+    {
+      "fields": [
+        "phase_id",
+        "order"
+      ]
+    }
+  ]
+}

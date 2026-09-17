@@ -1,0 +1,190 @@
+{
+  "name": "QuoteRequest",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "ID del cliente que solicita"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Email del cliente"
+    },
+    "client_phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono del cliente"
+    },
+    "professional_id": {
+      "type": "string",
+      "description": "ID del profesional destinatario"
+    },
+    "professional_name": {
+      "type": "string",
+      "description": "Nombre del profesional"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo breve del trabajo"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n detallada del trabajo"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Categor\u00edas de servicio",
+      "default": []
+    },
+    "location": {
+      "type": "string",
+      "description": "Ubicaci\u00f3n del trabajo"
+    },
+    "provincia": {
+      "type": "string",
+      "description": "Provincia"
+    },
+    "ciudad": {
+      "type": "string",
+      "description": "Ciudad"
+    },
+    "budget_range": {
+      "type": "string",
+      "enum": [
+        "0-500",
+        "500-1000",
+        "1000-2500",
+        "2500-5000",
+        "5000+",
+        "no_definido"
+      ],
+      "description": "Rango de presupuesto estimado",
+      "default": "no_definido"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha l\u00edmite deseada"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": [
+        "baja",
+        "media",
+        "alta",
+        "urgente"
+      ],
+      "description": "Nivel de urgencia",
+      "default": "media"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "quoted",
+        "accepted",
+        "rejected",
+        "expired"
+      ],
+      "description": "Estado de la solicitud",
+      "default": "pending"
+    },
+    "professional_response": {
+      "type": "object",
+      "properties": {
+        "quote_amount": {
+          "type": "number"
+        },
+        "estimated_days": {
+          "type": "number"
+        },
+        "response_message": {
+          "type": "string"
+        },
+        "breakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "concept": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "response_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Respuesta del profesional"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Archivos adjuntos del cliente"
+    },
+    "views_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Veces que el profesional vio la solicitud"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el profesional ley\u00f3 la solicitud"
+    }
+  },
+  "required": [
+    "client_id",
+    "professional_id",
+    "title",
+    "description"
+  ],
+  "security": {
+    "read": {
+      "rule": "resource.client_id == auth.user_id || resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.client_id == auth.user_id || resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "resource.client_id == auth.user_id || auth.role == 'admin'"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "professional_id",
+        "status"
+      ]
+    },
+    {
+      "fields": [
+        "client_id",
+        "created_date"
+      ]
+    },
+    {
+      "fields": [
+        "professional_id",
+        "is_read"
+      ]
+    }
+  ]
+}

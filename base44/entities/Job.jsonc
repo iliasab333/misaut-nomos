@@ -1,0 +1,97 @@
+{
+  "name": "Job",
+  "type": "object",
+  "properties": {
+    "professional_id": {
+      "type": "string",
+      "description": "ID del profesional"
+    },
+    "client_contact_id": {
+      "type": "string",
+      "description": "ID del contacto/cliente"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del trabajo"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del trabajo"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Estado del trabajo"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de inicio"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de finalizaci\u00f3n"
+    },
+    "estimated_hours": {
+      "type": "number",
+      "description": "Horas estimadas"
+    },
+    "actual_hours": {
+      "type": "number",
+      "description": "Horas reales"
+    },
+    "estimated_cost": {
+      "type": "number",
+      "description": "Coste estimado"
+    },
+    "final_cost": {
+      "type": "number",
+      "description": "Coste final"
+    },
+    "location": {
+      "type": "string",
+      "description": "Ubicaci\u00f3n del trabajo"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas del trabajo"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Fotos del trabajo"
+    }
+  },
+  "required": [
+    "professional_id",
+    "title"
+  ],
+  "security": {
+    "read": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    }
+  }
+}

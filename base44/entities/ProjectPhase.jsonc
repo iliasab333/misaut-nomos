@@ -1,0 +1,79 @@
+{
+  "name": "ProjectPhase",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nombre de la fase"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la fase"
+    },
+    "order": {
+      "type": "number",
+      "description": "Orden de la fase",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed"
+      ],
+      "default": "pending",
+      "description": "Estado de la fase"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de inicio"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de finalizaci\u00f3n"
+    },
+    "completed_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de finalizaci\u00f3n real"
+    },
+    "progress_percentage": {
+      "type": "number",
+      "description": "Porcentaje de progreso",
+      "default": 0
+    }
+  },
+  "required": [
+    "project_id",
+    "name"
+  ],
+  "security": {
+    "read": {
+      "rule": "true"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "authenticated"
+    },
+    "delete": {
+      "rule": "authenticated"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "project_id",
+        "order"
+      ]
+    }
+  ]
+}

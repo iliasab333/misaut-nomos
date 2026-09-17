@@ -1,0 +1,311 @@
+{
+  "name": "Invoice",
+  "type": "object",
+  "properties": {
+    "professional_id": {
+      "type": "string",
+      "description": "ID del profesional"
+    },
+    "client_contact_id": {
+      "type": "string",
+      "description": "ID del contacto/cliente"
+    },
+    "job_id": {
+      "type": "string",
+      "description": "ID del trabajo asociado"
+    },
+    "invoice_number": {
+      "type": "string",
+      "description": "N\u00famero de factura completo (ej: A-2025-001)"
+    },
+    "serie": {
+      "type": "string",
+      "description": "Serie de la factura",
+      "default": "A"
+    },
+    "numero": {
+      "type": "number",
+      "description": "N\u00famero secuencial de la factura"
+    },
+    "emisor_razon_social": {
+      "type": "string",
+      "description": "Raz\u00f3n social del emisor"
+    },
+    "emisor_nif": {
+      "type": "string",
+      "description": "NIF/CIF del emisor"
+    },
+    "emisor_direccion": {
+      "type": "string",
+      "description": "Direcci\u00f3n del emisor"
+    },
+    "emisor_cp": {
+      "type": "string",
+      "description": "C\u00f3digo postal del emisor"
+    },
+    "emisor_ciudad": {
+      "type": "string",
+      "description": "Ciudad del emisor"
+    },
+    "emisor_provincia": {
+      "type": "string",
+      "description": "Provincia del emisor"
+    },
+    "emisor_pais": {
+      "type": "string",
+      "description": "Pa\u00eds del emisor",
+      "default": "Espa\u00f1a"
+    },
+    "emisor_telefono": {
+      "type": "string",
+      "description": "Tel\u00e9fono del emisor"
+    },
+    "emisor_email": {
+      "type": "string",
+      "description": "Email del emisor"
+    },
+    "emisor_web": {
+      "type": "string",
+      "description": "Web del emisor"
+    },
+    "emisor_iban": {
+      "type": "string",
+      "description": "IBAN del emisor"
+    },
+    "emisor_actividad": {
+      "type": "string",
+      "description": "Actividad econ\u00f3mica del emisor"
+    },
+    "emisor_logo_url": {
+      "type": "string",
+      "description": "URL del logo del emisor"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "client_nif": {
+      "type": "string",
+      "description": "NIF del cliente"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Email del cliente"
+    },
+    "client_address": {
+      "type": "string",
+      "description": "Direcci\u00f3n del cliente"
+    },
+    "client_cp": {
+      "type": "string",
+      "description": "C\u00f3digo postal del cliente"
+    },
+    "client_ciudad": {
+      "type": "string",
+      "description": "Ciudad del cliente"
+    },
+    "client_provincia": {
+      "type": "string",
+      "description": "Provincia del cliente"
+    },
+    "client_pais": {
+      "type": "string",
+      "description": "Pa\u00eds del cliente",
+      "default": "Espa\u00f1a"
+    },
+    "issue_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de emisi\u00f3n"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de vencimiento"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit_price": {
+            "type": "number"
+          },
+          "discount_percent": {
+            "type": "number",
+            "default": 0
+          },
+          "iva_percent": {
+            "type": "number",
+            "default": 21
+          },
+          "exenta_iva": {
+            "type": "boolean",
+            "default": false
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "iva_amount": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        }
+      },
+      "default": [],
+      "description": "L\u00edneas de factura"
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Base imponible (sin IVA)"
+    },
+    "total_iva": {
+      "type": "number",
+      "description": "Total IVA"
+    },
+    "aplica_retencion": {
+      "type": "boolean",
+      "description": "Si se aplica retenci\u00f3n IRPF",
+      "default": false
+    },
+    "porcentaje_retencion": {
+      "type": "number",
+      "description": "Porcentaje de retenci\u00f3n IRPF",
+      "default": 0
+    },
+    "total_retencion": {
+      "type": "number",
+      "description": "Importe total de retenci\u00f3n",
+      "default": 0
+    },
+    "total": {
+      "type": "number",
+      "description": "Total factura (base + IVA - retenci\u00f3n)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sent",
+        "paid",
+        "overdue",
+        "cancelled"
+      ],
+      "default": "draft",
+      "description": "Estado de la factura"
+    },
+    "payment_method": {
+      "type": "string",
+      "description": "M\u00e9todo de pago"
+    },
+    "payment_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de pago"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales / observaciones"
+    },
+    "legal_text": {
+      "type": "string",
+      "description": "Texto legal de la factura"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "URL del PDF generado"
+    },
+    "payment_link": {
+      "type": "string",
+      "description": "Enlace de pago online"
+    },
+    "stripe_session_id": {
+      "type": "string",
+      "description": "ID de sesi\u00f3n de Stripe"
+    },
+    "stripe_payment_id": {
+      "type": "string",
+      "description": "ID de pago de Stripe"
+    },
+    "last_reminder_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima fecha de recordatorio enviado"
+    }
+  },
+  "required": [
+    "professional_id",
+    "client_name",
+    "issue_date"
+  ],
+  "security": {
+    "read": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    }
+  },
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "user_type": "professionnel"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.professional_id": "{{user.id}}"
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.professional_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

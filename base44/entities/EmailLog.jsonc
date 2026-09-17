@@ -1,0 +1,147 @@
+{
+  "name": "EmailLog",
+  "type": "object",
+  "properties": {
+    "to_email": {
+      "type": "string",
+      "description": "Email del destinatario"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del User si aplica",
+      "default": ""
+    },
+    "subject": {
+      "type": "string",
+      "description": "Asunto del email"
+    },
+    "template": {
+      "type": "string",
+      "description": "Nombre del template usado",
+      "default": "generic"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "transactional",
+        "marketing"
+      ],
+      "default": "transactional",
+      "description": "Tipo de email"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "sent",
+        "delivered",
+        "opened",
+        "clicked",
+        "bounced",
+        "spam",
+        "failed",
+        "skipped"
+      ],
+      "default": "queued",
+      "description": "Estado actual del email"
+    },
+    "resend_message_id": {
+      "type": "string",
+      "description": "Message ID devuelto por Resend para tracking",
+      "default": ""
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo se envi\u00f3"
+    },
+    "delivered_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo se entreg\u00f3 (webhook)"
+    },
+    "opened_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo se abri\u00f3 (primera vez)"
+    },
+    "clicked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo se click\u00f3 un link (primera vez)"
+    },
+    "bounced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo rebot\u00f3"
+    },
+    "complained_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cu\u00e1ndo se marc\u00f3 como spam"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Mensaje de error si fall\u00f3",
+      "default": ""
+    },
+    "campaign_id": {
+      "type": "string",
+      "description": "ID opcional de campa\u00f1a para agrupar env\u00edos",
+      "default": ""
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Datos extra del env\u00edo",
+      "default": {}
+    }
+  },
+  "required": [
+    "to_email",
+    "subject"
+  ],
+  "security": {
+    "read": {
+      "rule": "auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "auth.role == 'admin'"
+    },
+    "update": {
+      "rule": "auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "auth.role == 'admin'"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "to_email",
+        "created_date"
+      ]
+    },
+    {
+      "fields": [
+        "resend_message_id"
+      ],
+      "unique": false
+    },
+    {
+      "fields": [
+        "status"
+      ]
+    },
+    {
+      "fields": [
+        "category",
+        "created_date"
+      ]
+    },
+    {
+      "fields": [
+        "campaign_id"
+      ]
+    }
+  ]
+}

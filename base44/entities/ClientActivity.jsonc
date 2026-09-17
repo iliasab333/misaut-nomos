@@ -1,0 +1,111 @@
+{
+  "name": "ClientActivity",
+  "type": "object",
+  "properties": {
+    "professional_id": {
+      "type": "string",
+      "description": "ID del profesional"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "ID del cliente"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "note",
+        "call",
+        "email",
+        "meeting",
+        "reminder",
+        "payment",
+        "job_completed",
+        "quote_sent",
+        "invoice_sent",
+        "other"
+      ],
+      "description": "Tipo de actividad"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo de la actividad"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n detallada"
+    },
+    "is_reminder": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si es un recordatorio"
+    },
+    "reminder_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha del recordatorio"
+    },
+    "reminder_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el recordatorio est\u00e1 completado"
+    },
+    "related_job_id": {
+      "type": "string",
+      "description": "ID del trabajo relacionado"
+    },
+    "related_invoice_id": {
+      "type": "string",
+      "description": "ID de la factura relacionada"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Importe asociado (si aplica)"
+    },
+    "is_pinned": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si la nota est\u00e1 fijada"
+    }
+  },
+  "required": [
+    "professional_id",
+    "client_id",
+    "type",
+    "title"
+  ],
+  "security": {
+    "read": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "resource.professional_id == auth.user_id || auth.role == 'admin'"
+    }
+  },
+  "indexes": [
+    {
+      "fields": [
+        "client_id",
+        "created_date"
+      ]
+    },
+    {
+      "fields": [
+        "professional_id",
+        "is_reminder",
+        "reminder_completed"
+      ]
+    },
+    {
+      "fields": [
+        "professional_id",
+        "reminder_date"
+      ]
+    }
+  ]
+}

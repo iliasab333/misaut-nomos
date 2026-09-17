@@ -1,0 +1,65 @@
+{
+  "name": "TicketEvent",
+  "type": "object",
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "description": "ID del ticket"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "created",
+        "status_changed",
+        "assigned",
+        "message_added",
+        "attachment_added",
+        "priority_changed",
+        "tag_added",
+        "note_added",
+        "reopened",
+        "closed"
+      ],
+      "description": "Tipo de evento"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario que gener\u00f3 el evento"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Nombre del usuario"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del evento"
+    },
+    "old_value": {
+      "type": "string",
+      "description": "Valor anterior (para cambios)"
+    },
+    "new_value": {
+      "type": "string",
+      "description": "Valor nuevo (para cambios)"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "event_type",
+    "user_id"
+  ],
+  "security": {
+    "read": {
+      "rule": "true"
+    },
+    "create": {
+      "rule": "authenticated"
+    },
+    "update": {
+      "rule": "auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "auth.role == 'admin'"
+    }
+  }
+}

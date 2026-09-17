@@ -1,0 +1,100 @@
+{
+  "name": "FAQ",
+  "type": "object",
+  "properties": {
+    "title_es": {
+      "type": "string",
+      "description": "T\u00edtulo en espa\u00f1ol"
+    },
+    "title_en": {
+      "type": "string",
+      "description": "T\u00edtulo en ingl\u00e9s"
+    },
+    "summary_es": {
+      "type": "string",
+      "description": "Resumen corto en espa\u00f1ol"
+    },
+    "summary_en": {
+      "type": "string",
+      "description": "Resumen corto en ingl\u00e9s"
+    },
+    "content_es": {
+      "type": "string",
+      "description": "Contenido detallado en espa\u00f1ol"
+    },
+    "content_en": {
+      "type": "string",
+      "description": "Contenido detallado en ingl\u00e9s"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "clients",
+        "professionals",
+        "security",
+        "payments",
+        "profile",
+        "troubleshooting"
+      ],
+      "description": "Categor\u00eda del art\u00edculo"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Etiquetas para b\u00fasqueda"
+    },
+    "related_articles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "IDs de art\u00edculos relacionados"
+    },
+    "views": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero de vistas"
+    },
+    "helpful_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Votos \u00fatiles"
+    },
+    "published": {
+      "type": "boolean",
+      "default": true,
+      "description": "Est\u00e1 publicado"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    }
+  },
+  "required": [
+    "title_es",
+    "title_en",
+    "content_es",
+    "content_en",
+    "category"
+  ],
+  "security": {
+    "read": {
+      "rule": "true"
+    },
+    "create": {
+      "rule": "auth.role == 'admin'"
+    },
+    "update": {
+      "rule": "auth.role == 'admin'"
+    },
+    "delete": {
+      "rule": "auth.role == 'admin'"
+    }
+  }
+}
