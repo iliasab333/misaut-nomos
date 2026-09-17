@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ChevronDown, ArrowRight } from "lucide-react";
+import { IconSparkles, IconChevronDown, IconArrowRight } from "@/components/Icons";
 import { useTranslation, Trans } from "react-i18next";
 
 const PROVINCIAS = [
@@ -89,7 +89,7 @@ export default function HeroSection() {
         {/* Badge */}
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "999px", padding: "6px 16px", fontSize: "12px", fontWeight: 600 }}>
-            <Sparkles style={{ width: "14px", height: "14px", color: "#fbbf24", flexShrink: 0 }} />
+            <IconSparkles style={{ width: "14px", height: "14px", color: "#fbbf24", flexShrink: 0 }} />
             <span>{t('home.hero.badge')}</span>
           </div>
         </div>
@@ -228,7 +228,7 @@ export default function HeroSection() {
                   }}
                 >
                   <span>{selectedProvincia || t('home.hero.provincePlaceholder')}</span>
-                  <ChevronDown style={{ width: "18px", height: "18px", color: "#6b7280", transform: provinciaOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease", flexShrink: 0 }} />
+                  <IconChevronDown style={{ width: "18px", height: "18px", color: "#6b7280", transform: provinciaOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease", flexShrink: 0 }} />
                 </button>
 
                 {provinciaOpen && (
@@ -303,7 +303,7 @@ export default function HeroSection() {
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 30px rgba(245,158,11,0.5)"; }}
             >
               {t('home.hero.viewProfessionals')}
-              <ArrowRight style={{ width: "20px", height: "20px" }} />
+              <IconArrowRight style={{ width: "20px", height: "20px" }} />
             </button>
           )}
 
@@ -342,7 +342,7 @@ export default function HeroSection() {
       {/* Wave divider */}
       <div style={{ position: "relative", lineHeight: 0 }}>
         <svg style={{ display: "block", width: "100%", height: "48px" }} viewBox="0 0 1440 74" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 40L60 36C120 32 240 24 360 26C480 28 600 40 720 44C840 48 960 44 1080 38C1200 32 1320 24 1380 20L1440 16V74H0V40Z" fill="rgb(249 250 251)" />
+          <path d="M0 40L60 36C120 32 240 24 360 26C480 28 600 40 720 44C840 48 960 44 1080 38C1200 32 1320 24 1380 20L1440 16V74H0V40Z" style={{ fill: "rgb(var(--c-soft))" }} />
         </svg>
       </div>
     </section>

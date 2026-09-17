@@ -3,10 +3,11 @@ import { useTranslation, Trans } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/api/supabaseClient';
 import {
-  Mail, Download, Trash2, Users, TrendingUp, UserMinus,
-  RefreshCw, Send, Loader2, AlertCircle, CheckCircle2,
-} from 'lucide-react';
-import { toast } from 'sonner';
+  IconMail, IconDownload, IconTrash, IconUsers, IconTrending, IconUserMinus,
+  IconRefresh, IconSend, IconSpinner, IconAlert, IconSuccess,
+} from '@/components/Icons';
+import { SkeletonList, EmptyState } from '@/components/ListStates';
+import { toast } from '@/lib/toast';
 import SEOHead from '@/components/seo/SEOHead';
 
 const NAVY = '#00255C';
@@ -15,13 +16,13 @@ const NAVY_SOFT = 'rgba(0,37,92,0.06)';
 function StatusBadge({ status }) {
   const { t } = useTranslation();
   const map = {
-    confirmed: { label: t('admin.newsletter.status.confirmed'), bg: '#D1FAE5', color: '#065F46' },
-    pending: { label: t('admin.newsletter.status.pending'), bg: '#FEF3C7', color: '#92400E' },
-    unsubscribed: { label: t('admin.newsletter.status.unsubscribed'), bg: '#E5E7EB', color: '#374151' },
+    confirmed: { label: t('admin.newsletter.status.confirmed'), cls: 'badge-success' },
+    pending: { label: t('admin.newsletter.status.pending'), cls: 'badge-warning' },
+    unsubscribed: { label: t('admin.newsletter.status.unsubscribed'), cls: 'badge-muted' },
   };
-  const m = map[status] || { label: status || '—', bg: '#E5E7EB', color: '#374151' };
+  const m = map[status] || { label: status || '—', cls: 'badge-muted' };
   return (
-    <span className="inline-flex text-[11px] font-semibold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full" style={{ background: m.bg, color: m.color }}>
+    <span className={`${m.cls} text-[11px] uppercase tracking-[0.06em]`}>
       {m.label}
     </span>
   );
@@ -29,14 +30,14 @@ function StatusBadge({ status }) {
 
 function MetricCard({ label, value, icon: Icon }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">
+    <div className="card rounded-2xl p-5">
+      <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">
         <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg" style={{ background: NAVY_SOFT, color: NAVY }}>
           <Icon className="w-4 h-4" />
         </span>
         {label}
       </div>
-      <p className="mt-3 text-3xl font-semibold text-slate-900 tabular-nums">{(value || 0).toLocaleString('es-ES')}</p>
+      <p className="mt-3 text-3xl font-semibold text-ink tabular-nums">{(value || 0).toLocaleString('es-ES')}</p>
     </div>
   );
 }
@@ -91,10 +92,10 @@ function Composer({ adminEmail, confirmedCount, onSent }) {
   const busy = sendingTest || sendingAll;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white">
-      <div className="p-5 border-b border-slate-100">
-        <h2 className="text-base font-semibold text-slate-900">{t('admin.newsletter.composer.title')}</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
+    <div className="card rounded-2xl">
+      <div className="p-5 border-b border-c-border">
+        <h2 className="text-base font-semibold text-ink">{t('admin.newsletter.composer.title')}</h2>
+        <p className="text-xs text-c-muted mt-0.5">
           <Trans
             i18nKey="admin.newsletter.composer.subtitle"
             components={[<code key="fn" className="font-mono text-[11px]" />]}
@@ -103,25 +104,25 @@ function Composer({ adminEmail, confirmedCount, onSent }) {
       </div>
       <div className="p-5 space-y-4">
         <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.newsletter.composer.subjectLabel')}</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.newsletter.composer.subjectLabel')}</span>
           <input
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             placeholder={t('admin.newsletter.composer.subjectPlaceholder')}
-            className="mt-1.5 w-full h-10 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+            className="input mt-1.5 text-sm"
           />
         </label>
         <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.newsletter.composer.bodyLabel')}</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.newsletter.composer.bodyLabel')}</span>
           <textarea
             value={html}
             onChange={(e) => setHtml(e.target.value)}
             rows={12}
             placeholder={t('admin.newsletter.composer.bodyPlaceholder')}
-            className="mt-1.5 w-full px-3 py-2 text-[13px] font-mono border border-slate-200 rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+            className="textarea mt-1.5 text-[13px] font-mono"
           />
-          <p className="text-[11px] text-slate-400 mt-1">
+          <p className="text-[11px] text-c-muted mt-1">
             <Trans
               i18nKey="admin.newsletter.composer.unsubscribeHint"
               components={[<code key="path" className="font-mono" />]}
@@ -130,13 +131,15 @@ function Composer({ adminEmail, confirmedCount, onSent }) {
         </label>
 
         {result && (
-          <div className="rounded-lg border p-3 flex items-start gap-2 text-sm"
-               style={{
-                 borderColor: result.failed > 0 ? '#FECACA' : '#A7F3D0',
-                 background: result.failed > 0 ? '#FEF2F2' : '#F0FDF4',
-                 color: result.failed > 0 ? '#991B1B' : '#065F46',
-               }}>
-            {result.failed > 0 ? <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" /> : <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />}
+          <div
+            role="alert"
+            className={`rounded-lg border p-3 flex items-start gap-2 text-sm ${
+              result.failed > 0
+                ? 'border-error/30 bg-error/10 text-error'
+                : 'border-success/30 bg-success/10 text-success'
+            }`}
+          >
+            {result.failed > 0 ? <IconAlert className="w-4 h-4 mt-0.5 flex-shrink-0" /> : <IconSuccess className="w-4 h-4 mt-0.5 flex-shrink-0" />}
             <div>
               <p className="font-semibold">
                 {result.kind === 'test' ? t('admin.newsletter.composer.testResultTitle') : t('admin.newsletter.composer.broadcastResultTitle')}
@@ -152,14 +155,14 @@ function Composer({ adminEmail, confirmedCount, onSent }) {
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-c-border">
           <button
             type="button"
             onClick={sendTest}
             disabled={busy}
-            className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg text-sm font-semibold border border-slate-200 bg-white text-slate-900 hover:bg-slate-50 disabled:opacity-50"
+            className="btn-secondary btn-sm text-sm font-semibold"
           >
-            {sendingTest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            {sendingTest ? <IconSpinner className="w-4 h-4 animate-spin" /> : <IconMail className="w-4 h-4" />}
             {t('admin.newsletter.composer.sendTest', { email: adminEmail || '—' })}
           </button>
 
@@ -167,17 +170,17 @@ function Composer({ adminEmail, confirmedCount, onSent }) {
             type="button"
             onClick={sendAll}
             disabled={busy}
-            className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50"
+            className="btn-primary btn-sm text-sm font-semibold"
             style={{ background: confirmAll ? '#B91C1C' : NAVY }}
           >
-            {sendingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {sendingAll ? <IconSpinner className="w-4 h-4 animate-spin" /> : <IconSend className="w-4 h-4" />}
             {confirmAll
               ? t('admin.newsletter.composer.confirmSend', { recipients: confirmedCount.toLocaleString('es-ES') })
               : t('admin.newsletter.composer.sendAll')}
           </button>
 
           {confirmAll && !sendingAll && (
-            <button type="button" onClick={() => setConfirmAll(false)} className="text-xs text-slate-500 hover:text-slate-800 underline">
+            <button type="button" onClick={() => setConfirmAll(false)} className="text-xs text-c-muted hover:text-ink underline">
               {t('common.cancel')}
             </button>
           )}
@@ -186,7 +189,7 @@ function Composer({ adminEmail, confirmedCount, onSent }) {
             type="button"
             onClick={reset}
             disabled={busy}
-            className="ml-auto text-xs text-slate-500 hover:text-slate-800 underline disabled:opacity-50"
+            className="ml-auto text-xs text-c-muted hover:text-ink underline disabled:opacity-50"
           >
             {t('admin.newsletter.composer.clear')}
           </button>
@@ -284,98 +287,105 @@ export default function AdminNewsletter() {
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
           <div className="flex items-end justify-between gap-3 mb-6 flex-wrap">
             <div>
-              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em' }}>{t('admin.newsletter.title')}</h1>
-              <p className="text-sm text-slate-500 mt-1">{t('admin.newsletter.subtitle')}</p>
+              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-ink" style={{ letterSpacing: '-0.02em' }}>{t('admin.newsletter.title')}</h1>
+              <p className="text-sm text-c-muted mt-1">{t('admin.newsletter.subtitle')}</p>
             </div>
             <button
+              type="button"
               onClick={load}
-              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 h-9 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
+              className="btn-secondary btn-sm text-xs font-medium"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> {t('admin.newsletter.refresh')}
+              <IconRefresh className="w-3.5 h-3.5" /> {t('admin.newsletter.refresh')}
             </button>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <MetricCard label={t('admin.newsletter.metrics.active')} value={confirmed.length} icon={Users} />
-            <MetricCard label={t('admin.newsletter.metrics.thisMonth')} value={thisMonth.length} icon={TrendingUp} />
-            <MetricCard label={t('admin.newsletter.metrics.unsubscribed')} value={unsub.length} icon={UserMinus} />
-            <MetricCard label={t('admin.newsletter.metrics.total')} value={subs.length} icon={Mail} />
+            <MetricCard label={t('admin.newsletter.metrics.active')} value={confirmed.length} icon={IconUsers} />
+            <MetricCard label={t('admin.newsletter.metrics.thisMonth')} value={thisMonth.length} icon={IconTrending} />
+            <MetricCard label={t('admin.newsletter.metrics.unsubscribed')} value={unsub.length} icon={IconUserMinus} />
+            <MetricCard label={t('admin.newsletter.metrics.total')} value={subs.length} icon={IconMail} />
           </div>
 
           <Composer adminEmail={admin?.email} confirmedCount={confirmed.length} onSent={load} />
 
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 mt-10 mb-3">{t('admin.newsletter.subscribersHeading')}</h2>
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted mt-10 mb-3">{t('admin.newsletter.subscribersHeading')}</h2>
 
-          <div className="rounded-2xl border border-slate-200 bg-white">
-            <div className="p-4 border-b border-slate-100 flex flex-wrap gap-2 items-center">
+          <div className="card rounded-2xl">
+            <div className="p-4 border-b border-c-border flex flex-wrap gap-2 items-center">
               <input
                 type="text"
                 placeholder={t('admin.newsletter.searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="flex-1 min-w-[180px] h-9 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                className="input flex-1 min-w-[180px] text-sm"
               />
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="select w-auto text-sm">
                 <option value="all">{t('admin.newsletter.filters.allStatuses')}</option>
                 <option value="confirmed">{t('admin.newsletter.filters.active')}</option>
                 <option value="pending">{t('admin.newsletter.filters.pending')}</option>
                 <option value="unsubscribed">{t('admin.newsletter.filters.unsubscribed')}</option>
               </select>
-              <select value={langFilter} onChange={(e) => setLangFilter(e.target.value)} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
+              <select value={langFilter} onChange={(e) => setLangFilter(e.target.value)} className="select w-auto text-sm">
                 <option value="all">{t('admin.newsletter.filters.allLanguages')}</option>
                 {langs.map((l) => <option key={l} value={l}>{l}</option>)}
               </select>
-              <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
+              <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="select w-auto text-sm">
                 <option value="all">{t('admin.newsletter.filters.allSources')}</option>
                 {sources.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
               <button
+                type="button"
                 onClick={exportCSV}
-                className="ml-auto inline-flex items-center gap-1.5 h-9 px-3 text-sm font-semibold text-white rounded-lg"
+                className="btn-primary btn-sm ml-auto text-sm font-semibold"
                 style={{ background: NAVY }}
               >
-                <Download className="w-4 h-4" /> {t('admin.newsletter.exportCsv')}
+                <IconDownload className="w-4 h-4" /> {t('admin.newsletter.exportCsv')}
               </button>
             </div>
 
             <div className="overflow-x-auto">
               {loading ? (
-                <div className="p-12 text-center text-slate-400 text-sm">{t('admin.newsletter.loading')}</div>
+                <div className="p-4">
+                  <SkeletonList count={6} avatar={false} />
+                  <p className="sr-only">{t('admin.newsletter.loading')}</p>
+                </div>
               ) : filtered.length === 0 ? (
-                <div className="p-12 text-center text-slate-400 text-sm">{t('admin.newsletter.emptyState')}</div>
+                <EmptyState className="border-0 shadow-none" title={t('admin.newsletter.emptyState')} />
               ) : (
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50">
+                  <thead className="bg-soft">
                     <tr>
-                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{t('auth.email')}</th>
-                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{t('auth.name')}</th>
-                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.newsletter.table.language')}</th>
-                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.newsletter.table.source')}</th>
-                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.newsletter.table.signup')}</th>
-                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.newsletter.table.status')}</th>
-                      <th className="text-right px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.newsletter.table.sent')}</th>
-                      <th className="text-right px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.newsletter.table.last')}</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">{t('auth.email')}</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">{t('auth.name')}</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.newsletter.table.language')}</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.newsletter.table.source')}</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.newsletter.table.signup')}</th>
+                      <th className="text-left px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.newsletter.table.status')}</th>
+                      <th className="text-right px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.newsletter.table.sent')}</th>
+                      <th className="text-right px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.newsletter.table.last')}</th>
                       <th className="px-3 py-2" />
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.map((s) => (
-                      <tr key={s.id} className="border-t border-slate-100 hover:bg-slate-50/60">
-                        <td className="px-3 py-2 text-slate-900 font-mono text-[12px]">{s.email}</td>
-                        <td className="px-3 py-2 text-slate-700">{s.name || <span className="text-slate-300">—</span>}</td>
-                        <td className="px-3 py-2 text-xs uppercase text-slate-500">{s.language || '—'}</td>
-                        <td className="px-3 py-2 text-xs text-slate-500">{s.source || '—'}</td>
-                        <td className="px-3 py-2 text-xs text-slate-500">{s.created_date ? new Date(s.created_date).toLocaleDateString('es-ES') : '—'}</td>
+                      <tr key={s.id} className="border-t border-c-border hover:bg-soft">
+                        <td className="px-3 py-2 text-ink font-mono text-[12px]">{s.email}</td>
+                        <td className="px-3 py-2 text-ink">{s.name || <span className="text-c-muted">—</span>}</td>
+                        <td className="px-3 py-2 text-xs uppercase text-c-muted">{s.language || '—'}</td>
+                        <td className="px-3 py-2 text-xs text-c-muted">{s.source || '—'}</td>
+                        <td className="px-3 py-2 text-xs text-c-muted">{s.created_date ? new Date(s.created_date).toLocaleDateString('es-ES') : '—'}</td>
                         <td className="px-3 py-2"><StatusBadge status={s.status} /></td>
-                        <td className="px-3 py-2 text-right tabular-nums text-slate-700">{s.emails_sent ?? 0}</td>
-                        <td className="px-3 py-2 text-right text-xs text-slate-500">{s.last_sent_at ? new Date(s.last_sent_at).toLocaleDateString('es-ES') : '—'}</td>
+                        <td className="px-3 py-2 text-right tabular-nums text-ink">{s.emails_sent ?? 0}</td>
+                        <td className="px-3 py-2 text-right text-xs text-c-muted">{s.last_sent_at ? new Date(s.last_sent_at).toLocaleDateString('es-ES') : '—'}</td>
                         <td className="px-3 py-2">
                           <button
+                            type="button"
                             onClick={() => deleteSub(s.id)}
-                            className="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                            className="w-7 h-7 flex items-center justify-center rounded-md text-c-muted hover:text-error hover:bg-error/10"
                             title={t('common.delete')}
+                            aria-label={t('common.delete')}
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <IconTrash className="w-3.5 h-3.5" />
                           </button>
                         </td>
                       </tr>
@@ -384,7 +394,7 @@ export default function AdminNewsletter() {
                 </table>
               )}
             </div>
-            <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-500">
+            <div className="px-4 py-3 border-t border-c-border text-xs text-c-muted">
               {t('admin.newsletter.footerCount', {
                 shown: filtered.length.toLocaleString('es-ES'),
                 total: subs.length.toLocaleString('es-ES'),

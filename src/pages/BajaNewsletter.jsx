@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { IconSuccess, IconAlert, IconSpinner } from '@/components/Icons';
 import SEOHead from '@/components/seo/SEOHead';
 
 const NAVY = '#00255C';
@@ -56,13 +56,13 @@ export default function BajaNewsletter() {
     switch (state) {
       case STATE.loading:
         return {
-          icon: <Loader2 className="w-7 h-7 animate-spin" style={{ color: NAVY }} />,
+          icon: <IconSpinner className="w-7 h-7 animate-spin" style={{ color: NAVY }} />,
           title: t('newsletter.baja.loadingTitle'),
           body: t('newsletter.baja.loadingBody'),
         };
       case STATE.success:
         return {
-          icon: <CheckCircle2 className="w-7 h-7" style={{ color: NAVY }} />,
+          icon: <IconSuccess className="w-7 h-7" style={{ color: NAVY }} />,
           title: t('newsletter.unsubscribe.title'),
           body: email
             ? t('newsletter.baja.successBodyEmail', { email })
@@ -70,7 +70,7 @@ export default function BajaNewsletter() {
         };
       case STATE.already:
         return {
-          icon: <CheckCircle2 className="w-7 h-7 text-emerald-600" />,
+          icon: <IconSuccess className="w-7 h-7 text-success" />,
           title: t('newsletter.baja.alreadyTitle'),
           body: email
             ? t('newsletter.baja.alreadyBodyEmail', { email })
@@ -78,20 +78,20 @@ export default function BajaNewsletter() {
         };
       case STATE.not_found:
         return {
-          icon: <AlertCircle className="w-7 h-7 text-amber-600" />,
+          icon: <IconAlert className="w-7 h-7 text-warning" />,
           title: t('newsletter.baja.notFoundTitle'),
           body: t('newsletter.baja.notFoundBody'),
         };
       case STATE.no_token:
         return {
-          icon: <AlertCircle className="w-7 h-7 text-amber-600" />,
+          icon: <IconAlert className="w-7 h-7 text-warning" />,
           title: t('newsletter.baja.noTokenTitle'),
           body: t('newsletter.baja.noTokenBody'),
         };
       case STATE.error:
       default:
         return {
-          icon: <AlertCircle className="w-7 h-7 text-rose-600" />,
+          icon: <IconAlert className="w-7 h-7 text-error" />,
           title: t('common.errorGenericTitle'),
           body: msg || t('newsletter.baja.errorBody'),
         };
@@ -102,7 +102,7 @@ export default function BajaNewsletter() {
   return (
     <>
       <SEOHead title={t('newsletter.baja.seoTitle')} noindex />
-      <main className="min-h-screen bg-white text-slate-900">
+      <main className="min-h-screen bg-canvas text-ink">
         <section className="max-w-xl mx-auto px-4 pt-20 md:pt-28 pb-16 text-center">
           <div
             className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mx-auto"
@@ -116,10 +116,10 @@ export default function BajaNewsletter() {
           >
             {title}
           </h1>
-          <p className="mt-3 text-slate-600 max-w-md mx-auto leading-relaxed">{body}</p>
+          <p className="mt-3 text-c-muted max-w-md mx-auto leading-relaxed">{body}</p>
 
           {(state === STATE.success || state === STATE.already) && (
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-c-muted">
               {t('newsletter.baja.resubscribeHint')}
             </p>
           )}
@@ -134,13 +134,13 @@ export default function BajaNewsletter() {
             </Link>
             <Link
               to="/contacto"
-              className="inline-flex items-center justify-center h-11 px-6 rounded-xl font-semibold border border-slate-200 text-slate-700 hover:bg-slate-50"
+              className="inline-flex items-center justify-center h-11 px-6 rounded-xl font-semibold border border-c-border text-ink hover:bg-soft"
             >
               {t('profile_card.contact')}
             </Link>
           </div>
 
-          <p className="mt-10 text-[11px] text-slate-400">
+          <p className="mt-10 text-[11px] text-c-muted">
             <span className="inline-block w-1.5 h-1.5 rounded-full align-middle mr-1.5" style={{ background: GOLD }} />
             {BRAND} · {SUPPORT_EMAIL}
           </p>

@@ -3,13 +3,14 @@ import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Eye, MessageSquare, Star, MousePointerClick, ArrowRight, Camera,
-  ShieldCheck, Sparkles, CheckCircle2, Circle, X, BarChart3, User,
-  Loader2,
-} from 'lucide-react';
+  IconEye, IconMessageSquare, IconStar, IconStarOutline, IconPointerClick,
+  IconArrowRight, IconCamera, IconShield, IconSparkles, IconSuccess,
+  IconCircle, IconClose, IconChart, IconUser,
+} from '@/components/Icons';
 import { supabase } from '@/api/supabaseClient';
 import SEOHead from '@/components/seo/SEOHead';
-import PullToRefresh from '@/components/ui/PullToRefresh';
+import PullToRefresh from '@/components/PullToRefresh';
+import { ErrorState, SkeletonLine, SkeletonBlock } from '@/components/ListStates';
 
 const NAVY = '#00255C';
 const GOLD = '#F5C13D';
@@ -71,6 +72,20 @@ export default function ProfessionalDashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Reintento desde ErrorState: repite el fetch sin recargar la página.
+  const reload = async () => {
+    setLoading(true);
+    setErr('');
+    try {
+      const rpc = await fetchDashboard();
+      setData(rpc);
+    } catch (e) {
+      setErr(e?.message || t('dashboard.pro.errors.loadError'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRefresh = async () => {
     try {
       const rpc = await fetchDashboard();
@@ -86,7 +101,7 @@ export default function ProfessionalDashboardPage() {
     if (!completeness.has_photo) {
       return {
         id: 'photo',
-        icon: Camera,
+        icon: IconCamera,
         title: t('dashboard.pro.banner.photo.title'),
         body: t('dashboard.pro.banner.photo.body'),
         cta: t('myProfile.photoBanner.cta'),
@@ -96,7 +111,7 @@ export default function ProfessionalDashboardPage() {
     if (!data.is_verified) {
       return {
         id: 'verify',
-        icon: ShieldCheck,
+        icon: IconShield,
         title: t('verification.idle.title'),
         body: t('dashboard.pro.banner.verify.body'),
         cta: t('dashboard.pro.banner.verify.cta'),
@@ -106,7 +121,7 @@ export default function ProfessionalDashboardPage() {
     if ((completeness.percent || 0) < 100) {
       return {
         id: 'complete',
-        icon: Sparkles,
+        icon: IconSparkles,
         title: t('dashboard.pro.banner.complete.title'),
         body: t('dashboard.pro.banner.complete.body'),
         cta: t('dashboard.pro.banner.complete.cta'),
@@ -137,7 +152,7 @@ export default function ProfessionalDashboardPage() {
         key: 'views',
         label: t('dashboard.pro.stats.views'),
         value: fmt(d.views_month),
-        icon: Eye,
+        icon: IconEye,
         accent: NAVY,
         bg: 'rgba(0,37,92,0.06)',
         onClick: () => navigate('/mis-estadisticas'),
@@ -146,7 +161,7 @@ export default function ProfessionalDashboardPage() {
         key: 'unread',
         label: t('dashboard.pro.stats.unread'),
         value: fmt(d.unread_messages),
-        icon: MessageSquare,
+        icon: IconMessageSquare,
         accent: '#0B5394',
         bg: 'rgba(11,83,148,0.06)',
         alert: Number(d.unread_messages || 0) > 0,
@@ -159,7 +174,7 @@ export default function ProfessionalDashboardPage() {
         sub: reviews
           ? t('dashboard.pro.stats.reviewsCount', { count: reviews, n: fmt(reviews) })
           : t('dashboard.pro.stats.noReviews'),
-        icon: Star,
+        icon: IconStarOutline,
         accent: GOLD,
         bg: 'rgba(245,193,61,0.12)',
         onClick: () => navigate('/mis-valoraciones'),
@@ -168,7 +183,7 @@ export default function ProfessionalDashboardPage() {
         key: 'clicks',
         label: t('dashboard.pro.stats.contactClicks'),
         value: fmt(d.contact_clicks_30d),
-        icon: MousePointerClick,
+        icon: IconPointerClick,
         accent: '#1E8A3D',
         bg: 'rgba(30,138,61,0.08)',
         onClick: () => navigate('/mis-estadisticas'),
@@ -180,7 +195,7 @@ export default function ProfessionalDashboardPage() {
     const c = data?.completeness || {};
     return [
       { key: 'photo', label: t('dashboard.pro.completeness.photo'), done: !!c.has_photo },
-      { key: 'desc', label: t('premium.dashboard.checks.fullDescription'), done: !!c.has_description },
+      { key: 'desc', label: t('dashboard.completion.fullDescription'), done: !!c.has_description },
       { key: 'photos3', label: t('dashboard.pro.completeness.workPhotos'), done: !!c.has_3_work_photos },
     ];
   }, [data, t]);
@@ -192,8 +207,33 @@ export default function ProfessionalDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin" style={{ color: NAVY }} />
+      <div className="min-h-screen bg-soft">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-7 space-y-5">
+          <SkeletonBlock lines={2} />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="rounded-2xl bg-surface border border-c-border p-3.5 sm:p-4" aria-hidden="true">
+                <SkeletonLine width={36} height={36} />
+                <SkeletonLine className="mt-3" width="55%" height={24} />
+                <SkeletonLine className="mt-2" width="80%" height={11} />
+              </div>
+            ))}
+          </div>
+          <div className="rounded-2xl bg-surface border border-c-border p-4 sm:p-5">
+            <SkeletonBlock lines={4} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error sin datos: una salida, no un callejón.
+  if (err && !data) {
+    return (
+      <div className="min-h-screen bg-soft">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
+          <ErrorState message={err} onRetry={reload} />
+        </div>
       </div>
     );
   }
@@ -201,7 +241,7 @@ export default function ProfessionalDashboardPage() {
   return (
     <PullToRefresh onRefresh={handleRefresh}>
       <SEOHead title={t('dashboard.pro.seoTitle')} noindex />
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-soft">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-7 space-y-5">
 
           {/* HEADER */}
@@ -212,14 +252,14 @@ export default function ProfessionalDashboardPage() {
             className="flex items-end justify-between gap-3"
           >
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm text-slate-500">
+              <p className="text-xs sm:text-sm text-c-muted">
                 <Trans
                   i18nKey="dashboard.pro.header.greetingLine"
                   values={{ greeting, name: greetingName }}
-                  components={{ b: <span className="font-semibold text-slate-700" /> }}
+                  components={{ b: <span className="font-semibold text-ink" /> }}
                 />
               </p>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-0.5">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-ink mt-0.5">
                 {t('dashboard.pro.header.title')}
               </h1>
             </div>
@@ -228,15 +268,18 @@ export default function ProfessionalDashboardPage() {
                 className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md"
                 style={{ background: `${NAVY}10`, color: NAVY }}
               >
-                <ShieldCheck className="w-3.5 h-3.5" />
+                <IconShield className="w-3.5 h-3.5" />
                 {t('proProfile.badges.verified')}
               </span>
             )}
           </motion.div>
 
           {err && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 text-amber-900 p-3 text-sm">
-              {err}
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 text-warning p-3 text-sm flex items-center justify-between gap-3">
+              <span className="min-w-0">{err}</span>
+              <button type="button" className="btn-secondary btn-sm shrink-0" onClick={reload}>
+                {t('common.retry')}
+              </button>
             </div>
           )}
 
@@ -287,7 +330,7 @@ function NextStepBanner({ banner, onDismiss }) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
+      className="rounded-2xl border border-c-border bg-surface overflow-hidden"
     >
       <div className="p-4 sm:p-5 flex items-start gap-3">
         <div
@@ -309,8 +352,8 @@ function NextStepBanner({ banner, onDismiss }) {
               style={{ background: GOLD }}
             />
           </div>
-          <p className="text-sm font-semibold text-slate-900">{banner.title}</p>
-          <p className="text-xs text-slate-500 mt-0.5">{banner.body}</p>
+          <p className="text-sm font-semibold text-ink">{banner.title}</p>
+          <p className="text-xs text-c-muted mt-0.5">{banner.body}</p>
           <button
             type="button"
             onClick={banner.action}
@@ -318,16 +361,16 @@ function NextStepBanner({ banner, onDismiss }) {
             style={{ background: NAVY }}
           >
             {banner.cta}
-            <ArrowRight className="w-3.5 h-3.5" />
+            <IconArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
         <button
           type="button"
           onClick={onDismiss}
-          className="w-8 h-8 inline-flex items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 -mt-1 -mr-1"
+          className="w-8 h-8 inline-flex items-center justify-center rounded-md text-c-muted hover:bg-soft -mt-1 -mr-1"
           aria-label={t('dashboard.pro.nextStep.dismiss')}
         >
-          <X className="w-4 h-4" />
+          <IconClose className="w-4 h-4" />
         </button>
       </div>
     </motion.div>
@@ -343,7 +386,7 @@ function StatCard({ stat, delay = 0 }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.25 }}
-      className="relative text-left rounded-2xl bg-white border border-slate-200 p-3.5 sm:p-4 hover:border-slate-300 hover:shadow-sm transition active:scale-[0.99]"
+      className="relative text-left rounded-2xl bg-surface border border-c-border p-3.5 sm:p-4 hover:border-slate-300 hover:shadow-sm transition active:scale-[0.99]"
     >
       <div className="flex items-center justify-between">
         <div
@@ -357,18 +400,18 @@ function StatCard({ stat, delay = 0 }) {
         )}
       </div>
       <div className="mt-3 flex items-baseline gap-1">
-        <span className="text-2xl sm:text-[28px] font-extrabold text-slate-900 leading-none">
+        <span className="text-2xl sm:text-[28px] font-extrabold text-ink leading-none">
           {stat.value}
         </span>
         {stat.key === 'rating' && stat.value !== '—' && (
-          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+          <IconStar className="w-4 h-4 fill-star text-star" />
         )}
       </div>
-      <p className="text-[11px] sm:text-xs text-slate-500 mt-1 leading-tight">
+      <p className="text-[11px] sm:text-xs text-c-muted mt-1 leading-tight">
         {stat.label}
       </p>
       {stat.sub && (
-        <p className="text-[11px] text-slate-400 mt-0.5">{stat.sub}</p>
+        <p className="text-[11px] text-c-muted mt-0.5">{stat.sub}</p>
       )}
     </motion.button>
   );
@@ -381,32 +424,32 @@ function CompletenessCard({ percent, items, isComplete, onCta }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.18, duration: 0.25 }}
-      className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-5"
+      className="rounded-2xl bg-surface border border-c-border p-4 sm:p-5"
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 mb-1">
-            <Sparkles className="w-4 h-4" style={{ color: NAVY }} />
+            <IconSparkles className="w-4 h-4" style={{ color: NAVY }} />
             <span
               className="text-[10px] font-bold uppercase tracking-[0.1em]"
               style={{ color: NAVY }}
             >
-              {t('premium.dashboard.completeness.title')}
+              {t('dashboard.completion.title')}
             </span>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-c-muted">
             {isComplete
               ? t('dashboard.pro.completeness.optimized')
               : t('dashboard.pro.completeness.eachStep')}
           </p>
         </div>
-        <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-none">
+        <span className="text-2xl sm:text-3xl font-extrabold text-ink leading-none">
           {percent}
-          <span className="text-sm sm:text-base text-slate-400 font-bold">%</span>
+          <span className="text-sm sm:text-base text-c-muted font-bold">%</span>
         </span>
       </div>
 
-      <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden mb-4">
+      <div className="relative h-2 bg-soft rounded-full overflow-hidden mb-4">
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
           style={{ background: `linear-gradient(90deg, ${NAVY}, ${GOLD})` }}
@@ -420,11 +463,11 @@ function CompletenessCard({ percent, items, isComplete, onCta }) {
         {items.map((it) => (
           <li key={it.key} className="flex items-center gap-2 text-sm">
             {it.done ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <IconSuccess className="w-4 h-4 text-emerald-600 flex-shrink-0" />
             ) : (
-              <Circle className="w-4 h-4 text-slate-300 flex-shrink-0" />
+              <IconCircle className="w-4 h-4 text-slate-300 flex-shrink-0" />
             )}
-            <span className={it.done ? 'text-slate-700' : 'text-slate-500'}>
+            <span className={it.done ? 'text-ink' : 'text-c-muted'}>
               {it.label}
             </span>
           </li>
@@ -438,7 +481,7 @@ function CompletenessCard({ percent, items, isComplete, onCta }) {
         style={{ background: NAVY }}
       >
         {isComplete ? t('dashboard.pro.completeness.editProfile') : t('dashboard.pro.completeness.completeProfile')}
-        <ArrowRight className="w-4 h-4" />
+        <IconArrowRight className="w-4 h-4" />
       </button>
     </motion.div>
   );
@@ -452,15 +495,15 @@ function RankingHint({ isVerified, percent }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.22, duration: 0.25 }}
-      className="rounded-xl border border-slate-200 bg-white px-4 py-3 flex items-start gap-2.5"
+      className="rounded-xl border border-c-border bg-surface px-4 py-3 flex items-start gap-2.5"
     >
       <div
         className="w-7 h-7 rounded-lg inline-flex items-center justify-center flex-shrink-0"
         style={{ background: `${GOLD}26`, color: '#7A5B00' }}
       >
-        <Sparkles className="w-3.5 h-3.5" />
+        <IconSparkles className="w-3.5 h-3.5" />
       </div>
-      <p className="text-xs text-slate-600 leading-relaxed">
+      <p className="text-xs text-c-muted leading-relaxed">
         {t('dashboard.pro.rankingHint')}
       </p>
     </motion.div>
@@ -473,26 +516,26 @@ function QuickActions({ navigate, unread, pendingReviews }) {
     {
       key: 'profile',
       label: t('nav.myProfile'),
-      icon: User,
+      icon: IconUser,
       onClick: () => navigate('/mi-perfil'),
     },
     {
       key: 'stats',
       label: t('nav.statistics'),
-      icon: BarChart3,
+      icon: IconChart,
       onClick: () => navigate('/mis-estadisticas'),
     },
     {
       key: 'reviews',
       label: t('nav.reviews'),
-      icon: Star,
+      icon: IconStarOutline,
       onClick: () => navigate('/mis-valoraciones'),
       badge: pendingReviews > 0 ? pendingReviews : null,
     },
     {
       key: 'messages',
       label: t('nav.messages'),
-      icon: MessageSquare,
+      icon: IconMessageSquare,
       onClick: () => navigate('/mensajes'),
       badge: unread > 0 ? unread : null,
     },
@@ -503,7 +546,7 @@ function QuickActions({ navigate, unread, pendingReviews }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.26, duration: 0.25 }}
     >
-      <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-2">
+      <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-c-muted mb-2">
         {t('dashboard.pro.quickActions.title')}
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -514,7 +557,7 @@ function QuickActions({ navigate, unread, pendingReviews }) {
               key={a.key}
               type="button"
               onClick={a.onClick}
-              className="relative rounded-xl border border-slate-200 bg-white px-3 py-3 flex flex-col items-start gap-1.5 hover:border-slate-300 hover:shadow-sm transition text-left"
+              className="relative rounded-xl border border-c-border bg-surface px-3 py-3 flex flex-col items-start gap-1.5 hover:border-slate-300 hover:shadow-sm transition text-left"
             >
               <span
                 className="w-8 h-8 rounded-lg inline-flex items-center justify-center"
@@ -522,7 +565,7 @@ function QuickActions({ navigate, unread, pendingReviews }) {
               >
                 <Icon className="w-4 h-4" />
               </span>
-              <span className="text-sm font-semibold text-slate-800">{a.label}</span>
+              <span className="text-sm font-semibold text-ink">{a.label}</span>
               {a.badge != null && (
                 <span
                   className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold text-white inline-flex items-center justify-center"

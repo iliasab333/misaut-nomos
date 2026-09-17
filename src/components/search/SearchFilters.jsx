@@ -1,16 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useCategoryName } from '@/hooks/useCategoryName';
-import { Filter, Star, Clock, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { IconFilter, IconStarOutline, IconClock } from "@/components/Icons";
 
 export default function SearchFilters({
   filters,
@@ -23,6 +14,24 @@ export default function SearchFilters({
   const { t } = useTranslation();
   const categoryName = useCategoryName();
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const advancedRef = useRef(null);
+
+  // El Popover de Radix cerraba con click fuera y con Escape; aquí lo hace
+  // este efecto. `mousedown` y no `click`: si el usuario empieza a arrastrar
+  // dentro del panel y suelta fuera, no debe cerrarse.
+  useEffect(() => {
+    if (!showAdvanced) return undefined;
+    const onDown = (e) => {
+      if (advancedRef.current && !advancedRef.current.contains(e.target)) setShowAdvanced(false);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') setShowAdvanced(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [showAdvanced]);
 
   const activeFiltersCount = [
     filters.category !== "all",
@@ -37,188 +46,191 @@ export default function SearchFilters({
       <div className="flex flex-col md:flex-row gap-2.5 items-center">
 
         {/* ── CATEGORÍA ── */}
-        {/* Desktop: Radix Select */}
+        {/* Desktop: <select> nativo (antes Radix Select) */}
         <div className="hidden md:block w-full md:w-[220px]">
-          <Select value={filters.category} onValueChange={(val) => onFilterChange({ ...filters, category: val })}>
-            <SelectTrigger className="h-11 border-2 border-gray-200 text-sm rounded-lg font-medium hover:border-blue-300 transition-colors">
-              <SelectValue placeholder={t('allCategories')}>
-                {filters.category === "all"
-                  ? t('allCategories')
-                  : categoryName(categories.find((c) => c.name === filters.category)?.slug, filters.category)}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
-              <SelectItem value="all">{t('allCategories')}</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.name}>{categoryName(cat.slug, cat.name)}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        {/* Mobile: native <select> — iOS system picker, zero animation */}
-        <div className="md:hidden w-full relative">
-          <label htmlFor="select-categoria-mobile" className="sr-only">{t('search.filterPanel.category')}</label>
+          <label htmlFor="select-categoria-desktop" className="sr-only">{t('search.filterPanel.category')}</label>
           <select
-            id="select-categoria-mobile"
+            id="select-categoria-desktop"
             value={filters.category}
             onChange={(e) => onFilterChange({ ...filters, category: e.target.value })}
-            className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 pr-10 text-slate-900 text-base font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="select"
           >
             <option value="all">{t('allCategories')}</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.name}>{categoryName(cat.slug, cat.name)}</option>
             ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+        </div>
+        {/* Mobile: native <select> — iOS system picker, zero animation */}
+        <div className="md:hidden w-full">
+          <label htmlFor="select-categoria-mobile" className="sr-only">{t('search.filterPanel.category')}</label>
+          <select
+            id="select-categoria-mobile"
+            value={filters.category}
+            onChange={(e) => onFilterChange({ ...filters, category: e.target.value })}
+            className="select"
+          >
+            <option value="all">{t('allCategories')}</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.name}>{categoryName(cat.slug, cat.name)}</option>
+            ))}
+          </select>
         </div>
 
         {/* ── PROVINCIA ── */}
-        {/* Desktop: Radix Select */}
+        {/* Desktop: <select> nativo */}
         <div className="hidden md:block w-full md:w-[200px]">
-          <Select value={filters.provincia} onValueChange={(val) => {
-            onFilterChange({ ...filters, provincia: val, ciudad: "all" });
-          }}>
-            <SelectTrigger className="h-11 border-2 border-gray-200 text-sm rounded-lg font-medium hover:border-blue-300 transition-colors">
-              <SelectValue placeholder={t('allProvinces')} />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
-              <SelectItem value="all">{t('allProvinces')}</SelectItem>
-              {provinces.map((prov) => (
-                <SelectItem key={prov} value={prov}>{prov}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        {/* Mobile: native <select> */}
-        <div className="md:hidden w-full relative">
-          <label htmlFor="select-provincia-mobile" className="sr-only">{t('provinceField')}</label>
+          <label htmlFor="select-provincia-desktop" className="sr-only">{t('provinceField')}</label>
           <select
-            id="select-provincia-mobile"
+            id="select-provincia-desktop"
             value={filters.provincia}
             onChange={(e) => onFilterChange({ ...filters, provincia: e.target.value, ciudad: "all" })}
-            className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 pr-10 text-slate-900 text-base font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="select"
           >
             <option value="all">{t('allProvinces')}</option>
             {provinces.map((prov) => (
               <option key={prov} value={prov}>{prov}</option>
             ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+        </div>
+        {/* Mobile: native <select> */}
+        <div className="md:hidden w-full">
+          <label htmlFor="select-provincia-mobile" className="sr-only">{t('provinceField')}</label>
+          <select
+            id="select-provincia-mobile"
+            value={filters.provincia}
+            onChange={(e) => onFilterChange({ ...filters, provincia: e.target.value, ciudad: "all" })}
+            className="select"
+          >
+            <option value="all">{t('allProvinces')}</option>
+            {provinces.map((prov) => (
+              <option key={prov} value={prov}>{prov}</option>
+            ))}
+          </select>
         </div>
 
         {/* ── CIUDAD ── */}
-        {/* Desktop: Radix Select */}
+        {/* Desktop: <select> nativo */}
         <div className="hidden md:block w-full md:w-[200px]">
-          <Select value={filters.ciudad} onValueChange={(val) => onFilterChange({ ...filters, ciudad: val })} disabled={filters.provincia === "all"}>
-            <SelectTrigger className="h-11 border-2 border-gray-200 text-sm rounded-lg font-medium hover:border-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <SelectValue placeholder={filters.provincia === "all" ? t('search.filterPanel.selectProvinceFirst') : t('allCities')} />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
-              <SelectItem value="all">{t('allCities')}</SelectItem>
-              {availableCities.map((ciudad) => (
-                <SelectItem key={ciudad} value={ciudad}>{ciudad}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        {/* Mobile: native <select> */}
-        <div className="md:hidden w-full relative">
-          <label htmlFor="select-ciudad-mobile" className="sr-only">{t('cityField')}</label>
+          <label htmlFor="select-ciudad-desktop" className="sr-only">{t('cityField')}</label>
           <select
-            id="select-ciudad-mobile"
+            id="select-ciudad-desktop"
             value={filters.ciudad}
             onChange={(e) => onFilterChange({ ...filters, ciudad: e.target.value })}
             disabled={filters.provincia === "all"}
-            className="w-full appearance-none bg-white border-2 border-gray-200 rounded-lg px-4 py-3 pr-10 text-slate-900 text-base font-normal focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="select disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="all">{filters.provincia === "all" ? t('search.filterPanel.selectProvinceFirst') : t('allCities')}</option>
             {availableCities.map((ciudad) => (
               <option key={ciudad} value={ciudad}>{ciudad}</option>
             ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+        </div>
+        {/* Mobile: native <select> */}
+        <div className="md:hidden w-full">
+          <label htmlFor="select-ciudad-mobile" className="sr-only">{t('cityField')}</label>
+          <select
+            id="select-ciudad-mobile"
+            value={filters.ciudad}
+            onChange={(e) => onFilterChange({ ...filters, ciudad: e.target.value })}
+            disabled={filters.provincia === "all"}
+            className="select disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <option value="all">{filters.provincia === "all" ? t('search.filterPanel.selectProvinceFirst') : t('allCities')}</option>
+            {availableCities.map((ciudad) => (
+              <option key={ciudad} value={ciudad}>{ciudad}</option>
+            ))}
+          </select>
         </div>
 
-        {/* "Filtros avanzados" popover — hidden on mobile (always-visible layout handles it) */}
-        {!isMobile && <Popover open={showAdvanced} onOpenChange={setShowAdvanced}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="h-11 px-4 border-2 border-gray-200 hover:border-blue-300 relative"
+        {/* "Filtros avanzados" — hidden on mobile (always-visible layout handles it) */}
+        {!isMobile && (
+          <div className="relative" ref={advancedRef}>
+            <button
+              type="button"
+              onClick={() => setShowAdvanced((v) => !v)}
+              aria-expanded={showAdvanced}
+              aria-label={t('search.filters_advanced')}
+              className="btn-secondary btn-sm relative"
             >
-              <Filter className="w-4 h-4 mr-2" />
+              <IconFilter size={16} />
               {t('search.filters_advanced')}
               {activeFiltersCount > 3 && (
-                <Badge className="ml-2 bg-blue-600 text-white h-5 min-w-5 rounded-full px-1.5">
+                <span className="badge-accent ml-2">
                   {activeFiltersCount - 3}
-                </Badge>
+                </span>
               )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80" align="end">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                  <Star className="w-4 h-4 text-yellow-500" />
-                  {t('search.filterPanel.minRating')}
-                </label>
-                <div className="space-y-2">
-                  <Slider
-                    value={[filters.minRating]}
-                    onValueChange={(val) => onFilterChange({ ...filters, minRating: val[0] })}
-                    max={5}
-                    step={0.5}
-                    className="w-full"
-                  />
-                  <div className="flex items-center justify-between text-xs text-gray-600">
-                    <span>{t('search.filterPanel.anyRating')}</span>
-                    <Badge variant="outline" className="bg-yellow-50">
-                      {filters.minRating > 0 ? t('search.filterPanel.ratingPlus', { rating: filters.minRating }) : t('search.filterPanel.noFilter')}
-                    </Badge>
+            </button>
+
+            {showAdvanced && (
+              <div className="card p-4 absolute end-0 top-full mt-2 w-80 z-20">
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="filter-min-rating" className="text-sm font-medium flex items-center gap-2 mb-2">
+                      <IconStarOutline className="text-star" />
+                      {t('search.filterPanel.minRating')}
+                    </label>
+                    <div className="space-y-2">
+                      <input
+                        id="filter-min-rating"
+                        type="range"
+                        value={filters.minRating}
+                        onChange={(e) => onFilterChange({ ...filters, minRating: Number(e.target.value) })}
+                        min={0}
+                        max={5}
+                        step={0.5}
+                        className="w-full"
+                        style={{ accentColor: 'rgb(var(--c-accent))' }}
+                      />
+                      <div className="flex items-center justify-between text-xs text-c-muted">
+                        <span>{t('search.filterPanel.anyRating')}</span>
+                        <span className="badge-warning">
+                          {filters.minRating > 0 ? t('search.filterPanel.ratingPlus', { rating: filters.minRating }) : t('search.filterPanel.noFilter')}
+                        </span>
+                      </div>
+                    </div>
                   </div>
+
+                  <div>
+                    <label htmlFor="filter-availability" className="text-sm font-medium flex items-center gap-2 mb-2">
+                      <IconClock size={16} className="text-c-accent" />
+                      {t('availability')}
+                    </label>
+                    <select
+                      id="filter-availability"
+                      value={filters.availability}
+                      onChange={(e) => onFilterChange({ ...filters, availability: e.target.value })}
+                      className="select"
+                    >
+                      <option value="all">{t('search.filterPanel.anyAvailability')}</option>
+                      <option value="laborables">{t('search.filterPanel.weekdaysOnly')}</option>
+                      <option value="festivos">{t('proProfile.availability.weekends')}</option>
+                      <option value="ambos">{t('search.filterPanel.allWeek')}</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onFilterChange({
+                        ...filters,
+                        minRating: 0,
+                        availability: "all"
+                      });
+                    }}
+                    className="btn-secondary btn-sm w-full"
+                  >
+                    {t('search.filterPanel.clearAdvanced')}
+                  </button>
                 </div>
               </div>
-
-              <div>
-                <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                  <Clock className="w-4 h-4 text-blue-500" />
-                  {t('availability')}
-                </label>
-                <Select value={filters.availability} onValueChange={(val) => onFilterChange({ ...filters, availability: val })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('search.filterPanel.anyAvailability')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('search.filterPanel.anyAvailability')}</SelectItem>
-                    <SelectItem value="laborables">{t('search.filterPanel.weekdaysOnly')}</SelectItem>
-                    <SelectItem value="festivos">{t('proProfile.availability.weekends')}</SelectItem>
-                    <SelectItem value="ambos">{t('search.filterPanel.allWeek')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                onClick={() => {
-                  onFilterChange({
-                    ...filters,
-                    minRating: 0,
-                    availability: "all"
-                  });
-                }}
-                variant="outline"
-                className="w-full"
-                size="sm"
-              >
-                {t('search.filterPanel.clearAdvanced')}
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>}
+            )}
+          </div>
+        )}
 
         {activeFiltersCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() => onFilterChange({
               category: "all",
               provincia: "all",
@@ -226,10 +238,10 @@ export default function SearchFilters({
               minRating: 0,
               availability: "all"
             })}
-            className="text-xs text-gray-500 hover:text-gray-700 h-11 md:ml-auto whitespace-nowrap"
+            className="btn-ghost btn-sm text-xs text-c-muted md:ml-auto whitespace-nowrap"
           >
             {t('search.filterPanel.clearAll', { count: activeFiltersCount })}
-          </Button>
+          </button>
         )}
       </div>
     </div>

@@ -1,0 +1,106 @@
+{
+  "es": {
+    "footer": {
+      "claim": "Profesionales verificados, contacto directo, sin comisiones.",
+      "copyright": "© {{year}} <brand>MisAutónomos</brand>. Hecho en España.",
+      "columns": {
+        "product": "Producto",
+        "company": "Empresa",
+        "legal": "Legal"
+      },
+      "links": {
+        "searchPros": "Buscar profesionales",
+        "becomePro": "Hazte autónomo",
+        "pricing": "Precios",
+        "helpCenter": "Centro de ayuda",
+        "faq": "Preguntas frecuentes",
+        "blog": "Blog",
+        "contact": "Contacto",
+        "privacy": "Privacidad",
+        "terms": "Términos",
+        "cookies": "Cookies",
+        "legalNotice": "Aviso legal"
+      },
+      "seo": {
+        "servicesLabel": "Servicios",
+        "citiesLabel": "Ciudades",
+        "electricians": "Electricistas",
+        "plumbers": "Fontaneros",
+        "builders": "Albañiles / Reformas",
+        "painters": "Pintores",
+        "locksmiths": "Cerrajeros",
+        "advisors": "Asesoría / gestoría",
+        "cleaning": "Limpieza"
+      },
+      "newsletter": {
+        "label": "Newsletter:",
+        "pitch": "1-2 emails al mes. Cero spam.",
+        "emailPlaceholder": "tu@email.com",
+        "emailAria": "Tu email",
+        "sending": "Enviando…",
+        "submit": "Suscribirme",
+        "invalidEmail": "Introduce un email válido",
+        "reactivated": "Te hemos reactivado. Bienvenido de nuevo.",
+        "alreadySubscribed": "Ya estás suscrito.",
+        "confirmed": "Suscripción confirmada.",
+        "genericError": "No se ha podido completar. Inténtalo de nuevo."
+      }
+    },
+    "cookies": {
+      "regionLabel": "Consentimiento de cookies",
+      "policyLinkAria": "Consulta nuestra política de cookies"
+    }
+  },
+  "en": {
+    "footer": {
+      "claim": "Verified professionals, direct contact, no commission.",
+      "copyright": "© {{year}} <brand>MisAutónomos</brand>. Made in Spain.",
+      "columns": {
+        "product": "Product",
+        "company": "Company",
+        "legal": "Legal"
+      },
+      "links": {
+        "searchPros": "Find professionals",
+        "becomePro": "Join as a professional",
+        "pricing": "Pricing",
+        "helpCenter": "Help centre",
+        "faq": "FAQ",
+        "blog": "Blog",
+        "contact": "Contact",
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "cookies": "Cookies",
+        "legalNotice": "Legal notice"
+      },
+      "seo": {
+        "servicesLabel": "Services",
+        "citiesLabel": "Cities",
+        "electricians": "Electricians",
+        "plumbers": "Plumbers",
+        "builders": "Builders / Renovations",
+        "painters": "Painters",
+        "locksmiths": "Locksmiths",
+        "advisors": "Accountants / admin services",
+        "cleaning": "Cleaning"
+      },
+      "newsletter": {
+        "label": "Newsletter:",
+        "pitch": "1-2 emails a month. Zero spam.",
+        "emailPlaceholder": "you@email.com",
+        "emailAria": "Your email",
+        "sending": "Sending…",
+        "submit": "Subscribe",
+        "invalidEmail": "Enter a valid email address",
+        "reactivated": "You're back on the list. Welcome back.",
+        "alreadySubscribed": "You're already subscribed.",
+        "confirmed": "Subscription confirmed.",
+        "genericError": "That didn't go through. Try again."
+      }
+    },
+    "cookies": {
+      "regionLabel": "Cookie consent",
+      "policyLinkAria": "Read our cookie policy"
+    }
+  }
+}

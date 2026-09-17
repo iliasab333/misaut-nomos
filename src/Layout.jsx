@@ -4,48 +4,26 @@ import { useTranslation, Trans } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import {
-  Search,
-  MessageSquare,
-  User,
-  Heart,
-  Menu,
-  ArrowLeft,
-  LogOut,
-  Briefcase,
-  LayoutDashboard,
-  CreditCard,
-  X,
-  Search as SearchIcon,
-  FileText,
-  Users,
-  Eye,
-  Home,
-  HelpCircle,
-  Ticket,
-  TrendingUp,
-  Headphones,
-  Shield,
-  Gift,
-  BookOpen,
-  Mail,
-  Megaphone,
-  BarChart3,
-  Star
-} from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarHeader,
-  SidebarFooter,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+  IconSearch,
+  IconMessageSquare,
+  IconUser,
+  IconHeart,
+  IconMenu,
+  IconArrowLeft,
+  IconLogout,
+  IconBriefcase,
+  IconDashboard,
+  IconCard,
+  IconClose,
+  IconUsers,
+  IconHome,
+  IconHelp,
+  IconHeadphones,
+  IconShieldPlain,
+  IconBook,
+  IconMail,
+  IconStarOutline,
+} from "@/components/Icons";
 
 // Link reutilizable para los logos de la cabecera/sidebars. Apunta SIEMPRE a /,
 // y si ya estás en /, hace scroll arriba en vez de no hacer nada.
@@ -65,17 +43,14 @@ function HomeLogoLink({ children, className, ariaLabel }) {
 }
 
 // Lazy load componentes no críticos
-const Footer = lazy(() => import("@/components/ui/Footer").catch(() => ({ default: () => null })));
-const CookieBanner = lazy(() => import("@/components/ui/CookieBanner").catch(() => ({ default: () => null })));
-const ScrollToTop = lazy(() => import("@/components/ui/ScrollToTop").catch(() => ({ default: () => null })));
+const Footer = lazy(() => import("@/components/Footer").catch(() => ({ default: () => null })));
+const CookieBanner = lazy(() => import("@/components/CookieBanner").catch(() => ({ default: () => null })));
 const NotificationCenter = lazy(() => import("@/components/notifications/NotificationCenter").catch(() => ({ default: () => null })));
 const NotificationPermissionBanner = lazy(() => import("@/components/notifications/NotificationPermissionBanner").catch(() => ({ default: () => null })));
 const WebsiteSchema = lazy(() => import("@/components/seo/WebsiteSchema").catch(() => ({ default: () => null })));
-import PageTransitions from "@/components/ui/PageTransitions";
 import { setUserId, setUserTags, onesignalLogout } from "@/services/onesignalService";
 
-import LanguageSwitcher, { LanguageProvider } from "@/components/ui/LanguageSwitcher";
-import { getEffectivePlan, isAdsPlus } from "@/utils/subscription";
+import LanguageSwitcher, { LanguageProvider } from "@/components/LanguageSwitcher";
 
 
 // Logo servido como asset estático de Vercel (no depende de Base44 ni de
@@ -104,115 +79,114 @@ if (typeof window !== 'undefined') {
 const SidebarContentComponent = React.memo(function SidebarContentComponent({ navigationItems, location, user, isProfessional, isAdmin, isClient, language, onChangeLanguage, onLogout }) {
   const { t } = useTranslation();
   return (
-    <Sidebar className="border-r border-gray-200 bg-white shadow-sm hidden lg:flex">
-      <SidebarHeader className="border-b border-gray-100 p-6">
-        <HomeLogoLink className="flex items-center gap-3" ariaLabel={t('nav.home')}>
-          <img
-            src={LOGO_48}
-            srcSet={`${LOGO_48} 1x, ${LOGO_96} 2x`}
-            alt={t('layout.header.logoAlt')}
-            className="w-12 h-12 rounded-lg"
-            width="48"
-            height="48"
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            style={{ width: '48px', height: '48px' }}
-          />
-          <div>
-            <h2 className="font-bold text-xl text-gray-900 notranslate" translate="no">{BRAND}</h2>
-            <p className="text-xs text-gray-500">{t('layout.sidebar.tagline')}</p>
-          </div>
-        </HomeLogoLink>
-      </SidebarHeader>
-      
-      <SidebarContent className="p-3">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild={!item.action}
-                    className={`hover:bg-blue-50 hover:text-blue-900 transition-all duration-150 rounded-xl mb-1 relative ${
-                      location.pathname === item.url ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md' : ''
-                    }`}
-                  >
-                    {item.action ? (
-                      <button onClick={item.action} aria-label={item.title} className="flex items-center gap-3 px-4 py-3 w-full text-left cursor-pointer">
-                        <item.icon className="w-5 h-5" aria-hidden="true" />
-                        <span className="font-medium">{item.title}</span>
-                        {item.badge && (
-                          <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={t('layout.sidebar.unreadMessages', { count: item.badge })}>
-                            {item.badge}
-                          </span>
-                        )}
-                      </button>
-                    ) : (
-                      <Link to={item.url} className="flex items-center gap-3 px-4 py-3" aria-label={item.title}
-                        onMouseEnter={item.prefetch ? () => item.prefetch() : undefined}
-                      >
-                        <item.icon className="w-5 h-5" aria-hidden="true" />
-                        <span className="font-medium">{item.title}</span>
-                        {item.badge && (
-                          <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={t('layout.sidebar.unreadMessages', { count: item.badge })}>
-                            {item.badge}
-                          </span>
-                        )}
-                      </Link>
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter className="border-t border-gray-100 p-4">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 px-2">
-            <Avatar className="w-10 h-10 border-2 border-blue-600 overflow-hidden">
-              {user?.profile_picture ? (
-                <AvatarImage src={user.profile_picture} alt={t('layout.sidebar.avatarAlt')} className="object-cover object-center w-full h-full" />
-              ) : (
-                <AvatarFallback className={`font-semibold text-white ${isAdmin ? 'bg-gradient-to-br from-purple-600 to-purple-800' : 'bg-gradient-to-br from-blue-600 to-blue-800'}`}>
-                  {user?.full_name?.charAt(0) || 'U'}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-900 text-sm truncate">
-                {user?.full_name || t('layout.sidebar.defaultUserName')}
-              </p>
-              {isAdmin && (
-                <span className="inline-flex items-center gap-1 text-[10px] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded font-medium mt-0.5">
-                  <Shield className="w-2.5 h-2.5" />
-                  {t('layout.sidebar.adminBadge')}
-                </span>
-              )}
-              {isProfessional && <p className="text-xs text-gray-500">{t('professionalLabel')}</p>}
-              {isClient && <p className="text-xs text-gray-500">{t('clientLabel')}</p>}
+    // El carril es fijo (como hacía shadcn): el div de arriba reserva su
+    // ancho en el flujo para que el contenido no quede debajo.
+    <div className="hidden lg:block">
+      <div className="relative h-svh w-64 shrink-0" />
+      <aside className="fixed inset-y-0 left-0 z-10 flex h-svh w-64 flex-col border-r border-c-border bg-surface shadow-sm">
+        <div className="flex flex-col gap-2 border-b border-c-border p-6">
+          <HomeLogoLink className="flex items-center gap-3" ariaLabel={t('nav.home')}>
+            <img
+              src={LOGO_48}
+              srcSet={`${LOGO_48} 1x, ${LOGO_96} 2x`}
+              alt={t('layout.header.logoAlt')}
+              className="w-12 h-12 rounded-lg"
+              width="48"
+              height="48"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              style={{ width: '48px', height: '48px' }}
+            />
+            <div>
+              <h2 className="font-bold text-xl text-ink notranslate" translate="no">{BRAND}</h2>
+              <p className="text-xs text-c-muted">{t('layout.sidebar.tagline')}</p>
             </div>
-          </div>
+          </HomeLogoLink>
+        </div>
 
-          <div className="flex items-center gap-2 px-2">
-            <div className="flex-1">
-              <LanguageSwitcher />
+        <div className="flex min-h-0 flex-1 flex-col overflow-auto p-3">
+          <ul className="flex w-full min-w-0 flex-col gap-1 p-2">
+            {navigationItems.map((item) => {
+              const isActive = location.pathname === item.url;
+              const itemClass = `flex w-full items-center gap-3 px-4 py-3 text-left text-sm rounded-xl mb-1 relative transition-all duration-150 hover:bg-blue-50 hover:text-blue-900 ${
+                isActive ? 'bg-gradient-to-r from-c-accent to-accent-hover text-white shadow-md' : ''
+              }`;
+              return (
+                <li key={item.title} className="relative">
+                  {item.action ? (
+                    <button onClick={item.action} aria-label={item.title} className={`${itemClass} cursor-pointer`}>
+                      <item.icon className="w-5 h-5" aria-hidden="true" />
+                      <span className="font-medium">{item.title}</span>
+                      {item.badge && (
+                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={t('layout.sidebar.unreadMessages', { count: item.badge })}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  ) : (
+                    <Link to={item.url} className={itemClass} aria-label={item.title}
+                      onMouseEnter={item.prefetch ? () => item.prefetch() : undefined}
+                    >
+                      <item.icon className="w-5 h-5" aria-hidden="true" />
+                      <span className="font-medium">{item.title}</span>
+                      {item.badge && (
+                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={t('layout.sidebar.unreadMessages', { count: item.badge })}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="flex flex-col gap-2 border-t border-c-border p-4">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 px-2">
+              <div className="relative flex w-10 h-10 shrink-0 overflow-hidden rounded-full border-2 border-c-accent">
+                {user?.profile_picture ? (
+                  <img src={user.profile_picture} alt={t('layout.sidebar.avatarAlt')} className="object-cover object-center w-full h-full" />
+                ) : (
+                  <span className={`flex h-full w-full items-center justify-center font-semibold text-white ${isAdmin ? 'bg-gradient-to-br from-purple-600 to-purple-800' : 'bg-gradient-to-br from-c-accent to-blue-800'}`}>
+                    {user?.full_name?.charAt(0) || 'U'}
+                  </span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-ink text-sm truncate">
+                  {user?.full_name || t('layout.sidebar.defaultUserName')}
+                </p>
+                {isAdmin && (
+                  <span className="inline-flex items-center gap-1 text-[10px] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded font-medium mt-0.5">
+                    <IconShieldPlain className="w-2.5 h-2.5" />
+                    {t('layout.sidebar.adminBadge')}
+                  </span>
+                )}
+                {isProfessional && <p className="text-xs text-c-muted">{t('professionalLabel')}</p>}
+                {isClient && <p className="text-xs text-c-muted">{t('clientLabel')}</p>}
+              </div>
             </div>
-            <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 hover:bg-red-50 hover:text-red-600 transition-colors flex-shrink-0"
-            onClick={onLogout}
-            aria-label={t('nav.logout')}
-            >
-              <LogOut className="w-4 h-4 text-gray-600" aria-hidden="true" />
-            </Button>
+
+            <div className="flex items-center gap-2 px-2">
+              <div className="flex-1">
+                <LanguageSwitcher />
+              </div>
+              <button
+                type="button"
+                className="btn-ghost btn-icon no-underline hover:bg-red-50 hover:text-error transition-colors flex-shrink-0"
+                onClick={onLogout}
+                aria-label={t('nav.logout')}
+              >
+                <IconLogout className="w-4 h-4 text-c-muted" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
-      </SidebarFooter>
-    </Sidebar>
+      </aside>
+    </div>
   );
 });
 
@@ -223,7 +197,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
   const language = i18n.language.split('-')[0];
   const changeLanguage = (code) => i18n.changeLanguage(code);
   const [user, setUser] = useState(null);
-  const [userPlan, setUserPlan] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [professionalProfile, setProfessionalProfile] = useState(undefined);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -372,8 +345,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       const urlParams = new URLSearchParams(window.location.search);
       const isPostPayment = urlParams.get('session_id') || 
                             urlParams.get('onboarding') || 
-                            location.pathname.includes('PaymentSuccess') ||
-                            location.pathname.includes('SubscriptionManagement');
+                            false;
 
       // CAMBIO: cache extendido a 5 minutos (antes 60s) — el perfil no cambia con frecuencia
       const cached = sessionStorage.getItem('current_user');
@@ -399,7 +371,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
         console.warn('Failed to get current user:', e);
         setUser(null);
         setProfessionalProfile(null);
-        setUserPlan(null);
         setLoadingUser(false);
         return;
       }
@@ -414,7 +385,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
             || url.searchParams.get('plan')
             || url.pathname.includes('completar-perfil')
             || url.pathname.includes('ProfileOnboarding')
-            || sessionStorage.getItem('pendingPlanId');
+            ;
 
           if (!isProSignupFlow) {
             try {
@@ -456,14 +427,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
         }
         setProfessionalProfile(profile);
 
-        // Cargar plan efectivo del usuario (incluye regalos) - con try/catch para no romper login
-        let effective = null;
-        try {
-          effective = await getEffectivePlan(currentUser.id);
-        } catch (e) {
-          console.warn('Failed to load effective plan:', e);
-        }
-        setUserPlan(effective?.planId || null);
 
         if (!isPostPayment) {
           try {
@@ -479,7 +442,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
         }
       } else {
         setProfessionalProfile(null);
-        setUserPlan(null);
       }
 
       setUser(currentUser);
@@ -502,7 +464,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       console.error('Critical loadUser error:', error);
       setUser(null);
       setProfessionalProfile(null);
-      setUserPlan(null);
       sessionStorage.removeItem('current_user');
     } finally {
       setLoadingUser(false);
@@ -531,7 +492,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
   const handleLogout = () => {
     sessionStorage.removeItem('current_user');
     setUser(null);
-    setUserPlan(null);
     setProfessionalProfile(null);
     onesignalLogout();
     base44.auth.logout(createPageUrl("Search"));
@@ -579,11 +539,11 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       // existen como página pero quedan fuera del menú hasta tener KPIs y
       // operativa propios. Soporte permanece.
       return [
-        { title: t('nav.adminMetrics'), url: "/admin", icon: LayoutDashboard },
-        { title: t('nav.adminUsers'), url: "/admin/usuarios", icon: Users },
-        { title: t('nav.blog'), url: "/admin/blog", icon: BookOpen },
-        { title: t('nav.newsletter'), url: "/admin/newsletter", icon: Mail },
-        { title: t('nav.support'), url: "/admin/soporte", icon: Headphones },
+        { title: t('nav.adminMetrics'), url: "/admin", icon: IconDashboard },
+        { title: t('nav.adminUsers'), url: "/admin/usuarios", icon: IconUsers },
+        { title: t('nav.blog'), url: "/admin/blog", icon: IconBook },
+        { title: t('nav.newsletter'), url: "/admin/newsletter", icon: IconMail },
+        { title: t('nav.support'), url: "/admin/soporte", icon: IconHeadphones },
       ];
     }
     
@@ -594,31 +554,30 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       // ficheros y 19.616 líneas con cero filas en la base de datos — nadie
       // creó nunca una factura, un cliente ni un presupuesto.
       return [
-        { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), icon: Home },
-        { title: t('nav.myProfile'), url: createPageUrl("MyProfile"), icon: User },
-        { title: t('nav.reviews'), url: '/mis-valoraciones', icon: Star, prefetch: () => import('./pages/MisValoraciones') },
-        { title: t('nav.support'), url: "/soporte", icon: Headphones, prefetch: () => import('./pages/Soporte') },
+        { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), icon: IconHome },
+        { title: t('nav.myProfile'), url: createPageUrl("MyProfile"), icon: IconUser },
+        { title: t('nav.reviews'), url: '/mis-valoraciones', icon: IconStarOutline, prefetch: () => import('./pages/MisValoraciones') },
+        { title: t('nav.support'), url: "/soporte", icon: IconHeadphones, prefetch: () => import('./pages/Soporte') },
       ];
     }
     
     if (isClient) {
       return [
-        { title: t('nav.search_professionals'), url: createPageUrl("Search"), icon: Search },
-        { title: t('nav.favorites'), url: createPageUrl("Favorites"), icon: Heart },
-        { title: t('nav.my_profile'), url: createPageUrl("MyProfile"), icon: User },
-        { title: t('nav.view_plans'), url: createPageUrl("PricingPlans"), icon: CreditCard },
-        { title: t('nav.faq'), url: createPageUrl("FAQ"), icon: MessageSquare },
-        { title: t('nav.support'), url: "/soporte", icon: Headphones, prefetch: () => import('./pages/Soporte') }
+        { title: t('nav.search_professionals'), url: createPageUrl("Search"), icon: IconSearch },
+        { title: t('nav.favorites'), url: createPageUrl("Favorites"), icon: IconHeart },
+        { title: t('nav.my_profile'), url: createPageUrl("MyProfile"), icon: IconUser },
+        { title: t('nav.faq'), url: createPageUrl("FAQ"), icon: IconMessageSquare },
+        { title: t('nav.support'), url: "/soporte", icon: IconHeadphones, prefetch: () => import('./pages/Soporte') }
       ];
     }
     
     return [];
-  }, [isProfessional, isClient, isAdmin, userPlan, t]);
+  }, [isProfessional, isClient, isAdmin, t]);
 
   // CAMBIO: bloque <style> eliminado — todas estas reglas ya existen en globals.css.
   // Eliminar el inline style evita: CSS duplicado, conflictos de especificidad y ~20KB extra en el bundle.
   return (
-    <SidebarProvider style={{ '--sidebar-width': '16rem', '--sidebar-width-mobile': '0px' }}>
+    <>
         <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-slate-50 to-blue-50" style={{ marginLeft: 0, width: '100%', maxWidth: '100vw', overflow: 'visible' }}>
           <div className="flex flex-1" style={{ minWidth: 0, overflow: 'visible' }}>
             {user && shouldShowSidebar() && (
@@ -650,18 +609,18 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                   aria-label={t('layout.mobileMenu.ariaLabel')}
                 >
                   {/* Header */}
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-c-border">
                     <div className="flex items-center gap-2">
                       <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt="" className="w-8 h-8 rounded" width="32" height="32" />
-                      <span className="font-bold text-gray-900 notranslate" translate="no">{BRAND}</span>
+                      <span className="font-bold text-ink notranslate" translate="no">{BRAND}</span>
                     </div>
                     <button
                       onClick={() => setMobileMenuOpen(false)}
                       style={{ width: '44px', height: '44px', touchAction: 'manipulation' }}
-                      className="flex items-center justify-center rounded-lg hover:bg-gray-100"
+                      className="flex items-center justify-center rounded-lg hover:bg-soft"
                       aria-label={t('layout.mobileMenu.close')}
                     >
-                      <X className="w-5 h-5 text-gray-500" />
+                      <IconClose className="w-5 h-5 text-c-muted" />
                     </button>
                   </div>
 
@@ -669,18 +628,18 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     {/* Usuario logueado: avatar + nombre */}
                     {user && (
                       <div className="flex items-center gap-3 mx-3 mb-2 p-3 bg-blue-50 rounded-xl">
-                        <Avatar className="w-10 h-10 border-2 border-blue-600 overflow-hidden flex-shrink-0">
+                        <div className="relative flex w-10 h-10 border-2 border-c-accent overflow-hidden rounded-full flex-shrink-0">
                           {getProfilePicture() ? (
-                            <AvatarImage src={getProfilePicture()} alt={getDisplayName()} className="object-cover w-full h-full" />
+                            <img src={getProfilePicture()} alt={getDisplayName()} className="object-cover w-full h-full" />
                           ) : (
-                            <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-800 text-white font-semibold">
+                            <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-c-accent to-blue-800 text-white font-semibold">
                               {getDisplayName().charAt(0).toUpperCase()}
-                            </AvatarFallback>
+                            </span>
                           )}
-                        </Avatar>
+                        </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm truncate">{getDisplayName()}</p>
-                          <p className="text-xs text-gray-500">{isProfessional ? t('professionalLabel') : t('clientLabel')}</p>
+                          <p className="font-semibold text-ink text-sm truncate">{getDisplayName()}</p>
+                          <p className="text-xs text-c-muted">{isProfessional ? t('professionalLabel') : t('clientLabel')}</p>
                         </div>
                       </div>
                     )}
@@ -695,11 +654,11 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         className={`flex items-center gap-3 mx-2 rounded-xl ${
                           location.pathname === item.url
                             ? 'bg-blue-50 text-blue-700'
-                            : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                            : 'text-ink hover:bg-soft active:bg-gray-100'
                         }`}
                         style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
                       >
-                        <item.icon className={`w-5 h-5 flex-shrink-0 ${location.pathname === item.url ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <item.icon className={`w-5 h-5 flex-shrink-0 ${location.pathname === item.url ? 'text-c-accent' : 'text-c-muted'}`} />
                         <span className="font-medium flex-1">{item.title}</span>
                         {item.badge && (
                           <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold min-w-[20px] text-center">{item.badge}</span>
@@ -713,48 +672,39 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         <Link
                           to="/buscar"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-xl text-gray-700 hover:bg-gray-50"
+                          className="flex items-center gap-3 rounded-xl text-ink hover:bg-soft"
                           style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
                         >
-                          <SearchIcon className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                          <IconSearch className="w-5 h-5 text-blue-500 flex-shrink-0" />
                           <span className="font-medium">{t('nav.search_professionals')}</span>
                         </Link>
                         <Link
                           to="/blog"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-xl text-gray-700 hover:bg-gray-50"
+                          className="flex items-center gap-3 rounded-xl text-ink hover:bg-soft"
                           style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
                         >
-                          <BookOpen className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                          <IconBook className="w-5 h-5 text-c-muted flex-shrink-0" />
                           <span className="font-medium">{t('nav.blog')}</span>
                         </Link>
-                        <Link
-                          to="/precios"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-xl text-gray-700 hover:bg-gray-50"
-                          style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
-                        >
-                          <HelpCircle className="w-5 h-5 text-purple-500 flex-shrink-0" />
-                          <span className="font-medium">{t('nav.view_plans')}</span>
-                        </Link>
 
-                        <div className="pt-2 border-t border-gray-100 space-y-2 mt-2">
+                        <div className="pt-2 border-t border-c-border space-y-2 mt-2">
                           <Link
                             to="/registro?tipo=autonomo"
                             onClick={() => setMobileMenuOpen(false)}
                             className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold"
                             style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation', background: '#F5C13D', color: '#00255C' }}
                           >
-                            <Briefcase className="w-5 h-5" />
+                            <IconBriefcase className="w-5 h-5" />
                             {t('nav.becomeProFree')}
                           </Link>
                           <button
                             onClick={() => { handleLogin(); setMobileMenuOpen(false); }}
                             aria-label={t('nav.loginAria')}
-                            className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold text-gray-700 border-2 border-gray-200 hover:bg-gray-50"
+                            className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold text-ink border-2 border-c-border hover:bg-soft"
                             style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation' }}
                           >
-                            <User className="w-5 h-5" />
+                            <IconUser className="w-5 h-5" />
                             {t('nav.login')}
                           </button>
                         </div>
@@ -764,14 +714,14 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     {/* Cerrar sesión */}
                     {user && (
                       <>
-                        <div className="mx-3 mt-2 border-t border-gray-100 pt-2">
+                        <div className="mx-3 mt-2 border-t border-c-border pt-2">
                           <button
                           onClick={handleLogout}
                           aria-label={t('nav.logout')}
-                          className="flex items-center gap-3 w-full rounded-xl text-red-600 hover:bg-red-50 active:bg-red-100"
+                          className="flex items-center gap-3 w-full rounded-xl text-error hover:bg-red-50 active:bg-red-100"
                           style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
                           >
-                            <LogOut className="w-5 h-5 flex-shrink-0" />
+                            <IconLogout className="w-5 h-5 flex-shrink-0" />
                             <span className="font-medium">{t('nav.logout')}</span>
                           </button>
                         </div>
@@ -801,9 +751,9 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                   aria-modal="true"
                   aria-label={t('layout.joinModal.ariaLabel')}
                 >
-                  <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
-                  <h2 className="text-xl font-bold text-gray-900 text-center mb-2">{t('layout.joinModal.title')}</h2>
-                  <p className="text-sm text-gray-500 text-center mb-6">{t('layout.joinModal.subtitle')}</p>
+                  <div className="w-10 h-1 bg-c-border rounded-full mx-auto mb-5" />
+                  <h2 className="text-xl font-bold text-ink text-center mb-2">{t('layout.joinModal.title')}</h2>
+                  <p className="text-sm text-c-muted text-center mb-6">{t('layout.joinModal.subtitle')}</p>
                   <div className="space-y-3">
                     <Link
                       to="/buscar"
@@ -812,7 +762,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                       style={{ background: '#F8FAFF', borderColor: 'rgba(0,37,92,0.15)', color: '#0f172a', touchAction: 'manipulation' }}
                     >
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: '#00255C' }}>
-                        <SearchIcon className="w-5 h-5" />
+                        <IconSearch className="w-5 h-5" />
                       </div>
                       <div className="text-left">
                         <div className="font-bold">{t('nav.sign_up_client')}</div>
@@ -826,7 +776,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                       style={{ background: '#F5C13D', color: '#00255C', touchAction: 'manipulation' }}
                     >
                       <div className="w-10 h-10 bg-white/40 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Briefcase className="w-5 h-5" style={{ color: '#00255C' }} />
+                        <IconBriefcase className="w-5 h-5" style={{ color: '#00255C' }} />
                       </div>
                       <div className="text-left">
                         <div className="font-bold">{t('nav.iAmPro')}</div>
@@ -836,10 +786,10 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     <button
                       onClick={() => { handleLogin(); setJoinModalOpen(false); }}
                       aria-label={t('layout.joinModal.haveAccountAria')}
-                      className="w-full text-center text-sm text-gray-500 py-3 font-medium"
+                      className="w-full text-center text-sm text-c-muted py-3 font-medium"
                       style={{ touchAction: 'manipulation' }}
                     >
-                      <Trans i18nKey="layout.joinModal.haveAccount" components={{ 1: <span className="text-blue-600 font-semibold" /> }} />
+                      <Trans i18nKey="layout.joinModal.haveAccount" components={{ 1: <span className="text-c-accent font-semibold" /> }} />
                     </button>
                   </div>
                 </div>
@@ -848,7 +798,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
 
             {/* ── HEADER MÓVIL — SIEMPRE VISIBLE, fuera del main para evitar margin-left del sidebar ── */}
             <header
-              className="lg:hidden bg-white border-b border-gray-100 flex items-center justify-between px-4"
+              className="lg:hidden bg-surface border-b border-c-border flex items-center justify-between px-4"
               style={{
                 position: 'fixed',
                 top: 0,
@@ -874,7 +824,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     className="inline-flex items-center justify-center rounded-lg flex-shrink-0 active:bg-gray-200"
                     aria-label={t('common.back')}
                   >
-                    <ArrowLeft className="w-6 h-6 text-gray-700 pointer-events-none" />
+                    <IconArrowLeft className="w-6 h-6 text-ink pointer-events-none" />
                   </button>
                 ) : (
                   <button
@@ -884,14 +834,14 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     className="inline-flex items-center justify-center rounded-lg flex-shrink-0 active:bg-gray-200"
                     aria-label={t('layout.mobileMenu.open')}
                   >
-                    <Menu className="w-6 h-6 text-gray-700 pointer-events-none" />
+                    <IconMenu className="w-6 h-6 text-ink pointer-events-none" />
                   </button>
                 );
               })()}
 
               <HomeLogoLink className="flex items-center gap-2" ariaLabel={t('nav.home')}>
                 <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt={t('layout.header.logoAlt')} className="w-8 h-8 rounded" width="32" height="32" loading="eager" fetchPriority="high" decoding="async" />
-                <span className="font-bold text-lg text-gray-900 notranslate" translate="no">{BRAND}</span>
+                <span className="font-bold text-lg text-ink notranslate" translate="no">{BRAND}</span>
               </HomeLogoLink>
 
               <div style={{ width: '56px', height: '56px', margin: '-4px' }} className="flex items-center justify-end flex-shrink-0">
@@ -904,10 +854,10 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     type="button"
                     onPointerDown={() => setJoinModalOpen(true)}
                     style={{ width: '56px', height: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', background: 'none', border: 'none', padding: 0 }}
-                    className="flex items-center justify-center rounded-lg text-blue-600"
+                    className="flex items-center justify-center rounded-lg text-c-accent"
                     aria-label={t('layout.header.joinAria')}
                   >
-                    <User className="w-5 h-5" />
+                    <IconUser className="w-5 h-5" />
                   </button>
                 )}
               </div>
@@ -915,7 +865,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
 
             <main className="flex-1 flex flex-col min-h-0 min-w-0" style={{ width: '100%', maxWidth: '100vw', overflow: 'visible' }}>
               {!user && (
-                  <header className="bg-white border-b border-gray-200 px-6 py-4 hidden lg:block sticky top-0 z-20 shadow-sm will-change-transform">
+                  <header className="bg-surface border-b border-c-border px-6 py-4 hidden lg:block sticky top-0 z-20 shadow-sm will-change-transform">
                   <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <HomeLogoLink className="flex items-center gap-3" ariaLabel={t('nav.home')}>
                       <img
@@ -930,53 +880,49 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         decoding="async"
                       />
                       <div style={{ minWidth: '150px' }}>
-                        <h1 className="font-bold text-xl text-gray-900 notranslate" translate="no">{BRAND}</h1>
-                        <p className="text-xs text-gray-500">{t('footer.tagline')}</p>
+                        <h1 className="font-bold text-xl text-ink notranslate" translate="no">{BRAND}</h1>
+                        <p className="text-xs text-c-muted">{t('footer.tagline')}</p>
                       </div>
                       </HomeLogoLink>
                     
                     <div className="flex items-center gap-3">
                       {!user && (
-                        <Button
-                          variant="ghost"
-                          className="text-gray-700 hover:text-blue-700 hover:bg-blue-50"
+                        <button
+                          type="button"
+                          className="btn-ghost no-underline text-ink hover:text-blue-700 hover:bg-blue-50"
                           onClick={handleLogin}
                           aria-label={t('nav.loginAria')}
                         >
-                          <User className="w-4 h-4 mr-2" aria-hidden="true" />
+                          <IconUser className="w-4 h-4 mr-2" aria-hidden="true" />
                           {t('nav.login')}
-                        </Button>
+                        </button>
                       )}
                       {!user && (
-                        <Link to="/buscar">
-                          <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900">
-                            <SearchIcon className="w-4 h-4 mr-2" aria-hidden="true" />
-                            {t('nav.sign_up_client')}
-                          </Button>
+                        <Link to="/buscar" className="btn-secondary hover:bg-soft">
+                          <IconSearch className="w-4 h-4 mr-2" aria-hidden="true" />
+                          {t('nav.sign_up_client')}
                         </Link>
                       )}
                       {(!user || user.user_type !== 'professionnel') ? (
-                        <Link to="/registro?tipo=autonomo">
-                          <Button
-                            className="font-semibold shadow-sm"
-                            style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
-                          >
-                            <Briefcase className="w-4 h-4 mr-2" aria-hidden="true" />
-                            {t('nav.becomeProFree')}
-                          </Button>
+                        <Link
+                          to="/registro?tipo=autonomo"
+                          className="btn-primary font-semibold shadow-sm"
+                          style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
+                        >
+                          <IconBriefcase className="w-4 h-4 mr-2" aria-hidden="true" />
+                          {t('nav.becomeProFree')}
                         </Link>
                       ) : null}
                       <LanguageSwitcher />
                       {user && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="hover:bg-red-50 hover:text-red-600 transition-colors"
+                        <button
+                          type="button"
+                          className="btn-ghost btn-icon no-underline hover:bg-red-50 hover:text-error transition-colors"
                           onClick={handleLogout}
                           aria-label={t('nav.logout')}
                         >
-                          <LogOut className="w-5 h-5" aria-hidden="true" />
-                        </Button>
+                          <IconLogout className="w-5 h-5" aria-hidden="true" />
+                        </button>
                       )}
                     </div>
                   </div>
@@ -989,9 +935,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                     aporta un CLS de ~0.92 porque el footer se desplaza hacia
                     abajo cuando llega el contenido. */}
                 <Suspense fallback={<div className="min-h-[100svh]" aria-hidden="true" />}>
-                  <PageTransitions>
-                    {children}
-                  </PageTransitions>
+                  {children}
                 </Suspense>
 
                 {!location.pathname.startsWith("/soporte") && !location.pathname.startsWith("/admin") && (
@@ -1016,13 +960,13 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                 {user ? (
                   <>
                     {(isProfessional ? [
-                      { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), root: createPageUrl("ProfessionalDashboard"), icon: Home },
-                      { title: t('nav.reviews'), url: '/mis-valoraciones', root: '/mis-valoraciones', icon: Star },
-                      { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: User },
+                      { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), root: createPageUrl("ProfessionalDashboard"), icon: IconHome },
+                      { title: t('nav.reviews'), url: '/mis-valoraciones', root: '/mis-valoraciones', icon: IconStarOutline },
+                      { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: IconUser },
                     ] : [
-                      { title: t('common.search'), url: createPageUrl("Search"), root: '/buscar', icon: SearchIcon },
-                      { title: t('nav.saved'), url: createPageUrl("Favorites"), root: createPageUrl("Favorites"), icon: Heart },
-                      { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: User },
+                      { title: t('common.search'), url: createPageUrl("Search"), root: '/buscar', icon: IconSearch },
+                      { title: t('nav.saved'), url: createPageUrl("Favorites"), root: createPageUrl("Favorites"), icon: IconHeart },
+                      { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: IconUser },
                     ]).map((item) => (
                       <Link
                         key={item.title}
@@ -1052,7 +996,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                         aria-label={t('layout.bottomNav.searchAria')}
                       style={{ touchAction: 'manipulation', flex: 1, minWidth: 0 }}
                     >
-                      <SearchIcon className="w-5 h-5" />
+                      <IconSearch className="w-5 h-5" />
                       <span style={{ fontSize: '10px', fontWeight: 500 }}>{t('common.search')}</span>
                     </Link>
                     <button
@@ -1061,7 +1005,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
                       aria-label={t('layout.header.joinAria')}
                       style={{ touchAction: 'manipulation', border: 'none', background: 'none', cursor: 'pointer', flex: 1, minWidth: 0 }}
                     >
-                      <Briefcase className="w-5 h-5" />
+                      <IconBriefcase className="w-5 h-5" />
                       <span style={{ fontSize: '10px', fontWeight: 500 }}>{t('layout.bottomNav.join')}</span>
                     </button>
                   </>
@@ -1081,11 +1025,8 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
           <Suspense fallback={null}>
             <WebsiteSchema />
           </Suspense>
-          <Suspense fallback={null}>
-            <ScrollToTop />
-          </Suspense>
         </div>
-    </SidebarProvider>
+    </>
   );
 });
 

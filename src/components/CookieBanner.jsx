@@ -1,28 +1,29 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { Link } from 'react-router-dom';
-import { Cookie, X, Check } from 'lucide-react';
+import { IconCookie, IconClose, IconCheck } from '@/components/Icons';
 import { base44 } from '@/api/base44Client';
-import { useLanguage } from '@/components/LanguageSwitcher';
 
 function CookieCategory({ title, description, checked, onChange, disabled }) {
+  const { t } = useTranslation();
   return (
-    <div className="flex items-start justify-between gap-3 p-3 border border-gray-100 rounded-lg">
+    <div className="flex items-start justify-between gap-3 p-3 border border-c-border rounded-lg">
       <div className="flex-1">
-        <h4 className="font-medium text-gray-900 text-sm">{title}</h4>
-        <p className="text-xs text-gray-600 mt-0.5">{description}</p>
+        <h4 className="font-medium text-ink text-sm">{title}</h4>
+        <p className="text-xs text-c-muted mt-0.5">{description}</p>
       </div>
       <div>
         {disabled ? (
-          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded whitespace-nowrap flex-shrink-0">Siempre activo</span>
+          <span className="text-xs bg-soft text-c-muted px-2 py-1 rounded whitespace-nowrap flex-shrink-0">{t('cookies.alwaysActive')}</span>
         ) : (
-          <button 
+          <button
             onClick={onChange}
-            className={`relative inline-flex w-10 h-6 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-gray-900' : 'bg-gray-200'}`}
+            className={`relative inline-flex w-10 h-6 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-ink' : 'bg-c-border'}`}
             aria-pressed={checked}
-            aria-label={`${title}: ${checked ? 'activado' : 'desactivado'}`}
+            aria-label={checked ? t('cookies.preferences.toggleOn', { title }) : t('cookies.preferences.toggleOff', { title })}
           >
-            <span className={`inline-block w-4 h-4 bg-white rounded-full shadow transition-transform mt-1 ml-0.5 ${checked ? 'translate-x-4' : 'translate-x-0'}`}/>
+            <span className={`inline-block w-4 h-4 bg-surface rounded-full shadow transition-transform mt-1 ml-0.5 ${checked ? 'translate-x-4' : 'translate-x-0'}`}/>
           </button>
         )}
       </div>
@@ -31,10 +32,10 @@ function CookieCategory({ title, description, checked, onChange, disabled }) {
 }
 
 export default function CookieBanner() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
-  const [prefs, setPrefs] = useState({ 
+  const [prefs, setPrefs] = useState({
     essential: true,
     analytics: false,
     marketing: false
@@ -59,7 +60,7 @@ export default function CookieBanner() {
 
   const saveConsent = async (acceptedAnalytics, acceptedMarketing) => {
     const consentId = localStorage.getItem('consent_id') || generateConsentId();
-    
+
     const consent = {
       consent_id: consentId,
       accepted_essential: true,
@@ -70,13 +71,13 @@ export default function CookieBanner() {
       user_agent: navigator.userAgent,
       consent_timestamp: new Date().toISOString()
     };
-    
+
     try {
       await base44.entities.CookieConsent.create(consent);
     } catch(e) {
       // Non-blocking — continuar incluso si falla la BD
     }
-    
+
     localStorage.setItem('cookie_consent', JSON.stringify({
       essential: true,
       analytics: acceptedAnalytics,
@@ -85,18 +86,18 @@ export default function CookieBanner() {
       version: 'cookies-v1'
     }));
     localStorage.setItem('consent_id', consentId);
-    
+
     // Activar/desactivar scripts según preferencia
     if (acceptedAnalytics) enableAnalytics();
     if (acceptedMarketing) enableMarketing();
-    
+
     // Recargar Google Analytics si está activo
     if (acceptedAnalytics && window.gtag) {
       window.gtag('consent', 'update', {
         analytics_storage: 'granted'
       });
     }
-    
+
     setVisible(false);
   };
 
@@ -107,62 +108,62 @@ export default function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-x-0 bottom-0 z-[100] p-3 md:p-4 pointer-events-none"
       role="region"
-      aria-label="Consentimiento de cookies"
+      aria-label={t('cookies.regionLabel')}
       aria-live="polite"
     >
-      <div 
-        className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 md:p-5 pointer-events-auto"
+      <div
+        className="max-w-3xl mx-auto bg-surface rounded-2xl shadow-2xl border border-c-border p-4 md:p-5 pointer-events-auto"
         style={{paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0))'}}
       >
-        
+
         {!showDetail ? (
           // Vista inicial
           <>
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center flex-shrink-0">
-                <Cookie className="w-5 h-5 text-amber-600" aria-hidden="true" />
+              <div className="w-10 h-10 bg-warning/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <IconCookie className="w-5 h-5 text-warning" aria-hidden="true" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm md:text-base">
-                  {t('cookies.bannerTitle') || 'Usamos cookies'}
+                <h3 className="font-semibold text-ink text-sm md:text-base">
+                  {t('cookies.bannerTitle')}
                 </h3>
-                <p className="text-xs md:text-sm text-gray-600 mt-1 leading-relaxed">
-                  {t('cookies.bannerText') || 'Utilizamos cookies propias y de terceros para mejorar tu experiencia, analizar el uso de la plataforma y personalizar contenido. Puedes aceptar todas, rechazar las opcionales o configurar tus preferencias.'}{' '}
-                  <Link to="/cookies" className="text-blue-600 hover:underline font-medium" aria-label="Consulta nuestra política de cookies">
-                   {t('cookies.moreInfo') || 'Consulta nuestra política de cookies'}
+                <p className="text-xs md:text-sm text-c-muted mt-1 leading-relaxed">
+                  {t('cookies.bannerText')}{' '}
+                  <Link to="/cookies" className="text-c-accent hover:underline font-medium" aria-label={t('cookies.policyLinkAria')}>
+                   {t('cookies.moreInfo')}
                   </Link>
                 </p>
               </div>
               <button
                 onClick={() => setVisible(false)}
-                className="text-gray-400 hover:text-gray-600 flex-shrink-0 mt-0.5"
-                aria-label="Cerrar"
+                className="text-c-muted hover:text-ink flex-shrink-0 mt-0.5"
+                aria-label={t('common.close')}
               >
-                <X className="w-4 h-4" />
+                <IconClose className="w-4 h-4" />
               </button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-4">
-              <button 
+              <button
                 onClick={rejectAll}
-                className="text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 py-2.5 px-4 rounded-lg transition-colors"
+                className="btn-secondary btn-sm w-full"
               >
-                {t('cookies.rejectAll') || 'Rechazar opcionales'}
+                {t('cookies.rejectAll')}
               </button>
-              <button 
+              <button
                 onClick={() => setShowDetail(true)}
-                className="text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 py-2.5 px-4 rounded-lg transition-colors"
+                className="btn btn-sm w-full bg-soft text-ink hover:bg-c-border"
               >
-                {t('cookies.customize') || 'Personalizar'}
+                {t('cookies.customize')}
               </button>
-              <button 
+              <button
                 onClick={acceptAll}
-                className="text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 active:bg-gray-950 py-2.5 px-4 rounded-lg transition-colors"
+                className="btn-dark btn-sm w-full"
               >
-                {t('cookies.acceptAll') || 'Aceptar todas'}
+                {t('cookies.acceptAll')}
               </button>
             </div>
           </>
@@ -170,54 +171,54 @@ export default function CookieBanner() {
           // Vista detallada
           <>
             <div className="flex items-start justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 text-base">
-                {t('cookies.preferencesTitle') || 'Preferencias de cookies'}
+              <h3 className="font-semibold text-ink text-base">
+                {t('cookies.preferencesTitle')}
               </h3>
-              <button 
-                onClick={() => setShowDetail(false)} 
-                className="text-gray-400 hover:text-gray-600 flex-shrink-0"
-                aria-label="Cerrar"
+              <button
+                onClick={() => setShowDetail(false)}
+                className="text-c-muted hover:text-ink flex-shrink-0"
+                aria-label={t('common.close')}
               >
-                <X className="w-5 h-5" />
+                <IconClose className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="space-y-3 mb-4">
-              <CookieCategory 
-                title={t('cookies.essential') || 'Esenciales'}
-                description={t('cookies.essentialDesc') || 'Necesarias para el funcionamiento básico (sesión, idioma, seguridad). No se pueden desactivar.'}
+              <CookieCategory
+                title={t('cookies.essential')}
+                description={t('cookies.essentialDesc')}
                 checked={true}
                 disabled={true}
               />
-              
-              <CookieCategory 
-                title={t('cookies.analytics') || 'Analíticas'}
-                description={t('cookies.analyticsDesc') || 'Nos ayudan a entender cómo usas la plataforma para mejorarla (Google Analytics, estadísticas anónimas).'}
+
+              <CookieCategory
+                title={t('cookies.analytics')}
+                description={t('cookies.analyticsDesc')}
                 checked={prefs.analytics}
                 onChange={() => setPrefs({...prefs, analytics: !prefs.analytics})}
               />
-              
-              <CookieCategory 
-                title={t('cookies.marketing') || 'Marketing'}
-                description={t('cookies.marketingDesc') || 'Permiten mostrarte anuncios relevantes en otras webs según tus intereses.'}
+
+              <CookieCategory
+                title={t('cookies.marketing')}
+                description={t('cookies.marketingDesc')}
                 checked={prefs.marketing}
                 onChange={() => setPrefs({...prefs, marketing: !prefs.marketing})}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <button 
+              <button
                 onClick={rejectAll}
-                className="text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 py-2.5 px-4 rounded-lg transition-colors"
+                className="btn-secondary btn-sm w-full"
               >
-                {t('cookies.rejectAll') || 'Rechazar opcionales'}
+                {t('cookies.rejectAll')}
               </button>
-              <button 
+              <button
                 onClick={savePreferences}
-                className="text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 active:bg-gray-950 py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="btn-dark btn-sm w-full"
               >
-                <Check className="w-4 h-4" />
-                {t('cookies.savePreferences') || 'Guardar preferencias'}
+                <IconCheck className="w-4 h-4" />
+                {t('cookies.savePreferences')}
               </button>
             </div>
           </>
@@ -229,7 +230,7 @@ export default function CookieBanner() {
 
 function enableAnalytics() {
   if (typeof window === 'undefined' || window.gtag) return;
-  
+
   // Si ya existe, no cargar de nuevo
   const existingScript = document.querySelector('script[src*="googletagmanager.com"]');
   if (existingScript) return;

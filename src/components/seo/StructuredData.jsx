@@ -119,48 +119,6 @@ export function FAQPageSchema({ faqs }) {
   return null;
 }
 
-export function ProductSchema({ products }) {
-  useEffect(() => {
-    if (!products || products.length === 0) return;
-    
-    let script = document.getElementById('structured-data-product');
-    if (!script) {
-      script = document.createElement('script');
-      script.setAttribute('type', 'application/ld+json');
-      script.setAttribute('id', 'structured-data-product');
-      document.head.appendChild(script);
-    }
-    
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@graph": products.map(product => ({
-        "@type": "Product",
-        "name": product.name,
-        "description": product.description,
-        "offers": {
-          "@type": "Offer",
-          "price": product.price,
-          "priceCurrency": "EUR",
-          "availability": "https://schema.org/InStock",
-          "url": `https://misautonomos.es/PricingPlans`,
-          "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-        }
-      }))
-    });
-  }, [products]);
-
-  return null;
-}
-
-const FALLBACK_IMAGE = 'https://misautonomos.es/og-image.png';
-
-/**
- * MerchantListingSchema — @type Service
- * Corrige los 3 errores de Google Search Console:
- *   1. CRÍTICO: campo "image" siempre presente (fallback al logo)
- *   2. shippingDetails en offers (doesNotShip para servicios presenciales)
- *   3. hasMerchantReturnPolicy en offers
- */
 export function MerchantListingSchema({ profile, reviews, professionalUser }) {
   useEffect(() => {
     if (!profile) return;

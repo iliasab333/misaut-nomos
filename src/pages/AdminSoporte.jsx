@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Search as SearchIcon, Send, Lock, ArrowLeft } from 'lucide-react';
-import { toast } from 'sonner';
+import { IconSearch, IconSend, IconLock, IconArrowLeft } from '@/components/Icons';
+import { EmptyState } from '@/components/ListStates';
+import { toast } from '@/lib/toast';
 import SEOHead from '@/components/seo/SEOHead';
 import { useTranslation } from 'react-i18next';
 
@@ -12,11 +13,11 @@ const NAVY_SOFT = 'rgba(0,37,92,0.06)';
 // Reciben `t` para que las etiquetas se retraduzcan al cambiar de idioma
 // (una constante de módulo se evaluaría una sola vez al importar).
 const statusOptions = (t) => [
-  { value: 'open',         label: t('admin.soporte.status.open'),        bg: '#FEF3C7', color: '#92400E' },
-  { value: 'in_progress',  label: t('admin.soporte.status.inProgress'),  bg: '#DBEAFE', color: '#1E40AF' },
-  { value: 'waiting_user', label: t('admin.soporte.status.waitingUser'), bg: '#F3E8FF', color: '#6B21A8' },
-  { value: 'resolved',     label: t('admin.soporte.status.resolved'),    bg: '#D1FAE5', color: '#065F46' },
-  { value: 'closed',       label: t('admin.soporte.status.closed'),      bg: '#E5E7EB', color: '#374151' },
+  { value: 'open',         label: t('admin.soporte.status.open'),        cls: 'badge-warning' },
+  { value: 'in_progress',  label: t('admin.soporte.status.inProgress'),  cls: 'badge-accent' },
+  { value: 'waiting_user', label: t('admin.soporte.status.waitingUser'), cls: 'badge bg-purple-100 text-purple-800' },
+  { value: 'resolved',     label: t('admin.soporte.status.resolved'),    cls: 'badge-success' },
+  { value: 'closed',       label: t('admin.soporte.status.closed'),      cls: 'badge-muted' },
 ];
 const priorityOptions = (t) => [
   { value: 'low',    label: t('admin.soporte.priority.low') },
@@ -33,28 +34,28 @@ function TicketList({ tickets, activeId, onSelect, q, setQ, status, setStatus, t
   const STATUS_OPTIONS = statusOptions(t);
   const PRIORITY_OPTIONS = priorityOptions(t);
   return (
-    <aside className="w-full md:w-[360px] md:flex-shrink-0 border-r border-slate-100 bg-white flex flex-col">
-      <div className="p-4 border-b border-slate-100 space-y-2">
+    <aside className="w-full md:w-[360px] md:flex-shrink-0 border-r border-c-border bg-surface flex flex-col">
+      <div className="p-4 border-b border-c-border space-y-2">
         <div className="relative">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-c-muted pointer-events-none" />
           <input
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t('admin.soporte.searchPlaceholder')}
-            className="w-full pl-9 pr-3 h-9 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+            className="input pl-9 text-sm"
           />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-8 px-2 text-[12px] border border-slate-200 rounded-md bg-white">
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className="select text-[12px]">
             <option value="all">{t('admin.soporte.filter.status')}</option>
             {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          <select value={priority} onChange={(e) => setPriority(e.target.value)} className="h-8 px-2 text-[12px] border border-slate-200 rounded-md bg-white">
+          <select value={priority} onChange={(e) => setPriority(e.target.value)} className="select text-[12px]">
             <option value="all">{t('admin.soporte.filter.priority')}</option>
             {PRIORITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          <select value={type} onChange={(e) => setType(e.target.value)} className="h-8 px-2 text-[12px] border border-slate-200 rounded-md bg-white">
+          <select value={type} onChange={(e) => setType(e.target.value)} className="select text-[12px]">
             <option value="all">{t('admin.soporte.filter.type')}</option>
             <option value="bug">{t('admin.soporte.type.bug')}</option>
             <option value="question">{t('admin.soporte.type.question')}</option>
@@ -67,7 +68,7 @@ function TicketList({ tickets, activeId, onSelect, q, setQ, status, setStatus, t
 
       <div className="flex-1 overflow-y-auto">
         {tickets.length === 0 ? (
-          <p className="px-4 py-8 text-sm text-center text-slate-400">{t('admin.soporte.emptyState')}</p>
+          <EmptyState className="m-4" title={t('admin.soporte.emptyState')} />
         ) : tickets.map((tk) => {
           const meta = statusMeta(STATUS_OPTIONS, tk.status);
           const isActive = tk.id === activeId;
@@ -76,22 +77,22 @@ function TicketList({ tickets, activeId, onSelect, q, setQ, status, setStatus, t
               key={tk.id}
               type="button"
               onClick={() => onSelect(tk.id)}
-              className={`w-full text-left px-4 py-3 border-b border-slate-100 flex flex-col gap-1 transition ${isActive ? 'bg-slate-50' : 'hover:bg-slate-50/60'}`}
+              className={`w-full text-left px-4 py-3 border-b border-c-border flex flex-col gap-1 transition ${isActive ? 'bg-soft' : 'hover:bg-soft'}`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] text-slate-500 font-mono">#{tk.number || tk.id.slice(-6)}</span>
-                <span className="inline-flex text-[10px] font-semibold uppercase tracking-[0.06em] px-1.5 py-0.5 rounded-full" style={{ background: meta.bg, color: meta.color }}>{meta.label}</span>
+                <span className="text-[11px] text-c-muted font-mono">#{tk.number || tk.id.slice(-6)}</span>
+                <span className={`${meta.cls} text-[10px] uppercase tracking-[0.06em]`}>{meta.label}</span>
               </div>
-              <p className="text-[14px] font-medium text-slate-900 truncate">{tk.title || t('admin.soporte.untitled')}</p>
+              <p className="text-[14px] font-medium text-ink truncate">{tk.title || t('admin.soporte.untitled')}</p>
               {(() => {
                 const name = (tk.creator_name || '').trim();
                 const email = (tk.creator_email || tk.user_email || '').trim();
                 const who = name || email || '';
                 return who ? (
-                  <p className="text-[11px] text-slate-500 truncate">{who}</p>
+                  <p className="text-[11px] text-c-muted truncate">{who}</p>
                 ) : null;
               })()}
-              <p className="text-[11px] text-slate-400">{formatDate(tk.updated_date || tk.created_date)}</p>
+              <p className="text-[11px] text-c-muted">{formatDate(tk.updated_date || tk.created_date)}</p>
             </button>
           );
         })}
@@ -159,18 +160,18 @@ function TicketDetail({ ticket, onClose, refresh }) {
   const internalNotes = messages.filter(m => m.is_internal);
 
   return (
-    <section className="flex-1 flex flex-col bg-white">
-      <header className="p-4 border-b border-slate-100 flex items-start gap-3">
-        <button type="button" onClick={onClose} className="md:hidden inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100">
-          <ArrowLeft className="w-4 h-4" />
+    <section className="flex-1 flex flex-col bg-surface">
+      <header className="p-4 border-b border-c-border flex items-start gap-3">
+        <button type="button" onClick={onClose} className="md:hidden inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-soft" aria-label={t('common.back')}>
+          <IconArrowLeft className="w-4 h-4" />
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] text-slate-500 font-mono">#{ticket.number || ticket.id.slice(-6)}</span>
-            <span className="inline-flex text-[10px] font-semibold uppercase tracking-[0.06em] px-1.5 py-0.5 rounded-full" style={{ background: meta.bg, color: meta.color }}>{meta.label}</span>
-            {ticket.priority && <span className="text-[11px] text-slate-500">{t('admin.soporte.priorityLabel', { priority: ticket.priority })}</span>}
+            <span className="text-[11px] text-c-muted font-mono">#{ticket.number || ticket.id.slice(-6)}</span>
+            <span className={`${meta.cls} text-[10px] uppercase tracking-[0.06em]`}>{meta.label}</span>
+            {ticket.priority && <span className="text-[11px] text-c-muted">{t('admin.soporte.priorityLabel', { priority: ticket.priority })}</span>}
           </div>
-          <h2 className="text-[16px] font-semibold text-slate-900 truncate">{ticket.title || t('admin.soporte.untitled')}</h2>
+          <h2 className="text-[16px] font-semibold text-ink truncate">{ticket.title || t('admin.soporte.untitled')}</h2>
           {(() => {
             const name = (ticket.creator_name || '').trim();
             const email = (ticket.creator_email || ticket.user_email || '').trim();
@@ -178,10 +179,10 @@ function TicketDetail({ ticket, onClose, refresh }) {
             const primary = name || email || fallbackId;
             const showSecondary = !!(name && email);
             return (
-              <p className="text-[12px] text-slate-500 mt-0.5 truncate">
-                <span className="text-slate-700 font-medium">{primary}</span>
+              <p className="text-[12px] text-c-muted mt-0.5 truncate">
+                <span className="text-ink font-medium">{primary}</span>
                 {showSecondary && (
-                  <span className="text-slate-400"> · {email}</span>
+                  <span className="text-c-muted"> · {email}</span>
                 )}
                 <span> · {formatDate(ticket.created_date)}</span>
               </p>
@@ -189,10 +190,10 @@ function TicketDetail({ ticket, onClose, refresh }) {
           })()}
         </div>
         <div className="flex flex-col gap-2 items-end">
-          <select value={ticket.status} onChange={(e) => setStatus(e.target.value)} className="h-8 px-2 text-[12px] border border-slate-200 rounded-md bg-white">
+          <select value={ticket.status} onChange={(e) => setStatus(e.target.value)} className="select text-[12px]">
             {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          <select value={ticket.priority || 'normal'} onChange={(e) => setPriority(e.target.value)} className="h-8 px-2 text-[12px] border border-slate-200 rounded-md bg-white">
+          <select value={ticket.priority || 'normal'} onChange={(e) => setPriority(e.target.value)} className="select text-[12px]">
             {PRIORITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
@@ -200,7 +201,7 @@ function TicketDetail({ ticket, onClose, refresh }) {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {ticket.description && (
-          <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700 whitespace-pre-wrap">
+          <div className="rounded-xl border border-c-border bg-soft p-3 text-sm text-ink whitespace-pre-wrap">
             {ticket.description}
           </div>
         )}
@@ -208,9 +209,9 @@ function TicketDetail({ ticket, onClose, refresh }) {
           const isAdmin = m.sender_type === 'admin';
           return (
             <div key={m.id} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${isAdmin ? 'text-white' : 'bg-slate-100 text-slate-900'}`} style={isAdmin ? { background: NAVY } : null}>
+              <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${isAdmin ? 'text-white' : 'bg-soft text-ink'}`} style={isAdmin ? { background: NAVY } : null}>
                 <p className="whitespace-pre-wrap leading-relaxed">{m.body}</p>
-                <p className={`text-[10px] mt-1 ${isAdmin ? 'text-white/70' : 'text-slate-500'}`}>{formatDate(m.created_date)}</p>
+                <p className={`text-[10px] mt-1 ${isAdmin ? 'text-white/70' : 'text-c-muted'}`}>{formatDate(m.created_date)}</p>
               </div>
             </div>
           );
@@ -218,37 +219,37 @@ function TicketDetail({ ticket, onClose, refresh }) {
 
         {internalNotes.length > 0 && (
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-700 my-3">{t('admin.soporte.internalNotesTitle')}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-warning my-3">{t('admin.soporte.internalNotesTitle')}</p>
             {internalNotes.map((m) => (
-              <div key={m.id} className="my-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+              <div key={m.id} className="my-2 rounded-xl border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
                 <p className="whitespace-pre-wrap">{m.body}</p>
-                <p className="text-[10px] mt-1 text-amber-700/70">{formatDate(m.created_date)}</p>
+                <p className="text-[10px] mt-1 text-warning/70">{formatDate(m.created_date)}</p>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <form onSubmit={send} className="border-t border-slate-100 p-3 bg-white">
+      <form onSubmit={send} className="border-t border-c-border p-3 bg-surface">
         <textarea
           value={reply}
           onChange={(e) => setReply(e.target.value)}
           rows={3}
           placeholder={internal ? t('admin.soporte.internalNotePlaceholder') : t('admin.soporte.replyPlaceholder')}
-          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+          className="textarea text-sm"
         />
         <div className="mt-2 flex items-center justify-between">
-          <label className="inline-flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
-            <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
-            <span className="inline-flex items-center gap-1"><Lock className="w-3 h-3" /> {t('admin.soporte.internalNote')}</span>
+          <label className="inline-flex items-center gap-2 text-xs text-ink cursor-pointer">
+            <input type="checkbox" className="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
+            <span className="inline-flex items-center gap-1"><IconLock className="w-3 h-3" /> {t('admin.soporte.internalNote')}</span>
           </label>
           <button
             type="submit"
             disabled={!reply.trim()}
-            className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg text-xs font-semibold text-white disabled:opacity-50"
+            className="btn-primary btn-sm text-xs font-semibold"
             style={{ background: NAVY }}
           >
-            <Send className="w-3.5 h-3.5" />
+            <IconSend className="w-3.5 h-3.5" />
             {t('messages.send')}
           </button>
         </div>
@@ -298,9 +299,9 @@ export default function AdminSoportePage() {
   return (
     <>
       <SEOHead title={t('admin.soporte.seoTitle')} noindex />
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-canvas">
         <div className="max-w-7xl mx-auto px-0 md:px-6 py-0 md:py-8">
-          <div className="md:rounded-2xl md:border md:border-slate-200 bg-white overflow-hidden flex flex-col md:flex-row md:h-[calc(100vh-160px)] md:min-h-[640px]">
+          <div className="md:rounded-2xl md:border md:border-c-border bg-surface overflow-hidden flex flex-col md:flex-row md:h-[calc(100vh-160px)] md:min-h-[640px]">
             <TicketList
               tickets={filtered}
               activeId={activeId}
@@ -313,7 +314,7 @@ export default function AdminSoportePage() {
             {active ? (
               <TicketDetail ticket={active} onClose={() => setActiveId(null)} refresh={refresh} />
             ) : (
-              <div className="flex-1 flex items-center justify-center text-sm text-slate-400 p-8">
+              <div className="flex-1 flex items-center justify-center text-sm text-c-muted p-8">
                 {t('admin.soporte.selectTicket')}
               </div>
             )}

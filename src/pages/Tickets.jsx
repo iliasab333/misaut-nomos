@@ -1,41 +1,31 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { createPageUrl } from "@/utils";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { SkeletonList, EmptyState } from "@/components/ListStates";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  LifeBuoy,
-  Plus,
-  Search,
-  Filter,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  FileText,
-  MessageSquare,
-  Loader2
-} from "lucide-react";
-import { useLanguage } from "../components/ui/LanguageSwitcher";
+  IconLifeBuoy,
+  IconPlus,
+  IconSearch,
+  IconFilter,
+  IconClock,
+  IconCheckCircle,
+  IconError,
+  IconAlert,
+  IconFile,
+  IconMessageSquare,
+  IconSpinner,
+} from "@/components/Icons";
 import CreateTicketDialog from "../components/tickets/CreateTicketDialog";
 import SEOHead from "../components/seo/SEOHead";
 
 const statusConfig = {
-  abierto: { icon: Clock, color: "bg-blue-500", text_es: "Abierto", text_en: "Open" },
-  en_progreso: { icon: AlertCircle, color: "bg-amber-500", text_es: "En progreso", text_en: "In progress" },
-  resuelto: { icon: CheckCircle, color: "bg-green-500", text_es: "Resuelto", text_en: "Resolved" },
-  cerrado: { icon: XCircle, color: "bg-gray-500", text_es: "Cerrado", text_en: "Closed" }
+  abierto: { icon: IconClock, color: "bg-c-accent", text_es: "Abierto", text_en: "Open" },
+  en_progreso: { icon: IconAlert, color: "bg-warning", text_es: "En progreso", text_en: "In progress" },
+  resuelto: { icon: IconCheckCircle, color: "bg-success", text_es: "Resuelto", text_en: "Resolved" },
+  cerrado: { icon: IconError, color: "bg-c-muted", text_es: "Cerrado", text_en: "Closed" }
 };
 
 const typeConfig = {
@@ -49,7 +39,8 @@ const typeConfig = {
 
 export default function TicketsPage() {
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const { i18n } = useTranslation();
+  const language = i18n.language.split('-')[0];
   const [user, setUser] = useState(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");
@@ -132,7 +123,7 @@ export default function TicketsPage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <IconSpinner className="w-8 h-8 animate-spin text-c-accent" />
       </div>
     );
   }
@@ -149,122 +140,117 @@ export default function TicketsPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <LifeBuoy className="w-8 h-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-ink mb-2 flex items-center gap-3">
+                <IconLifeBuoy className="w-8 h-8 text-c-accent" />
                 {language === 'es' ? 'Mis Tickets de Soporte' : 'My Support Tickets'}
               </h1>
-              <p className="text-gray-600">
+              <p className="text-c-muted">
                 {language === 'es' 
                   ? 'Gestiona tus consultas y problemas reportados'
                   : 'Manage your queries and reported issues'}
               </p>
             </div>
-            <Button
+            <button
+              type="button"
               onClick={() => setShowCreateDialog(true)}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="btn-primary"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <IconPlus className="w-4 h-4" />
               {language === 'es' ? 'Nuevo Ticket' : 'New Ticket'}
-            </Button>
+            </button>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-sm text-gray-600 mb-1">{language === 'es' ? 'Total' : 'Total'}</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-sm text-gray-600 mb-1">{language === 'es' ? 'Abiertos' : 'Open'}</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.abiertos}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-sm text-gray-600 mb-1">{language === 'es' ? 'En progreso' : 'In progress'}</p>
-                <p className="text-2xl font-bold text-amber-600">{stats.en_progreso}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-sm text-gray-600 mb-1">{language === 'es' ? 'Resueltos' : 'Resolved'}</p>
-                <p className="text-2xl font-bold text-green-600">{stats.resueltos}</p>
-              </CardContent>
-            </Card>
+            <div className="card">
+              <div className="p-4">
+                <p className="text-sm text-c-muted mb-1">{language === 'es' ? 'Total' : 'Total'}</p>
+                <p className="text-2xl font-bold text-ink">{stats.total}</p>
+              </div>
+            </div>
+            <div className="card">
+              <div className="p-4">
+                <p className="text-sm text-c-muted mb-1">{language === 'es' ? 'Abiertos' : 'Open'}</p>
+                <p className="text-2xl font-bold text-c-accent">{stats.abiertos}</p>
+              </div>
+            </div>
+            <div className="card">
+              <div className="p-4">
+                <p className="text-sm text-c-muted mb-1">{language === 'es' ? 'En progreso' : 'In progress'}</p>
+                <p className="text-2xl font-bold text-warning">{stats.en_progreso}</p>
+              </div>
+            </div>
+            <div className="card">
+              <div className="p-4">
+                <p className="text-sm text-c-muted mb-1">{language === 'es' ? 'Resueltos' : 'Resolved'}</p>
+                <p className="text-2xl font-bold text-success">{stats.resueltos}</p>
+              </div>
+            </div>
           </div>
 
-          <Card className="mb-6">
-            <CardContent className="p-6">
+          <div className="card mb-6">
+            <div className="p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Filter className="w-5 h-5 text-blue-600" />
-                <h2 className="font-semibold text-gray-900">
+                <IconFilter className="w-5 h-5 text-c-accent" />
+                <h2 className="font-semibold text-ink">
                   {language === 'es' ? 'Filtros' : 'Filters'}
                 </h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-c-muted pointer-events-none" />
+                  <input
+                    type="text"
                     placeholder={language === 'es' ? "Buscar tickets..." : "Search tickets..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="input pl-10"
+                    aria-label={language === 'es' ? "Buscar tickets" : "Search tickets"}
                   />
                 </div>
 
-                <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={language === 'es' ? "Estado" : "Status"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{language === 'es' ? 'Todos los estados' : 'All statuses'}</SelectItem>
-                    <SelectItem value="abierto">{getStatusLabel('abierto')}</SelectItem>
-                    <SelectItem value="en_progreso">{getStatusLabel('en_progreso')}</SelectItem>
-                    <SelectItem value="resuelto">{getStatusLabel('resuelto')}</SelectItem>
-                    <SelectItem value="cerrado">{getStatusLabel('cerrado')}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select
+                  className="select"
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  aria-label={language === 'es' ? "Estado" : "Status"}
+                >
+                  <option value="all">{language === 'es' ? 'Todos los estados' : 'All statuses'}</option>
+                  <option value="abierto">{getStatusLabel('abierto')}</option>
+                  <option value="en_progreso">{getStatusLabel('en_progreso')}</option>
+                  <option value="resuelto">{getStatusLabel('resuelto')}</option>
+                  <option value="cerrado">{getStatusLabel('cerrado')}</option>
+                </select>
 
-                <Select value={filterType} onValueChange={setFilterType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={language === 'es' ? "Tipo" : "Type"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{language === 'es' ? 'Todos los tipos' : 'All types'}</SelectItem>
-                    {Object.entries(typeConfig).map(([key, config]) => (
-                      <SelectItem key={key} value={key}>
-                        {language === 'es' ? config.text_es : config.text_en}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  className="select"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  aria-label={language === 'es' ? "Tipo" : "Type"}
+                >
+                  <option value="all">{language === 'es' ? 'Todos los tipos' : 'All types'}</option>
+                  {Object.entries(typeConfig).map(([key, config]) => (
+                    <option key={key} value={key}>
+                      {language === 'es' ? config.text_es : config.text_en}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {isLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-            </div>
+            <SkeletonList count={3} avatar={false} />
           ) : filteredTickets.length === 0 ? (
-            <Card className="p-12 text-center">
-              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {language === 'es' ? 'No hay tickets' : 'No tickets'}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {language === 'es' 
-                  ? 'Crea tu primer ticket de soporte para obtener ayuda'
-                  : 'Create your first support ticket to get help'}
-              </p>
-              <Button onClick={() => setShowCreateDialog(true)} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                {language === 'es' ? 'Crear Ticket' : 'Create Ticket'}
-              </Button>
-            </Card>
+            <EmptyState
+              icon={<IconFile size={24} />}
+              title={language === 'es' ? 'No hay tickets' : 'No tickets'}
+              body={language === 'es'
+                ? 'Crea tu primer ticket de soporte para obtener ayuda'
+                : 'Create your first support ticket to get help'}
+              ctaLabel={language === 'es' ? 'Crear Ticket' : 'Create Ticket'}
+              onCta={() => setShowCreateDialog(true)}
+            />
           ) : (
             <div className="space-y-4">
               {filteredTickets.map((ticket) => {
@@ -272,38 +258,38 @@ export default function TicketsPage() {
                 const messageCount = messageCounts[ticket.id] || 0;
                 
                 return (
-                  <Card 
+                  <div
                     key={ticket.id}
-                    className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-gray-100 hover:border-blue-200"
+                    className="card hover:shadow-lg transition-shadow cursor-pointer border-2 border-c-border hover:border-c-accent/40"
                     onClick={() => navigate(createPageUrl("TicketDetail") + `?id=${ticket.id}`)}
                   >
-                    <CardContent className="p-6">
+                    <div className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <Badge variant="outline" className="font-mono text-xs">
+                            <span className="badge-outline font-mono text-xs">
                               {ticket.ticket_number}
-                            </Badge>
-                            <Badge className={`${statusConfig[ticket.status]?.color} text-white`}>
-                              {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
+                            </span>
+                            <span className={`badge ${statusConfig[ticket.status]?.color} text-white`}>
+                              {StatusIcon && <StatusIcon className="w-3 h-3" />}
                               {getStatusLabel(ticket.status)}
-                            </Badge>
-                            <Badge variant="outline">
+                            </span>
+                            <span className="badge-outline">
                               {getTypeLabel(ticket.type)}
-                            </Badge>
+                            </span>
                           </div>
                           
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          <h3 className="text-lg font-semibold text-ink mb-2">
                             {ticket.title}
                           </h3>
                           
-                          <p className="text-gray-600 line-clamp-2 mb-3">
+                          <p className="text-c-muted line-clamp-2 mb-3">
                             {ticket.description}
                           </p>
                           
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-4 text-sm text-c-muted">
                             <div className="flex items-center gap-1">
-                              <MessageSquare className="w-4 h-4" />
+                              <IconMessageSquare className="w-4 h-4" />
                               <span>{messageCount} {language === 'es' ? 'mensajes' : 'messages'}</span>
                             </div>
                             <span>
@@ -321,16 +307,16 @@ export default function TicketsPage() {
                           {ticket.tags && ticket.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-3">
                               {ticket.tags.map((tag, idx) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">
+                                <span key={idx} className="badge-muted text-xs">
                                   {tag}
-                                </Badge>
+                                </span>
                               ))}
                             </div>
                           )}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 );
               })}
             </div>

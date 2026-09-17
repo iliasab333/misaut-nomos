@@ -1,19 +1,20 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, Plus, Edit2, Trash2, MessageSquare } from "lucide-react";
-import { toast } from "sonner";
+import Modal from "@/components/Modal";
+import {
+  IconHelp,
+  IconPlus,
+  IconEdit,
+  IconTrash,
+  IconMessageSquare,
+  IconChevronDown,
+} from "@/components/Icons";
+import { toast } from "@/lib/toast";
 import { useTranslation } from "react-i18next";
 
-export default function FAQSection({ 
-  faqItems = [], 
-  isEditing, 
-  onFAQChange 
+export default function FAQSection({
+  faqItems = [],
+  isEditing,
+  onFAQChange
 }) {
   const { t } = useTranslation();
   // Dentro del componente para que las sugerencias sigan al idioma activo.
@@ -72,7 +73,7 @@ export default function FAQSection({
 
     let updatedItems;
     if (editingItem) {
-      updatedItems = faqItems.map(item => 
+      updatedItems = faqItems.map(item =>
         item.id === editingItem.id ? newItem : item
       );
     } else {
@@ -91,135 +92,142 @@ export default function FAQSection({
   };
 
   return (
-    <Card className="shadow-sm border-0 bg-white">
-      <CardHeader className="pb-3">
+    <div className="card">
+      <div className="p-6 pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-green-600" />
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
+            <IconHelp className="w-5 h-5 text-success" />
             {t("proProfile.faq.title")} ({faqItems.length})
-          </CardTitle>
+          </h3>
           {isEditing && (
-            <Button onClick={openAddDialog} size="sm" className="bg-green-600 hover:bg-green-700">
-              <Plus className="w-4 h-4 mr-1" />
+            <button
+              type="button"
+              onClick={openAddDialog}
+              className="btn-primary btn-sm bg-success hover:bg-green-700"
+            >
+              <IconPlus className="w-4 h-4 mr-1" />
               {t("proProfile.faq.add")}
-            </Button>
+            </button>
           )}
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-gray-600">
+      </div>
+      <div className="p-6 pt-0 space-y-4">
+        <p className="text-sm text-c-muted">
           {t("proProfile.faq.intro")}
         </p>
 
         {faqItems.length === 0 ? (
-          <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
-            <MessageSquare className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500">{t("proProfile.faq.empty")}</p>
+          <div className="text-center py-8 border-2 border-dashed border-c-border rounded-xl">
+            <IconMessageSquare className="w-12 h-12 mx-auto text-c-muted/50 mb-3" />
+            <p className="text-c-muted">{t("proProfile.faq.empty")}</p>
             {isEditing && (
-              <Button onClick={openAddDialog} variant="outline" className="mt-3">
-                <Plus className="w-4 h-4 mr-1" />
+              <button type="button" onClick={openAddDialog} className="btn-secondary mt-3">
+                <IconPlus className="w-4 h-4 mr-1" />
                 {t("proProfile.faq.addFirst")}
-              </Button>
+              </button>
             )}
           </div>
         ) : (
-          <Accordion type="single" collapsible className="w-full">
-            {faqItems.map((item, idx) => (
-              <AccordionItem key={item.id} value={item.id} className="border rounded-lg mb-2 px-4">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2 text-left flex-1">
-                    <span className="font-medium">{item.question}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="pt-2 pb-3">
-                    <p className="text-gray-700">{item.answer}</p>
-                    {isEditing && (
-                      <div className="flex gap-2 mt-3">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => openEditDialog(item)}
-                        >
-                          <Edit2 className="w-3 h-3 mr-1" />
-                          {t("common.edit")}
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          className="text-red-600 hover:bg-red-50"
-                          onClick={() => deleteItem(item.id)}
-                        >
-                          <Trash2 className="w-3 h-3 mr-1" />
-                          {t("common.delete")}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+          <div className="w-full">
+            {faqItems.map((item) => (
+              <details
+                key={item.id}
+                className="group border border-c-border rounded-lg mb-2 px-4"
+              >
+                <summary className="flex items-center justify-between gap-2 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="font-medium text-ink text-left flex-1">{item.question}</span>
+                  <IconChevronDown className="w-4 h-4 shrink-0 text-c-muted transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="pt-2 pb-3">
+                  <p className="text-ink">{item.answer}</p>
+                  {isEditing && (
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        type="button"
+                        className="btn-secondary btn-sm"
+                        onClick={() => openEditDialog(item)}
+                      >
+                        <IconEdit className="w-3 h-3 mr-1" />
+                        {t("common.edit")}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary btn-sm text-error hover:bg-error/10"
+                        onClick={() => deleteItem(item.id)}
+                      >
+                        <IconTrash className="w-3 h-3 mr-1" />
+                        {t("common.delete")}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </details>
             ))}
-          </Accordion>
+          </div>
         )}
 
-        {/* Dialog para añadir/editar */}
-        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>
-                {editingItem ? t("proProfile.faq.edit") : t("proProfile.faq.addNew")}
-              </DialogTitle>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              {!editingItem && (
-                <div>
-                  <Label className="text-sm text-gray-600">{t("proProfile.faq.quickSuggestions")}</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {FAQ_SUGGESTIONS.slice(0, 4).map((s, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => applySuggestion(s)}
-                        className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
-                      >
-                        {s.q.substring(0, 30)}...
-                      </button>
-                    ))}
-                  </div>
+        {/* Modal para añadir/editar */}
+        <Modal
+          open={showAddDialog}
+          onClose={() => setShowAddDialog(false)}
+          title={editingItem ? t("proProfile.faq.edit") : t("proProfile.faq.addNew")}
+        >
+          <div className="space-y-4">
+            {!editingItem && (
+              <div>
+                <span className="label text-c-muted">{t("proProfile.faq.quickSuggestions")}</span>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {FAQ_SUGGESTIONS.slice(0, 4).map((s, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => applySuggestion(s)}
+                      className="text-xs bg-soft hover:bg-c-border px-2 py-1 rounded transition-colors"
+                    >
+                      {s.q.substring(0, 30)}...
+                    </button>
+                  ))}
                 </div>
-              )}
-
-              <div>
-                <Label>{t("proProfile.faq.questionLabel")}</Label>
-                <Input
-                  value={formData.question}
-                  onChange={(e) => setFormData(prev => ({ ...prev, question: e.target.value }))}
-                  placeholder={t("proProfile.faq.questionPlaceholder")}
-                />
               </div>
+            )}
 
-              <div>
-                <Label>{t("proProfile.faq.answerLabel")}</Label>
-                <Textarea
-                  value={formData.answer}
-                  onChange={(e) => setFormData(prev => ({ ...prev, answer: e.target.value }))}
-                  placeholder={t("proProfile.faq.answerPlaceholder")}
-                  className="h-24"
-                />
-              </div>
+            <div>
+              <label className="label" htmlFor="faq-question">{t("proProfile.faq.questionLabel")}</label>
+              <input
+                id="faq-question"
+                className="input"
+                value={formData.question}
+                onChange={(e) => setFormData(prev => ({ ...prev, question: e.target.value }))}
+                placeholder={t("proProfile.faq.questionPlaceholder")}
+              />
             </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                {t("common.cancel")}
-              </Button>
-              <Button onClick={saveItem} className="bg-green-600 hover:bg-green-700">
-                {editingItem ? t("proProfile.form.saveChanges") : t("proProfile.faq.add")}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </CardContent>
-    </Card>
+            <div>
+              <label className="label" htmlFor="faq-answer">{t("proProfile.faq.answerLabel")}</label>
+              <textarea
+                id="faq-answer"
+                className="textarea h-24"
+                value={formData.answer}
+                onChange={(e) => setFormData(prev => ({ ...prev, answer: e.target.value }))}
+                placeholder={t("proProfile.faq.answerPlaceholder")}
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 flex gap-3 justify-end">
+            <button type="button" className="btn-secondary" onClick={() => setShowAddDialog(false)}>
+              {t("common.cancel")}
+            </button>
+            <button
+              type="button"
+              className="btn-primary bg-success hover:bg-green-700"
+              onClick={saveItem}
+            >
+              {editingItem ? t("proProfile.form.saveChanges") : t("proProfile.faq.add")}
+            </button>
+          </div>
+        </Modal>
+      </div>
+    </div>
   );
 }

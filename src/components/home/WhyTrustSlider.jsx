@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { IconChevronLeft, IconChevronRight } from "@/components/Icons";
 import { useTranslation } from "react-i18next";
 
 // Animación de entrada del slide: CSS, no texto.
@@ -44,14 +44,14 @@ export default function WhyTrustSlider() {
   const slide = slides[current];
 
   return (
-    <section className="py-14 md:py-20 bg-white" style={{ overflow: "hidden" }}>
+    <section className="py-14 md:py-20 bg-surface" style={{ overflow: "hidden" }}>
       <div className="max-w-4xl mx-auto px-4">
         {/* Título */}
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+          <h2 className="text-2xl md:text-4xl font-extrabold text-ink tracking-tight">
             {t('home.whyTrust.title')}
           </h2>
-          <p className="text-gray-500 mt-2 text-base">{t('home.whyTrust.subtitle')}</p>
+          <p className="text-c-muted mt-2 text-base">{t('home.whyTrust.subtitle')}</p>
         </div>
 
         {/* Slider */}
@@ -90,7 +90,7 @@ export default function WhyTrustSlider() {
             className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center transition-all backdrop-blur-sm"
             style={{ touchAction: "manipulation" }}
           >
-            <ChevronLeft className="w-5 h-5 text-white" />
+            <IconChevronLeft className="w-5 h-5 text-white" />
           </button>
           <button
             onClick={next}
@@ -98,7 +98,7 @@ export default function WhyTrustSlider() {
             className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center transition-all backdrop-blur-sm"
             style={{ touchAction: "manipulation" }}
           >
-            <ChevronRight className="w-5 h-5 text-white" />
+            <IconChevronRight className="w-5 h-5 text-white" />
           </button>
 
           {/* Decoración de fondo */}
@@ -146,7 +146,7 @@ export default function WhyTrustSlider() {
         </div>
 
         {/* Slide counter */}
-        <p className="text-center text-gray-400 text-xs mt-3">
+        <p className="text-center text-c-muted text-xs mt-3">
           {current + 1} / {slides.length}
         </p>
       </div>

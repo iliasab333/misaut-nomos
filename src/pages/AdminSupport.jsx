@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Send, Search, Headphones, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { IconSend, IconSearch, IconHeadphones, IconArrowLeft } from '@/components/Icons';
+import { SkeletonList, EmptyState } from '@/components/ListStates';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -148,68 +146,73 @@ export default function AdminSupport() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-white overflow-hidden">
+    <div className="flex h-[calc(100vh-64px)] bg-surface overflow-hidden">
       {/* Sidebar izquierda */}
-      <div className={`w-80 border-r border-gray-100 flex flex-col flex-shrink-0 ${selectedConvId ? 'hidden md:flex' : 'flex'}`}>
-        <div className="p-4 border-b border-gray-100">
-          <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Headphones className="w-5 h-5 text-blue-600" />
+      <div className={`w-80 border-r border-c-border flex flex-col flex-shrink-0 ${selectedConvId ? 'hidden md:flex' : 'flex'}`}>
+        <div className="p-4 border-b border-c-border">
+          <h1 className="text-lg font-semibold text-ink flex items-center gap-2">
+            <IconHeadphones className="w-5 h-5 text-c-accent" />
             {t('supportChat.supportInbox')}
           </h1>
-          <p className="text-xs text-gray-500 mt-0.5">{t('supportChat.conversationsCount', { count: filteredConversations.length })}</p>
+          <p className="text-xs text-c-muted mt-0.5">{t('supportChat.conversationsCount', { count: filteredConversations.length })}</p>
         </div>
 
-        <div className="px-3 py-2 border-b border-gray-100">
+        <div className="px-3 py-2 border-b border-c-border">
           <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
-            <Input
+            <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-c-muted pointer-events-none" />
+            <input
+              type="text"
+              className="input pl-9 text-sm"
               placeholder={t('admin.support.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 h-9 text-sm"
             />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           {isLoading ? (
-            <div className="p-4 text-sm text-gray-400 text-center">{t('common.loading')}</div>
+            <div className="p-3">
+              <SkeletonList count={5} />
+              <p className="sr-only">{t('common.loading')}</p>
+            </div>
           ) : filteredConversations.length === 0 ? (
-            <div className="p-6 text-center text-sm text-gray-400">{t('admin.support.emptyState')}</div>
+            <EmptyState className="m-3" title={t('admin.support.emptyState')} />
           ) : (
             filteredConversations.map(conv => (
               <button
                 key={conv.conversationId}
                 onClick={() => setSelectedConvId(conv.conversationId)}
-                className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                  selectedConvId === conv.conversationId ? 'bg-blue-50' : ''
-                } ${conv.unread > 0 ? 'bg-blue-50/30' : ''}`}
+                className={`w-full text-left px-4 py-3 border-b border-c-border hover:bg-soft transition-colors ${
+                  selectedConvId === conv.conversationId ? 'bg-c-accent/10' : ''
+                } ${conv.unread > 0 ? 'bg-c-accent/5' : ''}`}
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Avatar className="w-8 h-8 flex-shrink-0">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-700 text-white text-xs font-semibold">
-                        {conv.userName?.[0]?.toUpperCase() || '?'}
-                      </AvatarFallback>
-                    </Avatar>
+                    <span
+                      aria-hidden="true"
+                      className="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white text-xs font-semibold flex items-center justify-center"
+                    >
+                      {conv.userName?.[0]?.toUpperCase() || '?'}
+                    </span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className={`text-sm truncate ${conv.unread > 0 ? 'font-semibold text-gray-900' : 'font-medium text-gray-700'}`}>
+                        <p className={`text-sm truncate ${conv.unread > 0 ? 'font-semibold text-ink' : 'font-medium text-ink'}`}>
                           {conv.userName}
                         </p>
                         {conv.isBriefing && (
-                          <span className="bg-yellow-100 text-yellow-700 text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0">{t('admin.support.adsBadge')}</span>
+                          <span className="badge-warning text-[10px] flex-shrink-0">{t('admin.support.adsBadge')}</span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="text-xs text-c-muted truncate">
                         {conv.lastMsg?.sender_id === 'support_team' ? '✓ ' : ''}{conv.lastMsg?.content}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span className="text-[10px] text-gray-400">{formatDate(conv.lastMsg?.created_date)}</span>
+                    <span className="text-[10px] text-c-muted">{formatDate(conv.lastMsg?.created_date)}</span>
                     {conv.unread > 0 && (
-                      <span className="bg-blue-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                      <span className="bg-c-accent text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                         {conv.unread}
                       </span>
                     )}
@@ -224,49 +227,52 @@ export default function AdminSupport() {
       {/* Panel derecho: chat */}
       <div className={`flex-1 flex flex-col min-w-0 ${!selectedConvId ? 'hidden md:flex' : 'flex'}`}>
         {!selectedConvId ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3">
-            <Headphones className="w-12 h-12 text-gray-200" />
+          <div className="flex-1 flex flex-col items-center justify-center text-c-muted gap-3">
+            <IconHeadphones className="w-12 h-12 text-c-border" />
             <p className="text-sm">{t('supportChat.selectConversation')}</p>
           </div>
         ) : (
           <>
             {/* Header del chat */}
-            <div className="border-b border-gray-100 px-4 py-3 flex items-center gap-3 bg-white flex-shrink-0">
+            <div className="border-b border-c-border px-4 py-3 flex items-center gap-3 bg-surface flex-shrink-0">
               <button
+                type="button"
                 onClick={() => setSelectedConvId(null)}
-                className="md:hidden p-1.5 hover:bg-gray-100 rounded-lg"
+                className="md:hidden p-1.5 hover:bg-soft rounded-lg"
+                aria-label={t('common.back')}
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <IconArrowLeft className="w-5 h-5 text-c-muted" />
               </button>
-              <Avatar className="w-9 h-9">
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-700 text-white font-semibold text-sm">
-                  {activeConv?.userName?.[0]?.toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <span
+                aria-hidden="true"
+                className="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white font-semibold text-sm flex items-center justify-center"
+              >
+                {activeConv?.userName?.[0]?.toUpperCase()}
+              </span>
               <div>
                 <div className="flex items-center gap-2">
-                  <p className="font-semibold text-gray-900 text-sm">{activeConv?.userName}</p>
+                  <p className="font-semibold text-ink text-sm">{activeConv?.userName}</p>
                   {activeConv?.isBriefing && (
-                    <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded font-semibold">{t('admin.support.adsBadgeActive')}</span>
+                    <span className="badge-warning">{t('admin.support.adsBadgeActive')}</span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500">{activeConv?.isBriefing ? t('admin.support.adsCampaignChat') : t('admin.support.supportChat')}</p>
+                <p className="text-xs text-c-muted">{activeConv?.isBriefing ? t('admin.support.adsCampaignChat') : t('admin.support.supportChat')}</p>
               </div>
             </div>
 
             {/* Mensajes */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-soft">
               {activeMessages.map(msg => {
                 const isFromSupport = msg.sender_id === 'support_team';
                 return (
                   <div key={msg.id} className={`flex ${isFromSupport ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[70%] px-3 py-2 rounded-2xl text-sm ${
                       isFromSupport
-                        ? 'bg-blue-600 text-white rounded-br-md'
-                        : 'bg-white text-gray-900 rounded-bl-md border border-gray-100'
+                        ? 'bg-c-accent text-white rounded-br-md'
+                        : 'bg-surface text-ink rounded-bl-md border border-c-border'
                     }`}>
                       <p className="whitespace-pre-line break-words">{msg.content}</p>
-                      <span className={`text-[10px] block mt-0.5 ${isFromSupport ? 'text-blue-100' : 'text-gray-400'}`}>
+                      <span className={`text-[10px] block mt-0.5 ${isFromSupport ? 'text-white/70' : 'text-c-muted'}`}>
                         {formatTime(msg.created_date)}
                       </span>
                     </div>
@@ -277,23 +283,24 @@ export default function AdminSupport() {
             </div>
 
             {/* Input de respuesta */}
-            <div className="border-t border-gray-100 p-3 bg-white flex-shrink-0">
+            <div className="border-t border-c-border p-3 bg-surface flex-shrink-0">
               <form onSubmit={handleSend} className="flex gap-2">
-                <Input
+                <input
+                  type="text"
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder={t('admin.support.replyPlaceholder')}
-                  className="flex-1 rounded-full bg-gray-50 border-gray-200 text-sm"
+                  className="input flex-1 rounded-full bg-soft text-sm"
                   disabled={sendMutation.isPending}
                 />
-                <Button
+                <button
                   type="submit"
-                  size="icon"
-                  className="rounded-full w-10 h-10 bg-blue-600 hover:bg-blue-700 flex-shrink-0"
+                  className="btn-primary btn-icon rounded-full flex-shrink-0"
                   disabled={!messageInput.trim() || sendMutation.isPending}
+                  aria-label={t('messages.send')}
                 >
-                  <Send className="w-4 h-4 text-white" />
-                </Button>
+                  <IconSend className="w-4 h-4 text-white" />
+                </button>
               </form>
             </div>
           </>

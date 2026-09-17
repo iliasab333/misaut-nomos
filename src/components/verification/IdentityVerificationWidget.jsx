@@ -2,10 +2,11 @@ import React, { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Shield, ShieldCheck, ShieldX, Upload, X, Loader2, CheckCircle, Clock, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import {
+  IconShieldPlain, IconShield, IconShieldX, IconUpload, IconClose,
+  IconSpinner, IconCheckCircle, IconClock, IconInfo,
+} from "@/components/Icons";
+import { toast } from "@/lib/toast";
 
 export function VerifiedBadge({ size = "sm", showLabel = true }) {
   const { t } = useTranslation();
@@ -16,7 +17,7 @@ export function VerifiedBadge({ size = "sm", showLabel = true }) {
   };
   return (
     <span className="inline-flex items-center gap-1 text-emerald-700 font-medium" title={t('proProfile.badges.identityVerified')}>
-      <ShieldCheck className={`${sizeMap[size]} text-emerald-500 fill-emerald-100`} />
+      <IconShield className={`${sizeMap[size]} text-emerald-500 fill-emerald-100`} />
       {showLabel && <span className="text-xs">{t('proProfile.badges.verified')}</span>}
     </span>
   );
@@ -126,28 +127,28 @@ export default function IdentityVerificationWidget({ user }) {
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-blue-600" />
+            <IconShieldPlain className="w-5 h-5 text-c-accent" />
             <p className="text-sm font-semibold text-blue-900">{t('verification.form.title')}</p>
           </div>
-          <button onClick={() => setStep("idle")} className="text-gray-400 hover:text-gray-600">
-            <X className="w-4 h-4" />
+          <button type="button" onClick={() => setStep("idle")} className="text-c-muted hover:text-ink" aria-label={t('common.close')}>
+            <IconClose className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="bg-white rounded-lg p-3 border border-blue-100">
-          <p className="text-xs text-gray-600 flex items-start gap-1.5">
-            <Info className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
+        <div className="bg-surface rounded-lg p-3 border border-blue-100">
+          <p className="text-xs text-c-muted flex items-start gap-1.5">
+            <IconInfo className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
             {t('verification.form.privacyNote')}
           </p>
         </div>
 
         {/* Tipo de documento */}
         <div>
-          <p className="text-xs font-medium text-gray-700 mb-2">{t('verification.form.documentType')}</p>
+          <p className="text-xs font-medium text-ink mb-2">{t('verification.form.documentType')}</p>
           <div className="flex gap-2">
             {[["dni", "DNI"], ["nie", "NIE"], ["passport", t('verification.form.passport')]].map(([val, label]) => (
-              <button key={val} onClick={() => setDocType(val)}
-                className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-colors ${docType === val ? "bg-blue-600 border-blue-600 text-white" : "border-gray-200 text-gray-700 hover:border-blue-300"}`}>
+              <button key={val} type="button" onClick={() => setDocType(val)}
+                className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-colors ${docType === val ? "bg-c-accent border-c-accent text-white" : "border-c-border text-ink hover:border-blue-300"}`}>
                 {label}
               </button>
             ))}
@@ -156,21 +157,22 @@ export default function IdentityVerificationWidget({ user }) {
 
         {/* Foto frontal */}
         <div>
-          <p className="text-xs font-medium text-gray-700 mb-1">{t('verification.form.frontLabel')}</p>
+          <p className="text-xs font-medium text-ink mb-1">{t('verification.form.frontLabel')}</p>
           <input ref={frontRef} type="file" accept="image/*" className="hidden"
             onChange={(e) => handleFile(e, setFrontFile, setFrontPreview)} />
           {frontPreview ? (
             <div className="relative">
-              <img src={frontPreview} className="w-full h-28 object-cover rounded-lg border border-gray-200" />
-              <button onClick={() => { setFrontFile(null); setFrontPreview(null); }}
-                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5">
-                <X className="w-3 h-3" />
+              <img src={frontPreview} alt={t('verification.form.frontLabel')} className="w-full h-28 object-cover rounded-lg border border-c-border" />
+              <button type="button" onClick={() => { setFrontFile(null); setFrontPreview(null); }}
+                className="absolute top-1 right-1 bg-error text-white rounded-full p-0.5"
+                aria-label={`${t('common.delete')} — ${t('verification.form.frontLabel')}`}>
+                <IconClose className="w-3 h-3" />
               </button>
             </div>
           ) : (
-            <button onClick={() => frontRef.current.click()}
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 text-xs text-gray-500 hover:border-blue-400 flex flex-col items-center gap-1">
-              <Upload className="w-5 h-5" /> {t('verification.form.uploadFront')}
+            <button type="button" onClick={() => frontRef.current.click()}
+              className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 text-xs text-c-muted hover:border-blue-400 flex flex-col items-center gap-1">
+              <IconUpload className="w-5 h-5" /> {t('verification.form.uploadFront')}
             </button>
           )}
         </div>
@@ -178,21 +180,22 @@ export default function IdentityVerificationWidget({ user }) {
         {/* Foto trasera (DNI / NIE) */}
         {docType !== "passport" && (
           <div>
-            <p className="text-xs font-medium text-gray-700 mb-1">{t('verification.form.backLabel')}</p>
+            <p className="text-xs font-medium text-ink mb-1">{t('verification.form.backLabel')}</p>
             <input ref={backRef} type="file" accept="image/*" className="hidden"
               onChange={(e) => handleFile(e, setBackFile, setBackPreview)} />
             {backPreview ? (
               <div className="relative">
-                <img src={backPreview} className="w-full h-28 object-cover rounded-lg border border-gray-200" />
-                <button onClick={() => { setBackFile(null); setBackPreview(null); }}
-                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5">
-                  <X className="w-3 h-3" />
+                <img src={backPreview} alt={t('verification.form.backLabel')} className="w-full h-28 object-cover rounded-lg border border-c-border" />
+                <button type="button" onClick={() => { setBackFile(null); setBackPreview(null); }}
+                  className="absolute top-1 right-1 bg-error text-white rounded-full p-0.5"
+                  aria-label={`${t('common.delete')} — ${t('verification.form.backLabel')}`}>
+                  <IconClose className="w-3 h-3" />
                 </button>
               </div>
             ) : (
-              <button onClick={() => backRef.current.click()}
-                className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 text-xs text-gray-500 hover:border-blue-400 flex flex-col items-center gap-1">
-                <Upload className="w-5 h-5" /> {t('verification.form.uploadBack')}
+              <button type="button" onClick={() => backRef.current.click()}
+                className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 text-xs text-c-muted hover:border-blue-400 flex flex-col items-center gap-1">
+                <IconUpload className="w-5 h-5" /> {t('verification.form.uploadBack')}
               </button>
             )}
           </div>
@@ -200,32 +203,33 @@ export default function IdentityVerificationWidget({ user }) {
 
         {/* Selfie con documento */}
         <div>
-          <p className="text-xs font-medium text-gray-700 mb-1">{t('verification.form.selfieLabel')}</p>
+          <p className="text-xs font-medium text-ink mb-1">{t('verification.form.selfieLabel')}</p>
           <input ref={selfieRef} type="file" accept="image/*" className="hidden"
             onChange={(e) => handleFile(e, setSelfieFile, setSelfiePreview)} />
           {selfiePreview ? (
             <div className="relative">
-              <img src={selfiePreview} className="w-full h-28 object-cover rounded-lg border border-gray-200" />
-              <button onClick={() => { setSelfieFile(null); setSelfiePreview(null); }}
-                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5">
-                <X className="w-3 h-3" />
+              <img src={selfiePreview} alt={t('verification.form.selfieLabel')} className="w-full h-28 object-cover rounded-lg border border-c-border" />
+              <button type="button" onClick={() => { setSelfieFile(null); setSelfiePreview(null); }}
+                className="absolute top-1 right-1 bg-error text-white rounded-full p-0.5"
+                aria-label={`${t('common.delete')} — ${t('verification.form.selfieLabel')}`}>
+                <IconClose className="w-3 h-3" />
               </button>
             </div>
           ) : (
-            <button onClick={() => selfieRef.current.click()}
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 text-xs text-gray-500 hover:border-blue-400 flex flex-col items-center gap-1">
-              <Upload className="w-5 h-5" /> {t('verification.form.uploadSelfie')}
+            <button type="button" onClick={() => selfieRef.current.click()}
+              className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 text-xs text-c-muted hover:border-blue-400 flex flex-col items-center gap-1">
+              <IconUpload className="w-5 h-5" /> {t('verification.form.uploadSelfie')}
             </button>
           )}
         </div>
 
-        <Button onClick={handleSubmit} disabled={step === "submitting"} className="w-full bg-blue-600 hover:bg-blue-700">
+        <button type="button" onClick={handleSubmit} disabled={step === "submitting"} className="btn-primary w-full">
           {step === "submitting" ? (
-            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('reviews.form.sending')}</>
+            <><IconSpinner className="w-4 h-4 animate-spin mr-2" /> {t('reviews.form.sending')}</>
           ) : (
-            <><CheckCircle className="w-4 h-4 mr-2" /> {t('verification.form.submit')}</>
+            <><IconCheckCircle className="w-4 h-4 mr-2" /> {t('verification.form.submit')}</>
           )}
-        </Button>
+        </button>
       </div>
     );
   }
@@ -234,7 +238,7 @@ export default function IdentityVerificationWidget({ user }) {
   if (verification?.status === "approved") {
     return (
       <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
-        <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+        <IconShield className="w-5 h-5 text-emerald-600 flex-shrink-0" />
         <div>
           <p className="text-sm font-semibold text-emerald-800">{t('proProfile.badges.identityVerified')}</p>
           <p className="text-xs text-emerald-600">{t('verification.approved.subtitle')}</p>
@@ -247,10 +251,10 @@ export default function IdentityVerificationWidget({ user }) {
   if (verification?.status === "pending") {
     return (
       <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-        <Clock className="w-5 h-5 text-amber-600 flex-shrink-0" />
+        <IconClock className="w-5 h-5 text-warning flex-shrink-0" />
         <div>
-          <p className="text-sm font-semibold text-amber-800">{t('verification.pending.title')}</p>
-          <p className="text-xs text-amber-600">{t('verification.pending.subtitle')}</p>
+          <p className="text-sm font-semibold text-warning">{t('verification.pending.title')}</p>
+          <p className="text-xs text-warning">{t('verification.pending.subtitle')}</p>
         </div>
       </div>
     );
@@ -259,38 +263,38 @@ export default function IdentityVerificationWidget({ user }) {
   // --- ESTADO: RECHAZADO ---
   if (verification?.status === "rejected") {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3">
+      <div className="bg-error/10 border border-error/20 rounded-xl p-4 space-y-3">
         <div className="flex items-center gap-2">
-          <ShieldX className="w-5 h-5 text-red-600" />
-          <p className="text-sm font-semibold text-red-800">{t('verification.status.rejected')}</p>
+          <IconShieldX className="w-5 h-5 text-error" />
+          <p className="text-sm font-semibold text-error">{t('verification.status.rejected')}</p>
         </div>
         {verification.rejection_reason && (
-          <p className="text-xs text-red-700 bg-red-100 rounded-lg px-3 py-2">
+          <p className="text-xs text-error bg-error/10 rounded-lg px-3 py-2">
             {t('verification.rejected.reason', { reason: verification.rejection_reason })}
           </p>
         )}
-        <Button size="sm" variant="outline" className="border-red-300 text-red-700 hover:bg-red-50"
+        <button type="button" className="btn-secondary btn-sm border-error/40 text-error hover:bg-error/10"
           onClick={() => setStep("form")}>
           {t('verification.rejected.retry')}
-        </Button>
+        </button>
       </div>
     );
   }
 
   // --- ESTADO: IDLE (sin verificación) ---
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center justify-between gap-3">
+    <div className="bg-soft border border-c-border rounded-xl p-4 flex items-center justify-between gap-3">
       <div className="flex items-center gap-3">
-        <Shield className="w-8 h-8 text-gray-400 flex-shrink-0" />
+        <IconShieldPlain className="w-8 h-8 text-c-muted flex-shrink-0" />
         <div>
-          <p className="text-sm font-semibold text-gray-900">{t('verification.idle.title')}</p>
-          <p className="text-xs text-gray-500">{t('verification.idle.subtitle')}</p>
+          <p className="text-sm font-semibold text-ink">{t('verification.idle.title')}</p>
+          <p className="text-xs text-c-muted">{t('verification.idle.subtitle')}</p>
         </div>
       </div>
-      <Button size="sm" variant="outline" className="flex-shrink-0 border-blue-200 text-blue-700 hover:bg-blue-50"
+      <button type="button" className="btn-secondary btn-sm flex-shrink-0 border-blue-200 text-c-accent hover:bg-blue-50"
         onClick={() => setStep("form")}>
         {t('verification.idle.cta')}
-      </Button>
+      </button>
     </div>
   );
 }

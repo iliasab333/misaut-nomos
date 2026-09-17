@@ -29,7 +29,6 @@ export default function SEOHead({
     // Flujos de registro/onboarding
     '/completar-perfil', '/registro', '/registro-cliente', '/bienvenida',
     // Cuenta y suscripción
-    '/suscripcion', '/pago-exitoso', '/pago-completado', '/pagar',
     // Páginas privadas de usuario
     '/mi-perfil', '/notificaciones', '/mensajes', '/favoritos',
     '/soporte', '/solicitudes', '/automatizaciones', '/mi-campana',
@@ -50,7 +49,7 @@ export default function SEOHead({
     // Rutas privadas adicionales (Search Console legacy en inglés)
     '/Tickets', '/tickets', '/TicketDetail', '/Invoices', '/UserTypeSelection',
     '/ProfileOnboarding', '/MyProfile', '/NewsletterUnsubscribe', '/CookiePreferences',
-    '/Favorites', '/Notifications', '/Messages', '/PaymentSuccess', '/AdminFAQ',
+    '/Favorites', '/Notifications', '/AdminFAQ',
     '/AdminReferrals', '/BriefingMensual', '/PayInvoice',
   ];
   const isPrivatePage = NOINDEX_PATHS.some(p => location.pathname === p || location.pathname.startsWith(p + '/'));

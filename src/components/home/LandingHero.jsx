@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Search as SearchIcon,
-  ChevronDown,
-  ShieldCheck,
-  BadgeCheck,
-  Building2,
-  ArrowRight,
-  HelpCircle,
-} from "lucide-react";
+  IconSearch,
+  IconChevronDown,
+  IconShield,
+  IconVerified,
+  IconBuilding,
+  IconArrowRight,
+  IconHelp,
+} from "@/components/Icons";
 import { base44 } from "@/api/base44Client";
 import { PROVINCIAS, CIUDADES_POR_PROVINCIA } from "@/components/utils/locationsData";
 import { slugify } from "@/lib/seoUrl";
@@ -40,7 +40,7 @@ function buildCategorySlug(cat) {
 function NativeSelect({ id, label, value, onChange, placeholder, options, disabled }) {
   return (
     <label htmlFor={id} className="block">
-      <span className="block text-[11px] font-semibold text-slate-600 mb-1.5 uppercase tracking-[0.06em]">
+      <span className="block text-[11px] font-semibold text-c-muted mb-1.5 uppercase tracking-[0.06em]">
         {label}
       </span>
       <div className="relative">
@@ -49,7 +49,7 @@ function NativeSelect({ id, label, value, onChange, placeholder, options, disabl
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-full h-12 appearance-none rounded-xl bg-white border border-slate-200 pl-3.5 pr-9 text-[15px] text-slate-900 hover:border-slate-300 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/20 transition disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
+          className="w-full h-12 appearance-none rounded-xl bg-surface border border-c-border pl-3.5 pr-9 text-[15px] text-ink hover:border-slate-300 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/20 transition disabled:bg-soft disabled:text-slate-400 disabled:cursor-not-allowed"
         >
           <option value="">{placeholder}</option>
           {options.map((opt) => (
@@ -58,7 +58,7 @@ function NativeSelect({ id, label, value, onChange, placeholder, options, disabl
             </option>
           ))}
         </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+        <IconChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
       </div>
     </label>
   );
@@ -67,9 +67,9 @@ function NativeSelect({ id, label, value, onChange, placeholder, options, disabl
 // ── Skeleton para la rejilla de categorías ───────────────────────────────
 function CategoryChipSkeleton() {
   return (
-    <div className="flex flex-col items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 animate-pulse" aria-hidden="true">
-      <div className="w-10 h-10 rounded-xl bg-slate-100" />
-      <div className="h-3.5 w-20 rounded bg-slate-100" />
+    <div className="flex flex-col items-start gap-3 rounded-2xl border border-c-border bg-surface p-4 animate-pulse" aria-hidden="true">
+      <div className="w-10 h-10 rounded-xl bg-soft" />
+      <div className="h-3.5 w-20 rounded bg-soft" />
     </div>
   );
 }
@@ -169,7 +169,7 @@ export default function LandingHero() {
             className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] md:text-xs font-medium"
             style={{ backgroundColor: NAVY_SOFT, color: NAVY }}
           >
-            <ShieldCheck className="w-3.5 h-3.5" />
+            <IconShield className="w-3.5 h-3.5" />
             {t('landing.hero.eyebrow')}
           </div>
         </div>
@@ -190,13 +190,13 @@ export default function LandingHero() {
           />
         </h1>
 
-        <p className="text-center text-slate-600 mt-2 md:mt-5 max-w-xl mx-auto text-[14px] md:text-lg leading-snug md:leading-relaxed">
+        <p className="text-center text-c-muted mt-2 md:mt-5 max-w-xl mx-auto text-[14px] md:text-lg leading-snug md:leading-relaxed">
           {t('landing.hero.subtitle')}
         </p>
 
         {/* Panel de búsqueda guiada */}
         <div
-          className="mt-4 md:mt-12 mx-auto bg-white border border-slate-100"
+          className="mt-4 md:mt-12 mx-auto bg-surface border border-slate-100"
           style={{
             maxWidth: 920,
             borderRadius: RADIUS.xxl,
@@ -230,7 +230,7 @@ export default function LandingHero() {
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = NAVY_INK)}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = NAVY)}
               >
-                <SearchIcon className="w-4 h-4" />
+                <IconSearch className="w-4 h-4" />
                 {t('common.search')}
               </button>
             </div>
@@ -256,9 +256,9 @@ export default function LandingHero() {
               <button
                 type="button"
                 onClick={() => setShowFreeText(true)}
-                className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 underline underline-offset-2 focus:outline-none focus-visible:text-slate-900"
+                className="inline-flex items-center gap-1.5 text-xs text-c-muted hover:text-slate-700 underline underline-offset-2 focus:outline-none focus-visible:text-ink"
               >
-                <HelpCircle className="w-3.5 h-3.5" />
+                <IconHelp className="w-3.5 h-3.5" />
                 {t('landing.hero.keywordSearch')}
               </button>
             ) : (
@@ -269,11 +269,11 @@ export default function LandingHero() {
                   value={freeText}
                   onChange={(e) => setFreeText(e.target.value)}
                   placeholder={t('landing.hero.keywordPlaceholder')}
-                  className="flex-1 h-10 rounded-lg border border-slate-200 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                  className="flex-1 h-10 rounded-lg border border-c-border px-3 text-sm text-ink placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                 />
                 <button
                   type="submit"
-                  className="h-10 rounded-lg border border-slate-200 text-slate-700 font-medium px-4 text-sm hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00255C]/20"
+                  className="h-10 rounded-lg border border-c-border text-ink font-medium px-4 text-sm hover:bg-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00255C]/20"
                 >
                   {t('common.search')}
                 </button>
@@ -285,7 +285,7 @@ export default function LandingHero() {
         {/* Rejilla de servicios — dinámica desde service_categories ─────── */}
         <div className="mt-12 md:mt-16">
           <div className="flex items-end justify-between mb-4">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted">
               {t('landing.hero.servicesTitle')}
             </h2>
             <button
@@ -295,7 +295,7 @@ export default function LandingHero() {
               style={{ color: NAVY }}
             >
               {t('landing.hero.viewAll')}
-              <ArrowRight className="w-3.5 h-3.5" />
+              <IconArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -314,7 +314,7 @@ export default function LandingHero() {
                     type="button"
                     onClick={() => handleCategoryClick(cat)}
                     title={cat.description || cat.name}
-                    className="group flex flex-col items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left transition focus:outline-none hover:-translate-y-[1px]"
+                    className="group flex flex-col items-start gap-3 rounded-2xl border border-c-border bg-surface p-4 text-left transition focus:outline-none hover:-translate-y-[1px]"
                     style={{
                       transition: "border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease",
                     }}
@@ -330,7 +330,7 @@ export default function LandingHero() {
                     >
                       {cat.icon || cat.name.charAt(0)}
                     </span>
-                    <span className="font-semibold text-slate-900 text-[14px] leading-snug">
+                    <span className="font-semibold text-ink text-[14px] leading-snug">
                       {cat.name}
                     </span>
                   </button>
@@ -344,13 +344,13 @@ export default function LandingHero() {
             style={{ color: NAVY }}
           >
             {t('landing.hero.viewAll')}
-            <ArrowRight className="w-3.5 h-3.5" />
+            <IconArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* Banner "soy autónomo" — secundario, navy/dorado contenidos ───── */}
         <div
-          className="mt-14 md:mt-16 rounded-2xl border bg-white"
+          className="mt-14 md:mt-16 rounded-2xl border bg-surface"
           style={{ borderColor: NAVY_BORDER }}
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-5 md:p-6">
@@ -360,11 +360,11 @@ export default function LandingHero() {
                 style={{ backgroundColor: NAVY, color: "white" }}
                 aria-hidden="true"
               >
-                <Building2 className="w-5 h-5" />
+                <IconBuilding className="w-5 h-5" />
               </span>
               <div>
-                <p className="font-semibold text-slate-900">{t('landing.cta_pro_title')}</p>
-                <p className="text-sm text-slate-600">
+                <p className="font-semibold text-ink">{t('landing.cta_pro_title')}</p>
+                <p className="text-sm text-c-muted">
                   {t('landing.hero.proBannerText')}
                 </p>
               </div>
@@ -378,23 +378,23 @@ export default function LandingHero() {
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = GOLD)}
             >
               {t('nav.becomeProFree')}
-              <ArrowRight className="w-4 h-4" />
+              <IconArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Señales de confianza honestas (sin números inventados) */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-c-muted">
           <span className="inline-flex items-center gap-1.5">
-            <BadgeCheck className="w-3.5 h-3.5" style={{ color: NAVY }} />
+            <IconVerified className="w-3.5 h-3.5" style={{ color: NAVY }} />
             {t('landing.hero.trustVerified')}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5" style={{ color: NAVY }} />
+            <IconShield className="w-3.5 h-3.5" style={{ color: NAVY }} />
             {t('landing.feature_no_fees')}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <SearchIcon className="w-3.5 h-3.5" style={{ color: NAVY }} />
+            <IconSearch className="w-3.5 h-3.5" style={{ color: NAVY }} />
             {t('landing.feature_direct_contact')}
           </span>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Loader2, RefreshCw } from "lucide-react";
+import { IconSpinner, IconRefresh } from "@/components/Icons";
 
 export default function PullToRefresh({ onRefresh, children }) {
   const [pullDistance, setPullDistance] = useState(0);
@@ -76,9 +76,9 @@ export default function PullToRefresh({ onRefresh, children }) {
           style={{ height: isRefreshing ? '48px' : `${Math.max(pullDistance, 0)}px`, overflow: 'hidden', transition: 'height 200ms' }}
         >
           {isRefreshing ? (
-            <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+            <IconSpinner className="w-5 h-5 text-blue-500 animate-spin" />
           ) : (
-            <RefreshCw
+            <IconRefresh
               className="w-5 h-5 text-blue-400"
               style={{ transform: `rotate(${Math.min(pullDistance * 3, 360)}deg)` }}
             />

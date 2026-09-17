@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Loader2, Camera, X } from "lucide-react";
-import { toast } from "sonner";
-import OptimizedImage from "../ui/OptimizedImage";
+import { IconSpinner, IconCamera, IconClose } from "@/components/Icons";
+import { toast } from "@/lib/toast";
+import OptimizedImage from "@/components/OptimizedImage";
 import { useTranslation } from "react-i18next";
 
 export default function ProfilePictureUpload({ user, currentPicture, onUpdate, size = "lg", allowedForClients = true }) {
@@ -117,7 +115,7 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative group">
-        <Avatar className={`${sizes[size].avatar} border-4 border-white shadow-xl`}>
+        <div className={`relative flex shrink-0 overflow-hidden rounded-full ${sizes[size].avatar} border-4 border-surface shadow-xl`}>
           {previewUrl ? (
             <OptimizedImage
               src={previewUrl}
@@ -127,18 +125,18 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
               priority={true}
             />
           ) : (
-            <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-800 text-white font-bold text-2xl">
+            <span className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-800 text-white font-bold text-2xl">
               {getInitials()}
-            </AvatarFallback>
+            </span>
           )}
-        </Avatar>
+        </div>
         
         <label className="absolute bottom-0 right-0 cursor-pointer">
-          <div className="w-10 h-10 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg transition-all group-hover:scale-110">
+          <div className="w-10 h-10 bg-c-accent hover:bg-accent-hover rounded-full flex items-center justify-center shadow-lg transition-all group-hover:scale-110">
             {uploading ? (
-              <Loader2 className="w-5 h-5 text-white animate-spin" />
+              <IconSpinner className="w-5 h-5 text-white animate-spin" />
             ) : (
-              <Camera className="w-5 h-5 text-white" />
+              <IconCamera className="w-5 h-5 text-white" />
             )}
           </div>
           <input
@@ -153,19 +151,20 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
         {previewUrl && (
           <button
             onClick={handleRemove}
-            className="absolute top-0 left-0 w-8 h-8 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+            type="button"
+            className="absolute top-0 left-0 w-8 h-8 bg-error hover:brightness-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
             aria-label={t("proProfile.picture.removeAria")}
           >
-            <X className="w-4 h-4 text-white" />
+            <IconClose className="w-4 h-4 text-white" />
           </button>
         )}
       </div>
       
       <div className="text-center">
-        <p className={`font-semibold text-gray-900 ${sizes[size].text}`}>
+        <p className={`font-semibold text-ink ${sizes[size].text}`}>
           {previewUrl ? t("proProfile.picture.change") : t("proProfile.picture.add")}
         </p>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-c-muted mt-1">
           {t("proProfile.picture.hint")}
         </p>
       </div>

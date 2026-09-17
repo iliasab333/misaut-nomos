@@ -1,8 +1,6 @@
 {
   "dashboard": {
     "average_rating": "Valoración",
-    "complete_profile": "Completar mi perfil",
-    "days_remaining": "{{days}} días restantes",
     "pro": {
       "greeting": {
         "morning": "Buenos días",
@@ -59,6 +57,10 @@
       "quickActions": {
         "title": "Accesos rápidos"
       }
+    },
+    "completion": {
+      "fullDescription": "Descripción detallada",
+      "title": "Completitud del perfil"
     }
   },
   "admin": {
@@ -667,265 +669,11 @@
     }
   },
   "subscription": {
-    "page": {
-      "backToProfile": "Volver a mi perfil",
-      "seoDescription": "Gestiona tu plan profesional"
-    },
-    "sync": {
-      "stripe": "Sincronizando con Stripe..."
-    },
-    "native": {
-      "yourPlan": "Tu plan",
-      "status": "Estado:",
-      "renewsOn": "Renueva el {{date}}",
-      "noActivePlan": "Sin plan activo.",
-      "manageOnWeb": "Gestiona tu plan en <website>misautonomos.es</website>."
-    },
-    "noPlan": {
-      "canceledTitle": "Tu suscripción ha sido cancelada",
-      "title": "No tienes un plan activo",
-      "canceledText": "Tu perfil ya no es visible en las búsquedas. Puedes volver a suscribirte cuando quieras.",
-      "text": "Necesitas contratar un plan profesional para que tu perfil aparezca en las búsquedas",
-      "viewPlans": "Ver planes disponibles"
-    },
-    "gift": {
-      "title": "Tienes un plan regalado activo",
-      "enjoyUntil": "Disfrutas de <strong>{{plan}}</strong> hasta el <strong>{{date}}</strong>.",
-      "billingUnchanged": "Tu facturación actual ({{plan}}) no ha cambiado. Al terminar el regalo volverás automáticamente a este plan."
-    },
     "status": {
-      "active": "Activo",
-      "trial": "Periodo de prueba",
-      "canceled": "Cancelado",
-      "finished": "Finalizada"
-    },
-    "plan": {
-      "current": "Tu plan actual",
-      "giftBadge": "Regalo",
-      "price": "Precio",
-      "pricePerMonth": "{{price}}€/mes",
-      "trialEnds": "Fin de prueba",
-      "nextCharge": "Próximo cobro",
-      "daysLeft_one": "({{count}} día)",
-      "daysLeft_other": "({{count}} días)",
-      "trialNotice": "<strong>Periodo de prueba:</strong> Los primeros 7 días son gratis. Si no cancelas antes del {{date}}, se cobrará automáticamente {{price}}€/mes."
-    },
-    "upgrade": {
-      "title": "Mejorar a Plan Ads+",
-      "subtitle": "Acceso completo al Dashboard Pro + Campañas publicitarias gestionadas",
-      "featureCrm": "CRM completo y gestión de clientes",
-      "featureAds": "Campañas en Instagram, Facebook y TikTok",
-      "featureInvoicing": "Facturación y presupuestos automáticos",
-      "processingPayment": "Procesando pago...",
-      "button": "Mejorar por 33€/mes",
-      "proration": "Prorrateo automático. Solo pagas la diferencia del mes actual."
-    },
-    "downgrade": {
-      "title": "Cambiar a Plan Visibilidad",
-      "subtitle": "Reduce tus gastos manteniendo visibilidad en búsquedas",
-      "button": "Cambiar a 14€/mes",
-      "appliesNextPeriod": "Se aplicará en el próximo período de facturación."
-    },
-    "actions": {
-      "processing": "Procesando..."
-    },
-    "invoices": {
-      "title": "Facturas de tu suscripción",
-      "subtitle": "Descarga o consulta tus facturas de MisAutónomos",
-      "empty": "No hay facturas disponibles aún",
-      "emptyHint": "Las facturas aparecen después del primer cobro",
-      "fallbackNumber": "Factura {{id}}",
-      "statusOpen": "Pendiente",
-      "view": "Ver factura"
-    },
-    "payment": {
-      "subtitle": "Actualiza tu tarjeta o gestiona tu facturación",
-      "timeout": "La conexión está tardando mucho. Intenta de nuevo.",
-      "portalOpened": "Portal abierto en nueva pestaña",
-      "portalError": "Error al abrir el portal",
-      "connectionError": "Error de conexión. Verifica tu suscripción e intenta de nuevo.",
-      "openingPortal": "Abriendo portal...",
-      "manage": "Gestionar pago",
-      "customerId": "ID Cliente: {{id}}..."
+      "trial": "Periodo de prueba"
     },
     "reactivate": {
-      "title": "Suscripción cancelada",
-      "activeUntil_one": "Tu plan sigue activo hasta el {{date}}. Queda {{count}} día.",
-      "activeUntil_other": "Tu plan sigue activo hasta el {{date}}. Quedan {{count}} días.",
-      "loading": "Reactivando...",
-      "button": "Reactivar suscripción"
-    },
-    "expired": {
-      "title": "Tu plan ha expirado",
-      "text": "Tu perfil no es visible en las búsquedas"
-    },
-    "cancel": {
-      "link": "Cancelar suscripción",
-      "dialogTitle": "¿Cancelar tu suscripción?",
-      "trialNoCharge": "Si cancelas ahora, <strong>no se te cobrará nada</strong>. Tu prueba gratuita se detendrá inmediatamente.",
-      "trialWarning": "Tu perfil dejará de aparecer en las búsquedas al instante y perderás tu plaza reservada (máximo 10 por ciudad).",
-      "activeUntil": "Tu suscripción seguirá activa hasta el <strong>{{date}}</strong>.",
-      "activeWarning": "Después de esa fecha, tu perfil pasará a ser gratuito y <strong>perderás tu plaza reservada</strong> (máximo 10 profesionales por ciudad).",
-      "keep": "No, mantener activo",
-      "loading": "Cancelando...",
-      "confirm": "Sí, cancelar suscripción"
-    },
-    "toasts": {
-      "noEmail": "No se pudo obtener tu email",
-      "fixed": "Suscripción corregida, recargando...",
-      "fixFailed": "No se pudo corregir automáticamente",
-      "alreadyOk": "La suscripción está correctamente configurada",
-      "verifyError": "Error al verificar la suscripción",
-      "canceled": "Suscripción cancelada correctamente",
-      "canceledDescription": "Tu perfil ya no es visible en búsquedas",
-      "cancelError": "Error al cancelar",
-      "cancelSubscriptionError": "Error al cancelar la suscripción",
-      "reactivateError": "Error al reactivar",
-      "reactivateSubscriptionError": "Error al reactivar la suscripción",
-      "portalError": "Error al abrir el portal de facturación",
-      "downgraded": "Plan degradado correctamente",
-      "downgradeError": "Error al degradar el plan"
-    },
-    "onboarding": {
-      "steps": {
-        "userType": "¿Eres autónomo o empresa?",
-        "companyName": "Razón social",
-        "firstName": "¿Cuál es tu nombre?",
-        "lastName": "¿Y tus apellidos?",
-        "companyCif": "CIF de la empresa",
-        "nif": "Tu NIF",
-        "email": "¿Cuál es tu correo electrónico?",
-        "password": "Crea una contraseña segura",
-        "activity": "¿A qué te dedicas?"
-      },
-      "userType": {
-        "freelancer": "Autónomo",
-        "company": "Empresa"
-      },
-      "placeholders": {
-        "companyName": "Ej: Mi Empresa S.L.",
-        "firstName": "Ej: Juan",
-        "lastName": "Ej: Pérez García",
-        "cif": "Ej: B12345678",
-        "nif": "Ej: 12345678A",
-        "phone": "612345678 o +34612345678",
-        "address": "Calle, número, código postal, ciudad",
-        "activityOther": "Ej: Diseñador gráfico, Consultor IT..."
-      },
-      "password": {
-        "minChars": "Mínimo 8 caracteres"
-      },
-      "activities": {
-        "transporter": "Transportista",
-        "consultancy": "Asesoría o gestoría",
-        "multiservice": "Empresa multiservicios",
-        "other": "Otro tipo de servicio profesional"
-      },
-      "errors": {
-        "paymentCanceled": "El pago fue cancelado. Puedes intentarlo nuevamente.",
-        "required": "Por favor completa este campo para continuar",
-        "companyNameLength": "La razón social debe tener entre 2 y 50 caracteres",
-        "firstNameInvalid": "El nombre debe tener entre 2 y 50 caracteres y solo contener letras",
-        "lastNameInvalid": "Los apellidos deben tener entre 2 y 100 caracteres y solo contener letras",
-        "cifInvalid": "CIF inválido. Formato: B12345678",
-        "nifInvalid": "NIF inválido. Formato: 12345678A",
-        "emailInvalid": "Por favor introduce un email válido",
-        "passwordLength": "La contraseña debe tener al menos 8 caracteres",
-        "phoneInvalid": "Teléfono inválido. Formato: 612345678 o +34612345678",
-        "activityOtherRequired": "Por favor especifica tu actividad profesional",
-        "addressLength": "Por favor introduce una dirección completa (mínimo 10 caracteres)",
-        "allFieldsRequired": "Por favor, completa todos los campos antes de continuar",
-        "firstNameChars": "El nombre contiene caracteres no válidos",
-        "lastNameChars": "Los apellidos contienen caracteres no válidos",
-        "nifCifInvalid": "NIF/CIF inválido",
-        "emailShort": "Email inválido",
-        "phoneShort": "Teléfono inválido",
-        "temporary": "Ha habido un problema temporal. Por favor, inténtalo de nuevo en unos segundos."
-      },
-      "success": {
-        "title": "✅ ¡Pago completado con éxito!",
-        "activated": "Tu suscripción ha sido activada correctamente.",
-        "emailSent": "Recibirás un correo de confirmación en {{email}}",
-        "nextSteps": "✨ Próximos pasos:",
-        "stepConfirmEmail": "Revisa tu correo para confirmar tu cuenta",
-        "stepCompleteProfile": "Completa tu perfil profesional",
-        "stepAddPhotos": "Añade fotos de tus trabajos",
-        "stepGetClients": "¡Comienza a recibir clientes!",
-        "goToPanel": "Ir a mi panel"
-      },
-      "progress": {
-        "step": "Paso {{current}} de {{total}}",
-        "completed": "{{percent}}% completado"
-      },
-      "fields": {
-        "charCount": "{{current}}/{{max}} caracteres",
-        "cifFormat": "Formato: B12345678",
-        "nifFormat": "Formato: 12345678A",
-        "phoneFormats": "Formatos válidos: 612345678 o +34612345678",
-        "selectOption": "Selecciona una opción",
-        "specifyActivity": "Especifica tu actividad"
-      },
-      "plan": {
-        "selected": "Plan seleccionado:",
-        "mostPopular": "Más Popular",
-        "freeTrial": "🎁 7 días gratis",
-        "firstMonthPrice": "1€ <muted>el primer mes</muted>",
-        "thenPrice": "Luego 13€/mes · Sin permanencia",
-        "fullAccess": "Acceso completo a la plataforma profesional",
-        "featureSearch": "Aparece en todas las búsquedas",
-        "featureProfile": "Perfil profesional completo con fotos",
-        "securePayment": "🔒 Pago seguro procesado por Stripe"
-      },
-      "nav": {
-        "back": "Atrás",
-        "continueToPayment": "Continuar al pago",
-        "continue": "Continuar"
-      },
-      "footer": {
-        "secure": "🔒 Tus datos están seguros y protegidos • Puedes cancelar en cualquier momento"
-      }
-    }
-  },
-  "premium": {
-    "dashboard": {
-      "checks": {
-        "businessName": "Nombre profesional",
-        "fullDescription": "Descripción detallada",
-        "workPhotos": "Fotos de trabajos"
-      },
-      "completeness": {
-        "title": "Completitud del perfil"
-      }
-    }
-  },
-  "payments": {
-    "success": {
-      "activating": "Activando tu cuenta profesional...",
-      "noSession": "No se encontró tu sesión. Por favor inicia sesión.",
-      "verifyingPayment": "Verificando pago con Stripe...",
-      "waitingStripe": "Esperando confirmación de Stripe... ({{attempt}}/{{max}})",
-      "verifyingSubscription": "Verificando suscripción...",
-      "processingCompleteProfile": "El pago está siendo procesado. Por favor completa tu perfil.",
-      "allSetRedirecting": "¡Todo listo! Redirigiendo a tu dashboard...",
-      "confirmedCompleteProfile": "¡Pago confirmado! Ahora completa tu perfil profesional...",
-      "processingError": "Error al procesar. Por favor contacta con soporte.",
-      "processingTitle": "Procesando tu pago",
-      "benefitsTitle": "¿Qué obtienes con tu suscripción?",
-      "benefitVisibleProfile": "Perfil visible",
-      "benefitDirectContacts": "Contactos directos",
-      "benefitProInvoices": "Facturas pro",
-      "benefitEasyPayments": "Cobros fáciles",
-      "benefitClientManagement": "Gestión clientes",
-      "benefitProDashboard": "Panel Pro",
-      "learnMore": "Saber más",
-      "confirmedTitle": "¡Pago confirmado!",
-      "referralTitle": "🎁 ¿Conoces a otro autónomo?",
-      "referralDescription": "Invítale con tu código personal y os lleváis 1 mes gratis los dos.",
-      "referralCta": "Ver mi código de referido →",
-      "redirecting": "Redirigiendo...",
-      "processing": "Procesando...",
-      "errorTitle": "Hubo un problema",
-      "viewSubscription": "Ver mi suscripción"
+      "title": "Suscripción cancelada"
     }
   },
   "support": {
@@ -1020,7 +768,6 @@
       "descriptionPlaceholder": "Explica detalladamente el problema...",
       "typeLabel": "Tipo de ticket",
       "relatedPro": "Relacionado con profesional (opcional)",
-      "selectPro": "Seleccionar profesional...",
       "tagsLabel": "Etiquetas (separadas por comas)",
       "tagsPlaceholder": "urgente, pago, problema técnico",
       "attachments": "Archivos adjuntos",
@@ -1110,7 +857,7 @@
     "cta": {
       "wantOfferServices": "¿Quieres ofrecer tus servicios?",
       "becomeProfessionalAppear": "Conviértete en autónomo y aparece en las búsquedas de clientes",
-      "dashboardProLink": "Ver todo lo que incluye el Dashboard Pro →"
+      "becomeProfessional": "Hazte autónomo"
     },
     "photoBanner": {
       "title": "Añade una foto principal a tu perfil",
@@ -1356,7 +1103,15 @@
       "consents": "Consentimientos",
       "progressTitle": "✓ Progreso del paso actual",
       "completeAllFields": "Completa todos los campos para continuar",
-      "nifCifLabel": "NIF/CIF"
+      "nifCifLabel": "NIF/CIF",
+      "businessNameLabel": "Nombre profesional",
+      "workPhotosLabel": "Fotos de trabajos"
+    },
+    "progress": {
+      "step": "Paso {{current}} de {{total}}"
+    },
+    "success": {
+      "stepCompleteProfile": "Completa tu perfil profesional"
     }
   }
 }

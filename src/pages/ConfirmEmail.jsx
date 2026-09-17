@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { supabase } from '@/api/supabaseClient';
-import { Button } from '@/components/ui/button';
-import { Mail, RefreshCw, CheckCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import { IconMail, IconRefresh, IconCheckCircle, IconArrowLeft, IconSpinner } from '@/components/Icons';
 import { emailRedirectFor } from '@/lib/native/auth';
 
 // Pantalla intermedia entre signup y onboarding cuando Supabase exige
@@ -74,83 +73,81 @@ export default function ConfirmEmailPage() {
         <button
           type="button"
           onClick={() => navigate('/login?mode=signup', { replace: true })}
-          className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"
+          className="mb-4 inline-flex items-center gap-1 text-sm text-c-muted hover:text-ink"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <IconArrowLeft className="w-4 h-4" />
           {t('auth.confirmEmail.changeEmail')}
         </button>
 
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8 text-center">
-          <div className="mx-auto w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-            <Mail className="w-7 h-7 text-blue-700" aria-hidden="true" />
+        <div className="bg-surface border border-c-border rounded-2xl shadow-sm p-6 sm:p-8 text-center">
+          <div className="mx-auto w-14 h-14 rounded-full bg-c-accent/5 flex items-center justify-center mb-4">
+            <IconMail className="w-7 h-7 text-c-accent" aria-hidden="true" />
           </div>
-          <h1 className="text-xl font-bold text-slate-900 mb-2">{t('auth.confirmEmail.title')}</h1>
-          <p className="text-sm text-slate-600 mb-1">
+          <h1 className="text-xl font-bold text-ink mb-2">{t('auth.confirmEmail.title')}</h1>
+          <p className="text-sm text-c-muted mb-1">
             {t('auth.confirmEmail.sentTo')}
           </p>
           {email ? (
-            <p className="text-sm font-semibold text-slate-900 mb-4 break-all">{email}</p>
+            <p className="text-sm font-semibold text-ink mb-4 break-all">{email}</p>
           ) : (
-            <p className="text-sm text-slate-500 mb-4">{t('auth.confirmEmail.yourEmail')}</p>
+            <p className="text-sm text-c-muted mb-4">{t('auth.confirmEmail.yourEmail')}</p>
           )}
 
-          <div className="text-left bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm text-slate-600 mb-5">
-            <p className="mb-2 font-medium text-slate-800">{t('auth.confirmEmail.howToContinue')}</p>
+          <div className="text-left bg-soft border border-c-border rounded-xl p-4 text-sm text-c-muted mb-5">
+            <p className="mb-2 font-medium text-ink">{t('auth.confirmEmail.howToContinue')}</p>
             <ol className="list-decimal pl-5 space-y-1.5">
               <li><Trans i18nKey="auth.confirmEmail.stepOpen" components={{ strong: <strong /> }} /></li>
               <li><Trans i18nKey="auth.confirmEmail.stepClick" components={{ strong: <strong /> }} /></li>
               <li>{t('auth.confirmEmail.stepReturn')}</li>
             </ol>
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-3 text-xs text-c-muted">
               <Trans i18nKey="auth.confirmEmail.spamHint" components={{ strong: <strong /> }} />
             </p>
           </div>
 
           {status === 'ok' && (
-            <div className="mb-4 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+            <div className="mb-4 text-sm text-success bg-success/10 border border-success/20 rounded-lg px-3 py-2">
               {message}
             </div>
           )}
           {status === 'error' && (
-            <div className="mb-4 text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+            <div className="mb-4 text-sm text-error bg-error/10 border border-error/20 rounded-lg px-3 py-2">
               {message}
             </div>
           )}
 
-          <Button
+          <button
             type="button"
             onClick={handleCheck}
             disabled={checking}
-            className="w-full h-11 text-white font-semibold rounded-xl mb-3"
-            style={{ backgroundColor: '#0f172a' }}
+            className="btn-dark w-full font-semibold rounded-xl mb-3"
           >
             {checking ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('auth.confirmEmail.checking')}</>
+              <><IconSpinner className="w-4 h-4 mr-2 animate-spin" /> {t('auth.confirmEmail.checking')}</>
             ) : (
-              <><CheckCircle className="w-4 h-4 mr-2" /> {t('auth.confirmEmail.confirmed')}</>
+              <><IconCheckCircle className="w-4 h-4 mr-2" /> {t('auth.confirmEmail.confirmed')}</>
             )}
-          </Button>
+          </button>
 
-          <Button
+          <button
             type="button"
-            variant="outline"
             onClick={handleResend}
             disabled={resending || cooldown > 0 || !email}
-            className="w-full h-11 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium"
+            className="btn-secondary w-full rounded-xl font-medium"
           >
             {resending ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('auth.confirmEmail.resending')}</>
+              <><IconSpinner className="w-4 h-4 mr-2 animate-spin" /> {t('auth.confirmEmail.resending')}</>
             ) : cooldown > 0 ? (
               <>{t('auth.confirmEmail.resendIn', { seconds: cooldown })}</>
             ) : (
-              <><RefreshCw className="w-4 h-4 mr-2" /> {t('auth.confirmEmail.resend')}</>
+              <><IconRefresh className="w-4 h-4 mr-2" /> {t('auth.confirmEmail.resend')}</>
             )}
-          </Button>
+          </button>
         </div>
 
-        <p className="text-center text-xs text-slate-500 mt-6">
+        <p className="text-center text-xs text-c-muted mt-6">
           {t('auth.footer.haveAccount')}{' '}
-          <Link to="/login" className="text-blue-700 hover:underline font-medium">
+          <Link to="/login" className="text-c-accent hover:underline font-medium">
             {t('auth.login_title')}
           </Link>
         </p>

@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Plus, Search as SearchIcon, MessageCircle, Loader2, AlertCircle, ChevronRight,
-} from 'lucide-react';
-import { toast } from 'sonner';
+  IconPlus, IconSearch, IconMessageCircle, IconSpinner, IconAlert, IconChevronRight,
+} from '@/components/Icons';
+import { toast } from '@/lib/toast';
+import Modal from '@/components/Modal';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/api/supabaseClient';
 import SEOHead from '@/components/seo/SEOHead';
@@ -124,69 +125,65 @@ function CreateTicketDialog({ user, onClose, onCreated }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-6" onClick={onClose}>
-      <div
-        className="w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-5 border-b border-slate-100">
-          <h2 className="font-semibold text-slate-900">{t('support.create.title')}</h2>
-          <p className="text-xs text-slate-500 mt-0.5">{t('support.create.subtitle')}</p>
+    <Modal
+      open
+      onClose={onClose}
+      title={t('support.create.title')}
+      description={t('support.create.subtitle')}
+    >
+      <form onSubmit={submit} className="space-y-4">
+        <label className="block">
+          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('supportChat.ticketSubject')}</span>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={t('support.create.subjectPlaceholder')}
+            className="mt-1.5 w-full h-10 px-3 text-sm border border-c-border rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+          />
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block">
+            <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.soporte.filter.type')}</span>
+            <select value={type} onChange={(e) => setType(e.target.value)} className="mt-1.5 w-full h-10 px-2 text-sm border border-c-border rounded-lg bg-surface">
+              {TYPES.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.soporte.filter.priority')}</span>
+            <select value={priority} onChange={(e) => setPriority(e.target.value)} className="mt-1.5 w-full h-10 px-2 text-sm border border-c-border rounded-lg bg-surface">
+              {PRIORITIES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+            </select>
+          </label>
         </div>
-        <form onSubmit={submit} className="p-5 space-y-4">
-          <label className="block">
-            <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">{t('supportChat.ticketSubject')}</span>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t('support.create.subjectPlaceholder')}
-              className="mt-1.5 w-full h-10 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
-            />
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.soporte.filter.type')}</span>
-              <select value={type} onChange={(e) => setType(e.target.value)} className="mt-1.5 w-full h-10 px-2 text-sm border border-slate-200 rounded-lg bg-white">
-                {TYPES.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-              </select>
-            </label>
-            <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">{t('admin.soporte.filter.priority')}</span>
-              <select value={priority} onChange={(e) => setPriority(e.target.value)} className="mt-1.5 w-full h-10 px-2 text-sm border border-slate-200 rounded-lg bg-white">
-                {PRIORITIES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
-              </select>
-            </label>
-          </div>
-          <label className="block">
-            <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">{t('description')}</span>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={6}
-              placeholder={t('support.create.descriptionPlaceholder')}
-              className="mt-1.5 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
-            />
-          </label>
+        <label className="block">
+          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('description')}</span>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={6}
+            placeholder={t('support.create.descriptionPlaceholder')}
+            className="mt-1.5 w-full px-3 py-2 text-sm border border-c-border rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+          />
+        </label>
 
-          <div className="flex justify-end gap-2 pt-1">
-            <button type="button" onClick={onClose} className="h-10 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-lg">
-              {t('common.cancel')}
-            </button>
-            <button
-              type="button"
-              disabled={submitting}
-              onClick={submit}
-              className="inline-flex items-center gap-1.5 h-10 px-4 text-sm font-semibold text-white rounded-lg disabled:opacity-60"
-              style={{ background: NAVY }}
-            >
-              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              {t('support.page.openTicket')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex justify-end gap-2 pt-1">
+          <button type="button" onClick={onClose} className="h-10 px-4 text-sm font-semibold text-ink hover:bg-soft rounded-lg">
+            {t('common.cancel')}
+          </button>
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={submit}
+            className="inline-flex items-center gap-1.5 h-10 px-4 text-sm font-semibold text-white rounded-lg disabled:opacity-60"
+            style={{ background: NAVY }}
+          >
+            {submitting ? <IconSpinner className="w-4 h-4 animate-spin" /> : null}
+            {t('support.page.openTicket')}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 
@@ -232,8 +229,8 @@ export default function Soporte() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <IconSpinner className="w-6 h-6 animate-spin text-c-muted" />
       </div>
     );
   }
@@ -241,15 +238,15 @@ export default function Soporte() {
   return (
     <>
       <SEOHead title={t('support.page.seoTitle')} noindex />
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-surface">
         <div className="max-w-3xl mx-auto px-4 md:px-6 py-6 md:py-10">
 
           <div className="flex items-end justify-between gap-3 mb-5">
             <div>
-              <h1 className="text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em' }}>
+              <h1 className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink" style={{ letterSpacing: '-0.02em' }}>
                 {t('nav.support')}
               </h1>
-              <p className="text-sm text-slate-500 mt-1">{t('support.page.subtitle')}</p>
+              <p className="text-sm text-c-muted mt-1">{t('support.page.subtitle')}</p>
             </div>
             <button
               type="button"
@@ -257,26 +254,28 @@ export default function Soporte() {
               className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg text-sm font-semibold text-white"
               style={{ background: NAVY }}
             >
-              <Plus className="w-4 h-4" /> {t('support.page.openTicket')}
+              <IconPlus className="w-4 h-4" /> {t('support.page.openTicket')}
             </button>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white">
-            <div className="p-3 md:p-4 border-b border-slate-100 flex flex-wrap gap-2 items-center">
+          <div className="rounded-2xl border border-c-border bg-surface">
+            <div className="p-3 md:p-4 border-b border-c-border flex flex-wrap gap-2 items-center">
               <div className="relative flex-1 min-w-[180px]">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-c-muted pointer-events-none" />
                 <input
                   type="text"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder={t('support.page.searchPlaceholder')}
-                  className="w-full pl-9 pr-3 h-9 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                  aria-label={t('support.page.searchPlaceholder')}
+                  className="w-full pl-9 pr-3 h-9 text-sm border border-c-border rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white"
+                aria-label={t('support.page.allStatuses')}
+                className="h-9 px-2 text-sm border border-c-border rounded-lg bg-surface"
               >
                 <option value="all">{t('support.page.allStatuses')}</option>
                 {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{t(v.key)}</option>)}
@@ -284,14 +283,14 @@ export default function Soporte() {
             </div>
 
             {isLoading ? (
-              <div className="p-10 text-center text-slate-400 text-sm">{t('support.page.loading')}</div>
+              <div className="p-10 text-center text-c-muted text-sm">{t('support.page.loading')}</div>
             ) : filtered.length === 0 ? (
               <div className="p-10 text-center">
                 <div className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center" style={{ background: NAVY_SOFT, color: NAVY }}>
-                  <MessageCircle className="w-5 h-5" />
+                  <IconMessageCircle className="w-5 h-5" />
                 </div>
-                <p className="mt-4 font-semibold text-slate-900">{t('supportChat.noTicketsYet')}</p>
-                <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto">
+                <p className="mt-4 font-semibold text-ink">{t('supportChat.noTicketsYet')}</p>
+                <p className="text-sm text-c-muted mt-1 max-w-xs mx-auto">
                   {t('support.page.emptyHint')}
                 </p>
                 <button
@@ -300,7 +299,7 @@ export default function Soporte() {
                   className="mt-5 inline-flex items-center gap-1.5 h-10 px-5 rounded-lg text-sm font-semibold text-white"
                   style={{ background: NAVY }}
                 >
-                  <Plus className="w-4 h-4" /> {t('support.page.openFirst')}
+                  <IconPlus className="w-4 h-4" /> {t('support.page.openFirst')}
                 </button>
               </div>
             ) : (
@@ -308,22 +307,22 @@ export default function Soporte() {
                 {filtered.map((tk) => {
                   const meta = statusMeta(tk.status, t);
                   return (
-                    <li key={tk.id} className="border-t border-slate-100 first:border-t-0">
+                    <li key={tk.id} className="border-t border-c-border first:border-t-0">
                       <Link
                         to={`/soporte/${tk.id}`}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-soft transition-colors"
                       >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[11px] text-slate-500 font-mono">#{tk.number || tk.id.slice(-6)}</span>
+                            <span className="text-[11px] text-c-muted font-mono">#{tk.number || tk.id.slice(-6)}</span>
                             <span className="inline-flex text-[10px] font-semibold uppercase tracking-[0.06em] px-1.5 py-0.5 rounded-full" style={{ background: meta.bg, color: meta.color }}>
                               {meta.label}
                             </span>
                           </div>
-                          <p className="text-sm font-medium text-slate-900 truncate">{tk.title || t('admin.soporte.untitled')}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">{formatDate(tk.updated_date || tk.created_date)}</p>
+                          <p className="text-sm font-medium text-ink truncate">{tk.title || t('admin.soporte.untitled')}</p>
+                          <p className="text-xs text-c-muted mt-0.5">{formatDate(tk.updated_date || tk.created_date)}</p>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                        <IconChevronRight className="w-4 h-4 text-c-muted flex-shrink-0" />
                       </Link>
                     </li>
                   );
@@ -332,9 +331,9 @@ export default function Soporte() {
             )}
           </div>
 
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600">
+          <div className="mt-6 rounded-2xl border border-c-border bg-surface p-5 text-sm text-c-muted">
             <p className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: NAVY }} />
+              <IconAlert className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: NAVY }} />
               <span>
                 <Trans
                   i18nKey="support.page.helpHint"

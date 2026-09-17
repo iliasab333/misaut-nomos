@@ -1,44 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { EmptyState } from "@/components/ListStates";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  ArrowLeft,
-  Send,
-  Paperclip,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  User,
-  Calendar,
-  Tag,
-  FileText,
-  Loader2
-} from "lucide-react";
+  IconArrowLeft,
+  IconSend,
+  IconAttach,
+  IconClock,
+  IconCheckCircle,
+  IconError,
+  IconAlert,
+  IconUser,
+  IconCalendar,
+  IconFile,
+  IconSpinner,
+} from "@/components/Icons";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import SEOHead from "../components/seo/SEOHead";
 
 // Mapa explícito estado → clave i18n (la etiqueta se resuelve con t() en render).
 const statusConfig = {
-  abierto: { icon: Clock, color: "bg-blue-500", key: "admin.soporte.status.open" },
-  en_progreso: { icon: AlertCircle, color: "bg-amber-500", key: "tickets.status.inProgress" },
-  resuelto: { icon: CheckCircle, color: "bg-green-500", key: "admin.soporte.status.resolved" },
-  cerrado: { icon: XCircle, color: "bg-gray-500", key: "admin.soporte.status.closed" }
+  abierto: { icon: IconClock, color: "bg-c-accent", key: "admin.soporte.status.open" },
+  en_progreso: { icon: IconAlert, color: "bg-warning", key: "tickets.status.inProgress" },
+  resuelto: { icon: IconCheckCircle, color: "bg-success", key: "admin.soporte.status.resolved" },
+  cerrado: { icon: IconError, color: "bg-c-muted", key: "admin.soporte.status.closed" }
 };
 
 export default function TicketDetailPage() {
@@ -248,7 +236,7 @@ export default function TicketDetailPage() {
   if (loadingTicket || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <IconSpinner className="w-8 h-8 animate-spin text-c-accent" />
       </div>
     );
   }
@@ -256,15 +244,13 @@ export default function TicketDetailPage() {
   if (!ticket) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-md p-8 text-center">
-          <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">
-            {t('tickets.detail.notFound')}
-          </h2>
-          <Button onClick={() => navigate(createPageUrl("Tickets"))}>
-            {t('tickets.detail.backToTickets')}
-          </Button>
-        </Card>
+        <EmptyState
+          className="max-w-md"
+          icon={<IconAlert className="w-6 h-6" />}
+          title={t('tickets.detail.notFound')}
+          ctaLabel={t('tickets.detail.backToTickets')}
+          onCta={() => navigate(createPageUrl("Tickets"))}
+        />
       </div>
     );
   }
@@ -281,42 +267,42 @@ export default function TicketDetailPage() {
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
         <div className="max-w-6xl mx-auto">
-          <Button
-            variant="ghost"
+          <button
+            type="button"
             onClick={() => navigate(createPageUrl("Tickets"))}
-            className="mb-4"
+            className="btn-ghost mb-4"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <IconArrowLeft size={16} />
             {t('tickets.detail.backToTickets')}
-          </Button>
+          </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardContent className="p-6">
+              <div className="card">
+                <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-3">
-                        <Badge variant="outline" className="font-mono">
+                        <span className="badge-outline font-mono">
                           {ticket.ticket_number}
-                        </Badge>
-                        <Badge className={`${statusConfig[ticket.status]?.color} text-white`}>
-                          {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
+                        </span>
+                        <span className={`badge ${statusConfig[ticket.status]?.color} text-white`}>
+                          {StatusIcon && <StatusIcon className="w-3 h-3" />}
                           {getStatusLabel(ticket.status)}
-                        </Badge>
+                        </span>
                       </div>
-                      <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                      <h1 className="text-2xl font-bold text-ink mb-2">
                         {ticket.title}
                       </h1>
-                      <p className="text-gray-700">
+                      <p className="text-ink">
                         {ticket.description}
                       </p>
                     </div>
                   </div>
 
                   {ticket.attachments && ticket.attachments.length > 0 && (
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-sm font-medium text-gray-700 mb-2">
+                    <div className="mt-4 pt-4 border-t border-c-border">
+                      <p className="text-sm font-medium text-ink mb-2">
                         {t('tickets.detail.attachments')}
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -326,21 +312,21 @@ export default function TicketDetailPage() {
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                            className="text-sm text-c-accent hover:underline flex items-center gap-1"
                           >
-                            <FileText className="w-4 h-4" />
+                            <IconFile className="w-4 h-4" />
                             {t('tickets.detail.fileN', { index: idx + 1 })}
                           </a>
                         ))}
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="card">
+                <div className="p-6">
+                  <h2 className="text-lg font-semibold text-ink mb-4">
                     {t('tickets.detail.conversation')}
                   </h2>
                   
@@ -351,20 +337,20 @@ export default function TicketDetailPage() {
                       
                       return (
                         <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[80%] ${isOwn ? 'bg-blue-600 text-white' : isAdmin ? 'bg-amber-50 border border-amber-200' : 'bg-gray-100'} rounded-lg p-4`}>
+                          <div className={`max-w-[80%] ${isOwn ? 'bg-c-accent text-white' : isAdmin ? 'bg-warning/10 border border-warning/30' : 'bg-soft'} rounded-lg p-4`}>
                             <div className="flex items-center gap-2 mb-2">
-                              <User className="w-4 h-4" />
+                              <IconUser className="w-4 h-4" />
                               <span className="text-sm font-semibold">
                                 {msg.sender_name}
                               </span>
                               {isAdmin && (
-                                <Badge variant="secondary" className="text-xs">{t('admin.usersTable.adminBadge')}</Badge>
+                                <span className="badge-muted text-xs">{t('admin.usersTable.adminBadge')}</span>
                               )}
                             </div>
-                            <p className={`text-sm ${isOwn ? 'text-white' : 'text-gray-800'}`}>
+                            <p className={`text-sm ${isOwn ? 'text-white' : 'text-ink'}`}>
                               {msg.content}
                             </p>
-                            <p className={`text-xs mt-2 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
+                            <p className={`text-xs mt-2 ${isOwn ? 'text-white/70' : 'text-c-muted'}`}>
                               {new Date(msg.created_date).toLocaleString(locale)}
                             </p>
                             {msg.attachments && msg.attachments.length > 0 && (
@@ -375,9 +361,9 @@ export default function TicketDetailPage() {
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`text-xs flex items-center gap-1 ${isOwn ? 'text-blue-100 hover:text-white' : 'text-blue-600 hover:underline'}`}
+                                    className={`text-xs flex items-center gap-1 ${isOwn ? 'text-white/70 hover:text-white' : 'text-c-accent hover:underline'}`}
                                   >
-                                    <FileText className="w-3 h-3" />
+                                    <IconFile className="w-3 h-3" />
                                     {t('tickets.detail.attachmentN', { index: idx + 1 })}
                                   </a>
                                 ))}
@@ -392,7 +378,9 @@ export default function TicketDetailPage() {
 
                   {ticket.status !== 'cerrado' && (
                     <div className="space-y-3">
-                      <Textarea
+                      <textarea
+                        className="textarea"
+                        aria-label={t('tickets.detail.messagePlaceholder')}
                         placeholder={t('tickets.detail.messagePlaceholder')}
                         value={messageContent}
                         onChange={(e) => setMessageContent(e.target.value)}
@@ -412,155 +400,155 @@ export default function TicketDetailPage() {
                             className="hidden"
                             onChange={handleFileUpload}
                           />
-                          <Button
-                            variant="outline"
-                            size="sm"
+                          <button
+                            type="button"
+                            className="btn-secondary btn-sm"
                             onClick={() => fileInputRef.current?.click()}
                             disabled={uploadingFile}
                           >
                             {uploadingFile ? (
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              <IconSpinner size={16} />
                             ) : (
-                              <Paperclip className="w-4 h-4 mr-2" />
+                              <IconAttach size={16} />
                             )}
                             {t('tickets.detail.attach')}
-                          </Button>
+                          </button>
                         </div>
-                        <Button
+                        <button
+                          type="button"
+                          className="btn-primary"
                           onClick={handleSendMessage}
                           disabled={!messageContent.trim() || sendMessageMutation.isPending}
-                          className="bg-blue-600 hover:bg-blue-700"
                         >
                           {sendMessageMutation.isPending ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            <IconSpinner size={16} />
                           ) : (
-                            <Send className="w-4 h-4 mr-2" />
+                            <IconSend size={16} />
                           )}
                           {t('messages.send')}
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-6">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-4">
+              <div className="card">
+                <div className="p-6">
+                  <h3 className="font-semibold text-ink mb-4">
                     {t('tickets.detail.info')}
                   </h3>
                   
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm text-gray-600 block mb-1">
+                      <label
+                        className="text-sm text-c-muted block mb-1"
+                        htmlFor={user.role === 'admin' ? 'ticket-status' : undefined}
+                      >
                         {t('admin.soporte.filter.status')}
                       </label>
                       {user.role === 'admin' ? (
-                        <Select
+                        <select
+                          id="ticket-status"
+                          className="select"
                           value={ticket.status}
-                          onValueChange={(value) => updateStatusMutation.mutate(value)}
+                          onChange={(e) => updateStatusMutation.mutate(e.target.value)}
                         >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="abierto">{getStatusLabel('abierto')}</SelectItem>
-                            <SelectItem value="en_progreso">{getStatusLabel('en_progreso')}</SelectItem>
-                            <SelectItem value="resuelto">{getStatusLabel('resuelto')}</SelectItem>
-                            <SelectItem value="cerrado">{getStatusLabel('cerrado')}</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          <option value="abierto">{getStatusLabel('abierto')}</option>
+                          <option value="en_progreso">{getStatusLabel('en_progreso')}</option>
+                          <option value="resuelto">{getStatusLabel('resuelto')}</option>
+                          <option value="cerrado">{getStatusLabel('cerrado')}</option>
+                        </select>
                       ) : ticket.creator_id === user.id && ticket.status !== 'cerrado' ? (
                         <div className="space-y-2">
-                          <Badge className={`${statusConfig[ticket.status]?.color} text-white w-full justify-center py-2`}>
-                            {StatusIcon && <StatusIcon className="w-4 h-4 mr-1" />}
+                          <span className={`badge ${statusConfig[ticket.status]?.color} text-white w-full justify-center py-2`}>
+                            {StatusIcon && <StatusIcon className="w-4 h-4" />}
                             {getStatusLabel(ticket.status)}
-                          </Badge>
-                          <Button
-                            variant="outline"
-                            size="sm"
+                          </span>
+                          <button
+                            type="button"
+                            className="btn-secondary btn-sm w-full text-error hover:border-error"
                             onClick={() => updateStatusMutation.mutate('cerrado')}
-                            className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
                             disabled={updateStatusMutation.isPending}
                           >
                             {updateStatusMutation.isPending ? (
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              <IconSpinner size={16} />
                             ) : (
-                              <XCircle className="w-4 h-4 mr-2" />
+                              <IconError size={16} />
                             )}
                             {t('tickets.detail.closeTicket')}
-                          </Button>
+                          </button>
                         </div>
                       ) : (
-                        <Badge className={`${statusConfig[ticket.status]?.color} text-white w-full justify-center py-2`}>
-                          {StatusIcon && <StatusIcon className="w-4 h-4 mr-1" />}
+                        <span className={`badge ${statusConfig[ticket.status]?.color} text-white w-full justify-center py-2`}>
+                          {StatusIcon && <StatusIcon className="w-4 h-4" />}
                           {getStatusLabel(ticket.status)}
-                        </Badge>
+                        </span>
                       )}
                     </div>
 
                     <div>
-                      <label className="text-sm text-gray-600 block mb-1">
+                      <label className="text-sm text-c-muted block mb-1">
                         {t('admin.soporte.filter.type')}
                       </label>
-                      <Badge variant="outline" className="w-full justify-center py-2">
+                      <span className="badge-outline w-full justify-center py-2">
                         {typeConfig[ticket.type] ? t(typeConfig[ticket.type]) : null}
-                      </Badge>
+                      </span>
                     </div>
 
                     <div>
-                      <label className="text-sm text-gray-600 block mb-1">
+                      <label className="text-sm text-c-muted block mb-1">
                         {t('tickets.detail.createdBy')}
                       </label>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-ink">
                         {ticket.creator_name}
                       </p>
                     </div>
 
                     {ticket.assigned_to_name && (
                       <div>
-                        <label className="text-sm text-gray-600 block mb-1">
+                        <label className="text-sm text-c-muted block mb-1">
                           {t('tickets.detail.assignedTo')}
                         </label>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-ink">
                           {ticket.assigned_to_name}
                         </p>
                       </div>
                     )}
 
                     <div>
-                      <label className="text-sm text-gray-600 block mb-1">
+                      <label className="text-sm text-c-muted block mb-1">
                         {t('tickets.detail.created')}
                       </label>
-                      <p className="text-sm text-gray-900 flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
+                      <p className="text-sm text-ink flex items-center gap-1">
+                        <IconCalendar className="w-4 h-4" />
                         {new Date(ticket.created_date).toLocaleDateString(locale)}
                       </p>
                     </div>
 
                     {ticket.tags && ticket.tags.length > 0 && (
                       <div>
-                        <label className="text-sm text-gray-600 block mb-2">
+                        <label className="text-sm text-c-muted block mb-2">
                           {t('tickets.detail.tags')}
                         </label>
                         <div className="flex flex-wrap gap-1">
                           {ticket.tags.map((tag, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
+                            <span key={idx} className="badge-muted text-xs">
                               {tag}
-                            </Badge>
+                            </span>
                           ))}
                         </div>
                       </div>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-4">
+              <div className="card">
+                <div className="p-6">
+                  <h3 className="font-semibold text-ink mb-4">
                     {t('tickets.detail.timeline')}
                   </h3>
                   
@@ -568,24 +556,24 @@ export default function TicketDetailPage() {
                     {events.map((event, idx) => (
                       <div key={event.id} className="flex gap-3">
                         <div className="flex flex-col items-center">
-                          <div className="w-2 h-2 rounded-full bg-blue-600" />
+                          <div className="w-2 h-2 rounded-full bg-c-accent" />
                           {idx < events.length - 1 && (
-                            <div className="w-0.5 h-full bg-gray-200 mt-1" />
+                            <div className="w-0.5 h-full bg-c-border mt-1" />
                           )}
                         </div>
                         <div className="flex-1 pb-4">
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-ink">
                             {event.description}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-c-muted mt-1">
                             {new Date(event.created_date).toLocaleString(locale)}
                           </p>
                         </div>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
         </div>

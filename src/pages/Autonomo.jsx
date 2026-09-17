@@ -3,47 +3,41 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
-  MapPin,
-  Euro,
-  Globe,
-  Heart,
-  MessageSquare,
-  Phone,
-  MessageCircle,
-  Facebook,
-  Instagram,
-  Linkedin,
-  Star,
-  Award,
-  AlertCircle,
-  X,
-  Music,
-  Copy,
-  Check,
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  BadgeCheck,
-  Briefcase,
-  FileText,
-  Clock,
-  Share2
-} from "lucide-react";
+  IconMapPin,
+  IconEuro,
+  IconGlobe,
+  IconHeart,
+  IconPhone,
+  IconMessageCircle,
+  IconFacebook,
+  IconInstagram,
+  IconLinkedin,
+  IconStarOutline,
+  IconAward,
+  IconAlert,
+  IconClose,
+  IconMusic,
+  IconCopy,
+  IconCheck,
+  IconArrowLeft,
+  IconChevronLeft,
+  IconChevronRight,
+  IconSparkles,
+  IconVerified,
+  IconBriefcase,
+  IconClock,
+  IconShare,
+  IconWhatsApp,
+} from "@/components/Icons";
 import { shareUrl, haptic } from "@/lib/native";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import InitialsAvatar from "@/components/ui/InitialsAvatar";
+import InitialsAvatar from "@/components/InitialsAvatar";
 import { optimizeSupabaseImage } from "@/lib/supabaseImage";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import Modal from "@/components/Modal";
 import ReviewSection from "../components/profile/ReviewSection";
 import SEOHead from "../components/seo/SEOHead";
 import { LocalBusinessSchema, FAQPageSchema, ProfessionalPersonSchema, BreadcrumbSchema, MerchantListingSchema } from "../components/seo/StructuredData";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useTranslation } from "react-i18next";
 import { useProfileTranslation } from "../components/profile/useProfileTranslation";
 import { ActionButtonsProfile } from "../components/profile/ActionButtons";
@@ -353,10 +347,10 @@ export default function AutonomoPage() {
 
   if (loadingProfile) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="min-h-screen bg-soft p-4 md:p-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          <Skeleton className="h-64 w-full rounded-2xl" />
-          <Skeleton className="h-96 w-full rounded-2xl" />
+          <div className="skeleton h-64 w-full rounded-2xl" aria-hidden="true" />
+          <div className="skeleton h-96 w-full rounded-2xl" aria-hidden="true" />
         </div>
       </div>
     );
@@ -364,21 +358,26 @@ export default function AutonomoPage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Card className="max-w-md w-full shadow-lg border-0 rounded-2xl">
-          <CardContent className="p-8 text-center">
-            <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="min-h-screen bg-soft flex items-center justify-center p-4">
+        <div className="card max-w-md w-full shadow-lg rounded-2xl">
+          <div className="p-8 text-center">
+            <IconAlert className="w-16 h-16 text-c-muted mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-ink mb-2">
               {t('profileNotFound')}
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-c-muted mb-6">
               {t('profileNotFoundDesc')}
             </p>
-            <Button onClick={() => navigate('/buscar')} className="text-white" style={{ background: '#00255C' }}>
+            <button
+              type="button"
+              onClick={() => navigate('/buscar')}
+              className="btn-primary text-white"
+              style={{ background: '#00255C' }}
+            >
               {t('backToSearch')}
-            </Button>
-          </CardContent>
-        </Card>
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -469,20 +468,20 @@ export default function AutonomoPage() {
         <FAQPageSchema faqs={profileFaqData} />
       )}
       
-      <div className="min-h-screen bg-gray-50 py-3 px-3 md:py-4 md:px-4">
+      <div className="min-h-screen bg-soft py-3 px-3 md:py-4 md:px-4">
         <div className="max-w-5xl mx-auto space-y-3">
-          
-          <Button
+
+          <button
+            type="button"
             onClick={() => navigate(createPageUrl("Search"))}
-            variant="ghost"
-            className="hover:bg-white mb-2 text-gray-700 hover:text-gray-900 font-medium"
+            className="btn-ghost no-underline hover:bg-surface mb-2 text-ink font-medium"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <IconArrowLeft className="w-4 h-4 mr-2" />
             {t('backToSearch')}
-          </Button>
-          
+          </button>
+
           {/* CABECERA */}
-          <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
+          <div className="card rounded-xl p-4">
             <div className="flex items-center gap-4 mb-3">
               {(() => {
                 // Mismo orden que en la tarjeta del buscador: imagen_principal
@@ -525,9 +524,9 @@ export default function AutonomoPage() {
               })()}
               
               <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900 mb-1">{profile.business_name}</h1>
+              <h1 className="text-xl font-bold text-ink mb-1">{profile.business_name}</h1>
               {(profile.categories?.[0] || profile.ciudad) && (
-                <p className="text-sm text-gray-600 mb-1">
+                <p className="text-sm text-c-muted mb-1">
                   {profile.categories?.[0] && profile.ciudad
                     ? t('category.heading.inCity', { category: profile.categories[0], city: profile.ciudad })
                     : (profile.categories?.[0] || profile.ciudad)}
@@ -536,35 +535,35 @@ export default function AutonomoPage() {
 
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 {profile.categories?.[0] && (
-                  <Badge className="text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ background: 'rgba(0,37,92,0.06)', color: '#00255C' }}>
+                  <span className="badge text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ background: 'rgba(0,37,92,0.06)', color: '#00255C' }}>
                     {profile.categories[0]}
-                  </Badge>
+                  </span>
                 )}
                 {profile.is_ads_plus && (
-                  <Badge className="text-[11px] font-semibold uppercase tracking-[0.06em] border" style={{ background: '#FBF4DA', color: '#7B5400', borderColor: '#EFD68A' }}>
+                  <span className="badge text-[11px] font-semibold uppercase tracking-[0.06em] border" style={{ background: '#FBF4DA', color: '#7B5400', borderColor: '#EFD68A' }}>
                     {t('search.card.featured')}
-                  </Badge>
+                  </span>
                 )}
                 {isVerified && (
-                  <Badge className="text-[11px] font-semibold uppercase tracking-[0.06em] inline-flex items-center gap-1" style={{ background: 'rgba(0,37,92,0.06)', color: '#00255C' }}>
+                  <span className="badge text-[11px] font-semibold uppercase tracking-[0.06em] inline-flex items-center gap-1" style={{ background: 'rgba(0,37,92,0.06)', color: '#00255C' }}>
                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                     </svg>
                     {t('proProfile.badges.verified')}
-                  </Badge>
+                  </span>
                 )}
                 {profile.total_reviews > 0 && (
                   <div className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                    <IconStarOutline className="w-3.5 h-3.5 fill-star text-star" />
                     <span className="text-sm font-semibold">{profile.average_rating?.toFixed(1)}</span>
-                    <span className="text-xs text-gray-500">({profile.total_reviews})</span>
+                    <span className="text-xs text-c-muted">({profile.total_reviews})</span>
                   </div>
                 )}
               </div>
 
                 {(profile.ciudad || profile.provincia) && (
-                  <div className="flex items-center gap-1 text-xs text-gray-600">
-                    <MapPin className="w-3 h-3" />
+                  <div className="flex items-center gap-1 text-xs text-c-muted">
+                    <IconMapPin className="w-3 h-3" />
                     {profile.ciudad ? `${profile.ciudad}, ${profile.provincia}` : profile.provincia}
                   </div>
                 )}
@@ -589,9 +588,9 @@ export default function AutonomoPage() {
                   }}
                   aria-label={t('profile_page.share_profile')}
                   title={t('search.profile.share.button')}
-                  className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-c-border bg-surface text-ink hover:bg-soft transition-colors"
                 >
-                  <Share2 className="w-4 h-4" />
+                  <IconShare className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
@@ -601,10 +600,10 @@ export default function AutonomoPage() {
                   className={`inline-flex items-center gap-1.5 px-3 h-9 rounded-full border text-sm font-medium transition-colors ${
                     isFavorite
                       ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
-                      : 'bg-white border-slate-200 text-slate-700 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
+                      : 'bg-surface border-c-border text-ink hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
                   }`}
                 >
-                  <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                  <IconHeart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
                   {isFavorite ? t('profile_page.saved_favorite') : t('profile_page.save_favorite')}
                 </button>
               </div>
@@ -621,7 +620,7 @@ export default function AutonomoPage() {
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#001A45')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = '#00255C')}
                 >
-                  <MessageCircle className="w-4 h-4" /> {t('proProfile.contact.sendMessage')}
+                  <IconMessageCircle className="w-4 h-4" /> {t('proProfile.contact.sendMessage')}
                 </button>
               )}
               {showWhatsApp && (
@@ -633,7 +632,7 @@ export default function AutonomoPage() {
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#168D40')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = '#1FAD4F')}
                 >
-                  <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  <IconWhatsApp className="w-4 h-4" />
                   {t('profile_page.whatsapp')}
                 </button>
               )}
@@ -641,66 +640,66 @@ export default function AutonomoPage() {
                 <button
                   type="button"
                   onClick={handlePhoneClick}
-                  className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-900 text-sm font-semibold px-4 py-2.5 rounded-lg inline-flex items-center justify-center gap-2 transition-colors"
+                  className="border border-c-border bg-surface hover:bg-soft text-ink text-sm font-semibold px-4 py-2.5 rounded-lg inline-flex items-center justify-center gap-2 transition-colors"
                 >
-                  <Phone className="w-4 h-4" style={{ color: '#00255C' }} />
+                  <IconPhone className="w-4 h-4" style={{ color: '#00255C' }} />
                   <span className="hidden md:inline">{profile.telefono_contacto}</span>
                   <span className="md:hidden">{t('profile_page.call')}</span>
                 </button>
               )}
             </div>
-          </Card>
+          </div>
 
           {/* DESCRIPCIÓN */}
-          <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
+          <div className="card rounded-xl p-4">
             {displayProfile.descripcion_corta && (
-              <p className="text-sm text-gray-700 mb-3">{displayProfile.descripcion_corta}</p>
+              <p className="text-sm text-ink mb-3">{displayProfile.descripcion_corta}</p>
             )}
             {displayProfile.description && displayProfile.description !== displayProfile.descripcion_corta && (
-              <p className="text-sm text-gray-600">{displayProfile.description}</p>
+              <p className="text-sm text-c-muted">{displayProfile.description}</p>
             )}
 
             {(profile.years_experience > 0 || profile.tarifa_base > 0) && (
-              <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100 mt-3">
+              <div className="flex flex-wrap gap-2 pt-3 border-t border-c-border mt-3">
                 {profile.years_experience > 0 && (
-                  <Badge className="bg-blue-50 text-blue-700 border-0 px-3 py-1.5 text-sm font-medium">
-                    <Briefcase className="w-3.5 h-3.5 mr-1.5" />
+                  <span className="badge bg-c-accent/10 text-c-accent px-3 py-1.5 text-sm font-medium">
+                    <IconBriefcase className="w-3.5 h-3.5 mr-1.5" />
                     {t('profile_page.years_of_experience', { count: profile.years_experience })}
-                  </Badge>
+                  </span>
                 )}
                 {profile.tarifa_base > 0 && (
-                  <Badge className="bg-blue-50 text-blue-700 border-0 px-3 py-1.5 text-sm font-medium">
-                    <Euro className="w-3.5 h-3.5 mr-1.5" />
+                  <span className="badge bg-c-accent/10 text-c-accent px-3 py-1.5 text-sm font-medium">
+                    <IconEuro className="w-3.5 h-3.5 mr-1.5" />
                     {t('profile_page.from_price', { price: profile.tarifa_base })}
-                  </Badge>
+                  </span>
                 )}
               </div>
             )}
-          </Card>
+          </div>
 
           {/* SERVICIOS OFRECIDOS */}
           {displayProfile.services_offered && displayProfile.services_offered.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-blue-600" />
+            <div className="card rounded-xl p-4">
+              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
+                <IconBriefcase className="w-4 h-4 text-c-accent" />
                 {t('profile_page.services')}
               </h3>
               <div className="space-y-3">
                 {displayProfile.services_offered.map((service) => (
-                  <div key={service.id} className="border rounded-lg p-3 bg-gray-50">
-                    <h4 className="font-semibold text-gray-900 mb-1">{service.name}</h4>
+                  <div key={service.id} className="border border-c-border rounded-lg p-3 bg-soft">
+                    <h4 className="font-semibold text-ink mb-1">{service.name}</h4>
                     {service.description && (
-                      <p className="text-sm text-gray-600 mb-2">{service.description}</p>
+                      <p className="text-sm text-c-muted mb-2">{service.description}</p>
                     )}
                     <div className="flex gap-2 text-xs">
                       {service.price && (
-                        <span className="bg-green-50 text-green-700 px-2 py-1 rounded flex items-center gap-1">
-                          <Euro className="w-3 h-3" />
+                        <span className="bg-success/10 text-success px-2 py-1 rounded flex items-center gap-1">
+                          <IconEuro className="w-3 h-3" />
                           {service.price}€/{service.unit}
                         </span>
                       )}
                       {service.duration && (
-                        <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded">
+                        <span className="bg-c-accent/10 text-c-accent px-2 py-1 rounded">
                           {service.duration}
                         </span>
                       )}
@@ -708,42 +707,42 @@ export default function AutonomoPage() {
                   </div>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
 
           {/* DISPONIBILIDAD */}
           {(displayProfile.horario_apertura || displayProfile.horario_cierre) && (
-            <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-green-600" />
+            <div className="card rounded-xl p-4">
+              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
+                <IconClock className="w-4 h-4 text-success" />
                 {t('profile_page.availability')}
               </h3>
               <div className="space-y-2">
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-ink">
                   {displayProfile.disponibilidad_tipo === "ambos" && t('profile_page.available_every_day')}
                   {displayProfile.disponibilidad_tipo === "laborables" && t('proProfile.availability.summaryWeekdays')}
                   {displayProfile.disponibilidad_tipo === "festivos" && t('proProfile.availability.summaryWeekends')}
                 </p>
-                <p className="text-sm text-gray-600 flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5" />
+                <p className="text-sm text-c-muted flex items-center gap-2">
+                  <IconClock className="w-3.5 h-3.5" />
                   {t('proProfile.availability.scheduleRange', { from: displayProfile.horario_apertura, to: displayProfile.horario_cierre })}
                 </p>
               </div>
-            </Card>
+            </div>
           )}
 
           {/* PORTFOLIO DE TRABAJOS */}
           {displayProfile.portfolio_items && displayProfile.portfolio_items.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-indigo-600" />
+            <div className="card rounded-xl p-4">
+              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
+                <IconBriefcase className="w-4 h-4 text-indigo-600" />
                 {t('search.profile.portfolioTitle')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {displayProfile.portfolio_items.map((item) => (
                   <div 
                     key={item.id} 
-                    className="border rounded-xl overflow-hidden bg-gray-50 hover:shadow-md transition-shadow cursor-pointer"
+                    className="border border-c-border rounded-xl overflow-hidden bg-soft hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => {
                       if (item.images?.[0]) {
                         setSelectedImage(item.images[0]);
@@ -752,7 +751,7 @@ export default function AutonomoPage() {
                     }}
                   >
                     {item.images?.[0] && (
-                      <div className="relative h-32 bg-gray-200">
+                      <div className="relative h-32 bg-soft">
                         <img 
                           src={item.images[0]} 
                           alt={item.title}
@@ -766,14 +765,14 @@ export default function AutonomoPage() {
                       </div>
                     )}
                     <div className="p-3">
-                      <h4 className="font-semibold text-gray-900 text-sm mb-1">{item.title}</h4>
+                      <h4 className="font-semibold text-ink text-sm mb-1">{item.title}</h4>
                       {item.description && (
-                        <p className="text-xs text-gray-600 line-clamp-2">{item.description}</p>
+                        <p className="text-xs text-c-muted line-clamp-2">{item.description}</p>
                       )}
-                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                      <div className="flex items-center gap-2 mt-2 text-xs text-c-muted">
                         {item.date && <span>{item.date}</span>}
                         {item.category && (
-                          <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                          <span className="bg-c-accent/10 text-c-accent px-2 py-0.5 rounded">
                             {item.category}
                           </span>
                         )}
@@ -782,60 +781,60 @@ export default function AutonomoPage() {
                   </div>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
 
           {/* HABILIDADES */}
           {displayProfile.skills && displayProfile.skills.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-600" />
+            <div className="card rounded-xl p-4">
+              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
+                <IconSparkles className="w-4 h-4 text-purple-600" />
                 {t('skills')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {displayProfile.skills.map((skill, idx) => (
-                  <Badge 
-                    key={idx} 
-                    className="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 text-sm"
+                  <span
+                    key={idx}
+                    className="badge bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 text-sm"
                   >
-                    <Sparkles className="w-3 h-3 mr-1.5" />
+                    <IconSparkles className="w-3 h-3 mr-1.5" />
                     {skill}
-                  </Badge>
+                  </span>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
 
           {/* CERTIFICACIONES */}
           {displayProfile.certifications && displayProfile.certifications.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <BadgeCheck className="w-4 h-4 text-amber-600" />
+            <div className="card rounded-xl p-4">
+              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
+                <IconVerified className="w-4 h-4 text-warning" />
                 {t('certificationsAndTitles')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {displayProfile.certifications.map((cert, idx) => (
-                  <Badge 
-                    key={idx} 
-                    className="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 text-sm"
+                  <span
+                    key={idx}
+                    className="badge bg-amber-50 text-warning border border-amber-200 px-3 py-1.5 text-sm"
                   >
-                    <Award className="w-3 h-3 mr-1.5" />
+                    <IconAward className="w-3 h-3 mr-1.5" />
                     {cert}
-                  </Badge>
+                  </span>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
 
           {/* GALERÍA */}
           {profile.photos && profile.photos.length > 0 && (
-            <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">{t('workGalleryTitle')}</h3>
+            <div className="card rounded-xl p-4">
+              <h3 className="text-sm font-bold text-ink mb-3">{t('workGalleryTitle')}</h3>
               <div className="grid grid-cols-3 gap-2">
                 {profile.photos.map((photo, idx) => (
                 <div 
                   key={idx} 
-                  className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group bg-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                  className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group bg-soft shadow-sm hover:shadow-md transition-shadow"
                   onClick={() => {
                     setSelectedImage(photo);
                     setSelectedImageIndex(idx);
@@ -845,123 +844,133 @@ export default function AutonomoPage() {
                   </div>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
 
           {/* REDES SOCIALES */}
           {(profile.website || profile.social_links?.facebook || profile.social_links?.instagram || profile.social_links?.linkedin || profile.social_links?.tiktok) && (
-            <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">{t('socialNetworks')}</h3>
+            <div className="card rounded-xl p-4">
+              <h3 className="text-sm font-bold text-ink mb-3">{t('socialNetworks')}</h3>
               <div className="flex flex-wrap gap-2">
                 {profile.website && (
-                  <a href={formatSocialLink(profile.website, 'website')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Globe className="w-4 h-4 mr-2" />{t('proProfile.social.web')}</Button>
+                  <a href={formatSocialLink(profile.website, 'website')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                    <IconGlobe className="w-4 h-4 mr-2" />{t('proProfile.social.web')}
                   </a>
                 )}
                 {profile.social_links?.instagram && (
-                  <a href={formatSocialLink(profile.social_links.instagram, 'instagram')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Instagram className="w-4 h-4 mr-2 text-pink-600" />{t('proProfile.social.instagram')}</Button>
+                  <a href={formatSocialLink(profile.social_links.instagram, 'instagram')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                    <IconInstagram className="w-4 h-4 mr-2 text-pink-600" />{t('proProfile.social.instagram')}
                   </a>
                 )}
                 {profile.social_links?.facebook && (
-                  <a href={formatSocialLink(profile.social_links.facebook, 'facebook')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Facebook className="w-4 h-4 mr-2 text-blue-600" />{t('proProfile.social.facebook')}</Button>
+                  <a href={formatSocialLink(profile.social_links.facebook, 'facebook')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                    <IconFacebook className="w-4 h-4 mr-2 text-c-accent" />{t('proProfile.social.facebook')}
                   </a>
                 )}
                 {profile.social_links?.linkedin && (
-                  <a href={formatSocialLink(profile.social_links.linkedin, 'linkedin')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Linkedin className="w-4 h-4 mr-2 text-blue-700" />{t('proProfile.social.linkedin')}</Button>
+                  <a href={formatSocialLink(profile.social_links.linkedin, 'linkedin')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                    <IconLinkedin className="w-4 h-4 mr-2 text-c-accent" />{t('proProfile.social.linkedin')}
                   </a>
                 )}
                 {profile.social_links?.tiktok && (
-                  <a href={formatSocialLink(profile.social_links.tiktok, 'tiktok')} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Music className="w-4 h-4 mr-2 text-black" />{t('proProfile.social.tiktok')}</Button>
+                  <a href={formatSocialLink(profile.social_links.tiktok, 'tiktok')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                    <IconMusic className="w-4 h-4 mr-2 text-black" />{t('proProfile.social.tiktok')}
                   </a>
                 )}
               </div>
-            </Card>
+            </div>
           )}
 
           {/* RESEÑAS — bloque prominente con rating summary */}
-          <Card className="border-0 shadow-sm rounded-xl bg-white p-4">
+          <div className="card rounded-xl p-4">
             {/* Rating hero */}
             {profile.average_rating > 0 && profile.total_reviews > 0 ? (
-              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
-                <div className="text-4xl font-extrabold text-gray-900">{profile.average_rating?.toFixed(1)}</div>
+              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-c-border">
+                <div className="text-4xl font-extrabold text-ink">{profile.average_rating?.toFixed(1)}</div>
                 <div>
                   <div className="flex gap-0.5 mb-0.5">
                     {[1,2,3,4,5].map(s => (
-                      <Star key={s} className={`w-5 h-5 ${s <= Math.round(profile.average_rating) ? "fill-amber-400 text-amber-400" : "text-gray-200"}`} />
+                      <IconStarOutline key={s} className={`w-5 h-5 ${s <= Math.round(profile.average_rating) ? "fill-star text-star" : "text-c-border"}`} />
                     ))}
                   </div>
-                  <p className="text-sm text-gray-500">{t('search.profile.reviewsCount', { count: profile.total_reviews })}</p>
+                  <p className="text-sm text-c-muted">{t('search.profile.reviewsCount', { count: profile.total_reviews })}</p>
                 </div>
               </div>
             ) : null}
 
-            <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
+              <IconStarOutline className="w-4 h-4 text-star fill-star" />
               {t('clientReviews')}
             </h3>
 
             {reviews.length === 0 && (
-              <div className="bg-gray-50 rounded-xl p-4 mb-4 text-sm text-gray-500 text-center">
+              <div className="bg-soft rounded-xl p-4 mb-4 text-sm text-c-muted text-center">
                 {t('search.profile.noReviews')}
               </div>
             )}
 
             <ReviewSection professionalId={profile.user_id} reviews={reviews} currentUser={user} />
-          </Card>
+          </div>
         </div>
       </div>
 
       {/* MODALES */}
-      <Dialog open={showPhoneModal} onOpenChange={setShowPhoneModal}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>{t('proProfile.phoneModal.title')}</DialogTitle>
-            <DialogDescription>{profile.business_name}</DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 w-full text-center">
-              <p className="text-3xl font-bold text-blue-700">{profile.telefono_contacto}</p>
-            </div>
-            <Button onClick={() => copyToClipboard(profile.telefono_contacto)} variant="outline" className="w-full">
-              {copiedPhone ? <><Check className="w-4 h-4 mr-2 text-green-600" />{t('reviews.request.copied')}</> : <><Copy className="w-4 h-4 mr-2" />{t('proProfile.phoneModal.copyButton')}</>}
-            </Button>
+      <Modal
+        open={showPhoneModal}
+        onClose={() => setShowPhoneModal(false)}
+        title={t('proProfile.phoneModal.title')}
+        description={profile.business_name}
+      >
+        <div className="flex flex-col items-center gap-4 py-4">
+          <div className="p-4 bg-c-accent/10 rounded-xl border border-c-accent/20 w-full text-center">
+            <p className="text-3xl font-bold text-c-accent">{profile.telefono_contacto}</p>
           </div>
-        </DialogContent>
-      </Dialog>
+          <button
+            type="button"
+            onClick={() => copyToClipboard(profile.telefono_contacto)}
+            className="btn-secondary w-full"
+          >
+            {copiedPhone ? <><IconCheck className="w-4 h-4 mr-2 text-success" />{t('reviews.request.copied')}</> : <><IconCopy className="w-4 h-4 mr-2" />{t('proProfile.phoneModal.copyButton')}</>}
+          </button>
+        </div>
+      </Modal>
 
-      <Dialog open={showWhatsAppModal} onOpenChange={setShowWhatsAppModal}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="w-6 h-6 text-green-600" />{t('profile_page.whatsapp')}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="p-4 bg-green-50 rounded-xl border border-green-200 w-full text-center">
-              <p className="text-3xl font-bold text-green-700">{profile.telefono_contacto}</p>
-            </div>
-            <Button
-              onClick={() => {
-                window.open(`https://wa.me/${formatPhoneForWhatsApp(profile.telefono_contacto)}`, '_blank');
-                setShowWhatsAppModal(false);
-              }}
-              className="w-full bg-green-600 hover:bg-green-700 h-12"
-            >
-              <MessageCircle className="w-5 h-5 mr-2" />{t('search.card.openWhatsApp')}
-            </Button>
+      <Modal
+        open={showWhatsAppModal}
+        onClose={() => setShowWhatsAppModal(false)}
+        title={
+          <span className="flex items-center gap-2">
+            <IconMessageCircle className="w-6 h-6 text-success" />{t('profile_page.whatsapp')}
+          </span>
+        }
+      >
+        <div className="flex flex-col items-center gap-4 py-4">
+          <div className="p-4 bg-success/10 rounded-xl border border-success/20 w-full text-center">
+            <p className="text-3xl font-bold text-success">{profile.telefono_contacto}</p>
           </div>
-        </DialogContent>
-      </Dialog>
+          <button
+            type="button"
+            onClick={() => {
+              window.open(`https://wa.me/${formatPhoneForWhatsApp(profile.telefono_contacto)}`, '_blank');
+              setShowWhatsAppModal(false);
+            }}
+            className="btn-primary w-full bg-success hover:bg-green-700 h-12"
+          >
+            <IconMessageCircle className="w-5 h-5 mr-2" />{t('search.card.openWhatsApp')}
+          </button>
+        </div>
+      </Modal>
 
       {/* GALERÍA MODAL */}
       {selectedImage && (
         <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
-          <button onClick={() => setSelectedImage(null)} className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full">
-            <X className="w-6 h-6 text-white" />
+          <button
+            type="button"
+            onClick={() => setSelectedImage(null)}
+            aria-label={t('common.close')}
+            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full"
+          >
+            <IconClose className="w-6 h-6 text-white" />
           </button>
           
           {selectedImageIndex >= 0 && profile.photos?.length > 1 && (
@@ -973,9 +982,10 @@ export default function AutonomoPage() {
                   setSelectedImageIndex(newIndex);
                   setSelectedImage(profile.photos[newIndex]);
                 }}
+                aria-label={t('home.whyTrust.previous')}
                 className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full"
               >
-                <ChevronLeft className="w-6 h-6 text-white" />
+                <IconChevronLeft className="w-6 h-6 text-white" />
               </button>
               <button
                 onClick={(e) => {
@@ -984,9 +994,10 @@ export default function AutonomoPage() {
                   setSelectedImageIndex(newIndex);
                   setSelectedImage(profile.photos[newIndex]);
                 }}
+                aria-label={t('common.next')}
                 className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full"
               >
-                <ChevronRight className="w-6 h-6 text-white" />
+                <IconChevronRight className="w-6 h-6 text-white" />
               </button>
             </>
           )}

@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Search, ChevronDown, ArrowRight, Briefcase, Users, HelpCircle } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { IconSearch, IconChevronDown, IconArrowRight, IconBriefcase, IconUsers, IconHelp } from "@/components/Icons";
 import SEOHead from "../components/seo/SEOHead";
 
 // ─── Datos de las 20 preguntas ────────────────────────────────────────────────
@@ -22,8 +20,8 @@ const buildSections = (t) => [
   {
     id: "autonomos",
     label: t("faq.sections.autonomos"),
-    icon: Briefcase,
-    color: "bg-blue-600",
+    icon: IconBriefcase,
+    color: "bg-c-accent",
     faqs: [
       faqItem(t, "altaAutonomo", "/buscar"),
       faqItem(t, "cuotaAutonomos", "/buscar"),
@@ -40,7 +38,7 @@ const buildSections = (t) => [
   {
     id: "clientes",
     label: t("faq.sections.clientes"),
-    icon: Users,
+    icon: IconUsers,
     color: "bg-green-600",
     faqs: [
       faqItem(t, "encontrarAutonomo", "/buscar"),
@@ -53,12 +51,9 @@ const buildSections = (t) => [
   {
     id: "plataforma",
     label: t("faq.sections.plataforma"),
-    icon: HelpCircle,
+    icon: IconHelp,
     color: "bg-purple-600",
     faqs: [
-      faqItem(t, "queEs", "/precios"),
-      faqItem(t, "esGratis", "/precios"),
-      faqItem(t, "planes", "/precios", "faq.page.viewPlans"),
       faqItem(t, "verificacion", "/mi-perfil"),
       faqItem(t, "solicitudes", "/mi-perfil"),
     ],
@@ -97,25 +92,25 @@ function FAQSchema({ faqs }) {
 // Acordeón individual
 function FAQItem({ faq, isOpen, onToggle }) {
   return (
-    <div className={`border rounded-xl overflow-hidden transition-all ${isOpen ? "border-blue-200 shadow-sm" : "border-gray-200"}`}>
+    <div className={`border rounded-xl overflow-hidden transition-all ${isOpen ? "border-blue-200 shadow-sm" : "border-c-border"}`}>
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between p-5 text-left hover:bg-soft transition-colors"
         aria-expanded={isOpen}
       >
-        <span className={`font-semibold text-base pr-4 ${isOpen ? "text-blue-900" : "text-gray-900"}`}>
+        <span className={`font-semibold text-base pr-4 ${isOpen ? "text-blue-900" : "text-ink"}`}>
           {faq.q}
         </span>
-        <ChevronDown className={`w-5 h-5 flex-shrink-0 text-gray-400 transition-transform ${isOpen ? "rotate-180 text-blue-600" : ""}`} />
+        <IconChevronDown className={`w-5 h-5 flex-shrink-0 text-c-muted transition-transform ${isOpen ? "rotate-180 text-c-accent" : ""}`} />
       </button>
       {isOpen && (
         <div className="px-5 pb-5 border-t border-blue-100 pt-4">
-          <p className="text-gray-600 leading-relaxed mb-4">{faq.a}</p>
+          <p className="text-c-muted leading-relaxed mb-4">{faq.a}</p>
           <Link
             to={faq.ctaUrl}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-c-accent hover:text-accent-hover transition-colors"
           >
-            {faq.cta} <ArrowRight className="w-4 h-4" />
+            {faq.cta} <IconArrowRight className="w-4 h-4" />
           </Link>
         </div>
       )}
@@ -157,9 +152,9 @@ export default function FAQPage() {
         {/* ── Hero ── */}
         <div className="bg-gradient-to-br from-blue-700 to-blue-900 text-white py-16 px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <Badge className="mb-4 bg-blue-600/50 text-blue-100 border-blue-500/40 text-sm font-medium">
+            <span className="badge mb-4 bg-blue-600/50 text-blue-100 border border-blue-500/40 text-sm font-medium">
               {t("faq.page.badge")}
-            </Badge>
+            </span>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">
               {t("nav.faq")}
             </h1>
@@ -169,12 +164,14 @@ export default function FAQPage() {
 
             {/* Buscador */}
             <div className="relative max-w-xl mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <Input
+              <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-c-muted pointer-events-none" />
+              <input
+                type="text"
                 value={searchTerm}
                 onChange={e => { setSearchTerm(e.target.value); setOpenIndex(null); }}
                 placeholder={t("faq.page.searchPlaceholder")}
-                className="pl-12 h-13 text-base bg-white text-gray-900 border-0 shadow-lg rounded-xl py-3.5"
+                aria-label={t("faq.page.searchPlaceholder")}
+                className="input pl-12 text-base bg-surface text-ink border-0 shadow-lg rounded-xl py-3.5"
               />
             </div>
           </div>
@@ -184,17 +181,17 @@ export default function FAQPage() {
           {/* Resultados de búsqueda */}
           {filteredFaqs ? (
             <div>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-c-muted mb-4">
                 {t("faq.page.results", { count: filteredFaqs.length, term: searchTerm })}
               </p>
               {filteredFaqs.length === 0 ? (
-                <div className="text-center py-16 text-gray-500">
-                  <HelpCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <div className="text-center py-16 text-c-muted">
+                  <IconHelp className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                   <p className="text-lg font-medium">{t("faq.page.noResults")}</p>
                   <p className="text-sm mt-1">{t("faq.page.noResultsHint")}</p>
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="mt-4 text-blue-600 text-sm font-semibold hover:underline"
+                    className="mt-4 text-c-accent text-sm font-semibold hover:underline"
                   >
                     {t("faq.page.viewAll")}
                   </button>
@@ -215,18 +212,21 @@ export default function FAQPage() {
           ) : (
             <>
               {/* Tabs de sección */}
-              <div className="flex gap-2 mb-8 overflow-x-auto scrollbar-hide pb-1">
+              <div role="tablist" className="flex gap-2 mb-8 overflow-x-auto scrollbar-hide pb-1">
                 {sections.map(s => {
                   const Icon = s.icon;
                   const isActive = activeSection === s.id;
                   return (
                     <button
                       key={s.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
                       onClick={() => { setActiveSection(s.id); setOpenIndex(null); }}
                       className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
                         isActive
-                          ? "bg-blue-600 text-white shadow-md"
-                          : "bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-700"
+                          ? "bg-c-accent text-white shadow-md"
+                          : "bg-surface text-ink border border-c-border hover:border-blue-300 hover:text-c-accent"
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -243,8 +243,8 @@ export default function FAQPage() {
                     <div className={`w-10 h-10 ${activeSectionData.color} rounded-xl flex items-center justify-center`}>
                       <activeSectionData.icon className="w-5 h-5 text-white" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900">{activeSectionData.label}</h2>
-                    <span className="ml-auto text-sm text-gray-400">{t("faq.page.questionCount", { count: activeSectionData.faqs.length })}</span>
+                    <h2 className="text-2xl font-bold text-ink">{activeSectionData.label}</h2>
+                    <span className="ml-auto text-sm text-c-muted">{t("faq.page.questionCount", { count: activeSectionData.faqs.length })}</span>
                   </div>
 
                   <div className="space-y-3">
@@ -269,15 +269,9 @@ export default function FAQPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/buscar"
-                className="inline-flex items-center justify-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-surface text-c-accent font-bold px-6 py-3 rounded-xl hover:bg-c-accent/10 transition-colors"
               >
-                {t("faq.page.findPro")} <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/precios"
-                className="inline-flex items-center justify-center gap-2 bg-blue-500/40 text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-500/60 transition-colors border border-blue-400/30"
-              >
-                {t("faq.page.viewPlans")}
+                {t("faq.page.findPro")} <IconArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

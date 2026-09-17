@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { IconStarOutline, IconSuccess, IconSpinner, IconAlert } from '@/components/Icons';
 import SEOHead from '@/components/seo/SEOHead';
-import InitialsAvatar from '@/components/ui/InitialsAvatar';
+import InitialsAvatar from '@/components/InitialsAvatar';
 import { optimizeSupabaseImage } from '@/lib/supabaseImage';
 import { getReviewRequest, submitReview } from '@/lib/reviewRpc';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { useTranslation } from 'react-i18next';
 
 const NAVY = '#00255C';
@@ -112,11 +112,11 @@ export default function LeaveReviewPage() {
   return (
     <>
       <SEOHead title={t('reviews.leave.seoTitle')} noindex />
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-soft">
         <div className="max-w-md mx-auto px-4 sm:px-6 py-6 pb-24">
           {loading ? (
             <div className="flex items-center justify-center py-24">
-              <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+              <IconSpinner className="w-6 h-6 animate-spin text-c-muted" />
             </div>
           ) : reason ? (
             <InvalidTokenView
@@ -137,16 +137,16 @@ export default function LeaveReviewPage() {
                     alt={businessName}
                     width="72"
                     height="72"
-                    className="w-[72px] h-[72px] rounded-full object-cover border border-slate-200"
+                    className="w-[72px] h-[72px] rounded-full object-cover border border-c-border"
                     loading="eager"
                   />
                 ) : (
                   <InitialsAvatar name={businessName} size={72} />
                 )}
-                <h1 className="text-xl font-extrabold text-slate-900 mt-3">
+                <h1 className="text-xl font-extrabold text-ink mt-3">
                   {t('reviews.leave.title', { name: businessName })}
                 </h1>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm text-c-muted mt-1">
                   {t('reviews.leave.subtitle')}
                 </p>
               </div>
@@ -162,7 +162,7 @@ export default function LeaveReviewPage() {
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder={t('reviews.leave.commentPlaceholder')}
-                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                    className="w-full px-3 py-2 text-sm border border-c-border rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                   />
                 </Field>
 
@@ -173,12 +173,12 @@ export default function LeaveReviewPage() {
                     onChange={(e) => setClientName(e.target.value)}
                     placeholder={t('reviews.leave.namePlaceholder')}
                     autoComplete="name"
-                    className="w-full h-10 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                    className="w-full h-10 px-3 text-sm border border-c-border rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                   />
                 </Field>
 
-                <details className="rounded-xl border border-slate-200 bg-white p-3">
-                  <summary className="text-sm font-semibold text-slate-700 cursor-pointer select-none">
+                <details className="rounded-xl border border-c-border bg-surface p-3">
+                  <summary className="text-sm font-semibold text-ink cursor-pointer select-none">
                     {t('reviews.leave.detailsSummary')}
                   </summary>
                   <div className="mt-3 space-y-3">
@@ -213,7 +213,7 @@ export default function LeaveReviewPage() {
                 >
                   {submitting ? (
                     <span className="inline-flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" /> {t('reviews.form.sending')}
+                      <IconSpinner className="w-4 h-4 animate-spin" /> {t('reviews.form.sending')}
                     </span>
                   ) : (
                     t('reviews.form.submit')
@@ -231,8 +231,8 @@ export default function LeaveReviewPage() {
 function Field({ label, required, children }) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">
-        {label} {required && <span className="text-rose-500">*</span>}
+      <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">
+        {label} {required && <span className="text-error">*</span>}
       </span>
       <div className="mt-1.5">{children}</div>
     </label>
@@ -254,10 +254,10 @@ function RatingRow({ value, onChange, big }) {
             className="p-1 -m-1 rounded"
             aria-label={t('reviews.leave.starsAria', { count: n })}
           >
-            <Star
+            <IconStarOutline
               width={size}
               height={size}
-              className={active ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+              className={active ? 'fill-star text-star' : 'text-c-border'}
             />
           </button>
         );
@@ -269,7 +269,7 @@ function RatingRow({ value, onChange, big }) {
 function SubratingRow({ label, value, onChange }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-sm text-slate-700">{label}</span>
+      <span className="text-sm text-ink">{label}</span>
       <RatingRow value={value} onChange={onChange} />
     </div>
   );
@@ -301,15 +301,15 @@ function InvalidTokenView({ reason, onHome }) {
   };
   const v = map[reason] || map.no_existe;
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+    <div className="rounded-2xl border border-c-border bg-surface p-6 text-center">
       <div
         className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
         style={{ background: '#FEF3C7', color: '#92400E' }}
       >
-        <AlertCircle className="w-6 h-6" />
+        <IconAlert className="w-6 h-6" />
       </div>
-      <h1 className="font-semibold text-slate-900 mt-3">{v.title}</h1>
-      <p className="text-sm text-slate-600 mt-1">{v.body}</p>
+      <h1 className="font-semibold text-ink mt-3">{v.title}</h1>
+      <p className="text-sm text-c-muted mt-1">{v.body}</p>
       <button
         type="button"
         onClick={onHome}
@@ -325,15 +325,15 @@ function InvalidTokenView({ reason, onHome }) {
 function SubmittedView({ businessName, onHome }) {
   const { t } = useTranslation();
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+    <div className="rounded-2xl border border-c-border bg-surface p-6 text-center">
       <div
         className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
         style={{ background: 'rgba(0,37,92,0.06)' }}
       >
-        <CheckCircle2 className="w-6 h-6" style={{ color: NAVY }} />
+        <IconSuccess className="w-6 h-6" style={{ color: NAVY }} />
       </div>
-      <h1 className="font-semibold text-slate-900 mt-3">{t('reviews.leave.thanksTitle')}</h1>
-      <p className="text-sm text-slate-600 mt-1">
+      <h1 className="font-semibold text-ink mt-3">{t('reviews.leave.thanksTitle')}</h1>
+      <p className="text-sm text-c-muted mt-1">
         {t('reviews.leave.thanksBody', { name: businessName })}
       </p>
       <button

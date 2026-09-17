@@ -2,16 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  ShieldCheck,
-  BadgeCheck,
-  Clock3,
-  MessageSquare,
-  Wallet,
-  Megaphone,
-  Star,
-  ArrowRight,
-  Check,
-} from 'lucide-react';
+  IconShield,
+  IconVerified,
+  IconClock3,
+  IconMessageSquare,
+  IconWallet,
+  IconMegaphone,
+  IconStarOutline,
+  IconArrowRight,
+  IconCheck,
+} from '@/components/Icons';
 import SEOHead from '@/components/seo/SEOHead';
 
 const NAVY = '#00255C';
@@ -30,12 +30,12 @@ export default function ParaAutonomos() {
 
   // Textos dentro del componente para que se retraduzcan al cambiar de idioma.
   const benefits = [
-    { icon: BadgeCheck, title: t('landing.hero.trustVerified'), body: t('forPros.benefits.verified.body') },
-    { icon: Wallet, title: t('forPros.benefits.noFees.title'), body: t('forPros.benefits.noFees.body') },
-    { icon: MessageSquare, title: t('landing.feature_direct_contact'), body: t('forPros.benefits.directContact.body') },
-    { icon: Megaphone, title: t('forPros.benefits.promotion.title'), body: t('forPros.benefits.promotion.body') },
-    { icon: Star, title: t('home.whyTrust.slides.verifiedReviews.title'), body: t('forPros.benefits.reviews.body') },
-    { icon: Clock3, title: t('forPros.benefits.fast.title'), body: t('forPros.benefits.fast.body') },
+    { icon: IconVerified, title: t('landing.hero.trustVerified'), body: t('forPros.benefits.verified.body') },
+    { icon: IconWallet, title: t('forPros.benefits.noFees.title'), body: t('forPros.benefits.noFees.body') },
+    { icon: IconMessageSquare, title: t('landing.feature_direct_contact'), body: t('forPros.benefits.directContact.body') },
+    { icon: IconMegaphone, title: t('forPros.benefits.promotion.title'), body: t('forPros.benefits.promotion.body') },
+    { icon: IconStarOutline, title: t('home.whyTrust.slides.verifiedReviews.title'), body: t('forPros.benefits.reviews.body') },
+    { icon: IconClock3, title: t('forPros.benefits.fast.title'), body: t('forPros.benefits.fast.body') },
   ];
 
   const steps = [
@@ -68,7 +68,7 @@ export default function ParaAutonomos() {
         keywords="autónomos, profesionales, alta autónomo, conseguir clientes, sin comisiones"
       />
 
-      <main className="bg-white text-slate-900">
+      <main className="bg-canvas text-ink">
         {/* HERO */}
         <section className="relative" style={{ background: '#FBFCFE' }}>
           <div className="max-w-5xl mx-auto px-4 pt-16 pb-12 md:pt-24 md:pb-16">
@@ -76,7 +76,7 @@ export default function ParaAutonomos() {
               className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
               style={{ backgroundColor: 'rgba(0,37,92,0.06)', color: NAVY }}
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
+              <IconShield className="w-3.5 h-3.5" />
               {t('forPros.hero.eyebrow')}
             </div>
 
@@ -88,7 +88,7 @@ export default function ParaAutonomos() {
               <span style={{ color: GOLD }}>{t('forPros.hero.titleHighlight')}</span>
             </h1>
 
-            <p className="mt-5 max-w-2xl text-slate-600 text-[17px] md:text-lg leading-relaxed">
+            <p className="mt-5 max-w-2xl text-c-muted text-[17px] md:text-lg leading-relaxed">
               {t('forPros.hero.subtitle')}
             </p>
 
@@ -99,14 +99,14 @@ export default function ParaAutonomos() {
                 style={{ backgroundColor: GOLD, color: NAVY }}
               >
                 {t('nav.becomeProFree')}
-                <ArrowRight className="w-4 h-4" />
+                <IconArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-500">
-              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="w-3.5 h-3.5" style={{ color: NAVY }} />{t('landing.hero.trustVerified')}</span>
-              <span className="inline-flex items-center gap-1.5"><Wallet className="w-3.5 h-3.5" style={{ color: NAVY }} />{t('landing.feature_no_fees')}</span>
-              <span className="inline-flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5" style={{ color: NAVY }} />{t('landing.feature_direct_contact')}</span>
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-c-muted">
+              <span className="inline-flex items-center gap-1.5"><IconVerified className="w-3.5 h-3.5" style={{ color: NAVY }} />{t('landing.hero.trustVerified')}</span>
+              <span className="inline-flex items-center gap-1.5"><IconWallet className="w-3.5 h-3.5" style={{ color: NAVY }} />{t('landing.feature_no_fees')}</span>
+              <span className="inline-flex items-center gap-1.5"><IconMessageSquare className="w-3.5 h-3.5" style={{ color: NAVY }} />{t('landing.feature_direct_contact')}</span>
             </div>
           </div>
         </section>
@@ -114,22 +114,22 @@ export default function ParaAutonomos() {
         {/* BENEFICIOS — banda gris suave */}
         <section style={{ background: 'hsl(var(--brand-surface))' }}>
           <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">{t('forPros.benefits.eyebrow')}</h2>
-            <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900 max-w-2xl">
+            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-3">{t('forPros.benefits.eyebrow')}</h2>
+            <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink max-w-2xl">
               {t('forPros.benefits.title')}
             </p>
 
             <div className="mt-10 grid gap-4 md:gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
               {benefits.map(({ icon: Icon, title, body }) => (
-                <article key={title} className="rounded-2xl bg-white border border-slate-200 p-5">
+                <article key={title} className="rounded-2xl bg-surface border border-c-border p-5">
                   <span
                     className="inline-flex items-center justify-center w-10 h-10 rounded-xl"
                     style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: NAVY }}
                   >
                     <Icon className="w-5 h-5" />
                   </span>
-                  <h3 className="mt-4 font-semibold text-slate-900">{title}</h3>
-                  <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">{body}</p>
+                  <h3 className="mt-4 font-semibold text-ink">{title}</h3>
+                  <p className="mt-1.5 text-sm text-c-muted leading-relaxed">{body}</p>
                 </article>
               ))}
             </div>
@@ -137,19 +137,19 @@ export default function ParaAutonomos() {
         </section>
 
         {/* CÓMO FUNCIONA — banda blanca */}
-        <section className="bg-white">
+        <section className="bg-canvas">
           <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">{t('footer.how_it_works')}</h2>
-            <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900 max-w-2xl">
+            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-3">{t('footer.how_it_works')}</h2>
+            <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink max-w-2xl">
               {t('landing.howItWorks.title')}
             </p>
 
             <ol className="mt-10 grid gap-4 md:gap-5 md:grid-cols-3">
               {steps.map(({ n, title, body }) => (
-                <li key={n} className="rounded-2xl border border-slate-200 p-5">
+                <li key={n} className="rounded-2xl border border-c-border p-5">
                   <span className="text-xs font-semibold tracking-[0.12em]" style={{ color: GOLD }}>{n}</span>
-                  <h3 className="mt-3 font-semibold text-slate-900">{title}</h3>
-                  <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">{body}</p>
+                  <h3 className="mt-3 font-semibold text-ink">{title}</h3>
+                  <p className="mt-1.5 text-sm text-c-muted leading-relaxed">{body}</p>
                 </li>
               ))}
             </ol>
@@ -159,18 +159,18 @@ export default function ParaAutonomos() {
         {/* COMPARATIVA HONESTA — banda gris muy suave */}
         <section style={{ background: 'hsl(var(--brand-surface))' }}>
           <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">{t('forPros.differences.eyebrow')}</h2>
-            <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900 max-w-2xl">
+            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-3">{t('forPros.differences.eyebrow')}</h2>
+            <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink max-w-2xl">
               {t('forPros.differences.title')}
             </p>
 
             <ul className="mt-8 grid gap-3 md:gap-4 md:grid-cols-2">
               {differences.map((line) => (
-                <li key={line} className="flex items-start gap-3 rounded-2xl bg-white border border-slate-200 p-4">
+                <li key={line} className="flex items-start gap-3 rounded-2xl bg-surface border border-c-border p-4">
                   <span className="mt-0.5 inline-flex items-center justify-center w-6 h-6 rounded-full flex-shrink-0" style={{ background: 'rgba(0,37,92,0.08)' }}>
-                    <Check className="w-3.5 h-3.5" style={{ color: NAVY }} />
+                    <IconCheck className="w-3.5 h-3.5" style={{ color: NAVY }} />
                   </span>
-                  <span className="text-sm text-slate-700">{line}</span>
+                  <span className="text-sm text-ink">{line}</span>
                 </li>
               ))}
             </ul>
@@ -178,19 +178,19 @@ export default function ParaAutonomos() {
         </section>
 
         {/* FAQ — banda blanca */}
-        <section className="bg-white">
+        <section className="bg-canvas">
           <div className="max-w-3xl mx-auto px-4 py-16 md:py-20">
-            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">{t('nav.faq')}</h2>
-            <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-slate-900">{t('forPros.faq.title')}</p>
+            <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-3">{t('nav.faq')}</h2>
+            <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink">{t('forPros.faq.title')}</p>
 
             <dl className="mt-8 space-y-3">
               {faqs.map(({ q, a }) => (
-                <details key={q} className="group rounded-2xl border border-slate-200 bg-white">
-                  <summary className="list-none cursor-pointer p-5 flex items-center justify-between gap-4 font-semibold text-slate-900 text-[15px]">
+                <details key={q} className="group rounded-2xl border border-c-border bg-surface">
+                  <summary className="list-none cursor-pointer p-5 flex items-center justify-between gap-4 font-semibold text-ink text-[15px]">
                     {q}
-                    <span className="text-slate-400 group-open:rotate-180 transition-transform">▾</span>
+                    <span className="text-c-muted group-open:rotate-180 transition-transform">▾</span>
                   </summary>
-                  <p className="px-5 pb-5 text-slate-600 text-sm leading-relaxed">{a}</p>
+                  <p className="px-5 pb-5 text-c-muted text-sm leading-relaxed">{a}</p>
                 </details>
               ))}
             </dl>
@@ -213,7 +213,7 @@ export default function ParaAutonomos() {
                 style={{ backgroundColor: GOLD, color: NAVY }}
               >
                 {t('nav.becomeProFree')}
-                <ArrowRight className="w-4 h-4" />
+                <IconArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

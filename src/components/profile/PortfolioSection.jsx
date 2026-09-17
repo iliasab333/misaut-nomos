@@ -1,18 +1,23 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Camera, Plus, X, Upload, Loader2, Edit2, Trash2, Image, Calendar } from "lucide-react";
+import Modal from "@/components/Modal";
+import {
+  IconCamera,
+  IconPlus,
+  IconClose,
+  IconUpload,
+  IconSpinner,
+  IconEdit,
+  IconTrash,
+  IconImage,
+  IconCalendar,
+} from "@/components/Icons";
 import { base44 } from "@/api/base44Client";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useTranslation } from "react-i18next";
 
-export default function PortfolioSection({ 
-  portfolioItems = [], 
-  isEditing, 
+export default function PortfolioSection({
+  portfolioItems = [],
+  isEditing,
   onPortfolioChange,
   categories = []
 }) {
@@ -110,7 +115,7 @@ export default function PortfolioSection({
 
     let updatedItems;
     if (editingItem) {
-      updatedItems = portfolioItems.map(item => 
+      updatedItems = portfolioItems.map(item =>
         item.id === editingItem.id ? newItem : item
       );
     } else {
@@ -129,49 +134,49 @@ export default function PortfolioSection({
   };
 
   return (
-    <Card className="shadow-sm border-0 bg-white">
-      <CardHeader className="pb-3">
+    <div className="card">
+      <div className="p-6 pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Camera className="w-5 h-5 text-blue-700" />
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
+            <IconCamera className="w-5 h-5 text-c-accent" />
             {t("proProfile.portfolio.title")} ({portfolioItems.length})
-          </CardTitle>
+          </h3>
           {isEditing && (
-            <Button onClick={openAddDialog} size="sm" className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-1" />
+            <button type="button" onClick={openAddDialog} className="btn-primary btn-sm">
+              <IconPlus className="w-4 h-4 mr-1" />
               {t("proProfile.portfolio.add")}
-            </Button>
+            </button>
           )}
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-gray-600">
+      </div>
+      <div className="p-6 pt-0 space-y-4">
+        <p className="text-sm text-c-muted">
           {t("proProfile.portfolio.intro")}
         </p>
 
         {portfolioItems.length === 0 ? (
-          <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
-            <Image className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500">{t("proProfile.portfolio.empty")}</p>
+          <div className="text-center py-8 border-2 border-dashed border-c-border rounded-xl">
+            <IconImage className="w-12 h-12 mx-auto text-c-muted/50 mb-3" />
+            <p className="text-c-muted">{t("proProfile.portfolio.empty")}</p>
             {isEditing && (
-              <Button onClick={openAddDialog} variant="outline" className="mt-3">
-                <Plus className="w-4 h-4 mr-1" />
+              <button type="button" onClick={openAddDialog} className="btn-secondary mt-3">
+                <IconPlus className="w-4 h-4 mr-1" />
                 {t("proProfile.portfolio.addFirst")}
-              </Button>
+              </button>
             )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {portfolioItems.map((item) => (
-              <div 
-                key={item.id} 
-                className="border rounded-xl overflow-hidden bg-gray-50 hover:shadow-md transition-shadow"
+              <div
+                key={item.id}
+                className="border border-c-border rounded-xl overflow-hidden bg-soft hover:shadow-md transition-shadow"
               >
                 {/* Imagen principal */}
-                <div className="relative h-40 bg-gray-200">
+                <div className="relative h-40 bg-soft">
                   {item.images?.[0] && (
-                    <img 
-                      src={item.images[0]} 
+                    <img
+                      src={item.images[0]}
                       alt={item.title}
                       className="w-full h-full object-cover"
                     />
@@ -184,16 +189,20 @@ export default function PortfolioSection({
                   {isEditing && (
                     <div className="absolute top-2 right-2 flex gap-1">
                       <button
+                        type="button"
                         onClick={() => openEditDialog(item)}
-                        className="bg-white/90 hover:bg-white p-1.5 rounded-full shadow"
+                        className="bg-surface/90 hover:bg-surface p-1.5 rounded-full shadow"
+                        aria-label={t("common.edit")}
                       >
-                        <Edit2 className="w-4 h-4 text-blue-600" />
+                        <IconEdit className="w-4 h-4 text-c-accent" />
                       </button>
                       <button
+                        type="button"
                         onClick={() => deleteItem(item.id)}
-                        className="bg-white/90 hover:bg-white p-1.5 rounded-full shadow"
+                        className="bg-surface/90 hover:bg-surface p-1.5 rounded-full shadow"
+                        aria-label={t("common.delete")}
                       >
-                        <Trash2 className="w-4 h-4 text-red-600" />
+                        <IconTrash className="w-4 h-4 text-error" />
                       </button>
                     </div>
                   )}
@@ -201,19 +210,19 @@ export default function PortfolioSection({
 
                 {/* Info */}
                 <div className="p-3">
-                  <h4 className="font-semibold text-gray-900 mb-1">{item.title}</h4>
+                  <h4 className="font-semibold text-ink mb-1">{item.title}</h4>
                   {item.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
+                    <p className="text-sm text-c-muted line-clamp-2">{item.description}</p>
                   )}
-                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-3 mt-2 text-xs text-c-muted">
                     {item.date && (
                       <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
+                        <IconCalendar className="w-3 h-3" />
                         {item.date}
                       </span>
                     )}
                     {item.category && (
-                      <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                      <span className="bg-c-accent/10 text-c-accent px-2 py-0.5 rounded">
                         {item.category}
                       </span>
                     )}
@@ -224,113 +233,118 @@ export default function PortfolioSection({
           </div>
         )}
 
-        {/* Dialog para añadir/editar */}
-        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>
-                {editingItem ? t("proProfile.portfolio.edit") : t("proProfile.portfolio.addToPortfolio")}
-              </DialogTitle>
-            </DialogHeader>
+        {/* Modal para añadir/editar */}
+        <Modal
+          open={showAddDialog}
+          onClose={() => setShowAddDialog(false)}
+          title={editingItem ? t("proProfile.portfolio.edit") : t("proProfile.portfolio.addToPortfolio")}
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="label" htmlFor="pf-title">{t("proProfile.portfolio.titleLabel")}</label>
+              <input
+                id="pf-title"
+                className="input"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                placeholder={t("proProfile.portfolio.titlePlaceholder")}
+              />
+            </div>
 
-            <div className="space-y-4">
+            <div>
+              <label className="label" htmlFor="pf-description">{t("description")}</label>
+              <textarea
+                id="pf-description"
+                className="textarea h-24"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder={t("proProfile.portfolio.descriptionPlaceholder")}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>{t("proProfile.portfolio.titleLabel")}</Label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder={t("proProfile.portfolio.titlePlaceholder")}
+                <label className="label" htmlFor="pf-date">{t("proProfile.portfolio.dateLabel")}</label>
+                <input
+                  id="pf-date"
+                  className="input"
+                  value={formData.date}
+                  onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                  placeholder={t("proProfile.portfolio.datePlaceholder")}
                 />
               </div>
-
               <div>
-                <Label>{t("description")}</Label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder={t("proProfile.portfolio.descriptionPlaceholder")}
-                  className="h-24"
+                <label className="label" htmlFor="pf-category">{t("proProfile.portfolio.categoryLabel")}</label>
+                <input
+                  id="pf-category"
+                  className="input"
+                  value={formData.category}
+                  onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                  placeholder={t("proProfile.portfolio.categoryPlaceholder")}
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>{t("proProfile.portfolio.dateLabel")}</Label>
-                  <Input
-                    value={formData.date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                    placeholder={t("proProfile.portfolio.datePlaceholder")}
-                  />
-                </div>
-                <div>
-                  <Label>{t("proProfile.portfolio.categoryLabel")}</Label>
-                  <Input
-                    value={formData.category}
-                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    placeholder={t("proProfile.portfolio.categoryPlaceholder")}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label>{t("proProfile.portfolio.imagesLabel", { count: formData.images.length, max: 5 })}</Label>
-                
-                {formData.images.length < 5 && (
-                  <label className="cursor-pointer block mt-2">
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="hidden"
-                        onChange={handleImageUpload}
-                        disabled={uploading}
-                      />
-                      {uploading ? (
-                        <Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-600" />
-                      ) : (
-                        <>
-                          <Upload className="w-6 h-6 mx-auto text-gray-400 mb-1" />
-                          <p className="text-sm text-gray-500">{t("proProfile.portfolio.clickToAddPhotos")}</p>
-                        </>
-                      )}
-                    </div>
-                  </label>
-                )}
-
-                {formData.images.length > 0 && (
-                  <div className="grid grid-cols-5 gap-2 mt-3">
-                    {formData.images.map((img, idx) => (
-                      <div key={idx} className="relative">
-                        <img 
-                          src={img} 
-                          alt={t("proProfile.portfolio.photoAlt", { number: idx + 1 })}
-                          className="w-full h-16 object-cover rounded"
-                        />
-                        <button
-                          onClick={() => removeImage(idx)}
-                          className="absolute -top-1 -right-1 bg-red-500 text-white p-0.5 rounded-full"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                {t("common.cancel")}
-              </Button>
-              <Button onClick={saveItem} className="bg-blue-600 hover:bg-blue-700">
-                {editingItem ? t("proProfile.form.saveChanges") : t("proProfile.portfolio.add")}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </CardContent>
-    </Card>
+            <div>
+              <span className="label">{t("proProfile.portfolio.imagesLabel", { count: formData.images.length, max: 5 })}</span>
+
+              {formData.images.length < 5 && (
+                <label className="cursor-pointer block mt-2">
+                  <div className="border-2 border-dashed border-c-border rounded-lg p-4 text-center hover:border-c-accent transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                    />
+                    {uploading ? (
+                      <IconSpinner className="w-6 h-6 mx-auto text-c-accent animate-spin" />
+                    ) : (
+                      <>
+                        <IconUpload className="w-6 h-6 mx-auto text-c-muted mb-1" />
+                        <p className="text-sm text-c-muted">{t("proProfile.portfolio.clickToAddPhotos")}</p>
+                      </>
+                    )}
+                  </div>
+                </label>
+              )}
+
+              {formData.images.length > 0 && (
+                <div className="grid grid-cols-5 gap-2 mt-3">
+                  {formData.images.map((img, idx) => (
+                    <div key={idx} className="relative">
+                      <img
+                        src={img}
+                        alt={t("proProfile.portfolio.photoAlt", { number: idx + 1 })}
+                        className="w-full h-16 object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className="absolute -top-1 -right-1 bg-error text-white p-0.5 rounded-full"
+                        aria-label={t("common.delete")}
+                      >
+                        <IconClose className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-6 flex gap-3 justify-end">
+            <button type="button" className="btn-secondary" onClick={() => setShowAddDialog(false)}>
+              {t("common.cancel")}
+            </button>
+            <button type="button" className="btn-primary" onClick={saveItem}>
+              {editingItem ? t("proProfile.form.saveChanges") : t("proProfile.portfolio.add")}
+            </button>
+          </div>
+        </Modal>
+      </div>
+    </div>
   );
 }

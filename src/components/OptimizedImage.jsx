@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ImageIcon } from 'lucide-react';
+import { IconImage } from '@/components/Icons';
 
 const OptimizedImage = React.memo(function OptimizedImage({ 
   src, 
@@ -111,8 +111,8 @@ const OptimizedImage = React.memo(function OptimizedImage({
   }, []);
 
   const defaultFallback = (
-    <div className={`${className} bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center`}>
-      <ImageIcon className="w-1/3 h-1/3 text-gray-400" />
+    <div className={`${className} bg-gradient-to-br from-soft to-c-border flex items-center justify-center`}>
+      <IconImage className="w-1/3 h-1/3 text-c-muted" />
     </div>
   );
 
@@ -136,7 +136,7 @@ const OptimizedImage = React.memo(function OptimizedImage({
     >
       {isLoading && (
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" 
+          className="absolute inset-0 bg-gradient-to-br from-soft to-c-border animate-pulse" 
           style={width && height ? { width, height } : {}}
         />
       )}

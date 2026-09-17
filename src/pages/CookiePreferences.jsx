@@ -2,30 +2,30 @@ import { useState, useEffect } from 'react';
 import i18n from '@/i18n';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Cookie, Check, AlertCircle } from 'lucide-react';
+import { IconCookie, IconCheck, IconAlert } from '@/components/Icons';
 import { base44 } from '@/api/base44Client';
 import { getCookieConsent, revokeAnalyticsCookies } from '@/services/cookieConsent';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 const SUPPORT_EMAIL = 'hola@misautonomos.com';
 
 function CookieCategory({ title, description, checked, onChange, disabled }) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-start justify-between gap-3 p-4 border border-gray-100 rounded-lg hover:border-gray-200 transition-colors">
+    <div className="flex items-start justify-between gap-3 p-4 border border-c-border rounded-lg hover:border-ink transition-colors">
       <div className="flex-1">
-        <h4 className="font-medium text-gray-900">{title}</h4>
-        <p className="text-sm text-gray-600 mt-1">{description}</p>
+        <h4 className="font-medium text-ink">{title}</h4>
+        <p className="text-sm text-c-muted mt-1">{description}</p>
       </div>
       <div>
         {disabled ? (
-          <span className="text-xs bg-gray-100 text-gray-500 px-3 py-1.5 rounded font-medium whitespace-nowrap flex-shrink-0">
+          <span className="text-xs bg-soft text-c-muted px-3 py-1.5 rounded font-medium whitespace-nowrap flex-shrink-0">
             {t('cookies.alwaysActive')}
           </span>
         ) : (
           <button
             onClick={onChange}
-            className={`relative inline-flex w-12 h-7 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-gray-900' : 'bg-gray-200'}`}
+            className={`relative inline-flex w-12 h-7 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-ink' : 'bg-c-border'}`}
             aria-pressed={checked}
             aria-label={checked ? t('cookies.preferences.toggleOn', { title }) : t('cookies.preferences.toggleOff', { title })}
           >
@@ -104,21 +104,21 @@ export default function CookiePreferencesPage() {
       <div className="max-w-2xl mx-auto p-4 md:p-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-            <Cookie className="w-5 h-5 text-amber-600" />
+          <div className="w-10 h-10 bg-warning/10 rounded-full flex items-center justify-center">
+            <IconCookie className="w-5 h-5 text-warning" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-ink">
             {t('cookies.preferencesTitle')}
           </h1>
         </div>
-        <p className="text-gray-600 mb-8">
+        <p className="text-c-muted mb-8">
           {t('cookies.preferences.intro')}
         </p>
 
         {/* Info Box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-800">
+        <div className="bg-c-accent/5 border border-c-accent/20 rounded-xl p-4 mb-8 flex items-start gap-3">
+          <IconAlert className="w-5 h-5 text-c-accent flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-c-accent">
             <p className="font-medium mb-1">{t('cookies.preferences.essentialTitle')}</p>
             <p>{t('cookies.preferences.essentialBody')}</p>
           </div>
@@ -155,41 +155,41 @@ export default function CookiePreferencesPage() {
           <button
             onClick={resetToDefault}
             disabled={loading}
-            className="text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
+            className="btn-secondary"
           >
             {t('cookies.preferences.rejectOptional')}
           </button>
           <button
             onClick={() => updatePrefs({ essential: true, analytics: true, marketing: true })}
             disabled={loading}
-            className="text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 active:bg-gray-950 py-3 px-6 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="btn-dark"
           >
-            <Check className="w-4 h-4" />
+            <IconCheck className="w-4 h-4" />
             {t('cookies.acceptAll')}
           </button>
         </div>
 
         {/* Additional Info */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">{t('cookies.moreInfo')}</h3>
+        <div className="card p-6">
+          <h3 className="font-semibold text-ink mb-4">{t('cookies.moreInfo')}</h3>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link to="/cookies" className="text-blue-600 hover:underline font-medium">
+              <Link to="/cookies" className="text-c-accent hover:underline font-medium">
                 {t('cookies.preferences.fullPolicyLink')}
               </Link>
-              <p className="text-gray-600 text-xs mt-1">{t('cookies.preferences.fullPolicyHint')}</p>
+              <p className="text-c-muted text-xs mt-1">{t('cookies.preferences.fullPolicyHint')}</p>
             </li>
             <li className="mt-3">
-              <Link to="/privacidad" className="text-blue-600 hover:underline font-medium">
+              <Link to="/privacidad" className="text-c-accent hover:underline font-medium">
                 {t('cookies.preferences.privacyLink')}
               </Link>
-              <p className="text-gray-600 text-xs mt-1">{t('cookies.preferences.privacyHint')}</p>
+              <p className="text-c-muted text-xs mt-1">{t('cookies.preferences.privacyHint')}</p>
             </li>
             <li className="mt-3">
-              <a href={`mailto:${SUPPORT_EMAIL}`} className="text-blue-600 hover:underline font-medium">
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="text-c-accent hover:underline font-medium">
                 {t('cookies.preferences.contactLink', { email: SUPPORT_EMAIL })}
               </a>
-              <p className="text-gray-600 text-xs mt-1">{t('cookies.preferences.contactHint')}</p>
+              <p className="text-c-muted text-xs mt-1">{t('cookies.preferences.contactHint')}</p>
             </li>
           </ul>
         </div>

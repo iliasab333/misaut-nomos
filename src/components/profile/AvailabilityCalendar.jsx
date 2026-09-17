@@ -1,9 +1,5 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Calendar, CheckCircle } from "lucide-react";
+import { IconClock, IconCalendar, IconCheckCircle } from "@/components/Icons";
 import { useTranslation } from "react-i18next";
 
 export default function AvailabilityCalendar({ 
@@ -68,49 +64,51 @@ export default function AvailabilityCalendar({
   const activeDays = getActiveDays();
 
   return (
-    <Card className="shadow-sm border-0 bg-white">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-blue-700" />
+    <div className="card">
+      <div className="p-6 pb-3">
+        <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
+          <IconCalendar className="w-5 h-5 text-c-accent" />
           {t("proProfile.availability.title")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-gray-600">
+        </h3>
+      </div>
+      <div className="p-6 pt-0 space-y-4">
+        <p className="text-sm text-c-muted">
           {t("proProfile.availability.intro")}
         </p>
 
         {/* Tipo de disponibilidad */}
         <div>
-          <Label className="mb-3 block">{t("proProfile.availability.typeLabel")}</Label>
+          <p className="label mb-3 block">{t("proProfile.availability.typeLabel")}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {AVAILABILITY_TYPES.map((type) => (
-              <div
+              <button
+                type="button"
                 key={type.value}
                 onClick={() => handleTypeChange(type.value)}
-                className={`flex items-center gap-3 p-3 border-2 rounded-lg transition-all ${
+                aria-pressed={disponibilidadTipo === type.value}
+                className={`w-full text-left flex items-center gap-3 p-3 border-2 rounded-lg transition-all ${
                   isEditing ? 'cursor-pointer' : ''
                 } ${
                   disponibilidadTipo === type.value
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-200 hover:bg-gray-50"
+                    ? "border-c-accent bg-c-accent/10"
+                    : "border-c-border hover:bg-soft"
                 }`}
               >
                 <span className="text-2xl">{type.icon}</span>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{type.label}</p>
+                  <p className="text-sm font-medium text-ink">{type.label}</p>
                 </div>
                 {disponibilidadTipo === type.value && (
-                  <CheckCircle className="w-5 h-5 text-blue-600" />
+                  <IconCheckCircle className="w-5 h-5 text-c-accent" />
                 )}
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
         {/* Selector de días (visual) */}
         <div>
-          <Label className="mb-3 block">{t("proProfile.availability.workDays")}</Label>
+          <p className="label mb-3 block">{t("proProfile.availability.workDays")}</p>
           <div className="grid grid-cols-7 gap-2">
             {DAYS.map((day) => {
               const isActive = activeDays.includes(day.id);
@@ -119,8 +117,8 @@ export default function AvailabilityCalendar({
                   key={day.id}
                   className={`aspect-square flex flex-col items-center justify-center rounded-lg border-2 transition-all ${
                     isActive
-                      ? "border-green-500 bg-green-50 text-green-700"
-                      : "border-gray-200 bg-gray-50 text-gray-400"
+                      ? "border-success bg-success/10 text-success"
+                      : "border-c-border bg-soft text-c-muted"
                   }`}
                 >
                   <span className="text-xs font-bold mb-1">{day.short}</span>
@@ -129,7 +127,7 @@ export default function AvailabilityCalendar({
               );
             })}
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-c-muted mt-2">
             {disponibilidadTipo === "laborables" && t("proProfile.availability.hintWeekdays")}
             {disponibilidadTipo === "festivos" && t("proProfile.availability.hintWeekends")}
             {disponibilidadTipo === "ambos" && t("proProfile.availability.hintEveryDay")}
@@ -139,38 +137,40 @@ export default function AvailabilityCalendar({
         {/* Horarios */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-600" />
+            <label className="label flex items-center gap-2" htmlFor="availability-open">
+              <IconClock className="w-4 h-4 text-c-accent" />
               {t("proProfile.availability.openingTime")}
-            </Label>
-            <Input
+            </label>
+            <input
+              id="availability-open"
               type="time"
               value={horarioApertura}
               onChange={(e) => onChange({ horario_apertura: e.target.value })}
               disabled={!isEditing}
-              className="mt-2"
+              className="input mt-2"
             />
           </div>
           <div>
-            <Label className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-600" />
+            <label className="label flex items-center gap-2" htmlFor="availability-close">
+              <IconClock className="w-4 h-4 text-c-accent" />
               {t("proProfile.availability.closingTime")}
-            </Label>
-            <Input
+            </label>
+            <input
+              id="availability-close"
               type="time"
               value={horarioCierre}
               onChange={(e) => onChange({ horario_cierre: e.target.value })}
               disabled={!isEditing}
-              className="mt-2"
+              className="input mt-2"
             />
           </div>
         </div>
 
         {/* Resumen visual */}
         {!isEditing && (
-          <div className="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+          <div className="p-4 bg-c-accent/10 border-l-4 border-c-accent rounded-lg">
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <IconCheckCircle className="w-5 h-5 text-c-accent mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-blue-900 mb-1">
                   {disponibilidadTipo === "ambos" ? t("availableEveryDay") :
@@ -184,7 +184,7 @@ export default function AvailabilityCalendar({
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

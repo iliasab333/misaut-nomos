@@ -2,9 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createPageUrl } from "@/utils";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Briefcase, Search, ShieldCheck, Zap, BadgeCheck } from "lucide-react";
+import { IconBriefcase, IconSearch, IconShield, IconZap, IconVerified } from "@/components/Icons";
 
 export default function FinalCTASection() {
   const navigate = useNavigate();
@@ -13,9 +12,9 @@ export default function FinalCTASection() {
   // Antes constante de módulo (TRUST_ITEMS): vive aquí para que se retraduzca
   // al cambiar de idioma.
   const trustItems = [
-    { icon: Zap, label: t('home.finalCta.profileTime') },
-    { icon: ShieldCheck, label: t('landing.feature_no_fees') },
-    { icon: BadgeCheck, label: t('home.whyUs.verifiedClients.title') },
+    { icon: IconZap, label: t('home.finalCta.profileTime') },
+    { icon: IconShield, label: t('landing.feature_no_fees') },
+    { icon: IconVerified, label: t('home.whyUs.verifiedClients.title') },
   ];
 
   return (
@@ -53,21 +52,22 @@ export default function FinalCTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
-            <Button
+            <button
+              type="button"
               onClick={() => navigate('/completar-perfil')}
-              className="group h-14 px-10 text-lg font-bold bg-gradient-to-r from-emerald-400 to-green-400 hover:from-emerald-300 hover:to-green-300 text-gray-900 rounded-2xl shadow-[0_15px_50px_-10px_rgba(52,211,153,0.6)] hover:scale-[1.03] transition-all"
+              className="btn-primary group h-14 px-10 text-lg font-bold bg-gradient-to-r from-emerald-400 to-green-400 hover:from-emerald-300 hover:to-green-300 text-ink rounded-2xl shadow-[0_15px_50px_-10px_rgba(52,211,153,0.6)] hover:scale-[1.03] transition-all"
             >
-              <Briefcase className="w-5 h-5 mr-2 group-hover:rotate-6 transition-transform" />
+              <IconBriefcase className="w-5 h-5 mr-2 group-hover:rotate-6 transition-transform" />
               {t('home.finalCta.createProfile')}
-            </Button>
-            <Button
+            </button>
+            <button
+              type="button"
               onClick={() => navigate(createPageUrl("Search"))}
-              variant="outline"
-              className="h-14 px-8 text-lg font-semibold rounded-2xl border-white/25 text-white hover:bg-white/10 hover:border-white/40 transition-all"
+              className="btn-secondary h-14 px-8 text-lg font-semibold rounded-2xl bg-transparent border-white/25 text-white hover:bg-white/10 hover:border-white/40 transition-all"
             >
-              <Search className="w-5 h-5 mr-2" />
+              <IconSearch className="w-5 h-5 mr-2" />
               {t('home.hero.viewProfessionals')}
-            </Button>
+            </button>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">

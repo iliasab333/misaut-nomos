@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Mail, MessageSquare, ShieldCheck, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { IconMail, IconMessageSquare, IconShield, IconSend, IconSuccess, IconAlert } from '@/components/Icons';
 import SEOHead from '@/components/seo/SEOHead';
 import { base44 } from '@/api/base44Client';
 
@@ -10,7 +10,7 @@ const SUPPORT_EMAIL = 'hola@misautonomos.es';
 
 function FieldLabel({ htmlFor, children }) {
   return (
-    <label htmlFor={htmlFor} className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-[0.06em]">
+    <label htmlFor={htmlFor} className="block text-xs font-semibold text-ink mb-1.5 uppercase tracking-[0.06em]">
       {children}
     </label>
   );
@@ -52,7 +52,7 @@ export default function Contacto() {
         description={t('contact.seo.description')}
       />
 
-      <main className="bg-white text-slate-900">
+      <main className="bg-canvas text-ink">
         {/* HERO sobrio */}
         <section style={{ background: '#FBFCFE' }}>
           <div className="max-w-4xl mx-auto px-4 pt-14 pb-10 md:pt-20 md:pb-12 text-center">
@@ -60,7 +60,7 @@ export default function Contacto() {
               className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
               style={{ backgroundColor: 'rgba(0,37,92,0.06)', color: NAVY }}
             >
-              <MessageSquare className="w-3.5 h-3.5" /> {t('contact.hero.eyebrow')}
+              <IconMessageSquare className="w-3.5 h-3.5" /> {t('contact.hero.eyebrow')}
             </div>
             <h1
               className="mt-5 font-semibold tracking-tight"
@@ -68,23 +68,23 @@ export default function Contacto() {
             >
               {t('contact.hero.title')}
             </h1>
-            <p className="mt-4 max-w-xl mx-auto text-slate-600 text-[16px] md:text-lg leading-relaxed">
+            <p className="mt-4 max-w-xl mx-auto text-c-muted text-[16px] md:text-lg leading-relaxed">
               {t('contact.hero.subtitle')}
             </p>
           </div>
         </section>
 
         {/* CUERPO con dos columnas: formulario y datos directos */}
-        <section className="bg-white">
+        <section className="bg-canvas">
           <div className="max-w-5xl mx-auto px-4 pb-16 md:pb-20">
             <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 md:gap-10">
               {/* Formulario */}
               <form
                 onSubmit={handleSubmit}
-                className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6"
+                className="rounded-2xl border border-c-border bg-surface p-5 md:p-6"
               >
-                <h2 className="font-semibold text-slate-900 mb-1">{t('contact.form.title')}</h2>
-                <p className="text-sm text-slate-500 mb-5">{t('contact.form.subtitle')}</p>
+                <h2 className="font-semibold text-ink mb-1">{t('contact.form.title')}</h2>
+                <p className="text-sm text-c-muted mb-5">{t('contact.form.subtitle')}</p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -95,7 +95,7 @@ export default function Contacto() {
                       value={form.name}
                       onChange={update('name')}
                       placeholder={t('auth.name_placeholder')}
-                      className="w-full h-11 rounded-xl border border-slate-200 px-3 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                      className="w-full h-11 rounded-xl border border-c-border px-3 text-[15px] text-ink placeholder:text-c-muted focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                       autoComplete="name"
                     />
                   </div>
@@ -107,7 +107,7 @@ export default function Contacto() {
                       value={form.email}
                       onChange={update('email')}
                       placeholder={t('auth.email_placeholder')}
-                      className="w-full h-11 rounded-xl border border-slate-200 px-3 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                      className="w-full h-11 rounded-xl border border-c-border px-3 text-[15px] text-ink placeholder:text-c-muted focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                       autoComplete="email"
                     />
                   </div>
@@ -119,7 +119,7 @@ export default function Contacto() {
                     id="cf-topic"
                     value={form.topic}
                     onChange={update('topic')}
-                    className="w-full h-11 rounded-xl border border-slate-200 px-3 text-[15px] text-slate-900 bg-white focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                    className="w-full h-11 rounded-xl border border-c-border px-3 text-[15px] text-ink bg-surface focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                   >
                     <option value="general">{t('contact.form.topics.general')}</option>
                     <option value="autonomo">{t('contact.form.topics.pro')}</option>
@@ -137,19 +137,19 @@ export default function Contacto() {
                     onChange={update('message')}
                     rows={5}
                     placeholder={t('contact.form.messagePlaceholder')}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15 resize-y"
+                    className="w-full rounded-xl border border-c-border px-3 py-2.5 text-[15px] text-ink placeholder:text-c-muted focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15 resize-y"
                   />
                 </div>
 
                 {status.state === 'error' && (
-                  <div className="mt-4 flex items-start gap-2 text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div className="mt-4 flex items-start gap-2 text-sm text-error bg-error/10 border border-error/20 rounded-lg px-3 py-2">
+                    <IconAlert className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     {status.msg}
                   </div>
                 )}
                 {status.state === 'sent' && (
-                  <div className="mt-4 flex items-start gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div className="mt-4 flex items-start gap-2 text-sm text-success bg-success/10 border border-success/20 rounded-lg px-3 py-2">
+                    <IconSuccess className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     {status.msg}
                   </div>
                 )}
@@ -161,10 +161,10 @@ export default function Contacto() {
                     className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl font-semibold text-white disabled:opacity-60"
                     style={{ backgroundColor: NAVY }}
                   >
-                    <Send className="w-4 h-4" />
+                    <IconSend className="w-4 h-4" />
                     {status.state === 'sending' ? t('contact.form.sending') : t('proProfile.contact.sendMessage')}
                   </button>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-c-muted">
                     <Trans
                       i18nKey="contact.form.orEmail"
                       values={{ email: SUPPORT_EMAIL }}
@@ -176,23 +176,23 @@ export default function Contacto() {
 
               {/* Datos directos */}
               <aside className="space-y-4">
-                <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                <div className="rounded-2xl border border-c-border bg-surface p-5">
                   <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl" style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: NAVY }}>
-                    <Mail className="w-4 h-4" />
+                    <IconMail className="w-4 h-4" />
                   </span>
-                  <h3 className="mt-3 font-semibold text-slate-900">{t('auth.email')}</h3>
-                  <p className="text-sm text-slate-600 mt-1">
+                  <h3 className="mt-3 font-semibold text-ink">{t('auth.email')}</h3>
+                  <p className="text-sm text-c-muted mt-1">
                     <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:underline" style={{ color: NAVY }}>{SUPPORT_EMAIL}</a>
                   </p>
-                  <p className="text-xs text-slate-500 mt-2">{t('contact.aside.responseTime')}</p>
+                  <p className="text-xs text-c-muted mt-2">{t('contact.aside.responseTime')}</p>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                <div className="rounded-2xl border border-c-border bg-surface p-5">
                   <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl" style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: NAVY }}>
-                    <ShieldCheck className="w-4 h-4" />
+                    <IconShield className="w-4 h-4" />
                   </span>
-                  <h3 className="mt-3 font-semibold text-slate-900">{t('contact.aside.supportTitle')}</h3>
-                  <p className="text-sm text-slate-600 mt-1">
+                  <h3 className="mt-3 font-semibold text-ink">{t('contact.aside.supportTitle')}</h3>
+                  <p className="text-sm text-c-muted mt-1">
                     {t('contact.aside.supportBody')}
                   </p>
                 </div>

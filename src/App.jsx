@@ -1,6 +1,5 @@
 import './App.css'
 import { lazyWithRetry, lazyApp } from '@/lib/lazyWithRetry';
-import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import VisualEditAgent from '@/lib/VisualEditAgent'
@@ -41,10 +40,10 @@ function isChunkLoadError(error) {
 function ErrorFallback({ error, onLogout }) {
   const { t } = useTranslation();
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <div className="max-w-lg w-full bg-white rounded-2xl border border-red-100 p-6 shadow-lg">
-        <h2 className="font-semibold text-gray-900 text-lg">{t('errors.boundary.title')}</h2>
-        <p className="text-sm text-gray-500 mt-2">{t('errors.boundary.subtitle')}</p>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-soft">
+      <div className="max-w-lg w-full bg-surface rounded-2xl border border-red-100 p-6 shadow-lg">
+        <h2 className="font-semibold text-ink text-lg">{t('errors.boundary.title')}</h2>
+        <p className="text-sm text-c-muted mt-2">{t('errors.boundary.subtitle')}</p>
 
         {/* MOSTRAR ERROR REAL - TEMPORAL PARA DEBUGGING */}
         {error && (
@@ -67,7 +66,7 @@ function ErrorFallback({ error, onLogout }) {
           </button>
           <button
             onClick={() => { window.location.href = '/'; }}
-            className="flex-1 bg-gray-100 text-gray-700 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200 transition"
+            className="flex-1 bg-soft text-ink text-sm font-medium py-2.5 rounded-lg hover:bg-gray-200 transition"
           >
             {t('errors.boundary.goHome')}
           </button>
@@ -166,12 +165,11 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 // ===== MAPA DE RUTAS ANTIGUAS → NUEVAS (redirect 301-style) =====
-// Toda URL antigua tipo /Search, /PricingPlans, etc. redirige a la versión ES.
+// Toda URL antigua tipo /Search, /Favorites, etc. redirige a la versión ES.
 const LEGACY_REDIRECTS = {
   '/search': '/buscar',
   '/autonomo': '/autonomo',
   '/categoria': '/categoria',
-  '/pricingplans': '/precios',
   '/faq': '/preguntas-frecuentes',
   '/faqdetail': '/preguntas-frecuentes',
   '/helpcenter': '/ayuda',
@@ -202,9 +200,6 @@ const LEGACY_REDIRECTS = {
   '/crmautomations': '/automatizaciones',
   '/clientdetail': '/clientes',
   '/jobs': '/trabajos',
-  '/subscriptionmanagement': '/suscripcion',
-  '/paymentsuccess': '/pago-exitoso',
-  '/dashboardproinfo': '/dashboard/info',
   '/onboarding': '/bienvenida',
   '/admindashboard': '/admin',
   '/adminpayments': '/admin/pagos',
@@ -222,13 +217,11 @@ const EXPLICIT_301s = {
   '/Search': '/buscar',
   '/Favorites': '/favoritos',
   '/Notifications': '/notificaciones',
-  '/PricingPlans': '/precios',
   '/MyProfile': '/mi-perfil',
   '/Tickets': '/soporte',
   '/TicketDetail': '/soporte',
   '/FAQ': '/preguntas-frecuentes',
   '/LegalNotice': '/aviso-legal',
-  '/PaymentSuccess': '/pago-exitoso',
   '/UserTypeSelection': '/registro',
   '/ProfileOnboarding': '/completar-perfil',
   '/ClientOnboarding': '/registro-cliente',
@@ -300,7 +293,6 @@ const AuthenticatedApp = () => {
           <Route path="/categoria" element={<Pages.Categoria />} />
           <Route path="/categoria/:slug" element={<Pages.Categoria />} />            {/* legacy: ?name=X&ciudad=Y */}
           <Route path="/categoria/:cityCategory" element={<Pages.Categoria />} />     {/* SEO: /categoria/electricistas-en-antequera */}
-          <Route path="/precios" element={<Pages.PricingPlans />} />
           <Route path="/para-autonomos" element={<ParaAutonomos />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/preguntas-frecuentes" element={<Pages.FAQ />} />
@@ -325,16 +317,12 @@ const AuthenticatedApp = () => {
           <Route path="/notificaciones" element={<Pages.Notifications />} />
 
           {/* ===== RUTAS DE AUTÓNOMO ===== */}
-          {/* Importante: /dashboard/info va ANTES que /dashboard para que matchee primero */}
-          <Route path="/dashboard/info" element={<Pages.DashboardProInfo />} />
           <Route path="/dashboard" element={<Pages.ProfessionalDashboard />} />
           <Route path="/mis-valoraciones" element={<Suspense fallback={<PageLoader />}><MisValoraciones /></Suspense>} />
           <Route path="/perfil" element={<Pages.ProfessionalProfile />} />
           <Route path="/perfil/:slug" element={<Pages.ProfessionalProfile />} />
           <Route path="/completar-perfil" element={<Pages.ProfileOnboarding />} />
           {/* /clientes/:id ANTES que /clientes para que matchee primero */}
-          <Route path="/suscripcion" element={<Pages.SubscriptionManagement />} />
-          <Route path="/pago-exitoso" element={<Pages.PaymentSuccess />} />
           <Route path="/bienvenida" element={<Pages.Onboarding />} />
           
           {/* ===== RUTAS PLAN ADS+ ===== */}
@@ -394,7 +382,6 @@ function App() {
               <NavigationTracker />
               <AuthenticatedApp />
             </Router>
-            <Toaster />
             <VisualEditAgent />
             {/* Vercel RUM: Core Web Vitals reales (LCP/CLS/INP) por ruta.
                 El componente carga el script de forma diferida, no afecta al

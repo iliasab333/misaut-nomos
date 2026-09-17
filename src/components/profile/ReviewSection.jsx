@@ -1,27 +1,20 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, MessageSquare, Flag, Reply, ChevronDown, ChevronUp, ShieldCheck } from "lucide-react";
-import { useIdentityVerification } from "@/components/verification/IdentityVerificationWidget";
-import { Badge } from "@/components/ui/badge";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  IconStarOutline,
+  IconMessageSquare,
+  IconFlag,
+  IconReply,
+  IconShield,
+} from "@/components/Icons";
+import Modal from "@/components/Modal";
+import { EmptyState } from "@/components/ListStates";
+import { useIdentityVerification } from "@/components/verification/IdentityVerificationWidget";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 // ── Sub-componente: Formulario de valoración ──────────────────────────────────
 function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) {
@@ -55,10 +48,11 @@ function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) 
           type="button"
           onClick={() => setRatings((r) => ({ ...r, [field]: s }))}
           className="focus:outline-none"
+          aria-label={`${s}/5`}
         >
-          <Star
+          <IconStarOutline
             className={`w-6 h-6 transition-colors ${
-              s <= ratings[field] ? "fill-amber-400 text-amber-400" : "text-gray-300 hover:text-amber-300"
+              s <= ratings[field] ? "fill-star text-star" : "text-c-border hover:text-star/70"
             }`}
           />
         </button>
@@ -121,32 +115,33 @@ function ReviewForm({ professionalId, currentUser, existingReview, onSuccess }) 
 
   return (
     <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-4">
-      <p className="font-semibold text-gray-900 text-sm">
+      <p className="font-semibold text-ink text-sm">
         {existingReview ? t("reviews.form.editTitle") : t("reviews.form.newTitle")}
       </p>
       <div className="space-y-3">
         {Object.entries(LABELS).map(([field, label]) => (
           <div key={field} className="flex items-center justify-between gap-3">
-            <span className="text-sm text-gray-700 w-40 flex-shrink-0">{label}</span>
+            <span className="text-sm text-ink w-40 flex-shrink-0">{label}</span>
             <StarInput field={field} />
           </div>
         ))}
       </div>
-      <Textarea
+      <textarea
+        className="textarea h-24 text-sm bg-surface"
         placeholder={t("reviews.form.commentPlaceholder")}
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        className="h-24 text-sm bg-white"
         maxLength={500}
       />
-      <p className="text-xs text-gray-400 text-right">{comment.length}/500</p>
-      <Button
+      <p className="text-xs text-c-muted text-right">{comment.length}/500</p>
+      <button
+        type="button"
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold"
+        className="btn-primary w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold"
       >
         {submitting ? t("reviews.form.sending") : existingReview ? t("reviews.form.update") : t("reviews.form.submit")}
-      </Button>
+      </button>
     </div>
   );
 }
@@ -176,15 +171,16 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
 
   if (review.professional_response && !editing) {
     return (
-      <div className="mt-3 ml-8 bg-blue-50 border border-blue-100 rounded-lg p-3">
-        <p className="text-xs font-semibold text-blue-700 mb-1 flex items-center gap-1">
-          <Reply className="w-3 h-3" /> {t("reviews.card.professionalResponse")}
+      <div className="mt-3 ml-8 bg-c-accent/5 border border-c-accent/20 rounded-lg p-3">
+        <p className="text-xs font-semibold text-c-accent mb-1 flex items-center gap-1">
+          <IconReply className="w-3 h-3" /> {t("reviews.card.professionalResponse")}
         </p>
-        <p className="text-sm text-gray-700">{review.professional_response}</p>
+        <p className="text-sm text-ink">{review.professional_response}</p>
         {isOwner && (
           <button
+            type="button"
             onClick={() => setEditing(true)}
-            className="text-xs text-blue-600 mt-1 hover:underline"
+            className="text-xs text-c-accent mt-1 hover:underline"
           >
             {t("reviews.card.editResponse")}
           </button>
@@ -197,32 +193,31 @@ function ProfessionalResponseBox({ review, isOwner, professionalId }) {
     return editing || !review.professional_response ? (
       <div className="mt-3 ml-8 space-y-2">
         {!editing && (
-          <Button
-            size="sm"
-            variant="outline"
+          <button
+            type="button"
             onClick={() => setEditing(true)}
-            className="text-xs h-8"
+            className="btn-secondary btn-sm text-xs"
           >
-            <Reply className="w-3 h-3 mr-1" />
+            <IconReply className="w-3 h-3 mr-1" />
             {t("reviews.card.reply")}
-          </Button>
+          </button>
         )}
         {editing && (
           <>
-            <Textarea
+            <textarea
+              className="textarea h-20 text-sm"
               value={response}
               onChange={(e) => setResponse(e.target.value)}
               placeholder={t("reviews.card.replyPlaceholder")}
-              className="text-sm h-20"
               maxLength={400}
             />
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleSave} disabled={saving} className="h-8 text-xs">
+              <button type="button" className="btn-primary btn-sm text-xs" onClick={handleSave} disabled={saving}>
                 {saving ? t("reviews.card.saving") : t("reviews.card.publishResponse")}
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => setEditing(false)} className="h-8 text-xs">
+              </button>
+              <button type="button" className="btn-secondary btn-sm text-xs" onClick={() => setEditing(false)}>
                 {t("common.cancel")}
-              </Button>
+              </button>
             </div>
           </>
         )}
@@ -241,8 +236,8 @@ function ReviewButton({ currentUser, myReview, showForm, setShowForm }) {
 
   if (!isVerified) {
     return (
-      <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs text-amber-700">
-        <ShieldCheck className="w-3.5 h-3.5" />
+      <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs text-warning">
+        <IconShield className="w-3.5 h-3.5" />
         <span>{t("reviews.gate.verifyToReview")}</span>
         <a href="/mi-perfil" className="font-semibold underline hover:no-underline ml-1">→</a>
       </div>
@@ -250,15 +245,18 @@ function ReviewButton({ currentUser, myReview, showForm, setShowForm }) {
   }
 
   return (
-    <Button
-      size="sm"
-      variant={myReview ? "outline" : "default"}
-      className={myReview ? "h-8 text-xs" : "h-8 text-xs bg-amber-500 hover:bg-amber-600 text-white"}
+    <button
+      type="button"
+      className={
+        myReview
+          ? "btn-secondary btn-sm text-xs"
+          : "btn-primary btn-sm text-xs bg-amber-500 hover:bg-amber-600 text-white"
+      }
       onClick={() => setShowForm((v) => !v)}
     >
-      <Star className="w-3 h-3 mr-1" />
+      <IconStarOutline className="w-3 h-3 mr-1" />
       {myReview ? t("reviews.gate.myReview") : t("messages.rate")}
-    </Button>
+    </button>
   );
 }
 
@@ -310,10 +308,10 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
   const StatBar = ({ label, value, color }) => (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className="text-sm font-semibold text-gray-900">{value.toFixed(1)}</span>
+        <span className="text-sm font-medium text-ink">{label}</span>
+        <span className="text-sm font-semibold text-ink">{value.toFixed(1)}</span>
       </div>
-      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="h-2 bg-soft rounded-full overflow-hidden">
         <div className={`h-full ${color} transition-all`} style={{ width: `${(value / 5) * 100}%` }} />
       </div>
     </div>
@@ -326,8 +324,8 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-            <span className="font-semibold text-gray-900">
+            <IconStarOutline className="w-5 h-5 fill-star text-star" />
+            <span className="font-semibold text-ink">
               {t("reviewsTitle")} ({visibleReviews.length})
             </span>
           </div>
@@ -353,18 +351,22 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
             <div className="flex items-center gap-4 mb-4">
               <div>
-                <div className="text-4xl font-bold text-gray-900">{stats.overall.toFixed(1)}</div>
+                <div className="text-4xl font-bold text-ink">{stats.overall.toFixed(1)}</div>
                 <div className="flex items-center gap-0.5 mt-1">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <Star
+                    <IconStarOutline
                       key={s}
-                      className={`w-4 h-4 ${s <= stats.overall ? "fill-amber-400 text-amber-400" : "text-gray-300"}`}
+                      className={`w-4 h-4 ${s <= stats.overall ? "fill-star text-star" : "text-c-border"}`}
                     />
                   ))}
                 </div>
-                <p className="text-sm text-gray-600 mt-1">{t("reviews.summary.count", { count: visibleReviews.length })}</p>
+                <p className="text-sm text-c-muted mt-1">{t("reviews.summary.count", { count: visibleReviews.length })}</p>
               </div>
             </div>
+            {/* Juego decorativo de 4 barras (azul/verde/morado/naranja). No son
+                colores semánticos: `bg-blue-500` no es el primario (blue-600) y
+                morado/naranja no están en la tabla de tokens. Se dejan tal cual
+                para no romper el conjunto ni cambiar el aspecto. */}
             <div className="space-y-2">
               <StatBar label={t("reviews.criteria.speed")} value={stats.rapidez} color="bg-blue-500" />
               <StatBar label={t("reviews.criteria.communication")} value={stats.comunicacion} color="bg-green-500" />
@@ -378,33 +380,34 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
         {visibleReviews.length > 0 ? (
           <div className="space-y-4">
             {visibleReviews.map((review) => (
-              <article key={review.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <article key={review.id} className="bg-soft rounded-xl p-4 border border-c-border">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback className="bg-blue-600 text-white text-sm">
-                      {review.client_name?.charAt(0).toUpperCase() || "C"}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div
+                    className="w-8 h-8 shrink-0 rounded-full bg-c-accent text-white text-sm flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    {review.client_name?.charAt(0).toUpperCase() || "C"}
+                  </div>
                   <div>
-                    <p className="font-semibold text-sm text-gray-900 flex items-center gap-1.5">
+                    <p className="font-semibold text-sm text-ink flex items-center gap-1.5">
                       {review.client_name}
                       {review.client_verified && (
                         <span title={t("proProfile.badges.identityVerified")} className="inline-flex items-center">
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                          <IconShield className="w-3.5 h-3.5 text-emerald-500" />
                         </span>
                       )}
                     </p>
                       <div className="flex items-center gap-1.5">
                         <div className="flex gap-0.5">
                           {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
+                            <IconStarOutline
                               key={s}
-                              className={`w-3 h-3 ${s <= review.rating ? "fill-amber-400 text-amber-400" : "text-gray-300"}`}
+                              className={`w-3 h-3 ${s <= review.rating ? "fill-star text-star" : "text-c-border"}`}
                             />
                           ))}
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-c-muted">
                           {format(new Date(review.created_date), "d MMMM yyyy", { locale: es })}
                         </span>
                       </div>
@@ -413,17 +416,19 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
 
                   <div className="flex items-center gap-1">
                     {review.is_verified && (
-                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                      <span className="badge-success text-xs">
                         {t("reviews.card.verifiedReview")}
-                      </Badge>
+                      </span>
                     )}
                     {currentUser && review.client_id !== currentUser.id && !review.is_reported && (
                       <button
+                        type="button"
                         onClick={() => setReportingReviewId(review.id)}
-                        className="p-1 rounded hover:bg-red-50"
+                        className="p-1 rounded hover:bg-error/10"
                         title={t("reviews.card.reportTitle")}
+                        aria-label={t("reviews.card.reportTitle")}
                       >
-                        <Flag className="w-3.5 h-3.5 text-gray-300 hover:text-red-500" />
+                        <IconFlag className="w-3.5 h-3.5 text-c-border hover:text-error" />
                       </button>
                     )}
                   </div>
@@ -438,15 +443,15 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
                     { label: t("reviews.card.price"), val: review.precio_satisfaccion },
                   ].map(({ label, val }) =>
                     val ? (
-                      <span key={label} className="text-xs text-gray-500">
-                        {label}: <strong className="text-gray-800">{val}/5</strong>
+                      <span key={label} className="text-xs text-c-muted">
+                        {label}: <strong className="text-ink">{val}/5</strong>
                       </span>
                     ) : null
                   )}
                 </div>
 
                 {review.comment && (
-                  <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
+                  <p className="text-sm text-ink leading-relaxed">{review.comment}</p>
                 )}
 
                 {/* Respuesta del profesional */}
@@ -459,33 +464,35 @@ export default function ReviewSection({ reviews, professionalId, currentUser }) 
             ))}
           </div>
         ) : (
-          <div className="text-center py-8">
-            <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-base font-semibold text-gray-900 mb-1">{t("noReviewsYet")}</h3>
-            <p className="text-sm text-gray-500">{t("beFirstToReview")}</p>
-          </div>
+          <EmptyState
+            title={t("noReviewsYet")}
+            body={t("beFirstToReview")}
+            icon={<IconMessageSquare className="w-6 h-6" />}
+          />
         )}
       </div>
 
-      <AlertDialog open={!!reportingReviewId} onOpenChange={() => setReportingReviewId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("reviews.report.confirmTitle")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("reviews.report.confirmDescription")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => reportReviewMutation.mutate(reportingReviewId)}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {t("reviews.report.confirm")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Modal
+        open={!!reportingReviewId}
+        onClose={() => setReportingReviewId(null)}
+        dismissible={false}
+        showClose={false}
+        title={t("reviews.report.confirmTitle")}
+        description={t("reviews.report.confirmDescription")}
+      >
+        <div className="mt-6 flex gap-3 justify-end">
+          <button type="button" className="btn-secondary" onClick={() => setReportingReviewId(null)}>
+            {t("common.cancel")}
+          </button>
+          <button
+            type="button"
+            className="btn-danger-solid"
+            onClick={() => reportReviewMutation.mutate(reportingReviewId)}
+          >
+            {t("reviews.report.confirm")}
+          </button>
+        </div>
+      </Modal>
     </>
   );
 }

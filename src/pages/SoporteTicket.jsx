@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Send, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { IconArrowLeft, IconSend, IconSpinner } from '@/components/Icons';
+import { toast } from '@/lib/toast';
 import { base44 } from '@/api/base44Client';
 import SEOHead from '@/components/seo/SEOHead';
 
@@ -103,8 +103,8 @@ export default function SoporteTicket() {
 
   if (!user || !ticket) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <IconSpinner className="w-6 h-6 animate-spin text-c-muted" />
       </div>
     );
   }
@@ -115,22 +115,22 @@ export default function SoporteTicket() {
   return (
     <>
       <SEOHead title={t('support.ticket.seoTitle', { title: ticket.title || t('support.ticket.defaultTitle') })} noindex />
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-surface">
         <div className="max-w-3xl mx-auto px-4 md:px-6 py-6 md:py-8">
-          <Link to="/soporte" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900 mb-4">
-            <ArrowLeft className="w-4 h-4" /> {t('support.ticket.backToTickets')}
+          <Link to="/soporte" className="inline-flex items-center gap-1 text-sm text-c-muted hover:text-ink mb-4">
+            <IconArrowLeft className="w-4 h-4" /> {t('support.ticket.backToTickets')}
           </Link>
 
           {/* Cabecera */}
-          <header className="rounded-2xl border border-slate-200 bg-white p-5">
+          <header className="rounded-2xl border border-c-border bg-surface p-5">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] text-slate-500 font-mono">#{ticket.number || ticket.id.slice(-6)}</span>
+              <span className="text-[11px] text-c-muted font-mono">#{ticket.number || ticket.id.slice(-6)}</span>
               <span className="inline-flex text-[10px] font-semibold uppercase tracking-[0.06em] px-1.5 py-0.5 rounded-full" style={{ background: meta.bg, color: meta.color }}>{meta.label}</span>
             </div>
-            <h1 className="text-[18px] font-semibold text-slate-900">{ticket.title || t('admin.soporte.untitled')}</h1>
-            <p className="text-[12px] text-slate-500 mt-1">{t('support.ticket.openedOn', { date: formatDate(ticket.created_date) })}</p>
+            <h1 className="text-[18px] font-semibold text-ink">{ticket.title || t('admin.soporte.untitled')}</h1>
+            <p className="text-[12px] text-c-muted mt-1">{t('support.ticket.openedOn', { date: formatDate(ticket.created_date) })}</p>
             {ticket.description && (
-              <p className="mt-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed border-t border-slate-100 pt-4">
+              <p className="mt-4 text-sm text-ink whitespace-pre-wrap leading-relaxed border-t border-c-border pt-4">
                 {ticket.description}
               </p>
             )}
@@ -139,7 +139,7 @@ export default function SoporteTicket() {
           {/* Hilo */}
           <section className="mt-5 space-y-3">
             {publicMessages.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 p-5 text-sm text-slate-500 text-center">
+              <div className="rounded-2xl border border-dashed border-c-border p-5 text-sm text-c-muted text-center">
                 {t('support.ticket.waitingTeam')}
               </div>
             ) : publicMessages.map((m) => {
@@ -154,7 +154,7 @@ export default function SoporteTicket() {
                   >
                     {!isMe && <p className="text-[10px] font-semibold uppercase tracking-[0.06em] mb-1" style={{ color: NAVY }}>{t('supportChat.supportTeam')}</p>}
                     <p className="whitespace-pre-wrap leading-relaxed">{m.body}</p>
-                    <p className={`text-[10px] mt-1 ${isMe ? 'text-white/70' : 'text-slate-500'}`}>{formatDate(m.created_date)}</p>
+                    <p className={`text-[10px] mt-1 ${isMe ? 'text-white/70' : 'text-c-muted'}`}>{formatDate(m.created_date)}</p>
                   </div>
                 </div>
               );
@@ -163,29 +163,30 @@ export default function SoporteTicket() {
 
           {/* Respuesta del usuario */}
           {canReply ? (
-            <form onSubmit={send} className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
+            <form onSubmit={send} className="mt-5 rounded-2xl border border-c-border bg-surface p-4">
               <textarea
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
                 rows={4}
                 placeholder={t('support.ticket.replyPlaceholder')}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                aria-label={t('support.ticket.replyPlaceholder')}
+                className="w-full px-3 py-2 text-sm border border-c-border rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
               />
               <div className="mt-2 flex items-center justify-between gap-2">
-                <p className="text-[11px] text-slate-500">{t('support.ticket.replyHint')}</p>
+                <p className="text-[11px] text-c-muted">{t('support.ticket.replyHint')}</p>
                 <button
                   type="submit"
                   disabled={!reply.trim() || sending}
                   className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50"
                   style={{ background: NAVY }}
                 >
-                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  {sending ? <IconSpinner className="w-4 h-4 animate-spin" /> : <IconSend className="w-4 h-4" />}
                   {t('messages.send')}
                 </button>
               </div>
             </form>
           ) : (
-            <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600 text-center">
+            <div className="mt-5 rounded-2xl border border-c-border bg-soft p-5 text-sm text-c-muted text-center">
               <Trans
                 i18nKey="support.ticket.closedHint"
                 components={{ support: <Link to="/soporte" className="font-semibold underline underline-offset-2" style={{ color: NAVY }} /> }}

@@ -4,10 +4,18 @@ import { supabase } from '@/api/supabaseClient';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { defaultDestinationFor, isProfessional } from '@/lib/roles';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2, Mail, Lock, User as UserIcon, Eye, EyeOff, Briefcase, Search as SearchIcon, ShieldCheck, Apple } from 'lucide-react';
+import {
+  IconSpinner,
+  IconMail,
+  IconLock,
+  IconUser,
+  IconEye,
+  IconEyeOff,
+  IconBriefcase,
+  IconSearch,
+  IconShield,
+  IconApple,
+} from '@/components/Icons';
 import { signInWithGoogle, signInWithApple, emailRedirectFor, passwordResetRedirect, isNative, isIOS } from '@/lib/native/auth';
 import { useTranslation } from 'react-i18next';
 
@@ -312,33 +320,37 @@ export default function LoginPage() {
               </span>
             </span>
           </Link>
-          <p className="hidden sm:block mt-3 text-sm text-slate-500">
+          <p className="hidden sm:block mt-3 text-sm text-c-muted">
             {t('auth.tagline')}
           </p>
         </div>
 
         {/* Tarjeta principal */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-7">
+        <div className="card rounded-2xl shadow-sm p-4 sm:p-7">
           {/* Segmented control */}
-          <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl mb-3 sm:mb-6">
+          <div role="tablist" className="grid grid-cols-2 gap-1 p-1 bg-soft rounded-xl mb-3 sm:mb-6">
             <button
               type="button"
+              role="tab"
+              aria-selected={isSignIn}
               onClick={() => switchMode(MODES.SIGN_IN)}
               className={`text-sm font-medium py-2 rounded-lg transition ${
                 isSignIn
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-surface text-ink shadow-sm'
+                  : 'text-c-muted hover:text-ink'
               }`}
             >
               {t('nav.login')}
             </button>
             <button
               type="button"
+              role="tab"
+              aria-selected={!isSignIn}
               onClick={() => switchMode(MODES.SIGN_UP)}
               className={`text-sm font-medium py-2 rounded-lg transition ${
                 !isSignIn
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-surface text-ink shadow-sm'
+                  : 'text-c-muted hover:text-ink'
               }`}
             >
               {t('auth.signup.tab')}
@@ -351,19 +363,19 @@ export default function LoginPage() {
               + email directamente. */}
           {!isSignIn && !rolePreselected && (
             <div className="mb-5">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">{t('auth.role.title')}</h3>
+              <h3 className="text-sm font-semibold text-ink mb-3">{t('auth.role.title')}</h3>
               <div className="grid grid-cols-2 gap-3">
                 <RoleCard
                   active={role === ROLES.PROFESIONAL}
                   onClick={() => setRole(ROLES.PROFESIONAL)}
-                  icon={<Briefcase className="w-5 h-5" />}
+                  icon={<IconBriefcase size={20} />}
                   title={t('nav.iAmPro')}
                   subtitle={t('auth.role.proSubtitle')}
                 />
                 <RoleCard
                   active={role === ROLES.CLIENTE}
                   onClick={() => setRole(ROLES.CLIENTE)}
-                  icon={<SearchIcon className="w-5 h-5" />}
+                  icon={<IconSearch size={20} />}
                   title={t('auth.role.client')}
                   subtitle={t('auth.role.clientSubtitle')}
                 />
@@ -371,14 +383,14 @@ export default function LoginPage() {
             </div>
           )}
           {!isSignIn && rolePreselected && (
-            <p className="text-xs text-slate-500 mb-4 text-center">
+            <p className="text-xs text-c-muted mb-4 text-center">
               {role === ROLES.PROFESIONAL
                 ? t('auth.role.preselectedPro')
                 : t('auth.role.preselectedClient')}{' '}
               <button
                 type="button"
                 onClick={() => setRole(role === ROLES.PROFESIONAL ? ROLES.CLIENTE : ROLES.PROFESIONAL)}
-                className="text-blue-700 hover:underline font-medium"
+                className="text-c-accent hover:underline font-medium"
               >
                 {t('auth.role.switch')}
               </button>
@@ -390,57 +402,56 @@ export default function LoginPage() {
               (compliance App Store §4.8: si ofreces cualquier otro OAuth,
               debes ofrecer también SIWA cuando la plataforma lo soporta). */}
           {isIOS() && isNative() && (
-            <Button
+            <button
               type="button"
               onClick={handleApple}
               disabled={appleLoading || googleLoading || submitting}
-              className="w-full h-11 rounded-xl text-white font-semibold mb-2"
+              className="btn w-full rounded-xl text-white font-semibold mb-2"
               style={{ backgroundColor: '#000000' }}
             >
               {appleLoading ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('auth.social.connecting')}</>
+                <><IconSpinner size={16} /> {t('auth.social.connecting')}</>
               ) : (
                 <>
-                  <Apple className="w-4 h-4 mr-2" />
+                  <IconApple size={16} />
                   <span>{isSignIn ? t('auth.social.continueApple') : t('auth.social.signupApple')}</span>
                 </>
               )}
-            </Button>
+            </button>
           )}
-          <Button
+          <button
             type="button"
-            variant="outline"
             onClick={handleGoogle}
             disabled={googleLoading || appleLoading || submitting}
-            className="w-full h-11 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium mb-4"
+            className="btn-secondary w-full rounded-xl hover:bg-soft font-medium mb-4"
           >
             {googleLoading ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('auth.social.connecting')}</>
+              <><IconSpinner size={16} /> {t('auth.social.connecting')}</>
             ) : (
               <>
                 <GoogleIcon />
-                <span className="ml-2">{isSignIn ? t('auth.continue_with_google') : t('auth.social.signupGoogle')}</span>
+                <span>{isSignIn ? t('auth.continue_with_google') : t('auth.social.signupGoogle')}</span>
               </>
             )}
-          </Button>
+          </button>
 
           {/* Separador */}
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
+              <div className="w-full border-t border-c-border"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 text-slate-400">{isSignIn ? t('auth.separator.signIn') : t('auth.separator.signUp')}</span>
+              <span className="bg-surface px-3 text-c-muted">{isSignIn ? t('auth.separator.signIn') : t('auth.separator.signUp')}</span>
             </div>
           </div>
 
           <form onSubmit={isSignIn ? handleSignIn : handleSignUp} className="space-y-4" noValidate>
             {!isSignIn && (
               <div>
-                <Label htmlFor="name" className="text-slate-700">{t('auth.name')}</Label>
+                <label className="label" htmlFor="name">{t('auth.name')}</label>
                 <div className="relative mt-1">
-                  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input
+                  <IconUser size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-c-muted" />
+                  <input
                     id="name"
                     type="text"
                     autoComplete="name"
@@ -449,7 +460,7 @@ export default function LoginPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder={t('auth.name_placeholder')}
-                    className="pl-9 h-11"
+                    className="input pl-9"
                     disabled={submitting}
                   />
                 </div>
@@ -457,10 +468,10 @@ export default function LoginPage() {
             )}
 
             <div>
-              <Label htmlFor="email" className="text-slate-700">{t('auth.email')}</Label>
+              <label className="label" htmlFor="email">{t('auth.email')}</label>
               <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
+                <IconMail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-c-muted" />
+                <input
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -471,7 +482,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t('auth.email_placeholder')}
-                  className="pl-9 h-11"
+                  className="input pl-9"
                   disabled={submitting}
                 />
               </div>
@@ -479,21 +490,21 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-slate-700">{t('auth.password')}</Label>
+                <label className="label" htmlFor="password">{t('auth.password')}</label>
                 {isSignIn && (
                   <button
                     type="button"
                     onClick={handleResetPassword}
                     disabled={resetting || submitting}
-                    className="text-xs text-blue-700 hover:text-blue-800 hover:underline disabled:opacity-50"
+                    className="text-xs text-c-accent hover:text-accent-hover hover:underline disabled:opacity-50"
                   >
                     {resetting ? t('auth.reset.sending') : t('auth.reset.link')}
                   </button>
                 )}
               </div>
               <div className="relative mt-1">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
+                <IconLock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-c-muted" />
+                <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete={isSignIn ? 'current-password' : 'new-password'}
@@ -501,64 +512,64 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={isSignIn ? t('auth.passwordPlaceholder') : t('auth.passwordMinPlaceholder')}
-                  className="pl-9 pr-10 h-11"
+                  className="input pl-9 pr-10"
                   disabled={submitting}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-c-muted hover:text-ink"
                   aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <IconEyeOff size={16} /> : <IconEye size={16} />}
                 </button>
               </div>
             </div>
 
             {error && (
-              <div className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              <div role="alert" className="text-sm text-error bg-error/10 border border-error/20 rounded-lg px-3 py-2">
                 {error}
               </div>
             )}
             {info && !error && (
-              <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+              <div role="status" className="text-sm text-success bg-success/10 border border-success/20 rounded-lg px-3 py-2">
                 {info}
               </div>
             )}
 
-            <Button
+            <button
               type="submit"
               disabled={submitting}
-              className="w-full h-11 text-white font-semibold rounded-xl"
+              className="btn w-full text-white font-semibold rounded-xl"
               style={{ backgroundColor: '#0f172a' }}
             >
               {submitting ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {isSignIn ? t('auth.submitting.signIn') : t('auth.submitting.signUp')}</>
+                <><IconSpinner size={16} /> {isSignIn ? t('auth.submitting.signIn') : t('auth.submitting.signUp')}</>
               ) : (
                 isSignIn ? t('nav.login') : primarySignUpLabel
               )}
-            </Button>
+            </button>
           </form>
 
         </div>
 
         {/* Pie */}
         <div className="mt-6 flex flex-col items-center gap-3">
-          <p className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-            <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+          <p className="inline-flex items-center gap-1.5 text-xs text-c-muted">
+            <IconShield size={14} className="text-c-muted" />
             {t('auth.footer.trust')}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-c-muted">
             {isSignIn ? (
               <>{t('auth.footer.noAccount')}{' '}
-                <button onClick={() => switchMode(MODES.SIGN_UP)} className="text-blue-700 hover:underline font-medium">
+                <button type="button" onClick={() => switchMode(MODES.SIGN_UP)} className="text-c-accent hover:underline font-medium">
                   {t('auth.footer.createOne')}
                 </button>
               </>
             ) : (
               <>{t('auth.footer.haveAccount')}{' '}
-                <button onClick={() => switchMode(MODES.SIGN_IN)} className="text-blue-700 hover:underline font-medium">
+                <button type="button" onClick={() => switchMode(MODES.SIGN_IN)} className="text-c-accent hover:underline font-medium">
                   {t('auth.login_title')}
                 </button>
               </>
@@ -579,7 +590,7 @@ function RoleCard({ active, onClick, icon, title, subtitle }) {
       className={`text-left rounded-xl border p-3 transition focus:outline-none focus:ring-2 focus:ring-offset-1 ${
         active
           ? 'bg-blue-50/60 shadow-sm'
-          : 'bg-white hover:border-slate-300 hover:bg-slate-50'
+          : 'bg-surface hover:border-slate-300 hover:bg-soft'
       }`}
       style={active ? { borderColor: '#1E3A8A', borderWidth: 2, padding: '11px', '--tw-ring-color': '#1E3A8A' } : { borderColor: '#e2e8f0' }}
     >
@@ -593,9 +604,9 @@ function RoleCard({ active, onClick, icon, title, subtitle }) {
         >
           {icon}
         </span>
-        <span className={`text-sm font-semibold ${active ? 'text-slate-900' : 'text-slate-800'}`}>{title}</span>
+        <span className={`text-sm font-semibold ${active ? 'text-ink' : 'text-slate-800'}`}>{title}</span>
       </div>
-      <p className="mt-2 text-xs text-slate-500 leading-snug">{subtitle}</p>
+      <p className="mt-2 text-xs text-c-muted leading-snug">{subtitle}</p>
     </button>
   );
 }

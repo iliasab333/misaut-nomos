@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { Instagram } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { IconInstagram } from "@/components/Icons";
+import { useTranslation, Trans } from "react-i18next";
+import { toast } from "@/lib/toast";
 import { notifyAdminEvent } from "@/lib/notifyAdmin";
 
 const LOGO_URL = '/logo-192.png';
@@ -30,51 +30,16 @@ const TikTokIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
+// Nombres de red: marca, van literales (no se traducen).
 const socialLinks = [
-  { href: "https://www.instagram.com/misautonomos/", label: "Instagram", Icon: Instagram },
+  { href: "https://www.instagram.com/misautonomos/", label: "Instagram", Icon: IconInstagram },
   { href: "https://www.facebook.com/misautonomos", label: "Facebook", Icon: FacebookIcon },
   { href: "https://www.linkedin.com/company/misautonomos", label: "LinkedIn", Icon: LinkedInIcon },
   { href: "https://www.tiktok.com/@misautonomos", label: "TikTok", Icon: TikTokIcon },
 ];
 
-// Tres columnas exactas — Producto, Empresa, Legal. Todas las rutas verificadas
-// contra las <Route> declaradas en App.jsx: cero 404.
-const COLUMN_PRODUCTO = [
-  { label: "Buscar profesionales", to: "/buscar" },
-  { label: "Hazte autónomo", to: "/registro?tipo=autonomo" },
-  { label: "Precios", to: "/precios" },
-];
-
-const COLUMN_EMPRESA = [
-  { label: "Cómo funciona", to: "/para-autonomos" },
-  { label: "Centro de ayuda", to: "/ayuda" },
-  { label: "Preguntas frecuentes", to: "/preguntas-frecuentes" },
-  { label: "Blog", to: "/blog" },
-  { label: "Contacto", to: "/contacto" },
-];
-
-const COLUMN_LEGAL = [
-  { label: "Privacidad", to: "/privacidad" },
-  { label: "Términos", to: "/terminos" },
-  { label: "Cookies", to: "/cookies" },
-  { label: "Aviso legal", to: "/aviso-legal" },
-];
-
-// Bloque SEO interno: enlaces a las páginas reales /categoria/:slug que ya
-// existen (Categoria.jsx resuelve los slugs contra service_categories).
-// Slugs verificados con slugify() de @/lib/seoUrl.
-const SEO_SERVICIOS = [
-  { label: "Electricistas", to: "/categoria/electricista" },
-  { label: "Fontaneros", to: "/categoria/fontanero" },
-  { label: "Albañiles / Reformas", to: "/categoria/albanil-reformas" },
-  { label: "Pintores", to: "/categoria/pintor" },
-  { label: "Cerrajeros", to: "/categoria/cerrajero" },
-  { label: "Asesoría / gestoría", to: "/categoria/asesoria-o-gestoria" },
-  { label: "Limpieza", to: "/categoria/autonomo-de-limpieza" },
-];
-
-// Para ciudades: /buscar?provincia=Madrid funciona contra los filtros que
-// Search.jsx ya lee de query params. Cero 404.
+// Ciudades: topónimos, van literales. /buscar?provincia=Madrid funciona
+// contra los filtros que Search.jsx ya lee de query params. Cero 404.
 const SEO_CIUDADES = [
   { label: "Madrid", to: "/buscar?provincia=Madrid" },
   { label: "Barcelona", to: "/buscar?provincia=Barcelona" },
@@ -84,14 +49,14 @@ const SEO_CIUDADES = [
 ];
 
 function NewsletterInlineForm() {
+  const { t, i18n } = useTranslation();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { i18n } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
-      toast.error('Introduce un email válido');
+      toast.error(t('footer.newsletter.invalidEmail'));
       return;
     }
     setIsSubmitting(true);
@@ -114,9 +79,9 @@ function NewsletterInlineForm() {
             status: 'confirmed',
             confirmed_at: new Date().toISOString(),
           });
-          toast.success('Te hemos reactivado. Bienvenido de nuevo.');
+          toast.success(t('footer.newsletter.reactivated'));
         } else {
-          toast.info('Ya estás suscrito.');
+          toast.info(t('footer.newsletter.alreadySubscribed'));
         }
         setEmail('');
         return;
@@ -143,7 +108,8 @@ function NewsletterInlineForm() {
         unsubToken: unsubscribeToken,
       }).catch((err) => console.warn('[Newsletter] Welcome email failed:', err));
 
-      // Notificar al admin de la nueva alta (footer).
+      // Notificar al admin de la nueva alta (footer). Texto interno del
+      // aviso al administrador: no lo ve ningún usuario, va literal.
       notifyAdminEvent({
         event: 'newsletter_signup',
         title: '📧 Nuevo suscriptor newsletter (footer)',
@@ -152,11 +118,11 @@ function NewsletterInlineForm() {
         userEmail: normalizedEmail,
       });
 
-      toast.success('Suscripción confirmada.');
+      toast.success(t('footer.newsletter.confirmed'));
       setEmail('');
     } catch (err) {
       console.error('[Newsletter] Error:', err);
-      toast.error('No se ha podido completar. Inténtalo de nuevo.');
+      toast.error(t('footer.newsletter.genericError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -168,11 +134,11 @@ function NewsletterInlineForm() {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="tu@email.com"
+        placeholder={t('footer.newsletter.emailPlaceholder')}
         required
         disabled={isSubmitting}
-        aria-label="Tu email"
-        className="flex-1 h-9 bg-white border border-slate-200 rounded-l-lg px-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+        aria-label={t('footer.newsletter.emailAria')}
+        className="flex-1 h-9 bg-surface border border-c-border rounded-l-lg px-3 text-xs text-ink placeholder:text-c-muted focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
       />
       <button
         type="submit"
@@ -180,13 +146,14 @@ function NewsletterInlineForm() {
         className="h-9 text-xs font-semibold px-3 rounded-r-lg border border-l-0 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00255C]/20 disabled:opacity-50"
         style={{ borderColor: NAVY, background: NAVY, color: 'white' }}
       >
-        {isSubmitting ? 'Enviando…' : 'Suscribirme'}
+        {isSubmitting ? t('footer.newsletter.sending') : t('footer.newsletter.submit')}
       </button>
     </form>
   );
 }
 
 export default function Footer() {
+  const { t } = useTranslation();
   const [currentUser, setCurrentUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
@@ -199,8 +166,46 @@ export default function Footer() {
 
   const year = new Date().getFullYear();
 
+  // Tres columnas exactas — Producto, Empresa, Legal. Todas las rutas
+  // verificadas contra las <Route> declaradas en App.jsx: cero 404.
+  // Viven dentro del componente porque sus etiquetas pasan por t(): una
+  // constante de módulo se evaluaría una sola vez y no se retraduciría al
+  // cambiar de idioma.
+  const COLUMN_PRODUCTO = [
+    { label: t('footer.links.searchPros'), to: "/buscar" },
+    { label: t('footer.links.becomePro'), to: "/registro?tipo=autonomo" },
+  ];
+
+  const COLUMN_EMPRESA = [
+    { label: t('footer.how_it_works'), to: "/para-autonomos" },
+    { label: t('footer.links.helpCenter'), to: "/ayuda" },
+    { label: t('footer.links.faq'), to: "/preguntas-frecuentes" },
+    { label: t('footer.links.blog'), to: "/blog" },
+    { label: t('footer.links.contact'), to: "/contacto" },
+  ];
+
+  const COLUMN_LEGAL = [
+    { label: t('footer.links.privacy'), to: "/privacidad" },
+    { label: t('footer.links.terms'), to: "/terminos" },
+    { label: t('footer.links.cookies'), to: "/cookies" },
+    { label: t('footer.links.legalNotice'), to: "/aviso-legal" },
+  ];
+
+  // Bloque SEO interno: enlaces a las páginas reales /categoria/:slug que ya
+  // existen (Categoria.jsx resuelve los slugs contra service_categories).
+  // Slugs verificados con slugify() de @/lib/seoUrl.
+  const SEO_SERVICIOS = [
+    { label: t('footer.seo.electricians'), to: "/categoria/electricista" },
+    { label: t('footer.seo.plumbers'), to: "/categoria/fontanero" },
+    { label: t('footer.seo.builders'), to: "/categoria/albanil-reformas" },
+    { label: t('footer.seo.painters'), to: "/categoria/pintor" },
+    { label: t('footer.seo.locksmiths'), to: "/categoria/cerrajero" },
+    { label: t('footer.seo.advisors'), to: "/categoria/asesoria-o-gestoria" },
+    { label: t('footer.seo.cleaning'), to: "/categoria/autonomo-de-limpieza" },
+  ];
+
   return (
-    <footer className="border-t border-slate-200 bg-white text-slate-600">
+    <footer className="border-t border-c-border bg-surface text-c-muted">
       <div className="max-w-6xl mx-auto px-5 py-6 md:py-8">
         {/* Cabecera del footer: marca + 3 columnas. Gaps más ajustados. */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-6 md:gap-x-8 md:gap-y-6">
@@ -213,18 +218,18 @@ export default function Footer() {
                 <span style={{ color: '#0f172a', fontWeight: 700 }}>autónomos</span>
               </span>
             </Link>
-            <p className="text-xs text-slate-500 mt-2 leading-relaxed max-w-[24ch]">
-              Profesionales verificados, contacto directo, sin comisiones.
+            <p className="text-xs text-c-muted mt-2 leading-relaxed max-w-[24ch]">
+              {t('footer.claim')}
             </p>
           </div>
 
           {/* Producto */}
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-2">Producto</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-2">{t('footer.columns.product')}</h4>
             <ul className="space-y-1.5">
               {COLUMN_PRODUCTO.map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className="text-sm text-slate-700 hover:text-slate-900 hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
+                  <Link to={to} className="text-sm text-ink hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -232,11 +237,11 @@ export default function Footer() {
 
           {/* Empresa */}
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-2">Empresa</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-2">{t('footer.columns.company')}</h4>
             <ul className="space-y-1.5">
               {COLUMN_EMPRESA.map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className="text-sm text-slate-700 hover:text-slate-900 hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
+                  <Link to={to} className="text-sm text-ink hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -244,11 +249,11 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-2">Legal</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-2">{t('footer.columns.legal')}</h4>
             <ul className="space-y-1.5">
               {COLUMN_LEGAL.map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className="text-sm text-slate-700 hover:text-slate-900 hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
+                  <Link to={to} className="text-sm text-ink hover:underline underline-offset-2 focus:outline-none focus-visible:underline">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -257,22 +262,22 @@ export default function Footer() {
 
         {/* Bloque SEO interno compacto: TODO en una sola franja. Tipografía
             más pequeña que los enlaces principales, con separador "·". */}
-        <div className="mt-5 pt-4 border-t border-slate-100 space-y-1.5">
-          <p className="text-[11px] leading-relaxed text-slate-500">
-            <span className="font-semibold text-slate-600 uppercase tracking-[0.06em] mr-2">Servicios</span>
+        <div className="mt-5 pt-4 border-t border-c-border space-y-1.5">
+          <p className="text-[11px] leading-relaxed text-c-muted">
+            <span className="font-semibold text-c-muted uppercase tracking-[0.06em] mr-2">{t('footer.seo.servicesLabel')}</span>
             {SEO_SERVICIOS.map(({ label, to }, i) => (
               <React.Fragment key={label}>
-                {i > 0 && <span className="mx-1.5 text-slate-300" aria-hidden="true">·</span>}
-                <Link to={to} className="text-slate-600 hover:text-slate-900 hover:underline underline-offset-2">{label}</Link>
+                {i > 0 && <span className="mx-1.5 text-c-border" aria-hidden="true">·</span>}
+                <Link to={to} className="text-c-muted hover:text-ink hover:underline underline-offset-2">{label}</Link>
               </React.Fragment>
             ))}
           </p>
-          <p className="text-[11px] leading-relaxed text-slate-500">
-            <span className="font-semibold text-slate-600 uppercase tracking-[0.06em] mr-2">Ciudades</span>
+          <p className="text-[11px] leading-relaxed text-c-muted">
+            <span className="font-semibold text-c-muted uppercase tracking-[0.06em] mr-2">{t('footer.seo.citiesLabel')}</span>
             {SEO_CIUDADES.map(({ label, to }, i) => (
               <React.Fragment key={label}>
-                {i > 0 && <span className="mx-1.5 text-slate-300" aria-hidden="true">·</span>}
-                <Link to={to} className="text-slate-600 hover:text-slate-900 hover:underline underline-offset-2">{label}</Link>
+                {i > 0 && <span className="mx-1.5 text-c-border" aria-hidden="true">·</span>}
+                <Link to={to} className="text-c-muted hover:text-ink hover:underline underline-offset-2">{label}</Link>
               </React.Fragment>
             ))}
           </p>
@@ -282,17 +287,21 @@ export default function Footer() {
             superior propio (cuelga directamente del bloque SEO). */}
         {!loadingUser && !currentUser && (
           <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <p className="text-xs text-slate-500">
-              <span className="text-slate-700 font-medium">Newsletter:</span> 1-2 emails al mes. Cero spam.
+            <p className="text-xs text-c-muted">
+              <span className="text-ink font-medium">{t('footer.newsletter.label')}</span> {t('footer.newsletter.pitch')}
             </p>
             <NewsletterInlineForm />
           </div>
         )}
 
         {/* Bottom bar: copyright + redes en una sola fila */}
-        <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-slate-500">
-            © {year} <span className="notranslate" translate="no">MisAutónomos</span>. Hecho en España.
+        <div className="mt-5 pt-4 border-t border-c-border flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-xs text-c-muted">
+            <Trans
+              i18nKey="footer.copyright"
+              values={{ year }}
+              components={{ brand: <span className="notranslate" translate="no" /> }}
+            />
           </p>
           <div className="flex items-center gap-1">
             {socialLinks.map(({ href, label, Icon }) => (
@@ -302,7 +311,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="w-8 h-8 inline-flex items-center justify-center rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00255C]/20"
+                className="w-8 h-8 inline-flex items-center justify-center rounded-md text-c-muted hover:text-ink hover:bg-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00255C]/20"
               >
                 <Icon className="w-4 h-4" />
               </a>

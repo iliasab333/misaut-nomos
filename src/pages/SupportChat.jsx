@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Send, Headphones, ArrowLeft } from "lucide-react";
+import { IconSend, IconHeadphones, IconArrowLeft } from "@/components/Icons";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -101,53 +99,53 @@ export default function SupportChat() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-56px)] md:h-[calc(100vh-56px)] bg-white">
+    <div className="flex flex-col h-[calc(100dvh-56px)] md:h-[calc(100vh-56px)] bg-surface">
       {/* Tabs Mensajes / Soporte */}
-      <div className="px-4 pt-3 bg-white border-b border-gray-100">
+      <div className="px-4 pt-3 bg-surface border-b border-c-border">
       </div>
       {/* Header */}
-      <div className="border-b border-gray-100 px-4 py-3 flex items-center gap-3 bg-white sticky top-0">
+      <div className="border-b border-c-border px-4 py-3 flex items-center gap-3 bg-surface sticky top-0">
         <button
           onClick={() => navigate(-1)}
-          className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
+          className="md:hidden p-2 hover:bg-soft rounded-lg"
           aria-label={t('common.back')}
         >
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+          <IconArrowLeft className="w-5 h-5 text-ink" />
         </button>
-        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-          <Headphones className="w-5 h-5 text-white" />
+        <div className="w-10 h-10 rounded-full bg-c-accent flex items-center justify-center flex-shrink-0">
+          <IconHeadphones className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900">{t("supportChat.supportTeam")}</p>
-          <p className="text-xs text-green-600 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full" /> 
+          <p className="font-semibold text-ink">{t("supportChat.supportTeam")}</p>
+          <p className="text-xs text-success flex items-center gap-1">
+            <span className="w-1.5 h-1.5 bg-success rounded-full" /> 
             {t('support.chat.onlineStatus')}
           </p>
         </div>
       </div>
 
       {/* Mensajes */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-soft">
         {messages.map((msg) => {
           const isFromMe = msg.sender_id === user.id;
           return (
             <div key={msg.id} className={`flex gap-2 ${isFromMe ? "flex-row-reverse" : ""}`}>
               {!isFromMe && (
-                <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Headphones className="w-3.5 h-3.5 text-white" />
+                <div className="w-7 h-7 rounded-full bg-c-accent flex items-center justify-center flex-shrink-0">
+                  <IconHeadphones className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
               <div
                 className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm ${
                   isFromMe
-                    ? "bg-blue-600 text-white rounded-br-none"
-                    : "bg-white text-gray-900 rounded-bl-none border border-gray-100"
+                    ? "bg-c-accent text-white rounded-br-none"
+                    : "bg-surface text-ink rounded-bl-none border border-c-border"
                 }`}
               >
                 <p className="whitespace-pre-line break-words">{msg.content}</p>
                 <span
                   className={`text-[10px] block mt-0.5 ${
-                    isFromMe ? "text-blue-100" : "text-gray-400"
+                    isFromMe ? "text-blue-100" : "text-c-muted"
                   }`}
                 >
                   {new Date(msg.created_date).toLocaleTimeString("es-ES", {
@@ -163,24 +161,25 @@ export default function SupportChat() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-100 p-3 bg-white flex gap-2 items-center sticky bottom-0">
+      <div className="border-t border-c-border p-3 bg-surface flex gap-2 items-center sticky bottom-0">
         <form onSubmit={handleSend} className="flex gap-2 flex-1">
-          <Input
+          <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder={t('messages.write_message')}
-            className="flex-1 rounded-full bg-gray-50 border-gray-200 focus:ring-0 focus:border-gray-300"
+            aria-label={t('messages.write_message')}
+            className="input flex-1 rounded-full bg-soft"
             disabled={sendMutation.isPending}
           />
-          <Button
+          <button
             type="submit"
-            size="icon"
-            className="rounded-full w-10 h-10 bg-gray-900 hover:bg-gray-800 flex-shrink-0"
+            className="btn-icon rounded-full bg-contrast text-canvas hover:opacity-90 flex-shrink-0"
+            aria-label={t('messages.send')}
             disabled={!message.trim() || sendMutation.isPending}
           >
-            <Send className="w-4 h-4 text-white" />
-          </Button>
+            <IconSend className="w-4 h-4" />
+          </button>
         </form>
       </div>
     </div>

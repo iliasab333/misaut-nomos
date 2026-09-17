@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { IconAlert, IconCheckCircle } from '@/components/Icons';
 
 export default function EmailUnsubscribePage() {
   const [searchParams] = useSearchParams();
@@ -55,27 +54,28 @@ export default function EmailUnsubscribePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
+      <div className="bg-surface rounded-2xl shadow-lg p-8 max-w-md w-full">
         {status === 'loading' && (
           <div className="text-center">
-            <div className="animate-spin inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
-              <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="animate-spin inline-flex items-center justify-center w-12 h-12 bg-c-accent/10 rounded-full mb-4">
+              <div className="w-6 h-6 border-2 border-c-accent border-t-transparent rounded-full animate-spin" />
             </div>
-            <p className="text-gray-600">{t('newsletter.unsubscribe.processing')}</p>
+            <p className="text-c-muted">{t('newsletter.unsubscribe.processing')}</p>
           </div>
         )}
 
         {status === 'success' && (
           <div className="text-center">
             <div className="flex justify-center mb-4">
-              <CheckCircle className="w-12 h-12 text-green-600" />
+              <IconCheckCircle className="w-12 h-12 text-success" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('newsletter.unsubscribe.title')}</h2>
-            <p className="text-gray-600 mb-4">
+            <h2 className="text-xl font-bold text-ink mb-2">{t('newsletter.unsubscribe.title')}</h2>
+            <p className="text-c-muted mb-4">
               <Trans i18nKey="newsletter.unsubscribe.bodyEmail" values={{ email }} components={{ strong: <strong /> }} />
             </p>
-            <p className="text-sm text-gray-500 mb-6">{t('newsletter.unsubscribe.transactionalNoteLong')}</p>
-            <Button
+            <p className="text-sm text-c-muted mb-6">{t('newsletter.unsubscribe.transactionalNoteLong')}</p>
+            <button
+              type="button"
               onClick={async () => {
                 // Reactivar si el usuario lo desea
                 const subscribers = await base44.asServiceRole.entities.NewsletterSubscriber.filter({
@@ -89,12 +89,11 @@ export default function EmailUnsubscribePage() {
                   setStatus('resubscribed');
                 }
               }}
-              variant="outline"
-              className="w-full mb-2"
+              className="btn-secondary w-full mb-2"
             >
               {t('newsletter.unsubscribe.resubscribe')}
-            </Button>
-            <a href="/" className="text-blue-600 hover:text-blue-700 text-sm">
+            </button>
+            <a href="/" className="text-c-accent hover:text-accent-hover text-sm">
               {t('newsletter.backHome')}
             </a>
           </div>
@@ -103,11 +102,11 @@ export default function EmailUnsubscribePage() {
         {status === 'resubscribed' && (
           <div className="text-center">
             <div className="flex justify-center mb-4">
-              <CheckCircle className="w-12 h-12 text-green-600" />
+              <IconCheckCircle className="w-12 h-12 text-success" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('newsletter.unsubscribe.resubscribedTitle')}</h2>
-            <p className="text-gray-600 mb-6">{t('newsletter.unsubscribe.resubscribedBody')}</p>
-            <a href="/" className="text-blue-600 hover:text-blue-700 text-sm">
+            <h2 className="text-xl font-bold text-ink mb-2">{t('newsletter.unsubscribe.resubscribedTitle')}</h2>
+            <p className="text-c-muted mb-6">{t('newsletter.unsubscribe.resubscribedBody')}</p>
+            <a href="/" className="text-c-accent hover:text-accent-hover text-sm">
               {t('newsletter.backHome')}
             </a>
           </div>
@@ -116,11 +115,11 @@ export default function EmailUnsubscribePage() {
         {status === 'error' && (
           <div className="text-center">
             <div className="flex justify-center mb-4">
-              <AlertCircle className="w-12 h-12 text-red-600" />
+              <IconAlert className="w-12 h-12 text-error" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('common.error')}</h2>
-            <p className="text-gray-600 mb-6">{t('newsletter.unsubscribe.errorBodySupport')}</p>
-            <a href="/" className="text-blue-600 hover:text-blue-700 text-sm">
+            <h2 className="text-xl font-bold text-ink mb-2">{t('common.error')}</h2>
+            <p className="text-c-muted mb-6">{t('newsletter.unsubscribe.errorBodySupport')}</p>
+            <a href="/" className="text-c-accent hover:text-accent-hover text-sm">
               {t('newsletter.backHome')}
             </a>
           </div>
@@ -129,11 +128,11 @@ export default function EmailUnsubscribePage() {
         {status === 'not_found' && (
           <div className="text-center">
             <div className="flex justify-center mb-4">
-              <AlertCircle className="w-12 h-12 text-amber-600" />
+              <IconAlert className="w-12 h-12 text-warning" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('newsletter.unsubscribe.notFoundTitle')}</h2>
-            <p className="text-gray-600 mb-6">{t('newsletter.unsubscribe.notFoundBody')}</p>
-            <a href="/" className="text-blue-600 hover:text-blue-700 text-sm">
+            <h2 className="text-xl font-bold text-ink mb-2">{t('newsletter.unsubscribe.notFoundTitle')}</h2>
+            <p className="text-c-muted mb-6">{t('newsletter.unsubscribe.notFoundBody')}</p>
+            <a href="/" className="text-c-accent hover:text-accent-hover text-sm">
               {t('newsletter.backHome')}
             </a>
           </div>

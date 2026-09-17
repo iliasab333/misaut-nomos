@@ -1,107 +1,46 @@
-import React, { useState } from "react";
-import { Check } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerClose,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+// Select con el picker nativo del sistema.
+//
+// Antes: en escritorio un `Select` de shadcn y en móvil un `Drawer` con una
+// lista de botones a mano. Regla de khdemlidaba: el select nativo del móvil
+// (rueda de iOS, diálogo de Android) gana a cualquier menú custom —
+// arrastra mejor, no se pelea con el teclado y no necesita portal. Un solo
+// camino para los dos tamaños; la clase `.select` ya trae los 48px y el
+// texto de 16px que iOS exige para no hacer zoom.
+//
+// La firma no cambia (`value`, `onValueChange`, `placeholder`, `children`,
+// `disabled`, `label`): los hijos siguen siendo elementos con `value` y
+// contenido, y aquí se convierten en <option>.
 
-export default function MobileSelect({ 
-  value, 
-  onValueChange, 
-  placeholder, 
-  children, 
+import React from 'react';
+
+export default function MobileSelect({
+  value,
+  onValueChange,
+  placeholder,
+  children,
   disabled,
-  label 
+  label,
 }) {
-  const [open, setOpen] = useState(false);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-
-  if (!isMobile) {
-    return (
-      <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent className="max-h-[300px]">
-          {children}
-        </SelectContent>
-      </Select>
-    );
-  }
-
-  const items = React.Children.toArray(children);
-  const selectedItem = items.find(child => child.props.value === value);
+  const items = React.Children.toArray(children).filter((child) => child && child.props);
 
   return (
-    <>
-      <button
-        onClick={() => !disabled && setOpen(true)}
-        disabled={disabled}
-        className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
-          disabled ? 'bg-gray-50' : ''
-        }`}
-      >
-        <span className={!value ? 'text-gray-500' : ''}>
-          {selectedItem?.props.children || placeholder}
-        </span>
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 15 15"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 opacity-50"
-        >
-          <path
-            d="M4.93179 5.43179C4.75605 5.60753 4.75605 5.89245 4.93179 6.06819C5.10753 6.24392 5.39245 6.24392 5.56819 6.06819L7.49999 4.13638L9.43179 6.06819C9.60753 6.24392 9.89245 6.24392 10.0682 6.06819C10.2439 5.89245 10.2439 5.60753 10.0682 5.43179L7.81819 3.18179C7.73379 3.0974 7.61933 3.04999 7.49999 3.04999C7.38064 3.04999 7.26618 3.0974 7.18179 3.18179L4.93179 5.43179ZM10.0682 9.56819C10.2439 9.39245 10.2439 9.10753 10.0682 8.93179C9.89245 8.75606 9.60753 8.75606 9.43179 8.93179L7.49999 10.8636L5.56819 8.93179C5.39245 8.75606 5.10753 8.75606 4.93179 8.93179C4.75605 9.10753 4.75605 9.39245 4.93179 9.56819L7.18179 11.8182C7.26618 11.9026 7.38064 11.95 7.49999 11.95C7.61933 11.95 7.73379 11.9026 7.81819 11.8182L10.0682 9.56819Z"
-            fill="currentColor"
-            fillRule="evenodd"
-            clipRule="evenodd"
-          ></path>
-        </svg>
-      </button>
-
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>{label || placeholder}</DrawerTitle>
-          </DrawerHeader>
-          <div className="max-h-[60vh] overflow-y-auto px-4 pb-6">
-            <div className="space-y-1">
-              {items.map((child, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    onValueChange(child.props.value);
-                    setOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center justify-between ${
-                    value === child.props.value
-                      ? 'bg-blue-100 text-blue-900 font-semibold'
-                      : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <span>{child.props.children}</span>
-                  {value === child.props.value && (
-                    <Check className="w-5 h-5 text-blue-600" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
-    </>
+    <select
+      className="select"
+      value={value ?? ''}
+      onChange={(e) => onValueChange?.(e.target.value)}
+      disabled={disabled}
+      aria-label={label || placeholder || undefined}
+    >
+      {placeholder && (
+        <option value="" disabled>
+          {placeholder}
+        </option>
+      )}
+      {items.map((child, idx) => (
+        <option key={child.props.value ?? idx} value={child.props.value}>
+          {child.props.children}
+        </option>
+      ))}
+    </select>
   );
 }

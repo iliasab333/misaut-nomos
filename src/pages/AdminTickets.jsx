@@ -4,48 +4,30 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import Modal from "@/components/Modal";
+import { SkeletonList } from "@/components/ListStates";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Search,
-  Filter,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  MessageSquare,
-  StickyNote,
-  UserCog,
-  RefreshCw,
-  Loader2
-} from "lucide-react";
-import { toast } from "sonner";
+  IconSearch,
+  IconClock,
+  IconCheckCircle,
+  IconError,
+  IconAlert,
+  IconMessageSquare,
+  IconNote,
+  IconUserCog,
+  IconRefresh,
+  IconSpinner
+} from "@/components/Icons";
+import { toast } from "@/lib/toast";
 
 // Icono y color por estado. La etiqueta visible sale de `statusLabels` (t())
 // dentro del componente; `text` se conserva sólo para la descripción del
 // TicketEvent que se persiste en la BD, que sigue en español como hasta ahora.
 const statusConfig = {
-  abierto: { icon: Clock, color: "bg-blue-500", text: "Abierto" },
-  en_progreso: { icon: AlertCircle, color: "bg-amber-500", text: "En progreso" },
-  resuelto: { icon: CheckCircle, color: "bg-green-500", text: "Resuelto" },
-  cerrado: { icon: XCircle, color: "bg-gray-500", text: "Cerrado" }
+  abierto: { icon: IconClock, color: "bg-c-accent", text: "Abierto" },
+  en_progreso: { icon: IconAlert, color: "bg-warning", text: "En progreso" },
+  resuelto: { icon: IconCheckCircle, color: "bg-success", text: "Resuelto" },
+  cerrado: { icon: IconError, color: "bg-c-muted", text: "Cerrado" }
 };
 
 export default function AdminTicketsPage() {
@@ -226,7 +208,7 @@ export default function AdminTicketsPage() {
   if (loadingUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <IconSpinner size={32} className="animate-spin text-c-accent" />
       </div>
     );
   }
@@ -234,14 +216,14 @@ export default function AdminTicketsPage() {
   if (!user || user.role !== 'admin') {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-md p-8 text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">{t('admin.tickets.accessDenied.title')}</h2>
-          <p className="text-gray-600 mb-4">{t('admin.tickets.accessDenied.text')}</p>
-          <Button onClick={() => navigate(createPageUrl("Tickets"))}>
+        <div className="card max-w-md p-8 text-center">
+          <IconAlert size={64} className="text-error mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-ink mb-2">{t('admin.tickets.accessDenied.title')}</h2>
+          <p className="text-c-muted mb-4">{t('admin.tickets.accessDenied.text')}</p>
+          <button type="button" className="btn-primary" onClick={() => navigate(createPageUrl("Tickets"))}>
             {t('admin.tickets.accessDenied.backToTickets')}
-          </Button>
-        </Card>
+          </button>
+        </div>
       </div>
     );
   }
@@ -251,98 +233,98 @@ export default function AdminTicketsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-ink mb-2">
               {t('admin.tickets.title')}
             </h1>
-            <p className="text-gray-600">{t('admin.tickets.subtitle', { total: tickets.length })}</p>
+            <p className="text-c-muted">{t('admin.tickets.subtitle', { total: tickets.length })}</p>
           </div>
-          <Button
-            variant="outline"
+          <button
+            type="button"
+            className="btn-secondary"
             onClick={() => queryClient.invalidateQueries({ queryKey: ['adminTickets'] })}
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
+            <IconRefresh size={16} />
             {t('admin.tickets.refresh')}
-          </Button>
+          </button>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">{t('total')}</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">{t('admin.tickets.stats.open')}</p>
-              <p className="text-2xl font-bold text-blue-600">{stats.abiertos}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">{t('admin.tickets.status.inProgress')}</p>
-              <p className="text-2xl font-bold text-amber-600">{stats.en_progreso}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">{t('admin.tickets.stats.resolved')}</p>
-              <p className="text-2xl font-bold text-green-600">{stats.resueltos}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-gray-600 mb-1">{t('admin.tickets.stats.closed')}</p>
-              <p className="text-2xl font-bold text-gray-600">{stats.cerrados}</p>
-            </CardContent>
-          </Card>
+          <div className="card">
+            <div className="p-4">
+              <p className="text-sm text-c-muted mb-1">{t('total')}</p>
+              <p className="text-2xl font-bold text-ink">{stats.total}</p>
+            </div>
+          </div>
+          <div className="card">
+            <div className="p-4">
+              <p className="text-sm text-c-muted mb-1">{t('admin.tickets.stats.open')}</p>
+              <p className="text-2xl font-bold text-c-accent">{stats.abiertos}</p>
+            </div>
+          </div>
+          <div className="card">
+            <div className="p-4">
+              <p className="text-sm text-c-muted mb-1">{t('admin.tickets.status.inProgress')}</p>
+              <p className="text-2xl font-bold text-warning">{stats.en_progreso}</p>
+            </div>
+          </div>
+          <div className="card">
+            <div className="p-4">
+              <p className="text-sm text-c-muted mb-1">{t('admin.tickets.stats.resolved')}</p>
+              <p className="text-2xl font-bold text-success">{stats.resueltos}</p>
+            </div>
+          </div>
+          <div className="card">
+            <div className="p-4">
+              <p className="text-sm text-c-muted mb-1">{t('admin.tickets.stats.closed')}</p>
+              <p className="text-2xl font-bold text-c-muted">{stats.cerrados}</p>
+            </div>
+          </div>
         </div>
 
-        <Card className="mb-6">
-          <CardContent className="p-6">
+        <div className="card mb-6">
+          <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <IconSearch size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-c-muted pointer-events-none" />
+                <input
+                  className="input pl-10"
                   placeholder={t('admin.tickets.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  aria-label={t('admin.tickets.searchPlaceholder')}
                 />
               </div>
 
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('admin.tickets.filters.statusPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('admin.tickets.filters.allStatuses')}</SelectItem>
-                  <SelectItem value="abierto">{statusLabels.abierto}</SelectItem>
-                  <SelectItem value="en_progreso">{statusLabels.en_progreso}</SelectItem>
-                  <SelectItem value="resuelto">{statusLabels.resuelto}</SelectItem>
-                  <SelectItem value="cerrado">{statusLabels.cerrado}</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                className="select"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                aria-label={t('admin.tickets.filters.statusPlaceholder')}
+              >
+                <option value="all">{t('admin.tickets.filters.allStatuses')}</option>
+                <option value="abierto">{statusLabels.abierto}</option>
+                <option value="en_progreso">{statusLabels.en_progreso}</option>
+                <option value="resuelto">{statusLabels.resuelto}</option>
+                <option value="cerrado">{statusLabels.cerrado}</option>
+              </select>
 
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('admin.tickets.filters.typePlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('admin.tickets.filters.allTypes')}</SelectItem>
-                  {Object.entries(typeLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select
+                className="select"
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                aria-label={t('admin.tickets.filters.typePlaceholder')}
+              >
+                <option value="all">{t('admin.tickets.filters.allTypes')}</option>
+                {Object.entries(typeLabels).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {loadingTickets ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          </div>
+          <SkeletonList count={4} avatar={false} />
         ) : (
           <div className="space-y-4">
             {filteredTickets.map((ticket) => {
@@ -350,36 +332,36 @@ export default function AdminTicketsPage() {
               const messageCount = messageCounts[ticket.id] || 0;
               
               return (
-                <Card key={ticket.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
+                <div key={ticket.id} className="card hover:shadow-lg transition-shadow">
+                  <div className="p-6">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline" className="font-mono text-xs">
+                          <span className="badge-outline font-mono text-xs">
                             {ticket.ticket_number}
-                          </Badge>
-                          <Badge className={`${statusConfig[ticket.status]?.color} text-white`}>
-                            {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
+                          </span>
+                          <span className={`badge ${statusConfig[ticket.status]?.color} text-white`}>
+                            {StatusIcon && <StatusIcon size={12} />}
                             {statusLabels[ticket.status]}
-                          </Badge>
-                          <Badge variant="outline">{typeLabels[ticket.type]}</Badge>
+                          </span>
+                          <span className="badge-outline">{typeLabels[ticket.type]}</span>
                         </div>
                         
                         <h3 
-                          className="text-lg font-semibold text-gray-900 mb-2 hover:text-blue-700 cursor-pointer"
+                          className="text-lg font-semibold text-ink mb-2 hover:text-c-accent cursor-pointer"
                           onClick={() => navigate(createPageUrl("TicketDetail") + `?id=${ticket.id}`)}
                         >
                           {ticket.title}
                         </h3>
                         
-                        <p className="text-gray-600 line-clamp-1 mb-3">
+                        <p className="text-c-muted line-clamp-1 mb-3">
                           {ticket.description}
                         </p>
                         
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 text-sm text-c-muted">
                           <span>{t('admin.tickets.card.by', { name: ticket.creator_name })}</span>
                           <div className="flex items-center gap-1">
-                            <MessageSquare className="w-4 h-4" />
+                            <IconMessageSquare size={16} />
                             <span>{messageCount}</span>
                           </div>
                           <span>
@@ -389,117 +371,121 @@ export default function AdminTicketsPage() {
                       </div>
                       
                       <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
+                        <button
+                          type="button"
+                          className="btn-secondary btn-sm"
                           onClick={() => {
                             setSelectedTicket(ticket);
                             setShowNoteDialog(true);
                           }}
                         >
-                          <StickyNote className="w-4 h-4 mr-1" />
+                          <IconNote size={16} />
                           {t('admin.tickets.actions.note')}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-secondary btn-sm"
                           onClick={() => {
                             setSelectedTicket(ticket);
                             setShowAssignDialog(true);
                           }}
                         >
-                          <UserCog className="w-4 h-4 mr-1" />
+                          <IconUserCog size={16} />
                           {t('admin.tickets.actions.assign')}
-                        </Button>
-                        <Button
-                          size="sm"
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-primary btn-sm"
                           onClick={() => navigate(createPageUrl("TicketDetail") + `?id=${ticket.id}`)}
-                          className="bg-blue-600 hover:bg-blue-700"
                         >
                           {t('view')}
-                        </Button>
+                        </button>
                       </div>
                     </div>
                     
                     {ticket.internal_notes && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 mb-1">{t('admin.tickets.card.internalNote')}</p>
-                        <p className="text-sm text-gray-700 bg-amber-50 p-2 rounded">
+                      <div className="mt-4 pt-4 border-t border-c-border">
+                        <p className="text-xs text-c-muted mb-1">{t('admin.tickets.card.internalNote')}</p>
+                        <p className="text-sm text-ink bg-warning/10 p-2 rounded">
                           {ticket.internal_notes}
                         </p>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               );
             })}
           </div>
         )}
       </div>
 
-      <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('admin.tickets.noteDialog.title')}</DialogTitle>
-          </DialogHeader>
-          <div>
-            <Textarea
-              placeholder={t('admin.tickets.noteDialog.placeholder')}
-              value={internalNote}
-              onChange={(e) => setInternalNote(e.target.value)}
-              rows={4}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNoteDialog(false)}>
-              {t('common.cancel')}
-            </Button>
-            <Button
-              onClick={() => {
-                if (selectedTicket) {
-                  addNoteMutation.mutate({ ticketId: selectedTicket.id, note: internalNote });
-                }
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {t('admin.tickets.noteDialog.save')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Modal
+        open={showNoteDialog}
+        onClose={() => setShowNoteDialog(false)}
+        title={t('admin.tickets.noteDialog.title')}
+      >
+        <div>
+          <textarea
+            className="textarea"
+            placeholder={t('admin.tickets.noteDialog.placeholder')}
+            value={internalNote}
+            onChange={(e) => setInternalNote(e.target.value)}
+            rows={4}
+            aria-label={t('admin.tickets.noteDialog.title')}
+          />
+        </div>
+        <div className="mt-6 flex gap-3 justify-end">
+          <button type="button" className="btn-secondary" onClick={() => setShowNoteDialog(false)}>
+            {t('common.cancel')}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => {
+              if (selectedTicket) {
+                addNoteMutation.mutate({ ticketId: selectedTicket.id, note: internalNote });
+              }
+            }}
+          >
+            {t('admin.tickets.noteDialog.save')}
+          </button>
+        </div>
+      </Modal>
 
-      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('admin.tickets.assign.dialogTitle')}</DialogTitle>
-          </DialogHeader>
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              {t('admin.tickets.assign.emailLabel')}
-            </label>
-            <Input
-              placeholder={t('admin.tickets.assign.emailPlaceholder')}
-              value={assignToEmail}
-              onChange={(e) => setAssignToEmail(e.target.value)}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAssignDialog(false)}>
-              {t('common.cancel')}
-            </Button>
-            <Button
-              onClick={() => {
-                if (selectedTicket && assignToEmail) {
-                  assignTicketMutation.mutate({ ticketId: selectedTicket.id, adminEmail: assignToEmail });
-                }
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {t('admin.tickets.actions.assign')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Modal
+        open={showAssignDialog}
+        onClose={() => setShowAssignDialog(false)}
+        title={t('admin.tickets.assign.dialogTitle')}
+      >
+        <div>
+          <label className="label" htmlFor="assign-admin-email">
+            {t('admin.tickets.assign.emailLabel')}
+          </label>
+          <input
+            id="assign-admin-email"
+            className="input"
+            placeholder={t('admin.tickets.assign.emailPlaceholder')}
+            value={assignToEmail}
+            onChange={(e) => setAssignToEmail(e.target.value)}
+          />
+        </div>
+        <div className="mt-6 flex gap-3 justify-end">
+          <button type="button" className="btn-secondary" onClick={() => setShowAssignDialog(false)}>
+            {t('common.cancel')}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => {
+              if (selectedTicket && assignToEmail) {
+                assignTicketMutation.mutate({ ticketId: selectedTicket.id, adminEmail: assignToEmail });
+              }
+            }}
+          >
+            {t('admin.tickets.actions.assign')}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

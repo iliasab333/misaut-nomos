@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { Helmet } from 'react-helmet-async';
-import { Clock, ArrowLeft, Twitter, Linkedin, Copy, Check } from 'lucide-react';
+import { IconClock, IconArrowLeft, IconTwitter, IconLinkedin, IconCopy, IconCheck, IconWhatsApp } from '@/components/Icons';
+import { EmptyState, SkeletonLine, SkeletonBlock } from '@/components/ListStates';
 import { CategoryBadge } from './BlogList';
 import NewsletterSignup from '@/components/NewsletterSignup';
 
@@ -59,15 +60,24 @@ export default function BlogPostPage() {
   const url = typeof window !== 'undefined' ? window.location.href : '';
 
   if (post === null) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin h-8 w-8 border-2 border-gray-900 border-t-transparent rounded-full" />
+    <div className="min-h-screen bg-canvas">
+      <div className="max-w-3xl mx-auto px-4 py-10 space-y-5">
+        <SkeletonLine width="30%" height={20} />
+        <SkeletonLine width="85%" height={34} />
+        <SkeletonLine width="60%" height={34} />
+        <SkeletonBlock lines={8} />
+      </div>
     </div>
   );
 
   if (post === false) return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <p className="text-gray-500">{t('blog.post.notFound')}</p>
-      <Link to="/blog" className="text-sm text-blue-600 hover:underline">{t('blog.post.backToBlogArrow')}</Link>
+    <div className="min-h-screen bg-canvas flex items-center justify-center px-4 py-10">
+      <EmptyState
+        className="max-w-md w-full"
+        title={t('blog.post.notFound')}
+        ctaLabel={t('blog.post.backToBlogArrow')}
+        ctaTo="/blog"
+      />
     </div>
   );
 
@@ -93,7 +103,7 @@ export default function BlogPostPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-canvas">
       <Helmet>
         <title>{metaTitle}</title>
         <meta name="description" content={metaDesc} />
@@ -115,7 +125,7 @@ export default function BlogPostPage() {
 
       {/* Hero image — full width, above everything */}
       {post.featured_image && (
-        <div className="w-full max-h-[480px] overflow-hidden bg-gray-100">
+        <div className="w-full max-h-[480px] overflow-hidden bg-soft">
           <img
             src={post.featured_image}
             alt={post.title_es}
@@ -127,8 +137,8 @@ export default function BlogPostPage() {
 
       {/* Back link */}
       <div className="max-w-3xl mx-auto px-4 pt-6">
-        <Link to="/blog" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800">
-          <ArrowLeft className="w-4 h-4" /> {t('blog.post.backToBlog')}
+        <Link to="/blog" className="inline-flex items-center gap-1 text-sm text-c-muted hover:text-ink">
+          <IconArrowLeft className="w-4 h-4" /> {t('blog.post.backToBlog')}
         </Link>
       </div>
 
@@ -142,38 +152,38 @@ export default function BlogPostPage() {
         </h1>
 
         {post.excerpt_es && (
-          <p className="mt-4 text-lg text-slate-600 leading-relaxed">{post.excerpt_es}</p>
+          <p className="mt-4 text-lg text-c-muted leading-relaxed">{post.excerpt_es}</p>
         )}
 
-        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-5 pb-6 border-b border-gray-100">
+        <div className="flex flex-wrap items-center gap-3 text-sm text-c-muted mt-5 pb-6 border-b border-c-border">
           <div className="flex items-center gap-2">
             {post.author_avatar ? (
               <img src={post.author_avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold">
+              <div className="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center text-xs font-semibold">
                 {post.author_name?.[0] || 'M'}
               </div>
             )}
-            <span className="font-medium text-gray-700">{post.author_name || t('blog.post.defaultAuthor')}</span>
+            <span className="font-medium text-ink">{post.author_name || t('blog.post.defaultAuthor')}</span>
           </div>
           <span className="text-gray-300">·</span>
           {post.publish_date && (
             <span>{new Date(post.publish_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
           )}
           <span className="text-gray-300">·</span>
-          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{t('blog.post.readTime', { minutes: post.read_time_minutes })}</span>
+          <span className="flex items-center gap-1"><IconClock className="w-3.5 h-3.5" />{t('blog.post.readTime', { minutes: post.read_time_minutes })}</span>
         </div>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-10">
           <div>
             {/* Mobile TOC */}
             {toc.length > 2 && (
-              <details className="lg:hidden mb-6 bg-gray-50 rounded-lg p-4">
+              <details className="lg:hidden mb-6 bg-soft rounded-lg p-4">
                 <summary className="font-semibold text-sm cursor-pointer">{t('blog.post.toc')}</summary>
                 <ul className="mt-3 space-y-1 text-sm">
                   {toc.map(item => (
                     <li key={item.id} className={item.level === 3 ? 'ml-4' : ''}>
-                      <a href={`#${item.id}`} className="text-gray-600 hover:text-gray-900">{item.text}</a>
+                      <a href={`#${item.id}`} className="text-c-muted hover:text-ink">{item.text}</a>
                     </li>
                   ))}
                 </ul>
@@ -188,20 +198,20 @@ export default function BlogPostPage() {
             />
 
             {/* Share */}
-            <div className="mt-10 pt-6 border-t border-gray-100">
-              <p className="text-sm font-medium text-gray-700 mb-3">{t('blog.post.share')}</p>
+            <div className="mt-10 pt-6 border-t border-c-border">
+              <p className="text-sm font-medium text-ink mb-3">{t('blog.post.share')}</p>
               <div className="flex gap-2">
-                <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700">
-                  <Twitter className="w-4 h-4" />
+                <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="w-9 h-9 rounded-lg bg-soft hover:bg-c-border flex items-center justify-center text-ink">
+                  <IconTwitter className="w-4 h-4" />
                 </a>
-                <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700">
-                  <Linkedin className="w-4 h-4" />
+                <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-9 h-9 rounded-lg bg-soft hover:bg-c-border flex items-center justify-center text-ink">
+                  <IconLinkedin className="w-4 h-4" />
                 </a>
-                <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + url)}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-green-500 hover:bg-green-600 flex items-center justify-center text-white">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12 0C5.373 0 0 5.373 0 12c0 2.127.557 4.126 1.534 5.856L0 24l6.335-1.517A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" /></svg>
+                <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + url)}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="w-9 h-9 rounded-lg bg-whatsapp hover:bg-whatsapp-hover flex items-center justify-center text-white">
+                  <IconWhatsApp size={16} />
                 </a>
-                <button onClick={copyLink} className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700">
-                  {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                <button onClick={copyLink} aria-label={copied ? t('reviews.request.copied') : t('reviews.request.copyLink')} className="w-9 h-9 rounded-lg bg-soft hover:bg-c-border flex items-center justify-center text-ink">
+                  {copied ? <IconCheck className="w-4 h-4 text-success" /> : <IconCopy className="w-4 h-4" />}
                 </button>
               </div>
             </div>
@@ -231,11 +241,11 @@ export default function BlogPostPage() {
           {toc.length > 2 && (
             <aside className="hidden lg:block">
               <div className="sticky top-20">
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">{t('blog.post.tocShort')}</p>
-                <ul className="space-y-2 text-sm border-l-2 border-gray-100">
+                <p className="text-xs font-semibold uppercase tracking-wider text-c-muted mb-3">{t('blog.post.tocShort')}</p>
+                <ul className="space-y-2 text-sm border-l-2 border-c-border">
                   {toc.map(item => (
                     <li key={item.id} className={item.level === 3 ? 'ml-3' : ''}>
-                      <a href={`#${item.id}`} className="block pl-3 py-1 -ml-0.5 border-l-2 border-transparent hover:border-gray-900 text-gray-600 hover:text-gray-900 transition-colors">
+                      <a href={`#${item.id}`} className="block pl-3 py-1 -ml-0.5 border-l-2 border-transparent hover:border-ink text-c-muted hover:text-ink transition-colors">
                         {item.text}
                       </a>
                     </li>
@@ -248,18 +258,18 @@ export default function BlogPostPage() {
 
         {/* Related articles */}
         {related.length > 0 && (
-          <section className="mt-16 pt-10 border-t border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">{t('blog.post.related')}</h2>
+          <section className="mt-16 pt-10 border-t border-c-border">
+            <h2 className="text-xl font-bold text-ink mb-6">{t('blog.post.related')}</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {related.map(r => (
                 <Link key={r.id} to={`/blog/${r.slug}`} className="group">
                   {r.featured_image && (
-                    <div className="aspect-video rounded-lg overflow-hidden bg-gray-100 mb-2">
+                    <div className="aspect-video rounded-lg overflow-hidden bg-soft mb-2">
                       <img src={r.featured_image} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />
                     </div>
                   )}
-                  <h3 className="font-semibold text-gray-900 text-sm group-hover:text-gray-700 line-clamp-2">{r.title_es}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{t('blog.post.readTime', { minutes: r.read_time_minutes })}</p>
+                  <h3 className="font-semibold text-ink text-sm group-hover:text-c-muted line-clamp-2">{r.title_es}</h3>
+                  <p className="text-xs text-c-muted mt-1">{t('blog.post.readTime', { minutes: r.read_time_minutes })}</p>
                 </Link>
               ))}
             </div>

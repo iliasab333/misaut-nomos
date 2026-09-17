@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { Mail, Check, Loader2 } from 'lucide-react';
+import { IconMail, IconCheck, IconSpinner } from '@/components/Icons';
 import { notifyAdminEvent } from '@/lib/notifyAdmin';
 
 export default function NewsletterSignup({ variant = 'footer', source = 'footer' }) {
@@ -88,8 +88,8 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
         <p className="text-xs text-gray-400 mb-3">{t('newsletter.signup.footerSubtitle')}</p>
 
         {status === 'success' ? (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-2 flex items-center gap-2 text-sm text-green-400">
-            <Check className="w-4 h-4 flex-shrink-0" />
+          <div className="bg-success/10 border border-success/30 rounded-lg px-3 py-2 flex items-center gap-2 text-sm text-green-400">
+            <IconCheck className="w-4 h-4 flex-shrink-0" />
             <span>{t('newsletter.signup.thanks')}</span>
           </div>
         ) : (
@@ -106,9 +106,9 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="bg-white text-gray-900 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
+              className="bg-surface text-ink text-sm font-medium px-4 py-2 rounded-lg hover:bg-soft disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
             >
-              {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : t('newsletter.signup.button')}
+              {status === 'loading' ? <IconSpinner className="w-4 h-4 animate-spin" /> : t('newsletter.signup.button')}
             </button>
           </form>
         )}
@@ -123,7 +123,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
     <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-          <Mail className="w-5 h-5" />
+          <IconMail className="w-5 h-5" />
         </div>
         <div>
           <h3 className="font-bold text-lg">{t('newsletter.signup.blogTitle')}</h3>
@@ -133,7 +133,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
 
       {status === 'success' ? (
         <div className="bg-white/10 rounded-lg px-4 py-3 flex items-center gap-2">
-          <Check className="w-5 h-5 flex-shrink-0" />
+          <IconCheck className="w-5 h-5 flex-shrink-0" />
           <span className="text-sm">{t('newsletter.signup.thanks')}</span>
         </div>
       ) : (
@@ -151,9 +151,9 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="bg-white text-blue-700 text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-50 disabled:opacity-50 whitespace-nowrap flex-shrink-0"
+              className="bg-surface text-c-accent text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-c-accent/5 disabled:opacity-50 whitespace-nowrap flex-shrink-0"
             >
-              {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : t('newsletter.signup.button')}
+              {status === 'loading' ? <IconSpinner className="w-4 h-4 animate-spin" /> : t('newsletter.signup.button')}
             </button>
           </div>
           <div className="flex gap-4 text-xs flex-wrap">

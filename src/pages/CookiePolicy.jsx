@@ -2,9 +2,7 @@ import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { createPageUrl } from "@/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Cookie, Settings } from "lucide-react";
+import { IconArrowLeft, IconCookie, IconSettings } from "@/components/Icons";
 import SEOHead from "../components/seo/SEOHead";
 
 const SUPPORT_EMAIL = "hola@misautonomos.com";
@@ -62,60 +60,60 @@ export default function CookiePolicyPage() {
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
-          <Button
-            variant="ghost"
+          <button
+            type="button"
             onClick={() => navigate(createPageUrl("Search"))}
-            className="mb-6 hover:bg-blue-50"
+            className="btn-ghost mb-6 hover:bg-c-accent/5"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <IconArrowLeft className="w-4 h-4 mr-2" />
             {t('common.back')}
-          </Button>
+          </button>
 
-          <Card className="shadow-xl border-0">
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8">
+          <div className="card shadow-xl border-0">
+            <div className="bg-gradient-to-r from-c-accent to-accent-hover text-white p-8">
               <div className="flex items-center gap-3 mb-2">
-                <Cookie className="w-8 h-8" />
-                <CardTitle className="text-3xl font-bold">{t('cookies.policy.title')}</CardTitle>
+                <IconCookie className="w-8 h-8" />
+                <h1 className="text-3xl font-bold">{t('cookies.policy.title')}</h1>
               </div>
               <p className="text-blue-100">{t('cookies.policy.updated')}</p>
-            </CardHeader>
-            <CardContent className="p-8 space-y-8">
+            </div>
+            <div className="p-8 space-y-8">
               {SECTIONS.map((key) => (
                 <div key={key} className="space-y-3">
-                  <h2 className="text-xl font-semibold text-gray-900">{t(`cookies.policy.sections.${key}.title`)}</h2>
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">{t(`cookies.policy.sections.${key}.text`)}</p>
+                  <h2 className="text-xl font-semibold text-ink">{t(`cookies.policy.sections.${key}.title`)}</h2>
+                  <p className="text-ink leading-relaxed whitespace-pre-line">{t(`cookies.policy.sections.${key}.text`)}</p>
 
                   {key === TABLE_SECTION && (
                     <div className="mt-4 space-y-4">
                       {COOKIE_TABLES.map((table) => (
                         <div key={table.group} className="overflow-x-auto">
-                          <h4 className="font-semibold text-gray-900 text-sm mb-2">
+                          <h4 className="font-semibold text-ink text-sm mb-2">
                             {t(table.titleKey)}
                           </h4>
                           <table className="w-full text-sm border-collapse">
                             <thead>
-                              <tr className="bg-gray-100 border border-gray-200">
-                                <th className="p-2 text-left font-semibold text-gray-900">
+                              <tr className="bg-soft border border-c-border">
+                                <th className="p-2 text-left font-semibold text-ink">
                                   {t('cookies.policy.table.name')}
                                 </th>
-                                <th className="p-2 text-left font-semibold text-gray-900">
+                                <th className="p-2 text-left font-semibold text-ink">
                                   {t('cookies.policy.table.provider')}
                                 </th>
-                                <th className="p-2 text-left font-semibold text-gray-900">
+                                <th className="p-2 text-left font-semibold text-ink">
                                   {t('cookies.policy.table.purpose')}
                                 </th>
-                                <th className="p-2 text-left font-semibold text-gray-900">
+                                <th className="p-2 text-left font-semibold text-ink">
                                   {t('cookies.policy.table.duration')}
                                 </th>
                               </tr>
                             </thead>
                             <tbody>
                               {table.rows.map((row) => (
-                                <tr key={row.key} className="border border-gray-200 hover:bg-gray-50">
-                                  <td className="p-2 text-gray-700 font-mono text-xs">{row.name}</td>
-                                  <td className="p-2 text-gray-700 text-sm">{row.provider}</td>
-                                  <td className="p-2 text-gray-700 text-sm">{t(`cookies.policy.table.rows.${row.key}.purpose`)}</td>
-                                  <td className="p-2 text-gray-700 text-sm">{t(`cookies.policy.table.rows.${row.key}.duration`)}</td>
+                                <tr key={row.key} className="border border-c-border hover:bg-soft">
+                                  <td className="p-2 text-ink font-mono text-xs">{row.name}</td>
+                                  <td className="p-2 text-ink text-sm">{row.provider}</td>
+                                  <td className="p-2 text-ink text-sm">{t(`cookies.policy.table.rows.${row.key}.purpose`)}</td>
+                                  <td className="p-2 text-ink text-sm">{t(`cookies.policy.table.rows.${row.key}.duration`)}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -128,22 +126,22 @@ export default function CookiePolicyPage() {
               ))}
 
               <div className="mt-12 space-y-4">
-                <div className="p-6 bg-blue-50 border-l-4 border-blue-600 rounded-r-lg">
-                  <p className="text-sm text-gray-800 font-medium">
+                <div className="p-6 bg-c-accent/5 border-l-4 border-c-accent rounded-r-lg">
+                  <p className="text-sm text-ink font-medium">
                     {t('cookies.policy.contactLead')}:
-                    <a href={`mailto:${SUPPORT_EMAIL}`} className="text-blue-600 hover:text-blue-800 ml-1 font-semibold">
+                    <a href={`mailto:${SUPPORT_EMAIL}`} className="text-c-accent hover:text-accent-hover ml-1 font-semibold">
                       {SUPPORT_EMAIL}
                     </a>
                   </p>
                 </div>
 
-                <Link to="/configuracion-cookies" className="flex items-center justify-center gap-2 w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-4 rounded-lg transition-colors">
-                  <Settings className="w-4 h-4" />
+                <Link to="/configuracion-cookies" className="btn-dark w-full">
+                  <IconSettings className="w-4 h-4" />
                   {t('cookies.policy.goToPreferences')}
                 </Link>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </>

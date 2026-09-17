@@ -33,16 +33,11 @@ const Autonomo           = lazyWithRetry(() => import('./pages/Autonomo'));
 const Categoria          = lazyWithRetry(() => import('./pages/Categoria'));
 const ClientOnboarding   = lazyApp(() => import('./pages/ClientOnboarding'));
 const ConfirmEmail       = lazyWithRetry(() => import('./pages/ConfirmEmail'));
-const DashboardProInfo   = lazyWithRetry(() => import('./pages/DashboardProInfo'));
 const Favorites          = lazyWithRetry(() => import('./pages/Favorites'));
 const MyProfile          = lazyApp(() => import('./pages/MyProfile'));
 const Notifications      = lazyWithRetry(() => import('./pages/Notifications'));
-const Onboarding         = lazyApp(() => import('./pages/Onboarding'));
-const PaymentSuccess     = lazyApp(() => import('./pages/PaymentSuccess'));
-const PricingPlans       = lazyWithRetry(() => import('./pages/PricingPlans'));
 const ProfessionalProfile = lazyWithRetry(() => import('./pages/ProfessionalProfile'));
 const ProfileOnboarding  = lazyApp(() => import('./pages/ProfileOnboarding'));
-const SubscriptionManagement = lazyApp(() => import('./pages/SubscriptionManagement'));
 const TicketDetail       = lazyApp(() => import('./pages/TicketDetail'));
 const Tickets            = lazyApp(() => import('./pages/Tickets'));
 const UserTypeSelection  = lazyApp(() => import('./pages/UserTypeSelection'));
@@ -68,7 +63,6 @@ export const PAGES = {
     "ConfirmEmail": ConfirmEmail,
     "CookiePolicy": CookiePolicy,
     "CookiePreferences": CookiePreferences,
-    "DashboardProInfo": DashboardProInfo,
     "FAQ": FAQ,
     "FAQDetail": FAQDetail,
     "Favorites": Favorites,
@@ -77,15 +71,11 @@ export const PAGES = {
     "LegalNotice": LegalNotice,
     "MyProfile": MyProfile,
     "Notifications": Notifications,
-    "Onboarding": Onboarding,
-    "PaymentSuccess": PaymentSuccess,
-    "PricingPlans": PricingPlans,
     "PrivacyPolicy": PrivacyPolicy,
     "ProfessionalDashboard": ProfessionalDashboard,
     "ProfessionalProfile": ProfessionalProfile,
     "ProfileOnboarding": ProfileOnboarding,
     "Search": Search,
-    "SubscriptionManagement": SubscriptionManagement,
     "TermsConditions": TermsConditions,
     "TicketDetail": TicketDetail,
     "Tickets": Tickets,

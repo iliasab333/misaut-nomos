@@ -2,8 +2,12 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Search as SearchIcon, ShieldCheck, Star, ToggleLeft, ToggleRight, ChevronLeft, ChevronRight, Users as UsersIcon, Briefcase } from 'lucide-react';
-import { toast } from 'sonner';
+import {
+  IconSearch, IconShield, IconStar, IconToggleOff, IconToggleOn,
+  IconChevronLeft, IconChevronRight, IconUsers, IconBriefcase,
+} from '@/components/Icons';
+import { EmptyState } from '@/components/ListStates';
+import { toast } from '@/lib/toast';
 import SEOHead from '@/components/seo/SEOHead';
 
 const NAVY = '#00255C';
@@ -24,7 +28,7 @@ function Th({ children, sortKey, sort, setSort, align = 'left' }) {
     : '';
   return (
     <th
-      className={`text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500 px-3 py-2 ${align === 'right' ? 'text-right' : 'text-left'} ${sortable ? 'cursor-pointer hover:text-slate-900' : ''}`}
+      className={`text-[11px] font-semibold uppercase tracking-[0.06em] text-c-muted px-3 py-2 ${align === 'right' ? 'text-right' : 'text-left'} ${sortable ? 'cursor-pointer hover:text-ink' : ''}`}
       onClick={sortable && setSort
         ? () => setSort((s) => {
             const wasAsc = s && s.key === sortKey && s.dir === 'asc';
@@ -32,7 +36,7 @@ function Th({ children, sortKey, sort, setSort, align = 'left' }) {
           })
         : undefined}
     >
-      {children} {indicator && <span className="ml-1 text-slate-400">{indicator}</span>}
+      {children} {indicator && <span className="ml-1 text-c-muted">{indicator}</span>}
     </th>
   );
 }
@@ -41,22 +45,24 @@ function Pagination({ page, total, perPage, onPage }) {
   const { t } = useTranslation();
   const pages = Math.max(1, Math.ceil(total / perPage));
   return (
-    <div className="flex items-center justify-between text-xs text-slate-500 px-3 py-3">
+    <div className="flex items-center justify-between text-xs text-c-muted px-3 py-3">
       <span>{t('admin.users.pagination.results', { total: total.toLocaleString('es-ES') })}</span>
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-slate-200 disabled:opacity-50 hover:bg-slate-50"
+          className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-c-border disabled:opacity-50 hover:bg-soft"
           disabled={page <= 1}
           onClick={() => onPage(page - 1)}
-        ><ChevronLeft className="w-4 h-4" /></button>
+          aria-label={t('admin.users.pagination.page', { page: page - 1, pages })}
+        ><IconChevronLeft className="w-4 h-4" /></button>
         <span>{t('admin.users.pagination.page', { page, pages })}</span>
         <button
           type="button"
-          className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-slate-200 disabled:opacity-50 hover:bg-slate-50"
+          className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-c-border disabled:opacity-50 hover:bg-soft"
           disabled={page >= pages}
           onClick={() => onPage(page + 1)}
-        ><ChevronRight className="w-4 h-4" /></button>
+          aria-label={t('admin.users.pagination.page', { page: page + 1, pages })}
+        ><IconChevronRight className="w-4 h-4" /></button>
       </div>
     </div>
   );
@@ -114,30 +120,30 @@ function UsersTable() {
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white">
-      <div className="p-4 border-b border-slate-100 flex flex-wrap gap-2 items-center">
+    <div className="card rounded-2xl">
+      <div className="p-4 border-b border-c-border flex flex-wrap gap-2 items-center">
         <div className="relative flex-1 min-w-[200px]">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-c-muted pointer-events-none" />
           <input
             type="text"
             value={q}
             onChange={(e) => { setQ(e.target.value); setPage(1); }}
             placeholder={t('admin.users.searchPlaceholder')}
-            className="w-full pl-9 pr-3 h-9 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+            className="input pl-9 text-sm"
           />
         </div>
-        <select value={role} onChange={(e) => { setRole(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
+        <select value={role} onChange={(e) => { setRole(e.target.value); setPage(1); }} className="select w-auto text-sm">
           <option value="all">{t('admin.users.filters.allRoles')}</option>
           <option value="admin">{t('admin.users.filters.roleAdmin')}</option>
           <option value="user">{t('admin.users.filters.roleUser')}</option>
         </select>
-        <select value={userType} onChange={(e) => { setUserType(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
+        <select value={userType} onChange={(e) => { setUserType(e.target.value); setPage(1); }} className="select w-auto text-sm">
           <option value="all">{t('admin.users.filters.allTypes')}</option>
           <option value="professionnel">{t('professionalLabel')}</option>
           <option value="client">{t('clientLabel')}</option>
           <option value="">{t('admin.users.filters.typeNone')}</option>
         </select>
-        <span className="ml-auto text-xs text-slate-500">
+        <span className="ml-auto text-xs text-c-muted">
           {isLoading
             ? t('admin.users.loading')
             : t('admin.users.shownOfTotal', { shown: filtered.length.toLocaleString('es-ES'), total: users.length.toLocaleString('es-ES') })}
@@ -146,7 +152,7 @@ function UsersTable() {
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50">
+          <thead className="bg-soft">
             <tr>
               <Th sortKey="full_name" sort={sort} setSort={setSort}>{t('auth.name')}</Th>
               <Th sortKey="email" sort={sort} setSort={setSort}>{t('auth.email')}</Th>
@@ -158,33 +164,33 @@ function UsersTable() {
           </thead>
           <tbody>
             {paged.map((u) => (
-              <tr key={u.id} className="border-t border-slate-100 hover:bg-slate-50/60">
-                <td className="px-3 py-2 text-slate-900">{u.full_name || <span className="text-slate-400">—</span>}</td>
-                <td className="px-3 py-2 text-slate-700 font-mono text-[12px]">{u.email}</td>
+              <tr key={u.id} className="border-t border-c-border hover:bg-soft">
+                <td className="px-3 py-2 text-ink">{u.full_name || <span className="text-c-muted">—</span>}</td>
+                <td className="px-3 py-2 text-ink font-mono text-[12px]">{u.email}</td>
                 <td className="px-3 py-2">
-                  <span className={classNames('inline-flex text-[11px] font-semibold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full', u.role === 'admin' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-700')}>
+                  <span className={classNames('text-[11px] uppercase tracking-[0.06em]', u.role === 'admin' ? 'badge-warning' : 'badge-muted')}>
                     {u.role || 'user'}
                   </span>
                 </td>
-                <td className="px-3 py-2 text-slate-700">{u.user_type || <span className="text-slate-400">—</span>}</td>
-                <td className="px-3 py-2 text-slate-500 text-[12px]">
+                <td className="px-3 py-2 text-ink">{u.user_type || <span className="text-c-muted">—</span>}</td>
+                <td className="px-3 py-2 text-c-muted text-[12px]">
                   {u.created_date ? new Date(u.created_date).toLocaleDateString('es-ES') : '—'}
                 </td>
                 <td className="px-3 py-2 text-right">
                   <button
                     type="button"
                     onClick={() => toggleDisabled(u)}
-                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-700 hover:text-slate-900"
+                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-ink hover:text-ink"
                     title={u.disabled ? t('admin.users.actions.enable') : t('admin.users.actions.disable')}
                   >
-                    {u.disabled ? <ToggleLeft className="w-4 h-4 text-rose-500" /> : <ToggleRight className="w-4 h-4 text-emerald-600" />}
+                    {u.disabled ? <IconToggleOff className="w-4 h-4 text-error" /> : <IconToggleOn className="w-4 h-4 text-success" />}
                     {u.disabled ? t('admin.users.status.disabled') : t('admin.users.status.active')}
                   </button>
                 </td>
               </tr>
             ))}
             {!isLoading && paged.length === 0 && (
-              <tr><td colSpan={6} className="px-3 py-8 text-center text-sm text-slate-400">{t('admin.users.emptyState')}</td></tr>
+              <tr><td colSpan={6} className="px-3 py-8"><EmptyState className="border-0 shadow-none" title={t('admin.users.emptyState')} /></td></tr>
             )}
           </tbody>
         </table>
@@ -266,37 +272,37 @@ function ProsTable() {
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white">
-      <div className="p-4 border-b border-slate-100 flex flex-wrap gap-2 items-center">
+    <div className="card rounded-2xl">
+      <div className="p-4 border-b border-c-border flex flex-wrap gap-2 items-center">
         <div className="relative flex-1 min-w-[200px]">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-c-muted pointer-events-none" />
           <input
             type="text"
             value={q}
             onChange={(e) => { setQ(e.target.value); setPage(1); }}
             placeholder={t('admin.users.searchProPlaceholder')}
-            className="w-full pl-9 pr-3 h-9 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+            className="input pl-9 text-sm"
           />
         </div>
-        <select value={estado} onChange={(e) => { setEstado(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
+        <select value={estado} onChange={(e) => { setEstado(e.target.value); setPage(1); }} className="select w-auto text-sm">
           <option value="all">{t('admin.users.filters.allStatuses')}</option>
           <option value="activo">{t('admin.users.filters.statusActive')}</option>
           <option value="inactivo">{t('admin.users.filters.statusInactive')}</option>
         </select>
-        <select value={verified} onChange={(e) => { setVerified(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white">
+        <select value={verified} onChange={(e) => { setVerified(e.target.value); setPage(1); }} className="select w-auto text-sm">
           <option value="all">{t('admin.users.filters.allVerified')}</option>
           <option value="si">{t('common.yes')}</option>
           <option value="no">{t('common.no')}</option>
         </select>
-        <select value={categoria} onChange={(e) => { setCategoria(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white max-w-[200px]">
+        <select value={categoria} onChange={(e) => { setCategoria(e.target.value); setPage(1); }} className="select w-auto text-sm max-w-[200px]">
           <option value="all">{t('admin.users.filters.allCategories')}</option>
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <select value={ciudad} onChange={(e) => { setCiudad(e.target.value); setPage(1); }} className="h-9 px-2 text-sm border border-slate-200 rounded-lg bg-white max-w-[160px]">
+        <select value={ciudad} onChange={(e) => { setCiudad(e.target.value); setPage(1); }} className="select w-auto text-sm max-w-[160px]">
           <option value="all">{t('admin.users.filters.allCities')}</option>
           {cities.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <span className="ml-auto text-xs text-slate-500">
+        <span className="ml-auto text-xs text-c-muted">
           {isLoading
             ? t('admin.users.loading')
             : t('admin.users.shownOfTotal', { shown: filtered.length.toLocaleString('es-ES'), total: profiles.length.toLocaleString('es-ES') })}
@@ -305,7 +311,7 @@ function ProsTable() {
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50">
+          <thead className="bg-soft">
             <tr>
               <Th sortKey="business_name" sort={sort} setSort={setSort}>{t('auth.name')}</Th>
               <Th>{t('admin.users.table.category')}</Th>
@@ -321,30 +327,30 @@ function ProsTable() {
             {paged.map((p) => {
               const active = p.visible_en_busqueda && p.onboarding_completed;
               return (
-                <tr key={p.id} className="border-t border-slate-100 hover:bg-slate-50/60">
-                  <td className="px-3 py-2 text-slate-900">{p.business_name || <span className="text-slate-400">—</span>}</td>
-                  <td className="px-3 py-2 text-slate-700">{(p.categories || []).slice(0, 2).join(', ') || <span className="text-slate-400">—</span>}</td>
-                  <td className="px-3 py-2 text-slate-700">{p.ciudad || <span className="text-slate-400">—</span>}</td>
+                <tr key={p.id} className="border-t border-c-border hover:bg-soft">
+                  <td className="px-3 py-2 text-ink">{p.business_name || <span className="text-c-muted">—</span>}</td>
+                  <td className="px-3 py-2 text-ink">{(p.categories || []).slice(0, 2).join(', ') || <span className="text-c-muted">—</span>}</td>
+                  <td className="px-3 py-2 text-ink">{p.ciudad || <span className="text-c-muted">—</span>}</td>
                   <td className="px-3 py-2">
-                    <span className={classNames('inline-flex text-[11px] font-semibold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full', active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600')}>
+                    <span className={classNames('text-[11px] uppercase tracking-[0.06em]', active ? 'badge-success' : 'badge-muted')}>
                       {active ? t('admin.users.status.active') : t('admin.users.status.inactive')}
                     </span>
                   </td>
                   <td className="px-3 py-2">
-                    {p.identity_verified ? <ShieldCheck className="w-4 h-4" style={{ color: NAVY }} /> : <span className="text-slate-400">—</span>}
+                    {p.identity_verified ? <IconShield className="w-4 h-4" style={{ color: NAVY }} /> : <span className="text-c-muted">—</span>}
                   </td>
                   <td className="px-3 py-2">
-                    {p.is_ads_plus ? <Star className="w-4 h-4 fill-current" style={{ color: '#E2A91F' }} /> : <span className="text-slate-300">·</span>}
+                    {p.is_ads_plus ? <IconStar className="w-4 h-4 text-star" /> : <span className="text-c-muted">·</span>}
                   </td>
-                  <td className="px-3 py-2 text-slate-500 text-[12px]">
+                  <td className="px-3 py-2 text-c-muted text-[12px]">
                     {p.created_date ? new Date(p.created_date).toLocaleDateString('es-ES') : '—'}
                   </td>
                   <td className="px-3 py-2 text-right">
                     <div className="inline-flex items-center gap-3">
-                      <button onClick={() => toggleVisible(p)} className="text-[12px] font-medium text-slate-700 hover:text-slate-900" title={p.visible_en_busqueda ? t('admin.users.actions.hide') : t('admin.users.actions.show')}>
+                      <button type="button" onClick={() => toggleVisible(p)} className="text-[12px] font-medium text-ink hover:text-ink" title={p.visible_en_busqueda ? t('admin.users.actions.hide') : t('admin.users.actions.show')}>
                         {p.visible_en_busqueda ? t('admin.users.actions.hide') : t('admin.users.actions.show')}
                       </button>
-                      <button onClick={() => toggleAdsPlus(p)} className="text-[12px] font-medium text-slate-700 hover:text-slate-900" title={t('admin.users.actions.toggleAdsPlus')}>
+                      <button type="button" onClick={() => toggleAdsPlus(p)} className="text-[12px] font-medium text-ink hover:text-ink" title={t('admin.users.actions.toggleAdsPlus')}>
                         {p.is_ads_plus ? t('admin.users.actions.removeAdsPlus') : t('admin.users.actions.adsPlus')}
                       </button>
                     </div>
@@ -353,7 +359,7 @@ function ProsTable() {
               );
             })}
             {!isLoading && paged.length === 0 && (
-              <tr><td colSpan={8} className="px-3 py-8 text-center text-sm text-slate-400">{t('admin.users.emptyState')}</td></tr>
+              <tr><td colSpan={8} className="px-3 py-8"><EmptyState className="border-0 shadow-none" title={t('admin.users.emptyState')} /></td></tr>
             )}
           </tbody>
         </table>
@@ -369,19 +375,19 @@ export default function AdminUsuariosPage() {
   return (
     <>
       <SEOHead title={t('admin.users.pageTitle')} noindex />
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-canvas">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
           <div className="flex items-end justify-between gap-3 mb-6">
             <div>
-              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em' }}>{t('admin.users.title')}</h1>
-              <p className="text-sm text-slate-500 mt-1">{t('admin.users.subtitle')}</p>
+              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-ink" style={{ letterSpacing: '-0.02em' }}>{t('admin.users.title')}</h1>
+              <p className="text-sm text-c-muted mt-1">{t('admin.users.subtitle')}</p>
             </div>
-            <div className="inline-flex p-1 rounded-xl bg-slate-100">
-              <button onClick={() => setTab('users')} className={classNames('inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg', tab === 'users' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>
-                <UsersIcon className="w-3.5 h-3.5" /> {t('admin.users.tabs.accounts')}
+            <div role="tablist" className="inline-flex p-1 rounded-xl bg-soft">
+              <button type="button" role="tab" aria-selected={tab === 'users'} onClick={() => setTab('users')} className={classNames('inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg', tab === 'users' ? 'bg-surface text-ink shadow-sm' : 'text-c-muted hover:text-ink')}>
+                <IconUsers className="w-3.5 h-3.5" /> {t('admin.users.tabs.accounts')}
               </button>
-              <button onClick={() => setTab('pros')} className={classNames('inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg', tab === 'pros' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>
-                <Briefcase className="w-3.5 h-3.5" /> {t('admin.users.tabs.professionals')}
+              <button type="button" role="tab" aria-selected={tab === 'pros'} onClick={() => setTab('pros')} className={classNames('inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg', tab === 'pros' ? 'bg-surface text-ink shadow-sm' : 'text-c-muted hover:text-ink')}>
+                <IconBriefcase className="w-3.5 h-3.5" /> {t('admin.users.tabs.professionals')}
               </button>
             </div>
           </div>

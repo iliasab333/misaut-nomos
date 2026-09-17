@@ -1,21 +1,20 @@
 import React from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { HelpCircle } from "lucide-react";
+import { IconHelp } from '@/components/Icons';
 
+// El Tooltip de Radix se va: el contenido era una sola frase, así que el
+// atributo `title` nativo la da igual de bien y funciona en táctil (pulsación
+// larga) sin portal ni provider. `side` se conserva en la firma porque los
+// llamantes pueden seguir pasándolo; el navegador decide dónde pintarlo.
 export default function OnboardingTooltip({ children, content, side = "top" }) {
   return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button type="button" className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-700">
-            {children}
-            <HelpCircle className="w-4 h-4" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side={side} className="max-w-sm bg-gray-900 text-white p-3 rounded-lg">
-          <p className="text-sm leading-relaxed">{content}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <button
+      type="button"
+      title={content}
+      data-side={side}
+      className="inline-flex items-center gap-1.5 text-c-accent hover:text-accent-hover"
+    >
+      {children}
+      <IconHelp className="w-4 h-4" size={16} />
+    </button>
   );
 }

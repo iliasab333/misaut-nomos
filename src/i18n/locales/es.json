@@ -23,11 +23,9 @@
     "messages": "Mensajes",
     "favorites": "Favoritos",
     "my_profile": "Mi Perfil",
-    "view_plans": "Ver Planes",
     "faq": "Preguntas frecuentes",
     "support": "Soporte",
     "home": "Inicio",
-    "my_subscription": "Mi suscripción",
     "payments": "Pagos",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
@@ -322,7 +320,6 @@
     "name_placeholder": "Tu nombre",
     "email": "Email",
     "email_placeholder": "tu@email.com",
-    "password": "Contraseña",
     "continue_with_google": "Continuar con Google",
     "welcome_toast": "¡Bienvenido! Ya puedes contactar autónomos 🎉",
     "errors": {
@@ -402,54 +399,9 @@
       "resending": "Reenviando…",
       "resendIn": "Reenviar el email en {{seconds}} s",
       "resend": "Reenviar el email"
-    }
-  },
-  "pricing": {
-    "free": {
-      "seoTitle": "Registro gratuito para autónomos",
-      "seoDescription": "Regístrate gratis y empieza a recibir clientes. Sin tarjeta, sin permanencia, sin sorpresas. 100% gratuito para siempre.",
-      "banner": "🎉 <strong>100% Gratuito para autónomos</strong> — Sin tarjeta, sin permanencia, sin sorpresas",
-      "hero": {
-        "badge": "Sin coste · Sin tarjeta · Para siempre",
-        "title": "MisAutónomos es<br/> <highlight>completamente gratis</highlight><br/> para autónomos",
-        "subtitle": "Crea tu perfil hoy y empieza a recibir clientes. Sin ningún pago, sin letra pequeña."
-      },
-      "card": {
-        "ribbon": "✓ GRATIS · SIEMPRE · PARA TODOS LOS AUTÓNOMOS",
-        "perMonthForever": "al mes · para siempre",
-        "noCard": "Sin tarjeta · Sin permanencia · Sin sorpresas",
-        "cta": "Crear mi perfil gratis →"
-      },
-      "includes": {
-        "visibleSearch": "Perfil visible en búsquedas de toda España",
-        "fullProfile": "Foto, descripción y servicios completos",
-        "directContact": "Contacto directo: WhatsApp, llamada y chat interno",
-        "unlimitedMessages": "Mensajes ilimitados con clientes",
-        "stats": "Estadísticas de visitas a tu perfil",
-        "coverageArea": "Zona de cobertura geográfica personalizada",
-        "verifiedReviews": "Valoraciones y reseñas verificadas",
-        "permanentAccess": "Acceso permanente · Sin tarjeta · Sin compromisos"
-      },
-      "guarantee": {
-        "title": "🛡️ Gratuito garantizado · Sin letra pequeña",
-        "text": "Tu perfil en MisAutónomos es completamente gratuito para siempre. No existe ningún plan de pago para autónomos. Sin compromisos, sin sorpresas."
-      },
-      "why": {
-        "title": "¿Por qué unirte?",
-        "noFeesText": "Lo que ganes es 100% tuyo. Nunca cobramos por cada trabajo.",
-        "fastProfileTitle": "Perfil en 10 minutos",
-        "fastProfileText": "Regístrate, completa tu perfil y empieza a recibir contactos hoy mismo.",
-        "verifiedReviewsTitle": "Reseñas verificadas",
-        "verifiedReviewsText": "Solo clientes reales que han contactado al profesional pueden opinar.",
-        "adsIncludedTitle": "Publicidad incluida",
-        "adsIncludedText": "Invertimos en publicidad en redes y Google para llevar clientes a la plataforma."
-      },
-      "finalCta": {
-        "title": "¿A qué esperas?",
-        "text": "Es gratis. Siempre lo ha sido. Siempre lo será.",
-        "note": "Sin tarjeta · Sin permanencia · Perfil activo en 10 minutos"
-      }
-    }
+    },
+    "password": "Contraseña",
+    "passwordMinChars": "Mínimo 8 caracteres"
   },
   "footer": {
     "tagline": "Tu autónomo de confianza",
@@ -486,12 +438,10 @@
   "nifCifNie": "NIF / CIF / NIE *",
   "yearsExperience": "Años de experiencia",
   "emailContact": "Email de contacto",
-  "phoneContactLabel": "Teléfono de contacto",
   "visibleContactMethods": "Métodos de contacto visibles",
   "selectHowClientsContact": "Selecciona cómo te pueden contactar los clientes",
   "internalChat": "Chat interno",
   "alwaysActive": "Siempre activo",
-  "fiscalAddress": "Dirección fiscal",
   "cityField": "Ciudad",
   "provinceField": "Provincia",
   "emailField": "Email",
@@ -516,16 +466,13 @@
   "statusUpdated": "Estado actualizado",
   "city": "Ciudad",
   "province": "Provincia",
-  "paymentMethod": "Método de pago",
   "bankTransfer": "Transferencia",
   "card": "Tarjeta",
   "cash": "Efectivo",
   "description": "Descripción",
   "total": "Total",
   "draft": "Borrador",
-  "paid": "Pagada",
   "view": "Ver",
-  "downloadPDF": "Descargar PDF",
   "notifications": {
     "enable_title": "No te pierdas ningún cliente",
     "enable_subtitle": "Recibe avisos instantáneos cuando te contacten o te envíen una solicitud.",
@@ -547,7 +494,6 @@
       "deletedMany": "Notificaciones eliminadas"
     },
     "banner": {
-      "activatedDescription": "Recibirás avisos cuando te contacten.",
       "ariaLabel": "Activar notificaciones"
     },
     "page": {
@@ -1378,8 +1324,7 @@
       "questionCount_other": "{{count}} preguntas",
       "ctaTitle": "¿No encuentras tu respuesta?",
       "ctaSubtitle": "Habla directamente con un profesional de tu zona o contáctanos.",
-      "findPro": "Buscar profesional",
-      "viewPlans": "Ver planes y precios"
+      "findPro": "Buscar profesional"
     }
   },
   "forPros": {
@@ -1759,7 +1704,6 @@
     "supportInbox": "Bandeja de Soporte",
     "selectConversation": "Selecciona una conversación para responder",
     "conversationsCount": "{{count}} conversaciones",
-    "needHelp": "¿Necesitas ayuda?",
     "ticketTypeTechnical": "Problema técnico",
     "ticketTypeBilling": "Facturación",
     "ticketTypeComplaint": "Reclamación",

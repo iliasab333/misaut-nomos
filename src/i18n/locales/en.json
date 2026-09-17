@@ -23,11 +23,9 @@
     "messages": "Messages",
     "favorites": "Favorites",
     "my_profile": "My Profile",
-    "view_plans": "Plans",
     "faq": "FAQ",
     "support": "Support",
     "home": "Home",
-    "my_subscription": "My Subscription",
     "payments": "Payments",
     "login": "Sign in",
     "logout": "Sign out",
@@ -322,7 +320,6 @@
     "name_placeholder": "Your name",
     "email": "Email",
     "email_placeholder": "your@email.com",
-    "password": "Password",
     "continue_with_google": "Continue with Google",
     "welcome_toast": "Welcome! You can now contact professionals 🎉",
     "errors": {
@@ -402,54 +399,9 @@
       "resending": "Resending…",
       "resendIn": "Resend the email in {{seconds}} s",
       "resend": "Resend the email"
-    }
-  },
-  "pricing": {
-    "free": {
-      "seoTitle": "Free sign-up for self-employed professionals",
-      "seoDescription": "Sign up for free and start getting clients. No card, no commitment, no surprises. 100% free, forever.",
-      "banner": "🎉 <strong>100% free for self-employed professionals</strong> — No card, no commitment, no surprises",
-      "hero": {
-        "badge": "No cost · No card · Forever",
-        "title": "MisAutónomos is<br/> <highlight>completely free</highlight><br/> for self-employed professionals",
-        "subtitle": "Create your profile today and start getting clients. No payment, no fine print."
-      },
-      "card": {
-        "ribbon": "✓ FREE · ALWAYS · FOR EVERY SELF-EMPLOYED PROFESSIONAL",
-        "perMonthForever": "per month · forever",
-        "noCard": "No card · No commitment · No surprises",
-        "cta": "Create my free profile →"
-      },
-      "includes": {
-        "visibleSearch": "Profile visible in searches across Spain",
-        "fullProfile": "Photo, description and full list of services",
-        "directContact": "Direct contact: WhatsApp, phone and in-app chat",
-        "unlimitedMessages": "Unlimited messages with clients",
-        "stats": "Profile visit statistics",
-        "coverageArea": "Custom geographic coverage area",
-        "verifiedReviews": "Verified ratings and reviews",
-        "permanentAccess": "Permanent access · No card · No strings attached"
-      },
-      "guarantee": {
-        "title": "🛡️ Guaranteed free · No fine print",
-        "text": "Your MisAutónomos profile is completely free, forever. There is no paid plan for self-employed professionals. No commitment, no surprises."
-      },
-      "why": {
-        "title": "Why join?",
-        "noFeesText": "What you earn is 100% yours. We never charge per job.",
-        "fastProfileTitle": "Profile in 10 minutes",
-        "fastProfileText": "Sign up, complete your profile and start getting contacts today.",
-        "verifiedReviewsTitle": "Verified reviews",
-        "verifiedReviewsText": "Only real clients who have contacted the professional can leave a review.",
-        "adsIncludedTitle": "Advertising included",
-        "adsIncludedText": "We invest in social media and Google ads to bring clients to the platform."
-      },
-      "finalCta": {
-        "title": "What are you waiting for?",
-        "text": "It's free. It always has been. It always will be.",
-        "note": "No card · No commitment · Profile live in 10 minutes"
-      }
-    }
+    },
+    "password": "Password",
+    "passwordMinChars": "At least 8 characters"
   },
   "footer": {
     "tagline": "Your trusted professional",
@@ -486,12 +438,10 @@
   "nifCifNie": "NIF / CIF / NIE *",
   "yearsExperience": "Years of experience",
   "emailContact": "Contact email",
-  "phoneContactLabel": "Contact phone",
   "visibleContactMethods": "Visible contact methods",
   "selectHowClientsContact": "Select how clients can contact you",
   "internalChat": "Internal chat",
   "alwaysActive": "Always active",
-  "fiscalAddress": "Fiscal address",
   "cityField": "City",
   "provinceField": "Province",
   "emailField": "Email",
@@ -516,16 +466,13 @@
   "statusUpdated": "Status updated",
   "city": "City",
   "province": "Province",
-  "paymentMethod": "Payment method",
   "bankTransfer": "Bank transfer",
   "card": "Card",
   "cash": "Cash",
   "description": "Description",
   "total": "Total",
   "draft": "Draft",
-  "paid": "Paid",
   "view": "View",
-  "downloadPDF": "Download PDF",
   "notifications": {
     "enable_title": "Don't miss any client",
     "enable_subtitle": "Get instant alerts when someone contacts you or sends a request.",
@@ -547,7 +494,6 @@
       "deletedMany": "Notifications deleted"
     },
     "banner": {
-      "activatedDescription": "You'll get alerts when someone contacts you.",
       "ariaLabel": "Enable notifications"
     },
     "page": {
@@ -1378,8 +1324,7 @@
       "questionCount_other": "{{count}} questions",
       "ctaTitle": "Can't find your answer?",
       "ctaSubtitle": "Talk directly to a professional in your area or contact us.",
-      "findPro": "Find a professional",
-      "viewPlans": "See plans and pricing"
+      "findPro": "Find a professional"
     }
   },
   "forPros": {
@@ -1759,7 +1704,6 @@
     "supportInbox": "Support Inbox",
     "selectConversation": "Select a conversation to reply",
     "conversationsCount": "{{count}} conversations",
-    "needHelp": "Need help?",
     "ticketTypeTechnical": "Technical issue",
     "ticketTypeBilling": "Billing",
     "ticketTypeComplaint": "Complaint",

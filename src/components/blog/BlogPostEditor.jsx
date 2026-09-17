@@ -1,8 +1,7 @@
 import { useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, RefreshCw, Eye, Upload, X, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { IconArrowLeft, IconRefresh, IconEye, IconUpload, IconClose, IconSpinner } from '@/components/Icons';
+import { toast } from '@/lib/toast';
 import { useTranslation } from 'react-i18next';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -46,10 +45,10 @@ const QUILL_MODULES = {
 
 function Field({ label, hint, children }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
-      <label className="block text-sm font-semibold text-slate-800 mb-2">{label}</label>
+    <div className="bg-surface rounded-xl border border-c-border p-5">
+      <label className="block text-sm font-semibold text-ink mb-2">{label}</label>
       {children}
-      {hint && <p className="text-xs text-slate-400 mt-2">{hint}</p>}
+      {hint && <p className="text-xs text-c-muted mt-2">{hint}</p>}
     </div>
   );
 }
@@ -77,27 +76,27 @@ function ImageUploader({ value, onChange, label, ratio = 'aspect-[16/9]' }) {
 
   return (
     <div>
-      <div className={`rounded-xl border border-dashed border-slate-300 bg-slate-50 overflow-hidden flex items-center justify-center ${ratio} relative`}>
+      <div className={`rounded-xl border border-dashed border-c-border bg-soft overflow-hidden flex items-center justify-center ${ratio} relative`}>
         {value ? (
           <>
             <img src={value} alt={label} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
             <button
               type="button"
               onClick={() => onChange('')}
-              className="absolute top-2 right-2 inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/90 shadow border border-slate-200 hover:bg-white"
+              className="absolute top-2 right-2 inline-flex items-center justify-center w-7 h-7 rounded-full bg-surface/90 shadow border border-c-border hover:bg-surface"
               aria-label={t('blog.editor.upload.remove')}
             >
-              <X className="w-3.5 h-3.5 text-slate-600" />
+              <IconClose className="w-3.5 h-3.5 text-c-muted" />
             </button>
           </>
         ) : (
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="inline-flex items-center gap-2 text-sm font-medium text-c-muted hover:text-ink"
             disabled={uploading}
           >
-            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            {uploading ? <IconSpinner className="w-4 h-4 animate-spin" /> : <IconUpload className="w-4 h-4" />}
             {uploading ? t('blog.editor.upload.uploading') : t('blog.editor.upload.button')}
           </button>
         )}
@@ -117,15 +116,15 @@ function ImageUploader({ value, onChange, label, ratio = 'aspect-[16/9]' }) {
           placeholder={t('blog.editor.upload.urlPlaceholder')}
           className="flex-1 input-base"
         />
-        <Button
+        <button
           type="button"
-          variant="outline"
-          size="sm"
+          className="btn-secondary btn-sm"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
+          aria-label={t('blog.editor.upload.button')}
         >
-          {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-        </Button>
+          {uploading ? <IconSpinner className="w-3.5 h-3.5 animate-spin" /> : <IconUpload className="w-3.5 h-3.5" />}
+        </button>
       </div>
     </div>
   );
@@ -206,47 +205,50 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
   const TAB_LABELS = { content: t('blog.editor.tabs.content'), meta: t('blog.editor.tabs.meta'), seo: t('blog.editor.tabs.seo'), author: t('blog.editor.tabs.author'), publish: t('blog.editor.tabs.publish'), related: t('blog.editor.tabs.related') };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-soft">
       {/* Top bar */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-20">
+      <div className="bg-surface border-b border-c-border sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <button onClick={onCancel} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900">
-            <ArrowLeft className="w-4 h-4" /> {t('common.back')}
+          <button type="button" onClick={onCancel} className="flex items-center gap-1 text-sm text-c-muted hover:text-ink">
+            <IconArrowLeft className="w-4 h-4" /> {t('common.back')}
           </button>
-          <h2 className="font-semibold text-slate-900 text-sm truncate flex-1 text-center">
+          <h2 className="font-semibold text-ink text-sm truncate flex-1 text-center">
             {post ? t('blog.editor.editArticle') : t('blog.editor.newArticle')}
           </h2>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => handleSave('draft')} disabled={saving}>
+            <button type="button" className="btn-secondary btn-sm" onClick={() => handleSave('draft')} disabled={saving}>
               {t('blog.editor.saveDraft')}
-            </Button>
+            </button>
             {data.slug && data.status !== 'draft' && (
-              <a href={`/blog/${data.slug}`} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="sm"><Eye className="w-3.5 h-3.5 mr-1" /> {t('view')}</Button>
+              <a href={`/blog/${data.slug}`} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                <IconEye className="w-3.5 h-3.5 mr-1" /> {t('view')}
               </a>
             )}
-            <Button
-              size="sm"
+            <button
+              type="button"
               onClick={() => handleSave('published')}
               disabled={saving}
-              className="text-white font-semibold"
+              className="btn btn-sm text-white font-semibold"
               style={{ background: NAVY }}
               onMouseEnter={(e) => (e.currentTarget.style.background = NAVY_INK)}
               onMouseLeave={(e) => (e.currentTarget.style.background = NAVY)}
             >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t('blog.editor.publishButton')}
-            </Button>
+              {saving ? <IconSpinner className="w-4 h-4 animate-spin" /> : t('blog.editor.publishButton')}
+            </button>
           </div>
         </div>
 
         <div className="max-w-5xl mx-auto px-4 overflow-x-auto scrollbar-hide">
-          <div className="flex min-w-max">
+          <div className="flex min-w-max" role="tablist">
             {TABS.map((tab) => (
               <button
                 key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
-                  activeTab === tab ? 'text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-800'
+                  activeTab === tab ? 'text-ink' : 'border-transparent text-c-muted hover:text-ink'
                 }`}
                 style={activeTab === tab ? { borderColor: NAVY } : { borderColor: 'transparent' }}
               >
@@ -269,32 +271,32 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
 
             <Field label={t('blog.editor.content.excerptEs')}>
               <textarea className="input-base resize-none" rows={3} value={data.excerpt_es || ''} onChange={(e) => set('excerpt_es', e.target.value)} placeholder={t('blog.editor.content.excerptEsPlaceholder')} maxLength={200} />
-              <p className="text-xs text-slate-400 mt-1">{(data.excerpt_es || '').length}/200</p>
+              <p className="text-xs text-c-muted mt-1">{(data.excerpt_es || '').length}/200</p>
             </Field>
             <Field label={t('blog.editor.content.excerptEn')}>
               <textarea className="input-base resize-none" rows={3} value={data.excerpt_en || ''} onChange={(e) => set('excerpt_en', e.target.value)} placeholder={t('blog.editor.content.excerptEnPlaceholder')} maxLength={200} />
-              <p className="text-xs text-slate-400 mt-1">{(data.excerpt_en || '').length}/200</p>
+              <p className="text-xs text-c-muted mt-1">{(data.excerpt_en || '').length}/200</p>
             </Field>
 
-            <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <div className="bg-surface rounded-xl border border-c-border p-5">
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-semibold text-slate-800">
+                <label className="text-sm font-semibold text-ink">
                   {t('blog.editor.content.bodyLabel', { lang: contentLang === 'es' ? 'ES *' : 'EN' })}
                 </label>
-                <div className="inline-flex p-1 rounded-lg bg-slate-100">
+                <div className="inline-flex p-1 rounded-lg bg-soft">
                   <button
                     type="button"
                     onClick={() => setContentLang('es')}
-                    className={`text-xs font-semibold px-3 py-1 rounded-md ${contentLang === 'es' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
+                    className={`text-xs font-semibold px-3 py-1 rounded-md ${contentLang === 'es' ? 'bg-surface text-ink shadow-sm' : 'text-c-muted'}`}
                   >ES</button>
                   <button
                     type="button"
                     onClick={() => setContentLang('en')}
-                    className={`text-xs font-semibold px-3 py-1 rounded-md ${contentLang === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
+                    className={`text-xs font-semibold px-3 py-1 rounded-md ${contentLang === 'en' ? 'bg-surface text-ink shadow-sm' : 'text-c-muted'}`}
                   >EN</button>
                 </div>
               </div>
-              <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+              <div className="bg-surface rounded-lg border border-c-border overflow-hidden">
                 <ReactQuill
                   theme="snow"
                   key={contentLang}
@@ -305,7 +307,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
                   placeholder={contentLang === 'es' ? t('blog.editor.content.bodyEsPlaceholder') : t('blog.editor.content.bodyEnPlaceholder')}
                 />
               </div>
-              <p className="text-xs text-slate-400 mt-2">{t('blog.editor.content.readTimeEstimate', { minutes: data.read_time_minutes })}</p>
+              <p className="text-xs text-c-muted mt-2">{t('blog.editor.content.readTimeEstimate', { minutes: data.read_time_minutes })}</p>
             </div>
           </>
         )}
@@ -321,10 +323,10 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
                 <button
                   type="button"
                   onClick={() => set('slug', generateSlug(data.title_es))}
-                  className="px-3 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600"
+                  className="px-3 py-2 text-sm border border-c-border rounded-lg hover:bg-soft text-c-muted"
                   title={t('blog.editor.meta.regenerateSlug')}
                 >
-                  <RefreshCw className="w-4 h-4" />
+                  <IconRefresh className="w-4 h-4" />
                 </button>
               </div>
             </Field>
@@ -392,7 +394,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
             <Field label={t('blog.editor.publish.date')} hint={t('blog.editor.publish.dateHint')}>
               <input type="datetime-local" className="input-base" value={(data.publish_date || '').slice(0, 16)} onChange={(e) => set('publish_date', e.target.value)} />
             </Field>
-            <div className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-4">
+            <div className="flex items-center gap-3 bg-surface rounded-xl border border-c-border p-4">
               <input
                 type="checkbox"
                 id="featured"
@@ -400,7 +402,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
                 onChange={(e) => set('featured', e.target.checked)}
                 className="w-4 h-4 accent-[#00255C]"
               />
-              <label htmlFor="featured" className="text-sm font-medium text-slate-800">{t('blog.editor.publish.featured')}</label>
+              <label htmlFor="featured" className="text-sm font-medium text-ink">{t('blog.editor.publish.featured')}</label>
             </div>
           </>
         )}
@@ -411,7 +413,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
               {otherPosts.slice(0, 30).map((p) => {
                 const isSelected = (data.related_articles || []).includes(p.id);
                 return (
-                  <label key={p.id} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
+                  <label key={p.id} className="flex items-center gap-3 p-3 bg-surface border border-c-border rounded-lg hover:bg-soft cursor-pointer">
                     <input
                       type="checkbox"
                       className="accent-[#00255C]"
@@ -426,12 +428,12 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
                         }
                       }}
                     />
-                    <span className="text-sm text-slate-700 line-clamp-1">{p.title_es}</span>
-                    <span className="text-xs text-slate-400 ml-auto">{p.status}</span>
+                    <span className="text-sm text-ink line-clamp-1">{p.title_es}</span>
+                    <span className="text-xs text-c-muted ml-auto">{p.status}</span>
                   </label>
                 );
               })}
-              {otherPosts.length === 0 && <p className="text-xs text-slate-400">{t('blog.editor.related.empty')}</p>}
+              {otherPosts.length === 0 && <p className="text-xs text-c-muted">{t('blog.editor.related.empty')}</p>}
             </div>
           </Field>
         )}

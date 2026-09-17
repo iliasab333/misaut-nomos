@@ -5,10 +5,8 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { toast } from "sonner";
+import { IconSpinner, IconEye, IconEyeOff } from "@/components/Icons";
+import { toast } from "@/lib/toast";
 import { Link } from "react-router-dom";
 import SEOHead from "../components/seo/SEOHead";
 
@@ -169,8 +167,8 @@ export default function ClientOnboardingPage() {
 
   if (isLoadingUser) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="flex items-center justify-center min-h-screen bg-canvas">
+        <IconSpinner className="w-8 h-8 animate-spin text-c-accent" />
       </div>
     );
   }
@@ -185,7 +183,7 @@ export default function ClientOnboardingPage() {
       />
 
       {/* Fondo minimalista: blanco, sin sombras dobles, sin gradient. */}
-      <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10">
+      <div className="min-h-screen bg-canvas flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-[400px]">
           {/* Header sin iconos decorativos */}
           <div className="text-center mb-8">
@@ -213,8 +211,9 @@ export default function ClientOnboardingPage() {
               <label style={{ display: 'block', color: '#374151', fontWeight: 600, fontSize: '14px', marginBottom: '6px' }}>
                 {t('auth.name')}
               </label>
-              <Input
+              <input
                 type="text"
+                className="input"
                 placeholder={t('auth.name_placeholder')}
                 value={formData.nombre}
                 onChange={(e) => {
@@ -246,8 +245,9 @@ export default function ClientOnboardingPage() {
               <label style={{ display: 'block', color: '#374151', fontWeight: 600, fontSize: '14px', marginBottom: '6px' }}>
                 {t('auth.email')}
               </label>
-              <Input
+              <input
                 type="email"
+                className="input"
                 placeholder={t('auth.email_placeholder')}
                 value={formData.email}
                 onChange={(e) => {
@@ -284,8 +284,9 @@ export default function ClientOnboardingPage() {
                   {t('auth.password')}
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <Input
+                  <input
                     type={showPassword ? 'text' : 'password'}
+                    className="input"
                     placeholder={t('onboarding.client.passwordPlaceholder')}
                     value={formData.password}
                     onChange={(e) => {
@@ -316,7 +317,7 @@ export default function ClientOnboardingPage() {
                     tabIndex={-1}
                     aria-label={showPassword ? t('onboarding.client.hidePassword') : t('onboarding.client.showPassword')}
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? <IconEyeOff className="w-5 h-5" /> : <IconEye className="w-5 h-5" />}
                   </button>
                 </div>
                 {fieldErrors.password && (
@@ -329,6 +330,7 @@ export default function ClientOnboardingPage() {
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
               <input
                 type="checkbox"
+                className="checkbox"
                 id="acepta_terminos_client"
                 checked={formData.acepta_terminos}
                 onChange={(e) => {
@@ -357,9 +359,10 @@ export default function ClientOnboardingPage() {
             </p>
 
             {/* Botón principal */}
-            <Button
+            <button
               type="submit"
               disabled={completeOnboardingMutation.isPending}
+              className="inline-flex items-center justify-center"
               style={{
                 width: '100%',
                 height: '48px',
@@ -374,11 +377,11 @@ export default function ClientOnboardingPage() {
               }}
             >
               {completeOnboardingMutation.isPending ? (
-                <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> {t('onboarding.client.creating')}</>
+                <><IconSpinner className="w-5 h-5 mr-2 animate-spin" /> {t('onboarding.client.creating')}</>
               ) : (
                 t('onboarding.client.createAccount')
               )}
-            </Button>
+            </button>
           </form>
 
           {/* Link a login */}
