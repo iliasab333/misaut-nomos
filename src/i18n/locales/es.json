@@ -407,7 +407,51 @@
     "tagline": "Tu autónomo de confianza",
     "how_it_works": "Cómo funciona",
     "for_pros": "Para autónomos",
-    "for_clients": "Para clientes"
+    "for_clients": "Para clientes",
+    "claim": "Profesionales verificados, contacto directo, sin comisiones.",
+    "copyright": "© {{year}} <brand>MisAutónomos</brand>. Hecho en España.",
+    "columns": {
+      "product": "Producto",
+      "company": "Empresa",
+      "legal": "Legal"
+    },
+    "links": {
+      "searchPros": "Buscar profesionales",
+      "becomePro": "Hazte autónomo",
+      "pricing": "Precios",
+      "helpCenter": "Centro de ayuda",
+      "faq": "Preguntas frecuentes",
+      "blog": "Blog",
+      "contact": "Contacto",
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "cookies": "Cookies",
+      "legalNotice": "Aviso legal"
+    },
+    "seo": {
+      "servicesLabel": "Servicios",
+      "citiesLabel": "Ciudades",
+      "electricians": "Electricistas",
+      "plumbers": "Fontaneros",
+      "builders": "Albañiles / Reformas",
+      "painters": "Pintores",
+      "locksmiths": "Cerrajeros",
+      "advisors": "Asesoría / gestoría",
+      "cleaning": "Limpieza"
+    },
+    "newsletter": {
+      "label": "Newsletter:",
+      "pitch": "1-2 emails al mes. Cero spam.",
+      "emailPlaceholder": "tu@email.com",
+      "emailAria": "Tu email",
+      "sending": "Enviando…",
+      "submit": "Suscribirme",
+      "invalidEmail": "Introduce un email válido",
+      "reactivated": "Te hemos reactivado. Bienvenido de nuevo.",
+      "alreadySubscribed": "Ya estás suscrito.",
+      "confirmed": "Suscripción confirmada.",
+      "genericError": "No se ha podido completar. Inténtalo de nuevo."
+    }
   },
   "backToSearch": "Volver al buscador",
   "skills": "Especialidades",
@@ -659,7 +703,9 @@
       },
       "contactLead": "Para consultas sobre cookies",
       "goToPreferences": "Ir a Preferencias de Cookies"
-    }
+    },
+    "regionLabel": "Consentimiento de cookies",
+    "policyLinkAria": "Consulta nuestra política de cookies"
   },
   "layout": {
     "header": {

@@ -362,17 +362,13 @@
       "nav": {
         "dashboard": "Dashboard",
         "users": "Usuarios",
-        "pending": "Pendientes",
-        "subscriptions": "Suscripciones",
         "outreach": "Outreach WhatsApp",
-        "gifts": "Regalos",
-        "audit": "Auditoría",
-        "adsBriefings": "Briefings Ads+",
-        "referrals": "Referidos",
         "emails": "Emails",
-        "metrics": "Métricas",
         "support": "Soporte",
-        "verifications": "Verificaciones"
+        "tickets": "Tickets",
+        "newsletter": "Newsletter",
+        "blog": "Blog",
+        "faq": "FAQ"
       }
     },
     "newsletter": {
@@ -668,14 +664,6 @@
       }
     }
   },
-  "subscription": {
-    "status": {
-      "trial": "Periodo de prueba"
-    },
-    "reactivate": {
-      "title": "Suscripción cancelada"
-    }
-  },
   "support": {
     "status": {
       "waitingUser": "Esperando tu respuesta"
@@ -811,11 +799,6 @@
   "myProfile": {
     "toasts": {
       "onboardingCompleted": "🎉 ¡Enhorabuena! Tu perfil está publicado y visible para clientes.",
-      "reactivationCanceled": "Reactivación cancelada. Puedes intentarlo de nuevo cuando quieras.",
-      "subscriptionReactivated": "🎉 ¡Tu suscripción ha sido reactivada! Tu perfil ya es visible en búsquedas.",
-      "paymentConfirmed": "✅ ¡Pago confirmado! Ahora completa tu perfil profesional.",
-      "subscriptionActivatedOnboarding": "✅ ¡Suscripción activada! Completa tu perfil profesional.",
-      "subscriptionActive": "🎉 ¡Tu suscripción está activa!",
       "personalDataUpdated": "✅ Datos personales actualizados",
       "professionalProfileUpdated": "✅ Perfil profesional actualizado",
       "profileNowVisible": "✅ Tu perfil ahora es visible en búsquedas",
@@ -826,26 +809,6 @@
       "photoRemoved": "Foto eliminada",
       "accountDeleted": "Tu cuenta ha sido eliminada correctamente",
       "accountDeleteError": "Error al eliminar la cuenta. Contacta con soporte."
-    },
-    "subscription": {
-      "verifyFailedTitle": "No se pudo verificar tu suscripción",
-      "verifyFailedBody": "Por favor, contacta con soporte: {{email}}",
-      "trialDaysLeft": "{{days}} días de prueba restantes",
-      "trialEnded": "Prueba finalizada",
-      "active": "Suscripción activa",
-      "renewal": "Renovación: {{date}}",
-      "ended": "Suscripción finalizada",
-      "activeUntilNoRenew": "Activo hasta {{date}} (no se renovará)",
-      "profileHidden": "Tu perfil está oculto",
-      "inactive": "Suscripción inactiva",
-      "validUntil": "Válido hasta {{date}}",
-      "reactivateHint": "Reactiva tu plan para aparecer en búsquedas"
-    },
-    "verifying": {
-      "title": "Verificando tu suscripción",
-      "body": "Estamos confirmando tu pago y activando tu cuenta...",
-      "seconds": "Esto tardará solo unos segundos",
-      "dontClose": "Por favor, no cierres esta ventana mientras procesamos tu pago."
     },
     "header": {
       "manageYourInformation": "Gestiona tu información",

@@ -43,43 +43,6 @@ import IdentityVerificationWidget from "../components/verification/IdentityVerif
 import VerificationBanner from "../components/trust/VerificationBanner";
 import DeleteAccountButton from "../components/account/DeleteAccountButton";
 
-const isSubscriptionActive = (estado, fechaExpiracion) => {
-  if (!estado) return false;
-  
-  const normalizedState = estado.toLowerCase().trim();
-  const validStates = ["activo", "active", "en_prueba", "trialing", "trial_active", "actif"];
-  
-  if (validStates.includes(normalizedState)) {
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const expiration = new Date(fechaExpiracion);
-      expiration.setHours(0, 0, 0, 0);
-      
-      if (isNaN(expiration.getTime())) return true;
-      return expiration >= today;
-    } catch (error) {
-      return true;
-    }
-  }
-  
-  if (normalizedState === "cancelado" || normalizedState === "canceled") {
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const expiration = new Date(fechaExpiracion);
-      expiration.setHours(0, 0, 0, 0);
-      
-      if (isNaN(expiration.getTime())) return false;
-      return expiration >= today;
-    } catch (error) {
-      return false;
-    }
-  }
-  
-  return false;
-};
-
 const provincias = [
   "Álava", "Albacete", "Alicante", "Almería", "Asturias", "Ávila",
   "Badajoz", "Barcelona", "Burgos", "Cáceres", "Cádiz", "Cantabria",
@@ -116,14 +79,10 @@ export default function MyProfilePage() {
   const [isEditing, setIsEditing] = useState(true);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [isVerifyingSubscription, setIsVerifyingSubscription] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
   
-  const MAX_POLLING_ATTEMPTS = 10;
-  const reactivationSuccess = searchParams.get("reactivation");
-  const onboardingPending = searchParams.get("onboarding");
   const onboardingCompleted = searchParams.get("onboarding") === "completed";
 
   const [userData, setUserData] = useState({
@@ -194,19 +153,6 @@ export default function MyProfilePage() {
   }, []);
 
   // ================== QUERIES ==================
-  const { data: subscription, isLoading: loadingSubscription } = useQuery({
-    queryKey: ['subscription', user?.id],
-    queryFn: async () => {
-      const subs = await base44.entities.Subscription.filter({ user_id: user.id });
-      return subs.length > 0 ? subs[0] : null;
-    },
-    enabled: !!user && !isVerifyingSubscription,
-    retry: 1,
-    staleTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-  });
-
   const { data: profile, isLoading: loadingProfile } = useQuery({
     queryKey: ['myProfile', user?.id],
     queryFn: async () => {
@@ -291,103 +237,16 @@ export default function MyProfilePage() {
     }
   }, [profileData.provincia, profileData.ciudad, profileData.municipio]);
 
-  // ================== SUBSCRIPTION POLLING ==================
+  // ================== ONBOARDING COMPLETADO ==================
   useEffect(() => {
-    if (reactivationSuccess === "success" || onboardingPending === "pending") {
-      setIsVerifyingSubscription(true);
-      startSubscriptionPolling();
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (onboardingCompleted) {
+    if (onboardingCompleted) {
       toast.success(t('myProfile.toasts.onboardingCompleted'), {
         duration: 8000
       });
       window.history.replaceState({}, document.title, window.location.pathname);
       queryClient.invalidateQueries({ queryKey: ['myProfile'] });
-      queryClient.invalidateQueries({ queryKey: ['subscription'] });
-    } else if (reactivationSuccess === "canceled") {
-      toast.info(t('myProfile.toasts.reactivationCanceled'));
-      window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [reactivationSuccess, onboardingPending, onboardingCompleted]);
-
-  const startSubscriptionPolling = async () => {
-    for (let attempt = 1; attempt <= MAX_POLLING_ATTEMPTS; attempt++) {
-      try {
-        const currentUser = await loadUser();
-        if (!currentUser) throw new Error("User not loaded during polling");
-        
-        await queryClient.invalidateQueries({ queryKey: ['subscription', currentUser.id] });
-        const result = await queryClient.fetchQuery({
-          queryKey: ['subscription', currentUser.id],
-          queryFn: async () => {
-            const subs = await base44.entities.Subscription.filter({ user_id: currentUser.id });
-            return subs[0] || null;
-          },
-          staleTime: 0,
-          gcTime: 0,
-        });
-        
-        if (result && isSubscriptionActive(result.estado, result.fecha_expiracion)) {
-          setIsVerifyingSubscription(false);
-          
-          if (reactivationSuccess === "success") {
-            toast.success(t('myProfile.toasts.subscriptionReactivated'), {
-              duration: 6000
-            });
-          } else if (onboardingPending === "pending") {
-            toast.success(t('myProfile.toasts.paymentConfirmed'), {
-              duration: 8000
-            });
-            setTimeout(() => navigate(createPageUrl("ProfileOnboarding")), 2000);
-          }
-          
-          queryClient.invalidateQueries({ queryKey: ['myProfile'] });
-          return;
-        }
-        
-        if (attempt === 5 && currentUser) {
-          try {
-            const syncResponse = await base44.functions.invoke('syncStripeSubscription', { user_id: currentUser.id });
-            
-            if (syncResponse.data.ok) {
-              await loadUser();
-              await queryClient.invalidateQueries({ queryKey: ['subscription'] });
-              await queryClient.refetchQueries({ queryKey: ['subscription'] });
-              
-              if (syncResponse.data.needs_onboarding) {
-                toast.success(t('myProfile.toasts.subscriptionActivatedOnboarding'), { duration: 8000 });
-                setTimeout(() => navigate(createPageUrl("ProfileOnboarding")), 2000);
-              } else {
-                toast.success(t('myProfile.toasts.subscriptionActive'), { duration: 6000 });
-              }
-              
-              setIsVerifyingSubscription(false);
-              return;
-            }
-          } catch (syncError) {
-            console.error('❌ Error en sincronización forzada:', syncError);
-          }
-        }
-        
-        if (attempt < MAX_POLLING_ATTEMPTS) {
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-      } catch (error) {
-        console.error(`❌ Error en intento ${attempt}:`, error);
-        if (attempt < MAX_POLLING_ATTEMPTS) {
-          await new Promise(resolve => setTimeout(resolve, 1500));
-        }
-      }
-    }
-
-    setIsVerifyingSubscription(false);
-    // El toast propio sólo acepta texto (ver src/lib/toast.js): las dos
-    // frases van en una sola cadena, sin perder ninguna clave de i18n.
-    toast.error(
-      `${t('myProfile.subscription.verifyFailedTitle')} — ${t('myProfile.subscription.verifyFailedBody', { email: 'soporte@misautonomos.es' })}`,
-      { duration: 15000 }
-    );
-  };
+  }, [onboardingCompleted]);
 
   // ================== MUTATIONS ==================
   const updateUserMutation = useMutation({
@@ -547,74 +406,6 @@ export default function MyProfilePage() {
   // ================== COMPUTED VALUES ==================
   const isProfessional = (profile && profile.onboarding_completed) || user?.user_type === "professionnel";
   
-  const getSubscriptionStatus = () => {
-    if (!subscription) return null;
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const expirationDate = new Date(subscription.fecha_expiracion);
-    expirationDate.setHours(0, 0, 0, 0);
-    
-    const daysLeft = Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24));
-    const isActive = isSubscriptionActive(subscription.estado, subscription.fecha_expiracion);
-    const normalizedState = subscription.estado.toLowerCase();
-    
-    if (normalizedState === "en_prueba" || normalizedState === "trialing" || normalizedState === "trial_active") {
-      return {
-        text: t('subscription.status.trial'),
-        badge: "🟡",
-        color: "bg-c-accent/10 text-c-accent border border-c-accent/30",
-        details: isActive ? t('myProfile.subscription.trialDaysLeft', { days: daysLeft }) : t('myProfile.subscription.trialEnded'),
-        isActive: isActive,
-        showUpgrade: true,
-        showReactivate: false
-      };
-    }
-    
-    if (normalizedState === "activo" || normalizedState === "active" || normalizedState === "actif") {
-      return {
-        text: t('myProfile.subscription.active'),
-        badge: "🟢",
-        color: "bg-success/10 text-success border border-success/30",
-        details: t('myProfile.subscription.renewal', { date: expirationDate.toLocaleDateString('es-ES') }),
-        isActive: true,
-        showUpgrade: false,
-        showReactivate: false
-      };
-    }
-    
-    if (normalizedState === "cancelado" || normalizedState === "canceled") {
-      return {
-        text: isActive ? t('subscription.reactivate.title') : t('myProfile.subscription.ended'),
-        badge: isActive ? "⚪" : "🔴",
-        color: isActive 
-          ? "bg-warning/10 text-warning border border-warning/30" 
-          : "bg-error/10 text-error border border-error/30",
-        details: isActive 
-          ? t('myProfile.subscription.activeUntilNoRenew', { date: expirationDate.toLocaleDateString('es-ES') })
-          : t('myProfile.subscription.profileHidden'),
-        isActive: isActive,
-        showUpgrade: false,
-        showReactivate: true
-      };
-    }
-    
-    return {
-      text: isActive ? t('myProfile.subscription.active') : t('myProfile.subscription.inactive'),
-      badge: isActive ? "🟢" : "🔴",
-      color: isActive 
-        ? "bg-success/10 text-success border border-success/30"
-        : "bg-error/10 text-error border border-error/30",
-      details: isActive ? t('myProfile.subscription.validUntil', { date: expirationDate.toLocaleDateString('es-ES') }) : t('myProfile.subscription.reactivateHint'),
-      isActive: isActive,
-      showUpgrade: false,
-      showReactivate: !isActive
-    };
-  };
-
-  const subscriptionStatus = getSubscriptionStatus();
-
   // Mapa explícito valor BD → etiqueta traducida (el valor guardado no cambia).
   const paymentLabels = {
     Tarjeta: t('card'),
@@ -623,39 +414,16 @@ export default function MyProfilePage() {
     Bizum: t('onboarding.location.bizum'),
   };
   const isProfileVisible = profile?.visible_en_busqueda === true && 
-                           subscriptionStatus?.isActive && 
                            profile?.onboarding_completed === true;
 
   // ================== LOADING STATES ==================
-  const isInitialLoading = !user || loadingProfile || (loadingSubscription && !isVerifyingSubscription);
+  const isInitialLoading = !user || loadingProfile;
 
   if (isInitialLoading) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
         <SkeletonBlock lines={2} />
         <SkeletonList count={4} avatar={false} />
-      </div>
-    );
-  }
-
-  if (isVerifyingSubscription) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="card max-w-md w-full shadow-xl">
-          <div className="p-8">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                <IconSpinner className="w-8 h-8 text-c-accent animate-spin" />
-              </div>
-              <h2 className="text-2xl font-bold text-ink">{t('myProfile.verifying.title')}</h2>
-              <p className="text-c-muted">{t('myProfile.verifying.body')}</p>
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-900 font-medium">{t('myProfile.verifying.seconds')}</p>
-                <p className="text-xs text-c-accent mt-2">{t('myProfile.verifying.dontClose')}</p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     );
   }
@@ -917,7 +685,7 @@ export default function MyProfilePage() {
                 </div>
 
                 {/* VISIBILITY TOGGLE - SOLO PARA PROFESIONALES */}
-                {isProfessional && profile && subscriptionStatus?.isActive && (
+                {isProfessional && profile && (
                   <div className="pt-4 mt-4 border-t border-c-border">
                     <div className="card p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-sm">
                       <div className="space-y-4">

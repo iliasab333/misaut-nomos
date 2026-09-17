@@ -362,17 +362,13 @@
       "nav": {
         "dashboard": "Dashboard",
         "users": "Users",
-        "pending": "Pending",
-        "subscriptions": "Subscriptions",
         "outreach": "WhatsApp outreach",
-        "gifts": "Gifts",
-        "audit": "Audit",
-        "adsBriefings": "Ads+ briefings",
-        "referrals": "Referrals",
         "emails": "Emails",
-        "metrics": "Metrics",
         "support": "Support",
-        "verifications": "Verifications"
+        "tickets": "Tickets",
+        "newsletter": "Newsletter",
+        "blog": "Blog",
+        "faq": "FAQ"
       }
     },
     "newsletter": {
@@ -668,14 +664,6 @@
       }
     }
   },
-  "subscription": {
-    "status": {
-      "trial": "Trial period"
-    },
-    "reactivate": {
-      "title": "Subscription cancelled"
-    }
-  },
   "support": {
     "status": {
       "waitingUser": "Waiting for your reply"
@@ -811,11 +799,6 @@
   "myProfile": {
     "toasts": {
       "onboardingCompleted": "🎉 Congratulations! Your profile is published and visible to clients.",
-      "reactivationCanceled": "Reactivation cancelled. You can try again whenever you like.",
-      "subscriptionReactivated": "🎉 Your subscription has been reactivated! Your profile is now visible in searches.",
-      "paymentConfirmed": "✅ Payment confirmed! Now complete your professional profile.",
-      "subscriptionActivatedOnboarding": "✅ Subscription activated! Complete your professional profile.",
-      "subscriptionActive": "🎉 Your subscription is active!",
       "personalDataUpdated": "✅ Personal details updated",
       "professionalProfileUpdated": "✅ Professional profile updated",
       "profileNowVisible": "✅ Your profile is now visible in searches",
@@ -826,26 +809,6 @@
       "photoRemoved": "Photo removed",
       "accountDeleted": "Your account has been deleted",
       "accountDeleteError": "Error deleting your account. Please contact support."
-    },
-    "subscription": {
-      "verifyFailedTitle": "We couldn't verify your subscription",
-      "verifyFailedBody": "Please contact support: {{email}}",
-      "trialDaysLeft": "{{days}} trial days left",
-      "trialEnded": "Trial ended",
-      "active": "Active subscription",
-      "renewal": "Renews on: {{date}}",
-      "ended": "Subscription ended",
-      "activeUntilNoRenew": "Active until {{date}} (won't renew)",
-      "profileHidden": "Your profile is hidden",
-      "inactive": "Inactive subscription",
-      "validUntil": "Valid until {{date}}",
-      "reactivateHint": "Reactivate your plan to appear in searches"
-    },
-    "verifying": {
-      "title": "Verifying your subscription",
-      "body": "We're confirming your payment and activating your account...",
-      "seconds": "This will only take a few seconds",
-      "dontClose": "Please don't close this window while we process your payment."
     },
     "header": {
       "manageYourInformation": "Manage your details",

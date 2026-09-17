@@ -2,23 +2,25 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
-  IconDashboard, IconUsers, IconBriefcase, IconCard,
-  IconBarChart, IconTicket, IconSettings, IconChevronRight, IconGift,
-  IconShieldPlain, IconMegaphone, IconMail, IconMessageCircle
+  IconDashboard, IconUsers, IconBriefcase,
+  IconTicket, IconSettings, IconChevronRight,
+  IconMail, IconMessageCircle
 } from "@/components/Icons";
 
+// Cada sección a SU ruta. Antes media docena apuntaba a "/admin" a secas —
+// un resto de cuando el panel era una sola página con pestañas internas— y
+// las de regalos y referidos a páginas que el recorte de alcance borró.
+// Pinchar en ellas no llevaba a ninguna parte o llevaba a un 404.
 const SECTION_ROUTES = {
   dashboard: "/admin",
-  users: "/admin",
-  pending: "/admin",
-  subscriptions: "/admin",
+  users: "/admin/usuarios",
+  emails: "/admin/emails",
+  newsletter: "/admin/newsletter",
+  blog: "/admin/blog",
+  faq: "/admin/faq",
   outreach: "/admin/outreach-whatsapp",
-  gifts: "/admin/regalos",
-  emails: "/admin",
-  metrics: "/admin",
   support: "/admin/soporte",
-  verifications: "/admin",
-  referrals: "/admin/referidos",
+  tickets: "/admin/tickets",
 };
 
 export default function AdminLayout({ activeSection, currentSection, onSectionChange, openTickets = 0, children }) {
@@ -27,20 +29,19 @@ export default function AdminLayout({ activeSection, currentSection, onSectionCh
   const active = activeSection || currentSection;
 
   // Antes constante de módulo (NAV_ITEMS); dentro para que las etiquetas sigan al idioma
+  // Una entrada por página de admin que existe. Suscripciones, regalos,
+  // referidos, briefings de Ads, auditoría de planes, métricas y
+  // verificaciones se fueron con el recorte de alcance.
   const navItems = [
     { id: "dashboard", label: t("admin.layout.nav.dashboard"), icon: IconDashboard, emoji: "📊" },
     { id: "users", label: t("admin.layout.nav.users"), icon: IconUsers, emoji: "👥" },
-    { id: "pending", label: t("admin.layout.nav.pending"), icon: IconBriefcase, emoji: "🔧" },
-    { id: "subscriptions", label: t("admin.layout.nav.subscriptions"), icon: IconCard, emoji: "💳" },
-    { id: "outreach", label: t("admin.layout.nav.outreach"), icon: IconMessageCircle, emoji: "💬" },
-    { id: "gifts", label: t("admin.layout.nav.gifts"), icon: IconGift, emoji: "🎁" },
-    { id: "audit", label: t("admin.layout.nav.audit"), icon: IconShieldPlain, emoji: "📋" },
-    { id: "ads_briefings", label: t("admin.layout.nav.adsBriefings"), icon: IconMegaphone, emoji: "📢" },
-    { id: "referrals", label: t("admin.layout.nav.referrals"), icon: IconGift, emoji: "🤝" },
-    { id: "emails", label: t("admin.layout.nav.emails"), icon: IconMail, emoji: "📧" },
-    { id: "metrics", label: t("admin.layout.nav.metrics"), icon: IconBarChart, emoji: "📈" },
     { id: "support", label: t("admin.layout.nav.support"), icon: IconTicket, emoji: "🎫" },
-    { id: "verifications", label: t("admin.layout.nav.verifications"), icon: IconSettings, emoji: "🛡️" },
+    { id: "tickets", label: t("admin.layout.nav.tickets"), icon: IconTicket, emoji: "🎟️" },
+    { id: "outreach", label: t("admin.layout.nav.outreach"), icon: IconMessageCircle, emoji: "💬" },
+    { id: "emails", label: t("admin.layout.nav.emails"), icon: IconMail, emoji: "📧" },
+    { id: "newsletter", label: t("admin.layout.nav.newsletter"), icon: IconMail, emoji: "📰" },
+    { id: "blog", label: t("admin.layout.nav.blog"), icon: IconBriefcase, emoji: "✍️" },
+    { id: "faq", label: t("admin.layout.nav.faq"), icon: IconSettings, emoji: "❓" },
   ];
 
   const handleSectionChange = (id) => {

@@ -407,7 +407,51 @@
     "tagline": "Your trusted professional",
     "how_it_works": "How it works",
     "for_pros": "For professionals",
-    "for_clients": "For clients"
+    "for_clients": "For clients",
+    "claim": "Verified professionals, direct contact, no commission.",
+    "copyright": "© {{year}} <brand>MisAutónomos</brand>. Made in Spain.",
+    "columns": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal"
+    },
+    "links": {
+      "searchPros": "Find professionals",
+      "becomePro": "Join as a professional",
+      "pricing": "Pricing",
+      "helpCenter": "Help centre",
+      "faq": "FAQ",
+      "blog": "Blog",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies",
+      "legalNotice": "Legal notice"
+    },
+    "seo": {
+      "servicesLabel": "Services",
+      "citiesLabel": "Cities",
+      "electricians": "Electricians",
+      "plumbers": "Plumbers",
+      "builders": "Builders / Renovations",
+      "painters": "Painters",
+      "locksmiths": "Locksmiths",
+      "advisors": "Accountants / admin services",
+      "cleaning": "Cleaning"
+    },
+    "newsletter": {
+      "label": "Newsletter:",
+      "pitch": "1-2 emails a month. Zero spam.",
+      "emailPlaceholder": "you@email.com",
+      "emailAria": "Your email",
+      "sending": "Sending…",
+      "submit": "Subscribe",
+      "invalidEmail": "Enter a valid email address",
+      "reactivated": "You're back on the list. Welcome back.",
+      "alreadySubscribed": "You're already subscribed.",
+      "confirmed": "Subscription confirmed.",
+      "genericError": "That didn't go through. Try again."
+    }
   },
   "backToSearch": "Back to search",
   "skills": "Skills",
@@ -659,7 +703,9 @@
       },
       "contactLead": "For cookie inquiries",
       "goToPreferences": "Go to Cookie Preferences"
-    }
+    },
+    "regionLabel": "Cookie consent",
+    "policyLinkAria": "Read our cookie policy"
   },
   "layout": {
     "header": {

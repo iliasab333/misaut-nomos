@@ -36,7 +36,6 @@ export const APP_NAMESPACES = [
   'dashboard',
   'myProfile',
   'onboarding',
-  'subscription',
   'support',
   'tickets',
 ];
