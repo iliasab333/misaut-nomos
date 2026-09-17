@@ -161,6 +161,14 @@
   --c-soft:           243 244 246;   /* gray-100 — fondos suaves, chips */
   --c-accent:          37  99 235;   /* blue-600 — primario */
   --c-accent-hover:    29  78 216;   /* blue-700 */
+  /* Acento SECUNDARIO. No es decoración suelta: la web lo venía usando de
+     forma consistente en morado para lo que no es la acción principal —
+     búsquedas guardadas, especialidades, la vista previa del perfil y las
+     métricas de campaña. Tenía nombre en ningún sitio y aparecía como
+     purple-600, purple-100, purple-50… en 60 lugares. Ahora es un token, y
+     los tintes salen de él con opacidad (bg-secondary/10). */
+  --c-secondary:      147  51 234;   /* purple-600, el que ya se usaba */
+  --c-secondary-hover:126  34 206;   /* purple-700 */
   --c-success:         22 163  74;   /* green-600 */
   --c-error:          220  38  38;   /* red-600 */
   --c-warning:        217 119   6;   /* amber-600 */

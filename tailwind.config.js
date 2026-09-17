@@ -29,6 +29,8 @@ module.exports = {
   			contrast: 'rgb(var(--c-contrast) / <alpha-value>)',
   			soft: 'rgb(var(--c-soft) / <alpha-value>)',
   			'accent-hover': 'rgb(var(--c-accent-hover) / <alpha-value>)',
+  			secondary2: 'rgb(var(--c-secondary) / <alpha-value>)',
+  			'secondary2-hover': 'rgb(var(--c-secondary-hover) / <alpha-value>)',
   			success: 'rgb(var(--c-success) / <alpha-value>)',
   			error: 'rgb(var(--c-error) / <alpha-value>)',
   			warning: 'rgb(var(--c-warning) / <alpha-value>)',

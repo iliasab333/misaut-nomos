@@ -130,17 +130,6 @@
       "internalNote": "Internal note",
       "selectTicket": "Select a ticket to see its details."
     },
-    "support": {
-      "adsProfessional": "Ads+ professional",
-      "userFallback": "User",
-      "searchPlaceholder": "Search user...",
-      "emptyState": "No support conversations",
-      "adsBadge": "Ads+",
-      "adsBadgeActive": "⚡ Ads+",
-      "adsCampaignChat": "Ads+ campaign chat",
-      "supportChat": "Support chat",
-      "replyPlaceholder": "Reply as MisAutónomos Support..."
-    },
     "emails": {
       "title": "📧 Email Center",
       "subtitle": "Manage templates, logs and test sends for transactional and marketing emails."
@@ -253,11 +242,6 @@
         },
         "confirmSend": "Yes, send now"
       },
-      "manage": {
-        "chat": {
-          "sent": "Message sent"
-        }
-      },
       "metrics": {
         "title": "Campaign metrics",
         "refreshed": "Data refreshed",
@@ -353,9 +337,6 @@
           "body": "You're about to send <strong>{{total}} real emails</strong> to clients. This can't be undone. Confirm?"
         }
       }
-    },
-    "usersTable": {
-      "adminBadge": "Admin"
     },
     "layout": {
       "title": "⚙️ Admin Panel",
@@ -705,15 +686,9 @@
       "replyPlaceholder": "Reply here…",
       "replyHint": "Replying puts this ticket back in the team's queue.",
       "closedHint": "This ticket is closed. If you need anything else, open a new one from <support>Support</support>."
-    },
-    "chat": {
-      "onlineStatus": "Online · Replies in under 1h"
     }
   },
   "tickets": {
-    "status": {
-      "inProgress": "In progress"
-    },
     "types": {
       "clientSupport": "Client support",
       "proSupport": "Professional support",
@@ -726,23 +701,7 @@
       "uploadError": "Error uploading file"
     },
     "detail": {
-      "fileUploaded": "File uploaded",
-      "notFound": "Ticket not found",
-      "backToTickets": "Back to tickets",
-      "seoTitle": "Ticket {{number}} - MisAutónomos",
-      "attachments": "Attachments:",
-      "fileN": "File {{index}}",
-      "attachmentN": "Attachment {{index}}",
-      "conversation": "Conversation",
-      "messagePlaceholder": "Write your message...",
-      "attach": "Attach",
-      "info": "Ticket information",
-      "closeTicket": "Close ticket",
-      "createdBy": "Created by",
-      "assignedTo": "Assigned to",
-      "created": "Created",
-      "tags": "Tags",
-      "timeline": "Timeline"
+      "fileN": "File {{index}}"
     },
     "create": {
       "created": "✅ Ticket created successfully",

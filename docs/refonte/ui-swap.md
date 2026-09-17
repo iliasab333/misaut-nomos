@@ -150,3 +150,65 @@ No ejecutes `npm run build`.
 6. Imports a `ui/<NoShadcn>` que dejaste porque la ruta nueva aún no existía.
 7. Cualquier duda sobre comportamiento (algo que antes hacía shadcn y no
    estás seguro de haber replicado: foco, teclado, cierre con click fuera).
+
+## Mapa de colores completo (reseteo final)
+
+La tabla de arriba cubría los colores de chrome. Esta cubre **todo lo que
+queda**, incluidos tintes y degradados, y es la que manda en el reseteo final.
+
+El principio: **los tintes salen del token con opacidad**, no de otra parada
+de la escala de Tailwind. `bg-blue-50` no es «otro azul», es el azul de marca
+al 8%. Escribirlo como `bg-accent/10` hace que un cambio de marca se propague
+solo, que es la razón de tener tokens.
+
+### Neutros
+
+| Antes | Ahora |
+|---|---|
+| `gray-900`, `slate-900`, `gray-800`, `slate-800` | `ink` |
+| `gray-700`, `slate-700`, `gray-600`, `slate-600` | `ink` si es texto principal · `muted` si es secundario |
+| `gray-500`, `gray-400`, `slate-500`, `slate-400`, `slate-300`, `gray-300` | `muted` |
+| `gray-200`, `slate-200`, `gray-100`, `slate-100` (bordes) | `border` |
+| `bg-gray-100`, `bg-gray-50`, `bg-slate-50`, `bg-slate-100` | `bg-soft` |
+| `bg-white` | `bg-surface` |
+
+### Marca y estados — el tinte es opacidad
+
+| Antes | Ahora |
+|---|---|
+| `blue-600`, `blue-700` | `accent` (hover: `accent-hover`) |
+| `blue-500`, `blue-400` | `accent` |
+| `bg-blue-50` | `bg-accent/5` |
+| `bg-blue-100` | `bg-accent/10` |
+| `border-blue-100`, `border-blue-200` | `border-accent/20` |
+| `border-blue-300`, `border-blue-400`, `border-blue-500` | `border-accent/40` |
+| `text-blue-100`, `text-blue-200` (sobre fondo oscuro) | `text-white/80` |
+| `text-blue-800`, `text-blue-900` | `text-accent` |
+| `green-*`, `emerald-*` | `success` · tintes `success/10`, bordes `success/20` |
+| `red-*`, `rose-*` | `error` · tintes `error/10`, bordes `error/20` |
+| `amber-*`, `yellow-*`, `orange-*` | `warning` · tintes `warning/10` · las estrellas, `star` |
+
+### Acento secundario
+
+El morado no era decoración suelta: la web lo usaba de forma consistente para
+lo que **no** es la acción principal (búsquedas guardadas, especialidades,
+vista previa del perfil, métricas de campaña). Ahora tiene nombre.
+
+| Antes | Ahora |
+|---|---|
+| `purple-600`, `purple-700`, `violet-*`, `indigo-600` | `secondary2` (hover: `secondary2-hover`) |
+| `bg-purple-50`, `bg-purple-100` | `bg-secondary2/10` |
+| `border-purple-100/200/300` | `border-secondary2/20` |
+| `text-purple-700/800/900` | `text-secondary2` |
+
+### Lo que NO se convierte a token: los degradados por oficio
+
+`components/home/CategoriesGrid.jsx` da un degradado distinto a cada gremio
+(fontanero azul→cian, pintor rosa→rosa fuerte, limpieza morado→índigo). Eso
+son **datos**, un color por categoría, no cromo de interfaz: no hay un token
+que signifique «el color del fontanero», y forzarlos al acento los volvería
+indistinguibles, que es justo lo contrario de para lo que están.
+
+Se sacan de las clases de Tailwind a valores explícitos en el propio dato, y
+se aplican con `style`. Así sobreviven al reseteo de la paleta sin pedirle al
+sistema de diseño que finja que son suyos.

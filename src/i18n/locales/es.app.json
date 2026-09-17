@@ -130,17 +130,6 @@
       "internalNote": "Nota interna",
       "selectTicket": "Selecciona un ticket para ver el detalle."
     },
-    "support": {
-      "adsProfessional": "Profesional Ads+",
-      "userFallback": "Usuario",
-      "searchPlaceholder": "Buscar usuario...",
-      "emptyState": "No hay conversaciones de soporte",
-      "adsBadge": "Ads+",
-      "adsBadgeActive": "⚡ Ads+",
-      "adsCampaignChat": "Chat de campaña Ads+",
-      "supportChat": "Chat de soporte",
-      "replyPlaceholder": "Responder como Soporte MisAutónomos..."
-    },
     "emails": {
       "title": "📧 Centro de Emails",
       "subtitle": "Gestiona templates, registros y pruebas de emails transaccionales y marketing."
@@ -253,11 +242,6 @@
         },
         "confirmSend": "Sí, enviar ahora"
       },
-      "manage": {
-        "chat": {
-          "sent": "Mensaje enviado"
-        }
-      },
       "metrics": {
         "title": "Métricas de campañas",
         "refreshed": "Datos actualizados",
@@ -353,9 +337,6 @@
           "body": "Vas a enviar <strong>{{total}} emails</strong> reales a clientes. Esta acción no se puede deshacer. ¿Confirmar?"
         }
       }
-    },
-    "usersTable": {
-      "adminBadge": "Admin"
     },
     "layout": {
       "title": "⚙️ Admin Panel",
@@ -705,15 +686,9 @@
       "replyPlaceholder": "Responde aquí…",
       "replyHint": "Al responder, este ticket vuelve a la cola del equipo.",
       "closedHint": "Este ticket está cerrado. Si necesitas algo más, abre uno nuevo desde <support>Soporte</support>."
-    },
-    "chat": {
-      "onlineStatus": "En línea · Responde en menos de 1h"
     }
   },
   "tickets": {
-    "status": {
-      "inProgress": "En progreso"
-    },
     "types": {
       "clientSupport": "Soporte Cliente",
       "proSupport": "Soporte Autónomo",
@@ -726,23 +701,7 @@
       "uploadError": "Error subiendo archivo"
     },
     "detail": {
-      "fileUploaded": "Archivo subido",
-      "notFound": "Ticket no encontrado",
-      "backToTickets": "Volver a tickets",
-      "seoTitle": "Ticket {{number}} - MisAutónomos",
-      "attachments": "Archivos adjuntos:",
-      "fileN": "Archivo {{index}}",
-      "attachmentN": "Archivo adjunto {{index}}",
-      "conversation": "Conversación",
-      "messagePlaceholder": "Escribe tu mensaje...",
-      "attach": "Adjuntar",
-      "info": "Información del Ticket",
-      "closeTicket": "Cerrar ticket",
-      "createdBy": "Creado por",
-      "assignedTo": "Asignado a",
-      "created": "Creado",
-      "tags": "Etiquetas",
-      "timeline": "Cronología"
+      "fileN": "Archivo {{index}}"
     },
     "create": {
       "created": "✅ Ticket creado correctamente",

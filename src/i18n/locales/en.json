@@ -280,7 +280,6 @@
   "messages": {
     "title": "Messages",
     "find_pros_cta": "Find professionals",
-    "write_message": "Write a message...",
     "send": "Send",
     "rate": "Rate",
     "attach_file": "Attach file",
@@ -704,8 +703,7 @@
       "contactLead": "For cookie inquiries",
       "goToPreferences": "Go to Cookie Preferences"
     },
-    "regionLabel": "Cookie consent",
-    "policyLinkAria": "Read our cookie policy"
+    "regionLabel": "Cookie consent"
   },
   "layout": {
     "header": {
@@ -795,61 +793,13 @@
         "plumbing": "Plumbing"
       }
     },
-    "howItWorks": {
-      "badge": "Simple process",
-      "title": "Start getting clients in 3 steps",
-      "subtitle": "No complicated setup",
-      "createProfile": {
-        "title": "Create your profile",
-        "desc": "Sign up in under 5 minutes. Add your services, photos and service area."
-      },
-      "getFound": {
-        "title": "Clients find you",
-        "desc": "Your profile shows up when clients in your area search for your service."
-      },
-      "connect": {
-        "title": "Connect and work",
-        "desc": "Get requests directly by chat, phone or WhatsApp, with no middlemen."
-      }
-    },
     "whyUs": {
-      "title": "Why MisAutónomos?",
-      "noFees": {
-        "desc": "You and the client deal directly. We don't charge anything per job."
-      },
-      "profileTime": {
-        "title": "Profile in 10 minutes",
-        "desc": "Sign up, complete your profile and start getting client enquiries the same day."
-      },
       "verifiedClients": {
-        "title": "Verified clients",
-        "desc": "Every client signs up with a real email. No bot enquiries, no spam."
-      }
-    },
-    "faq": {
-      "title": "We answer your questions",
-      "viewAll": "See all FAQs",
-      "cost": {
-        "q": "How much does it cost for freelancers?",
-        "a": "Nothing. MisAutónomos is completely free for freelancers. No card, no commitment, no surprises. Your profile stays active forever at no cost."
-      },
-      "clientsPay": {
-        "q": "Do clients pay anything?",
-        "a": "No. Clients use MisAutónomos completely free. That brings more clients to the platform and more work for you."
-      },
-      "whenActive": {
-        "q": "When does my profile go live?",
-        "a": "In under 10 minutes. Once you complete your profile, you appear in search results for your area."
+        "title": "Verified clients"
       }
     },
     "categories": {
-      "badge": "Most searched services",
-      "title": "What do you need today?",
-      "subtitle": "Tap a category to find professionals near you",
-      "explore": "Explore →",
-      "cleaning": "Cleaning",
-      "renovations": "Renovations",
-      "viewAll": "See all"
+      "cleaning": "Cleaning"
     },
     "testimonials": {
       "badge": "Real testimonials",
@@ -1747,9 +1697,6 @@
   },
   "supportChat": {
     "supportTeam": "MisAutónomos Support",
-    "supportInbox": "Support Inbox",
-    "selectConversation": "Select a conversation to reply",
-    "conversationsCount": "{{count}} conversations",
     "ticketTypeTechnical": "Technical issue",
     "ticketTypeBilling": "Billing",
     "ticketTypeComplaint": "Complaint",
@@ -1879,7 +1826,6 @@
     },
     "post": {
       "notFound": "Article not found",
-      "backToBlogArrow": "← Back to the blog",
       "backToBlog": "Back to the blog",
       "metaTitle": "{{title}} | MisAutónomos Blog",
       "defaultAuthor": "MisAutónomos team",

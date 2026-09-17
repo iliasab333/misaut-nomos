@@ -280,7 +280,6 @@
   "messages": {
     "title": "Mensajes",
     "find_pros_cta": "Buscar autónomos",
-    "write_message": "Escribe un mensaje...",
     "send": "Enviar",
     "rate": "Valorar",
     "attach_file": "Adjuntar archivo",
@@ -704,8 +703,7 @@
       "contactLead": "Para consultas sobre cookies",
       "goToPreferences": "Ir a Preferencias de Cookies"
     },
-    "regionLabel": "Consentimiento de cookies",
-    "policyLinkAria": "Consulta nuestra política de cookies"
+    "regionLabel": "Consentimiento de cookies"
   },
   "layout": {
     "header": {
@@ -795,61 +793,13 @@
         "plumbing": "Fontanería"
       }
     },
-    "howItWorks": {
-      "badge": "Proceso simple",
-      "title": "Empieza a recibir clientes en 3 pasos",
-      "subtitle": "Sin configuraciones complicadas",
-      "createProfile": {
-        "title": "Crea tu perfil",
-        "desc": "Regístrate en menos de 5 minutos. Añade tus servicios, fotos y zona de trabajo."
-      },
-      "getFound": {
-        "title": "Clientes te encuentran",
-        "desc": "Tu perfil aparece en búsquedas de clientes de tu zona que necesitan tu servicio."
-      },
-      "connect": {
-        "title": "Conecta y trabaja",
-        "desc": "Recibe solicitudes directamente por chat, teléfono o WhatsApp sin intermediarios."
-      }
-    },
     "whyUs": {
-      "title": "¿Por qué MisAutónomos?",
-      "noFees": {
-        "desc": "Tú y el cliente negociáis directamente. Nosotros no cobramos nada por cada trabajo."
-      },
-      "profileTime": {
-        "title": "Perfil en 10 minutos",
-        "desc": "Regístrate, completa tu perfil y empieza a recibir contactos de clientes el mismo día."
-      },
       "verifiedClients": {
-        "title": "Clientes verificados",
-        "desc": "Todos los clientes se registran con email real. No hay consultas de bots ni spam."
-      }
-    },
-    "faq": {
-      "title": "Resolvemos tus dudas",
-      "viewAll": "Ver todas las preguntas frecuentes",
-      "cost": {
-        "q": "¿Cuánto cuesta para los autónomos?",
-        "a": "Nada. MisAutónomos es completamente gratuito para autónomos. Sin tarjeta, sin permanencia, sin sorpresas. Tu perfil estará activo para siempre sin coste."
-      },
-      "clientsPay": {
-        "q": "¿Los clientes pagan algo?",
-        "a": "No. Los clientes usan MisAutónomos totalmente gratis. Esto atrae más clientes a la plataforma y más trabajo para ti."
-      },
-      "whenActive": {
-        "q": "¿Cuándo empieza a funcionar mi perfil?",
-        "a": "En menos de 10 minutos. Una vez completes tu perfil, apareces en los resultados de búsqueda de tu zona."
+        "title": "Clientes verificados"
       }
     },
     "categories": {
-      "badge": "Servicios más buscados",
-      "title": "¿Qué necesitas hoy?",
-      "subtitle": "Toca una categoría para encontrar profesionales cerca de ti",
-      "explore": "Explorar →",
-      "cleaning": "Limpieza",
-      "renovations": "Reformas",
-      "viewAll": "Ver todos"
+      "cleaning": "Limpieza"
     },
     "testimonials": {
       "badge": "Testimonios reales",
@@ -1747,9 +1697,6 @@
   },
   "supportChat": {
     "supportTeam": "Soporte MisAutónomos",
-    "supportInbox": "Bandeja de Soporte",
-    "selectConversation": "Selecciona una conversación para responder",
-    "conversationsCount": "{{count}} conversaciones",
     "ticketTypeTechnical": "Problema técnico",
     "ticketTypeBilling": "Facturación",
     "ticketTypeComplaint": "Reclamación",
@@ -1879,7 +1826,6 @@
     },
     "post": {
       "notFound": "Artículo no encontrado",
-      "backToBlogArrow": "← Volver al blog",
       "backToBlog": "Volver al blog",
       "metaTitle": "{{title}} | Blog MisAutónomos",
       "defaultAuthor": "Equipo MisAutónomos",

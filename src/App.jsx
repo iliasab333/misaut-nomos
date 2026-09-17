@@ -130,7 +130,6 @@ class ErrorBoundary extends Component {
 const AdminDashboard = lazyApp(() => import('./pages/AdminDashboard'));
 const AdminTickets = lazyApp(() => import('./pages/AdminTickets'));
 const AdminFAQ = lazyApp(() => import('./pages/AdminFAQ'));
-const AdminSupport = lazyApp(() => import('./pages/AdminSupport'));
 const AdminNewsletter = lazyApp(() => import('./pages/AdminNewsletter'));
 const AdminEmails = lazyApp(() => import('./pages/AdminEmails'));
 const AdminUsuarios = lazyApp(() => import('./pages/AdminUsuarios'));
@@ -141,7 +140,6 @@ const EmailUnsubscribe = lazyWithRetry(() => import('./pages/EmailUnsubscribe'))
 const BlogList = lazyWithRetry(() => import('./pages/BlogList'));
 const BlogPost = lazyWithRetry(() => import('./pages/BlogPost'));
 const AdminBlog = lazyApp(() => import('./pages/AdminBlog'));
-const SupportChat = lazyApp(() => import('./pages/SupportChat.jsx'));
 const Soporte = lazyApp(() => import('./pages/Soporte'));
 const SoporteTicket = lazyApp(() => import('./pages/SoporteTicket'));
 const LeaveReview = lazyWithRetry(() => import('./pages/LeaveReview'));

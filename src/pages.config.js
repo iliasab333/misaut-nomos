@@ -38,8 +38,6 @@ const MyProfile          = lazyApp(() => import('./pages/MyProfile'));
 const Notifications      = lazyWithRetry(() => import('./pages/Notifications'));
 const ProfessionalProfile = lazyWithRetry(() => import('./pages/ProfessionalProfile'));
 const ProfileOnboarding  = lazyApp(() => import('./pages/ProfileOnboarding'));
-const TicketDetail       = lazyApp(() => import('./pages/TicketDetail'));
-const Tickets            = lazyApp(() => import('./pages/Tickets'));
 const UserTypeSelection  = lazyApp(() => import('./pages/UserTypeSelection'));
 
 // 🟢 PÁGINAS ESTÁTICAS — ligeras, pero no críticas
@@ -48,7 +46,6 @@ const CookiePreferences  = lazyWithRetry(() => import('./pages/CookiePreferences
 const FAQ                = lazyWithRetry(() => import('./pages/FAQ'));
 const FAQDetail          = lazyWithRetry(() => import('./pages/FAQDetail'));
 const HelpCenter         = lazyApp(() => import('./pages/HelpCenter'));
-const Home               = lazyWithRetry(() => import('./pages/Home'));
 const LegalNotice        = lazyWithRetry(() => import('./pages/LegalNotice'));
 const PrivacyPolicy      = lazyWithRetry(() => import('./pages/PrivacyPolicy'));
 const TermsConditions    = lazyWithRetry(() => import('./pages/TermsConditions'));
@@ -67,7 +64,6 @@ export const PAGES = {
     "FAQDetail": FAQDetail,
     "Favorites": Favorites,
     "HelpCenter": HelpCenter,
-    "Home": Home,
     "LegalNotice": LegalNotice,
     "MyProfile": MyProfile,
     "Notifications": Notifications,
@@ -77,8 +73,6 @@ export const PAGES = {
     "ProfileOnboarding": ProfileOnboarding,
     "Search": Search,
     "TermsConditions": TermsConditions,
-    "TicketDetail": TicketDetail,
-    "Tickets": Tickets,
     "UserTypeSelection": UserTypeSelection,
 }
 
