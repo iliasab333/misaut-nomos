@@ -67,7 +67,12 @@
       "servicesTitle": "Available services",
       "viewAll": "See all professionals",
       "proBannerText": "Show up in search results for your area. Direct contact, no commissions.",
-      "trustVerified": "Verified identity"
+      "trustVerified": "Verified identity",
+      "headlineA": "The pro you need,",
+      "headlineB": "one call away.",
+      "pitch": "Electricians, plumbers, painters, cleaners… verified and reviewed, all across Spain. Free.",
+      "browseAllHint": "Rather browse yourself? See every pro in your area",
+      "trustWhatsapp": "Direct contact on WhatsApp"
     },
     "howItWorks": {
       "title": "Three steps. No catch.",
@@ -125,7 +130,51 @@
     },
     "finalCta": {
       "title": "Get found in your area.",
-      "body": "We get you set up in minutes. No card. No commissions. Direct contact with clients."
+      "body": "We get you set up in minutes. No card. No commissions. Direct contact with clients.",
+      "button": "Create my pro profile"
+    },
+    "mockup": {
+      "clock": "9:41",
+      "city": "Madrid",
+      "trade": "Electrician",
+      "resultsCount": "1 result",
+      "proName": "Carlos Herrero",
+      "badgeNew": "New",
+      "badgeVerified": "Verified",
+      "callLabel": "Call",
+      "whatsappLabel": "WhatsApp",
+      "newMessage": "New message",
+      "messagePreview": "“Hi, could you come by today to look at a fault?”",
+      "contactedIn": "Contacted in 2 minutes"
+    },
+    "free": {
+      "eyebrow": "No commissions",
+      "title": "For the pro, none of this costs a thing.",
+      "body": "Sign up, publish your profile and start getting clients. We never charge for a lead, for a job you close, or for ranking higher in the results. The advertising that brings clients to you is on us.",
+      "b1": "A verified profile with your work and your service area",
+      "b2": "Direct contact by phone and WhatsApp, no middlemen",
+      "b3": "Promotion on Google and social media in your city, at our expense",
+      "price": "€0",
+      "note": "No card, no lock-in and no commission on the clients you win.",
+      "cta": "How it works for pros"
+    },
+    "about": {
+      "title": "About MisAutónomos",
+      "p1": "MisAutónomos is Spain's directory of self-employed professionals: electricians, plumbers, painters, builders, cleaners, locksmiths and many more trades, province by province and city by city. We check identity, phone and trade before a profile goes live.",
+      "p2": "Pros create their profile for free and clients call or message them directly. No commissions, no quote auctions and nobody in the middle taking a cut.",
+      "p3": "Signing in with Google is only used to create and protect your account: we access nothing beyond your name and email address."
+    },
+    "guides": {
+      "eyebrow": "Blog",
+      "title": "And the paperwork, in plain language.",
+      "body": "We write about what really eats a freelancer's time: the monthly contribution, quarterly VAT, the grants in each region, and how to win more work. No fluff, nothing to sell you.",
+      "cta": "Read the blog"
+    },
+    "help": {
+      "eyebrow": "Real support",
+      "title": "And if something breaks, we're the ones who answer.",
+      "body": "Help centre, FAQs and written support. There's no bot behind it: someone who knows the site reads and replies. Free as well.",
+      "cta": "Go to the help centre"
     }
   },
   "categories": {

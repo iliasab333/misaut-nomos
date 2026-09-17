@@ -354,6 +354,34 @@
   .scroll-x::-webkit-scrollbar { display: none; }
   .scroll-x > * { scroll-snap-align: start; flex-shrink: 0; }
 
+  /* ---- Entrada y flotación del hero de la portada -----------------------
+     Portadas de khdemlidaba junto con la maqueta del hero: los bloques
+     entran de abajo arriba, escalonados, y las dos piezas que rodean el
+     móvil flotan despacio. Nada de esto mueve la maqueta (sólo opacidad y
+     translate), así que no hay CLS. Con `prefers-reduced-motion` todo
+     aparece ya colocado y quieto. */
+  .hero-enter {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: heroRise 500ms ease-out forwards;
+  }
+  .hero-enter-delay-1 { animation-delay: 120ms; }
+  .hero-enter-delay-2 { animation-delay: 240ms; }
+  .hero-enter-delay-3 { animation-delay: 360ms; }
+  @keyframes heroRise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-float      { animation: heroFloat 4s ease-in-out infinite; animation-delay: 900ms; }
+  .hero-float-slow { animation: heroFloat 5s ease-in-out infinite; animation-delay: 1200ms; }
+  @keyframes heroFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-enter { opacity: 1; transform: none; animation: none; }
+    .hero-float, .hero-float-slow { animation: none; }
+  }
+
   /* ---- Toast — imperativo, ver src/lib/toast.js -------------------------
      Arriba, bajo la barra de estado: donde aparecen las notificaciones del
      sistema, y fuera del camino de la tab bar nativa. */

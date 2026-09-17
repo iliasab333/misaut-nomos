@@ -67,7 +67,12 @@
       "servicesTitle": "Servicios disponibles",
       "viewAll": "Ver todos los profesionales",
       "proBannerText": "Aparece en los resultados de tu zona. Contacto directo, sin comisiones.",
-      "trustVerified": "Identidad verificada"
+      "trustVerified": "Identidad verificada",
+      "headlineA": "El autónomo que necesitas,",
+      "headlineB": "a una llamada.",
+      "pitch": "Electricistas, fontaneros, pintores, limpieza… verificados y valorados, en toda España. Gratis.",
+      "browseAllHint": "¿Prefieres mirar tú? Ve todos los autónomos de tu zona",
+      "trustWhatsapp": "Contacto directo por WhatsApp"
     },
     "howItWorks": {
       "title": "Tres pasos. Sin trampa.",
@@ -125,7 +130,51 @@
     },
     "finalCta": {
       "title": "Aparece en tu zona.",
-      "body": "Te damos de alta en minutos. Sin tarjeta. Sin comisiones. Contacto directo con los clientes."
+      "body": "Te damos de alta en minutos. Sin tarjeta. Sin comisiones. Contacto directo con los clientes.",
+      "button": "Crear mi perfil de autónomo"
+    },
+    "mockup": {
+      "clock": "9:41",
+      "city": "Madrid",
+      "trade": "Electricista",
+      "resultsCount": "1 resultado",
+      "proName": "Carlos Herrero",
+      "badgeNew": "Nuevo",
+      "badgeVerified": "Verificado",
+      "callLabel": "Llamar",
+      "whatsappLabel": "WhatsApp",
+      "newMessage": "Nuevo mensaje",
+      "messagePreview": "«Hola, ¿puedes pasarte hoy a ver una avería?»",
+      "contactedIn": "Contactado en 2 minutos"
+    },
+    "free": {
+      "eyebrow": "Sin comisiones",
+      "title": "Para el autónomo, todo esto no cuesta nada.",
+      "body": "Te das de alta, publicas tu perfil y recibes clientes. No cobramos por contacto recibido, ni por trabajo cerrado, ni por salir arriba en los resultados. La publicidad para que te encuentren la pagamos nosotros.",
+      "b1": "Perfil verificado, con tus trabajos y tu zona",
+      "b2": "Contacto directo por teléfono y WhatsApp, sin intermediarios",
+      "b3": "Promoción en Google y redes sociales de tu ciudad, a nuestro coste",
+      "price": "0 €",
+      "note": "Sin tarjeta, sin permanencia y sin comisión por cliente conseguido.",
+      "cta": "Cómo funciona para autónomos"
+    },
+    "about": {
+      "title": "Sobre MisAutónomos",
+      "p1": "MisAutónomos es el directorio español de profesionales autónomos: electricistas, fontaneros, pintores, reformas, limpieza, cerrajería y muchos oficios más, provincia a provincia y ciudad a ciudad. Antes de publicar un perfil comprobamos identidad, teléfono y oficio.",
+      "p2": "El autónomo crea su perfil gratis y el cliente le llama o le escribe directamente. Sin comisiones, sin subastas de presupuestos y sin nadie en medio quedándose una parte.",
+      "p3": "Entrar con Google sirve únicamente para crear y proteger tu cuenta: sólo accedemos a tu nombre y a tu dirección de correo."
+    },
+    "guides": {
+      "eyebrow": "Blog",
+      "title": "Y las cuentas, explicadas en cristiano.",
+      "body": "Escribimos sobre lo que de verdad le quita horas a un autónomo: la cuota, el IVA trimestral, las ayudas de cada comunidad y cómo conseguir más clientes. Sin humo y sin venderte nada.",
+      "cta": "Leer el blog"
+    },
+    "help": {
+      "eyebrow": "Ayuda de verdad",
+      "title": "Y si algo no funciona, contestamos nosotros.",
+      "body": "Centro de ayuda, preguntas frecuentes y soporte por escrito. Detrás no hay un robot: hay alguien que conoce la web y te responde. También gratis.",
+      "cta": "Ir al centro de ayuda"
     }
   },
   "categories": {
