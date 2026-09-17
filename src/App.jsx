@@ -2,11 +2,9 @@ import './App.css'
 import { lazyWithRetry, lazyApp } from '@/lib/lazyWithRetry';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import VisualEditAgent from '@/lib/VisualEditAgent'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import { setupIframeMessaging } from './lib/iframe-messaging';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { AppProvider } from '@/lib/AppContext';
@@ -157,8 +155,6 @@ const Contacto = lazyWithRetry(() => import('./pages/Contacto'));
 const PageLoader = () => null;
 
 const { Pages, Layout } = pagesConfig;
-
-setupIframeMessaging();
 
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
@@ -381,7 +377,6 @@ function App() {
               <NavigationTracker />
               <AuthenticatedApp />
             </Router>
-            <VisualEditAgent />
             {/* Vercel RUM: Core Web Vitals reales (LCP/CLS/INP) por ruta.
                 El componente carga el script de forma diferida, no afecta al
                 LCP, y solo envía métricas en producción (en dev es no-op). */}

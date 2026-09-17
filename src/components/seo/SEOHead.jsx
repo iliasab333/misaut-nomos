@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useLanguage } from '../ui/LanguageSwitcher';
+import { useLanguage } from '@/components/LanguageSwitcher';
 
 export default function SEOHead({ 
   title = "MisAutónomos - Tu autónomo de confianza en España",
