@@ -11,7 +11,6 @@ const PAGE_ROUTES: Record<string, string> = {
     Search: "/buscar",
     Autonomo: "/autonomo",
     Categoria: "/categoria",
-    PricingPlans: "/precios",
     FAQ: "/preguntas-frecuentes",
     FAQDetail: "/preguntas-frecuentes",
     HelpCenter: "/ayuda",
@@ -44,10 +43,6 @@ const PAGE_ROUTES: Record<string, string> = {
     CRMAutomations: "/automatizaciones",
     ClientDetail: "/clientes",
     Jobs: "/trabajos",
-    SubscriptionManagement: "/suscripcion",
-    PaymentSuccess: "/pago-exitoso",
-    DashboardProInfo: "/dashboard/info",
-    Onboarding: "/bienvenida",
 
     // Admin
     AdminDashboard: "/admin",

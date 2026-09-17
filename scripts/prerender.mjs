@@ -8,7 +8,7 @@
 // de Supabase (anon key) y escribe HTMLs derivados.
 //
 // Tipos de ruta cubiertos:
-//   - Estáticas: /, /buscar, /precios, /preguntas-frecuentes, /ayuda, /blog,
+//   - Estáticas: /, /buscar, /preguntas-frecuentes, /ayuda, /blog,
 //     /para-autonomos, /privacidad, /terminos, /cookies, /aviso-legal, /contacto
 //   - /categoria/{slug}                       (17 categorías)
 //   - /autonomo/{cat-en-ciudad}/{slug}        (profiles con visible_en_busqueda)
@@ -223,13 +223,6 @@ const STATIC_ROUTES = [
     h1: 'Buscar autónomos por servicio y ciudad',
     intro:
       '<p>Directorio de autónomos verificados en toda España. Filtra por categoría (electricista, fontanero, carpintero, abogado…) y por provincia o ciudad. Cada perfil incluye fotos de trabajos reales, valoraciones de clientes que ya le han contactado, zona de cobertura y formas de pago aceptadas.</p>',
-  },
-  {
-    path: '/precios',
-    title: 'Planes para autónomos · 100% gratis | MisAutónomos',
-    description: 'Plan gratuito permanente para autónomos: aparece en búsquedas, contacta clientes y conserva el 100% de lo que ganas. Sin comisiones, sin tarjeta.',
-    h1: 'Planes para autónomos',
-    intro: '<p>MisAutónomos es 100% gratuito para autónomos. Crea tu perfil en 10 minutos, aparece en las búsquedas de tu zona y recibe contactos por chat, teléfono o WhatsApp. Sin permanencia, sin comisiones por trabajo.</p>',
   },
   {
     path: '/para-autonomos',

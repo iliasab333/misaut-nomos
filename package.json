@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run check:i18n && node scripts/i18n-orphans.mjs --strict && node scripts/check-routes.mjs --strict && vite build && npm run prerender",
+    "build": "npm run check:i18n && node scripts/i18n-orphans.mjs --strict && node scripts/check-routes.mjs --strict && node scripts/check-vercel-routes.mjs --strict && vite build && npm run prerender",
     "prerender": "node scripts/prerender.mjs",
     "build:nossr": "vite build",
     "check:i18n": "node scripts/check-i18n.mjs",

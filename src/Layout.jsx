@@ -286,7 +286,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
     createPageUrl("UserTypeSelection"),    // /registro
     createPageUrl("ProfileOnboarding"),   // /completar-perfil
     createPageUrl("ClientOnboarding"),    // /registro-cliente
-    createPageUrl("Onboarding"),          // /bienvenida
   ];
 
   const shouldShowSidebar = () => {
