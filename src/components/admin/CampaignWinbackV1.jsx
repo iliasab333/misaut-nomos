@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Users, Send, Eye, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
+import Modal from '@/components/Modal';
+import {
+  IconUsers, IconSend, IconEye, IconCheckCircle, IconError, IconWarning,
+} from '@/components/Icons';
+import { toast } from '@/lib/toast';
 
 const CAMPAIGN_TAG = 'winback_v1_sent';
 const CAMPAIGN_ID = 'winback_v1';
@@ -71,6 +73,7 @@ const buildHtml = (name, email) => {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default function CampaignWinbackV1() {
+  const { t } = useTranslation();
   const [audience, setAudience] = useState(null);
   const [loadingAudience, setLoadingAudience] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -85,10 +88,10 @@ export default function CampaignWinbackV1() {
     try {
       const records = await base44.entities.User.filter({ id: { $in: TARGET_USER_IDS } });
       const userMap = new Map((records || []).map(u => [u.id, u]));
-      const users = TARGET_USER_IDS.map(uid => userMap.get(uid) || { id: uid, email: '(no encontrado)', full_name: '', tags: [] });
+      const users = TARGET_USER_IDS.map(uid => userMap.get(uid) || { id: uid, email: t('admin.campaigns.shared.userNotFound'), full_name: '', tags: [] });
       setAudience(users);
     } catch (e) {
-      toast.error('No se pudo cargar la audiencia. ' + e.message);
+      toast.error(t('admin.campaigns.shared.audienceLoadError', { message: e.message }));
     } finally {
       setLoadingAudience(false);
     }
@@ -103,7 +106,7 @@ export default function CampaignWinbackV1() {
     if (!audience) return;
     const toSend = pendingAudience;
     if (toSend.length === 0) {
-      toast.info('Todos los destinatarios ya tienen el tag. No hay nada que enviar.');
+      toast.info(t('admin.campaigns.shared.nothingToSend'));
       setShowConfirm(false);
       return;
     }
@@ -172,58 +175,59 @@ export default function CampaignWinbackV1() {
     setProgress({ done: toSend.length, total: toSend.length });
     setResult({ ok, failed, skippedBlocklist, skippedTag });
     setSending(false);
-    toast.success(`Campaña completada: ${ok} enviados, ${failed} fallidos`);
+    toast.success(t('admin.campaigns.shared.completed', { ok, failed }));
 
     // Refrescar audiencia para mostrar estado actualizado
     await fetchAudience();
   };
 
   return (
-    <Card className="p-6 border-2 border-orange-100">
+    <div className="card p-6 border-2 border-orange-100">
       {/* Cabecera */}
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-          <Send className="w-5 h-5 text-orange-600" />
+          <IconSend className="w-5 h-5 text-orange-600" />
         </div>
         <div>
-          <h3 className="font-bold text-gray-900">Win-back Autónomos V1</h3>
-          <p className="text-xs text-gray-500">Audiencia: 6 usuarios hardcoded · Tag: {CAMPAIGN_TAG}</p>
+          <h3 className="font-bold text-ink">{t('admin.campaigns.winback.title')}</h3>
+          <p className="text-xs text-c-muted">{t('admin.campaigns.winback.subtitle', { tag: CAMPAIGN_TAG })}</p>
         </div>
-        <span className="ml-auto text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-semibold">Cancelada — no enviar</span>
+        <span className="ml-auto badge-error">{t('admin.campaigns.winback.cancelledBadge')}</span>
       </div>
 
       {/* Info */}
-      <div className="bg-gray-50 rounded-lg p-3 mb-4 text-sm text-gray-700">
-        <p><strong>Asunto:</strong> {CAMPAIGN_SUBJECT}</p>
-        <p className="mt-1"><strong>Audiencia objetivo:</strong> 6 autónomos que tuvieron suscripción previa. Lista fija hardcoded.</p>
-        <p className="mt-1"><strong>campaign_id:</strong> {CAMPAIGN_ID}</p>
+      <div className="bg-soft rounded-lg p-3 mb-4 text-sm text-ink">
+        <p><strong>{t('admin.campaigns.shared.subjectLabel')}</strong> {CAMPAIGN_SUBJECT}</p>
+        <p className="mt-1"><strong>{t('admin.campaigns.shared.targetAudienceLabel')}</strong> {t('admin.campaigns.winback.targetAudience')}</p>
+        <p className="mt-1"><strong>{t('admin.campaigns.shared.campaignIdLabel')}</strong> {CAMPAIGN_ID}</p>
       </div>
 
       {/* Banner cancelación */}
-      <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 flex items-center gap-2">
-        <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-        <span className="text-sm text-red-700 font-medium">Campaña cancelada. El envío está bloqueado. Los datos se conservan para histórico.</span>
+      <div role="alert" className="bg-error/10 border border-error/30 rounded-lg p-3 mb-4 flex items-center gap-2">
+        <IconError className="w-4 h-4 text-error flex-shrink-0" />
+        <span className="text-sm text-error font-medium">{t('admin.campaigns.winback.cancelledNotice')}</span>
       </div>
 
       {/* Acciones — solo previsualización, envío deshabilitado */}
       <div className="flex gap-3 mb-4 flex-wrap">
-        <Button
-          variant="outline"
+        <button
+          type="button"
+          className="btn-secondary btn-sm"
           onClick={fetchAudience}
           disabled={loadingAudience}
-          className="gap-2"
         >
-          <Eye className="w-4 h-4" />
-          {loadingAudience ? 'Cargando...' : 'Previsualizar audiencia'}
-        </Button>
+          <IconEye className="w-4 h-4" />
+          {loadingAudience ? t('common.loading') : t('admin.campaigns.shared.previewAudience')}
+        </button>
 
-        <Button
-          className="gap-2 bg-gray-300 text-gray-500 cursor-not-allowed"
+        <button
+          type="button"
+          className="btn-primary btn-sm bg-c-border text-c-muted hover:bg-c-border cursor-not-allowed"
           disabled={true}
         >
-          <Send className="w-4 h-4" />
-          Enviar campaña (cancelada)
-        </Button>
+          <IconSend className="w-4 h-4" />
+          {t('admin.campaigns.winback.sendCancelled')}
+        </button>
       </div>
 
       {/* Progreso */}
@@ -231,29 +235,29 @@ export default function CampaignWinbackV1() {
         <div className="mb-4 bg-orange-50 rounded-lg p-4 flex items-center gap-3">
           <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
           <span className="text-orange-800 font-semibold">
-            Enviando {progress.done} / {progress.total}...
+            {t('admin.campaigns.shared.progress', { done: progress.done, total: progress.total })}
           </span>
         </div>
       )}
 
       {/* Resultado */}
       {result && (
-        <div className="mb-4 bg-green-50 rounded-lg p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="mb-4 bg-success/10 rounded-lg p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-semibold text-green-800">{result.ok} enviados OK</span>
+            <IconCheckCircle className="w-4 h-4 text-success" />
+            <span className="text-sm font-semibold text-success">{t('admin.campaigns.shared.result.sentOk', { ok: result.ok })}</span>
           </div>
           <div className="flex items-center gap-2">
-            <XCircle className="w-4 h-4 text-red-500" />
-            <span className="text-sm font-semibold text-red-700">{result.failed} fallidos</span>
+            <IconError className="w-4 h-4 text-error" />
+            <span className="text-sm font-semibold text-error">{t('admin.campaigns.shared.result.failed', { failed: result.failed })}</span>
           </div>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm font-semibold text-yellow-700">{result.skippedBlocklist} bloqueados</span>
+            <IconWarning className="w-4 h-4 text-warning" />
+            <span className="text-sm font-semibold text-warning">{t('admin.campaigns.shared.result.blocked', { blocked: result.skippedBlocklist })}</span>
           </div>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-gray-400" />
-            <span className="text-sm font-semibold text-gray-600">{result.skippedTag} ya tenían tag</span>
+            <IconWarning className="w-4 h-4 text-c-muted" />
+            <span className="text-sm font-semibold text-c-muted">{t('admin.campaigns.shared.result.alreadyTagged', { tagged: result.skippedTag })}</span>
           </div>
         </div>
       )}
@@ -263,36 +267,36 @@ export default function CampaignWinbackV1() {
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-semibold text-gray-700">
-                Audiencia total: <strong>{audience.length}</strong> · Pendientes: <strong>{pendingAudience.length}</strong>
+              <IconUsers className="w-4 h-4 text-c-muted" />
+              <span className="text-sm font-semibold text-ink">
+                <Trans i18nKey="admin.campaigns.shared.audienceSummary" values={{ total: audience.length, pending: pendingAudience.length }} />
               </span>
             </div>
-            <Button variant="ghost" size="sm" onClick={fetchAudience} disabled={loadingAudience} className="text-xs gap-1 h-7">
-              🔄 Recargar
-            </Button>
+            <button type="button" className="btn-ghost btn-sm text-xs" onClick={fetchAudience} disabled={loadingAudience}>
+              {t('admin.campaigns.shared.reload')}
+            </button>
           </div>
-          <div className="overflow-auto max-h-64 rounded border border-gray-200">
+          <div className="overflow-auto max-h-64 rounded border border-c-border">
             <table className="w-full text-xs">
-              <thead className="bg-gray-50 sticky top-0">
+              <thead className="bg-soft sticky top-0">
                 <tr>
-                  <th className="text-left py-2 px-3 font-semibold text-gray-700">Email</th>
-                  <th className="text-left py-2 px-3 font-semibold text-gray-700">Nombre</th>
-                  <th className="text-left py-2 px-3 font-semibold text-gray-700">Estado</th>
+                  <th className="text-left py-2 px-3 font-semibold text-ink">{t('emailField')}</th>
+                  <th className="text-left py-2 px-3 font-semibold text-ink">{t('admin.campaigns.shared.table.name')}</th>
+                  <th className="text-left py-2 px-3 font-semibold text-ink">{t('admin.campaigns.shared.table.status')}</th>
                 </tr>
               </thead>
               <tbody>
                 {audience.map((u) => {
                   const alreadySent = Array.isArray(u.tags) && u.tags.includes(CAMPAIGN_TAG);
                   return (
-                    <tr key={u.id} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="py-2 px-3 text-gray-800">{u.email}</td>
-                      <td className="py-2 px-3 text-gray-600">{u.full_name || '—'}</td>
+                    <tr key={u.id} className="border-t border-c-border hover:bg-soft">
+                      <td className="py-2 px-3 text-ink">{u.email}</td>
+                      <td className="py-2 px-3 text-c-muted">{u.full_name || '—'}</td>
                       <td className="py-2 px-3">
                         {alreadySent ? (
-                          <span className="inline-block bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-semibold">✓ ya enviado</span>
+                          <span className="badge-success">{t('admin.campaigns.shared.table.alreadySent')}</span>
                         ) : (
-                          <span className="inline-block bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full font-semibold">pendiente</span>
+                          <span className="badge-muted">{t('admin.campaigns.shared.table.pending')}</span>
                         )}
                       </td>
                     </tr>
@@ -305,31 +309,32 @@ export default function CampaignWinbackV1() {
       )}
 
       {/* Modal confirmación */}
-      {showConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-sm p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">⚠️ Confirmar envío Win-back</h3>
-            <p className="text-gray-600 mb-6">
-              Vas a enviar <strong>{pendingAudience.length} emails Win-back</strong> a autónomos con suscripción previa. Esta acción no se puede deshacer. ¿Confirmar?
-            </p>
-            <div className="flex gap-3">
-              <Button
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                onClick={handleSend}
-              >
-                Sí, enviar ahora
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setShowConfirm(false)}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </Card>
+      <Modal
+        open={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        dismissible={false}
+        title={t('admin.campaigns.winback.confirm.title')}
+      >
+        <p className="text-c-muted mb-6">
+          <Trans i18nKey="admin.campaigns.winback.confirm.body" values={{ pending: pendingAudience.length }} />
+        </p>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            className="btn-danger-solid flex-1"
+            onClick={handleSend}
+          >
+            {t('admin.campaigns.shared.confirmSend')}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary flex-1"
+            onClick={() => setShowConfirm(false)}
+          >
+            {t('common.cancel')}
+          </button>
         </div>
-      )}
-    </Card>
+      </Modal>
+    </div>
   );
 }

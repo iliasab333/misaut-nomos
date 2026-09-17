@@ -1,22 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Bell, Check, CheckCheck, CheckSquare, Trash2, Mail, Star, AlertCircle, Info, Loader2, Settings, FileText, Clock, MessageSquare, Calendar } from "lucide-react";
+import Modal from "@/components/Modal";
+import { SkeletonList, EmptyState } from "@/components/ListStates";
+import {
+  IconBell,
+  IconCheck,
+  IconCheckCheck,
+  IconCheckSquare,
+  IconTrash,
+  IconStarOutline,
+  IconAlert,
+  IconInfo,
+  IconSpinner,
+  IconSettings,
+  IconFile,
+  IconMessageSquare,
+} from "@/components/Icons";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 export default function NotificationsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
@@ -70,7 +79,7 @@ export default function NotificationsPage() {
         professional_id: user.id,
         status: 'pending'
       }, 'due_date', 10);
-      return tasks.filter(t => new Date(t.due_date) >= new Date());
+      return tasks.filter(task => new Date(task.due_date) >= new Date());
     },
     enabled: !!user && user.user_type === 'professionnel',
   });
@@ -119,7 +128,7 @@ export default function NotificationsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Todas marcadas como leídas');
+      toast.success(t('notifications.toast.allRead'));
     }
   });
 
@@ -129,7 +138,7 @@ export default function NotificationsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Notificación eliminada');
+      toast.success(t('notifications.toast.deleted'));
     }
   });
 
@@ -142,7 +151,7 @@ export default function NotificationsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Notificaciones eliminadas');
+      toast.success(t('notifications.toast.deletedMany'));
     }
   });
 
@@ -151,7 +160,7 @@ export default function NotificationsPage() {
       await base44.auth.updateMe({ notification_preferences: prefs });
     },
     onSuccess: () => {
-      toast.success('Preferencias guardadas');
+      toast.success(t('cookies.settingsSaved'));
       setShowSettings(false);
     }
   });
@@ -169,21 +178,21 @@ export default function NotificationsPage() {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'new_message':
-        return <MessageSquare className="w-5 h-5 text-blue-600" />;
+        return <IconMessageSquare className="w-5 h-5 text-c-accent" />;
       case 'new_review':
-        return <Star className="w-5 h-5 text-amber-500" />;
+        return <IconStarOutline className="w-5 h-5 text-star" />;
       case 'review_reminder':
-        return <Star className="w-5 h-5 text-amber-500" />;
+        return <IconStarOutline className="w-5 h-5 text-star" />;
       case 'subscription_expiring':
-        return <AlertCircle className="w-5 h-5 text-orange-500" />;
+        return <IconAlert className="w-5 h-5 text-orange-500" />;
       case 'subscription_expired':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <IconAlert className="w-5 h-5 text-error" />;
       case 'profile_approved':
-        return <CheckCheck className="w-5 h-5 text-green-500" />;
+        return <IconCheckCheck className="w-5 h-5 text-success" />;
       case 'system_update':
-        return <Info className="w-5 h-5 text-blue-500" />;
+        return <IconInfo className="w-5 h-5 text-c-accent" />;
       default:
-        return <Bell className="w-5 h-5 text-gray-500" />;
+        return <IconBell className="w-5 h-5 text-c-muted" />;
     }
   };
 
@@ -198,7 +207,7 @@ export default function NotificationsPage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-700" />
+        <IconSpinner className="w-8 h-8 animate-spin text-c-accent" />
       </div>
     );
   }
@@ -210,158 +219,162 @@ export default function NotificationsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Notificaciones</h1>
-            <Button 
-              variant="outline"
-              size="sm"
+            <h1 className="text-2xl md:text-3xl font-bold text-ink">{t('notifications.title')}</h1>
+            <button
+              type="button"
               onClick={() => setShowSettings(true)}
-              className="bg-white"
+              className="btn-secondary btn-sm"
             >
-              <Settings className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Configurar</span>
-            </Button>
+              <IconSettings size={16} />
+              <span className="hidden sm:inline">{t('notifications.page.configure')}</span>
+            </button>
           </div>
-          <p className="text-xs md:text-sm text-gray-600">Mantente al día con todas tus actualizaciones</p>
+          <p className="text-xs md:text-sm text-c-muted">{t('notifications.page.subtitle')}</p>
         </div>
 
         {/* Alertas pendientes */}
         {isProfessional && (upcomingTasks.length > 0 || upcomingInvoices.length > 0 || pendingQuotes.length > 0) && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
             {upcomingTasks.length > 0 && (
-              <Card className="border-0 shadow-sm bg-green-50 border-l-4 border-l-green-500">
-                <CardContent className="p-4">
+              <div className="card border-0 shadow-sm bg-success/10 border-l-4 border-l-success">
+                <div className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <CheckSquare className="w-4 h-4 text-green-600" />
-                    <h3 className="font-semibold text-sm text-gray-900">Tareas próximas</h3>
+                    <IconCheckSquare className="w-4 h-4 text-success" />
+                    <h3 className="font-semibold text-sm text-ink">{t('notifications.page.upcomingTasks')}</h3>
                   </div>
-                  <p className="text-2xl font-bold text-green-600">{upcomingTasks.length}</p>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="mt-2 h-7 text-xs"
+                  <p className="text-2xl font-bold text-success">{upcomingTasks.length}</p>
+                  <button
+                    type="button"
+                    className="btn-ghost btn-sm mt-2 px-0 text-xs"
                     onClick={() => navigate(createPageUrl("Calendar"))}
                   >
-                    Ver en calendario →
-                  </Button>
-                </CardContent>
-              </Card>
+                    {t('notifications.page.viewCalendar')}
+                  </button>
+                </div>
+              </div>
             )}
             {upcomingInvoices.length > 0 && (
-              <Card className="border-0 shadow-sm bg-orange-50 border-l-4 border-l-orange-500">
-                <CardContent className="p-4">
+              <div className="card border-0 shadow-sm bg-orange-50 border-l-4 border-l-orange-500">
+                <div className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <FileText className="w-4 h-4 text-orange-600" />
-                    <h3 className="font-semibold text-sm text-gray-900">Facturas a vencer</h3>
+                    <IconFile className="w-4 h-4 text-orange-600" />
+                    <h3 className="font-semibold text-sm text-ink">{t('notifications.page.invoicesDue')}</h3>
                   </div>
                   <p className="text-2xl font-bold text-orange-600">{upcomingInvoices.length}</p>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="mt-2 h-7 text-xs"
+                  <button
+                    type="button"
+                    className="btn-ghost btn-sm mt-2 px-0 text-xs"
                     onClick={() => navigate(createPageUrl("Invoices"))}
                   >
-                    Ver facturas →
-                  </Button>
-                </CardContent>
-              </Card>
+                    {t('notifications.page.viewInvoices')}
+                  </button>
+                </div>
+              </div>
             )}
             {pendingQuotes.length > 0 && (
-              <Card className="border-0 shadow-sm bg-blue-50 border-l-4 border-l-blue-500">
-                <CardContent className="p-4">
+              <div className="card border-0 shadow-sm bg-c-accent/10 border-l-4 border-l-c-accent">
+                <div className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <FileText className="w-4 h-4 text-blue-600" />
-                    <h3 className="font-semibold text-sm text-gray-900">Presupuestos pendientes</h3>
+                    <IconFile className="w-4 h-4 text-c-accent" />
+                    <h3 className="font-semibold text-sm text-ink">{t('notifications.page.pendingQuotes')}</h3>
                   </div>
-                  <p className="text-2xl font-bold text-blue-600">{pendingQuotes.length}</p>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="mt-2 h-7 text-xs"
+                  <p className="text-2xl font-bold text-c-accent">{pendingQuotes.length}</p>
+                  <button
+                    type="button"
+                    className="btn-ghost btn-sm mt-2 px-0 text-xs"
                     onClick={() => navigate(createPageUrl("Presupuestos"))}
                   >
-                    Ver presupuestos →
-                  </Button>
-                </CardContent>
-              </Card>
+                    {t('notifications.page.viewQuotes')}
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}
 
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
-          <Tabs value={filter} onValueChange={setFilter} className="w-full md:w-auto">
-            <TabsList className="grid grid-cols-3 w-full md:w-auto">
-              <TabsTrigger value="all">
-                Todas ({notifications.length})
-              </TabsTrigger>
-              <TabsTrigger value="unread">
-                Nuevas ({unreadCount})
-              </TabsTrigger>
-              <TabsTrigger value="read">
-                Leídas ({notifications.length - unreadCount})
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div role="tablist" aria-label={t('notifications.title')} className="grid grid-cols-3 gap-2 w-full md:w-auto md:flex">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={filter === 'all'}
+              onClick={() => setFilter('all')}
+              className={`${filter === 'all' ? 'chip-active' : 'chip'} justify-center`}
+            >
+              {t('notifications.page.tabAll', { count: notifications.length })}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={filter === 'unread'}
+              onClick={() => setFilter('unread')}
+              className={`${filter === 'unread' ? 'chip-active' : 'chip'} justify-center`}
+            >
+              {t('notifications.page.tabUnread', { count: unreadCount })}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={filter === 'read'}
+              onClick={() => setFilter('read')}
+              className={`${filter === 'read' ? 'chip-active' : 'chip'} justify-center`}
+            >
+              {t('notifications.page.tabRead', { count: notifications.length - unreadCount })}
+            </button>
+          </div>
 
           <div className="flex gap-2 w-full md:w-auto">
             {unreadCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 onClick={() => markAllAsReadMutation.mutate()}
                 disabled={markAllAsReadMutation.isPending}
-                className="flex-1 md:flex-none bg-white"
+                className="btn-secondary btn-sm flex-1 md:flex-none"
               >
-                <CheckCheck className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Marcar todas</span>
-                <span className="sm:hidden">Marcar</span>
-              </Button>
+                <IconCheckCheck size={16} />
+                <span className="hidden sm:inline">{t('notifications.page.markAll')}</span>
+                <span className="sm:hidden">{t('notifications.page.mark')}</span>
+              </button>
             )}
-            
+
             {notifications.some(n => n.is_read) && (
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 onClick={() => deleteAllReadMutation.mutate()}
                 disabled={deleteAllReadMutation.isPending}
-                className="flex-1 md:flex-none bg-white"
+                className="btn-secondary btn-sm flex-1 md:flex-none"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Eliminar leídas</span>
-                <span className="sm:hidden">Eliminar</span>
-              </Button>
+                <IconTrash size={16} />
+                <span className="hidden sm:inline">{t('notifications.page.deleteRead')}</span>
+                <span className="sm:hidden">{t('common.delete')}</span>
+              </button>
             )}
           </div>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-700" />
-          </div>
+          <SkeletonList count={4} avatar={false} />
         ) : filteredNotifications.length === 0 ? (
-          <Card className="shadow-sm border-0">
-            <CardContent className="p-12 text-center">
-              <Bell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
-                {filter === 'unread' ? 'Sin notificaciones nuevas' : 
-                 filter === 'read' ? 'Sin notificaciones leídas' : 
-                 'Sin notificaciones'}
-              </h2>
-              <p className="text-gray-600">
-                Te avisaremos cuando haya novedades
-              </p>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={<IconBell className="w-6 h-6" />}
+            title={
+              filter === 'unread' ? t('notifications.page.emptyUnread') :
+              filter === 'read' ? t('notifications.page.emptyRead') :
+              t('notifications.empty')
+            }
+            body={t('notifications.emptyHint')}
+          />
         ) : (
           <div className="space-y-3">
             {filteredNotifications.map((notification) => (
-              <Card
+              <div
                 key={notification.id}
-                className={`shadow-sm border-0 cursor-pointer transition-all hover:shadow-md active:scale-98 ${
-                  !notification.is_read ? 'bg-blue-50 border-l-4 border-l-blue-600' : 'bg-white'
+                className={`card shadow-sm border-0 cursor-pointer transition-all hover:shadow-md active:scale-98 ${
+                  !notification.is_read ? 'bg-c-accent/10 border-l-4 border-l-c-accent' : 'bg-surface'
                 }`}
                 onClick={() => handleNotificationClick(notification)}
               >
-                <CardContent className="p-4">
+                <div className="p-4">
                   <div className="flex items-start gap-3 md:gap-4">
                     <div className="mt-1 flex-shrink-0">
                       {getNotificationIcon(notification.type)}
@@ -370,196 +383,226 @@ export default function NotificationsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1 gap-2">
                         <h3 className={`text-sm md:text-base font-semibold truncate ${
-                          !notification.is_read ? 'text-gray-900' : 'text-gray-700'
+                          !notification.is_read ? 'text-ink' : 'text-c-muted'
                         }`}>
                           {notification.title}
                         </h3>
                         {!notification.is_read && (
-                          <Badge className="bg-blue-600 flex-shrink-0 text-xs">Nueva</Badge>
+                          <span className="badge-accent flex-shrink-0 text-xs">{t('notifications.page.newBadge')}</span>
                         )}
                       </div>
 
-                      <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3 line-clamp-2">
+                      <p className="text-xs md:text-sm text-c-muted mb-2 md:mb-3 line-clamp-2">
                         {notification.message}
                       </p>
 
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-c-muted">
                           {format(new Date(notification.created_date), "d MMM yyyy 'a las' HH:mm", { locale: es })}
                         </p>
 
                         <div className="flex gap-2">
                           {!notification.is_read && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 text-xs"
+                            <button
+                              type="button"
+                              className="btn-ghost btn-sm text-xs"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 markAsReadMutation.mutate(notification.id);
                               }}
                             >
-                              <Check className="w-3 h-3 mr-1" />
-                              Marcar
-                            </Button>
+                              <IconCheck size={12} />
+                              {t('notifications.page.mark')}
+                            </button>
                           )}
 
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
+                          <button
+                            type="button"
+                            className="btn-icon text-c-muted hover:text-error"
+                            aria-label={t('common.delete')}
                             onClick={(e) => {
                               e.stopPropagation();
                               deleteNotificationMutation.mutate(notification.id);
                             }}
                           >
-                            <Trash2 className="w-3 h-3 text-gray-400 hover:text-red-500" />
-                          </Button>
+                            <IconTrash size={16} />
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Dialog: Configuración de notificaciones */}
-      <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Settings className="w-5 h-5" />
-              Configuración de notificaciones
-            </DialogTitle>
-          </DialogHeader>
-
-          {notifPrefs && (
-            <div className="space-y-6 py-4">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Canales de notificación</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label className="font-medium">Notificaciones por email</Label>
-                      <p className="text-xs text-gray-500">Recibe alertas en tu correo electrónico</p>
-                    </div>
-                    <Switch
-                      checked={notifPrefs.email_enabled}
-                      onCheckedChange={(v) => setNotifPrefs({...notifPrefs, email_enabled: v})}
-                    />
+      {/* Modal: Configuración de notificaciones */}
+      <Modal
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        size="lg"
+        title={
+          <span className="flex items-center gap-2">
+            <IconSettings size={20} />
+            {t('notifications.settings.title')}
+          </span>
+        }
+      >
+        {notifPrefs && (
+          <div className="space-y-6 py-4">
+            <div className="space-y-4">
+              <h3 className="font-semibold text-ink">{t('notifications.settings.channels')}</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="label font-medium mb-0" htmlFor="notif-email">{t('notifications.settings.email')}</label>
+                    <p className="text-xs text-c-muted">{t('notifications.settings.emailHint')}</p>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label className="font-medium">Notificaciones push</Label>
-                      <p className="text-xs text-gray-500">Recibe notificaciones en la plataforma</p>
-                    </div>
-                    <Switch
-                      checked={notifPrefs.push_enabled}
-                      onCheckedChange={(v) => setNotifPrefs({...notifPrefs, push_enabled: v})}
-                    />
+                  <input
+                    id="notif-email"
+                    type="checkbox"
+                    role="switch"
+                    className="switch"
+                    checked={notifPrefs.email_enabled}
+                    onChange={(e) => setNotifPrefs({...notifPrefs, email_enabled: e.target.checked})}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="label font-medium mb-0" htmlFor="notif-push">{t('notifications.settings.push')}</label>
+                    <p className="text-xs text-c-muted">{t('notifications.settings.pushHint')}</p>
                   </div>
+                  <input
+                    id="notif-push"
+                    type="checkbox"
+                    role="switch"
+                    className="switch"
+                    checked={notifPrefs.push_enabled}
+                    onChange={(e) => setNotifPrefs({...notifPrefs, push_enabled: e.target.checked})}
+                  />
                 </div>
               </div>
-
-              <div className="border-t pt-6 space-y-4">
-                <h3 className="font-semibold text-gray-900">Tipos de alertas</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="font-medium">Nuevos mensajes</Label>
-                    <Switch
-                      checked={notifPrefs.new_messages}
-                      onCheckedChange={(v) => setNotifPrefs({...notifPrefs, new_messages: v})}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="font-medium">Actualizaciones de presupuestos</Label>
-                    <Switch
-                      checked={notifPrefs.quote_updates}
-                      onCheckedChange={(v) => setNotifPrefs({...notifPrefs, quote_updates: v})}
-                    />
-                  </div>
-                  {isProfessional && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <Label className="font-medium">Recordatorios de tareas</Label>
-                        <Switch
-                          checked={notifPrefs.task_reminders}
-                          onCheckedChange={(v) => setNotifPrefs({...notifPrefs, task_reminders: v})}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <Label className="font-medium">Vencimientos de facturas</Label>
-                        <Switch
-                          checked={notifPrefs.invoice_reminders}
-                          onCheckedChange={(v) => setNotifPrefs({...notifPrefs, invoice_reminders: v})}
-                        />
-                      </div>
-                    </>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <Label className="font-medium">Alertas de suscripción</Label>
-                    <Switch
-                      checked={notifPrefs.subscription_alerts}
-                      onCheckedChange={(v) => setNotifPrefs({...notifPrefs, subscription_alerts: v})}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {isProfessional && (
-                <div className="border-t pt-6 space-y-4">
-                  <h3 className="font-semibold text-gray-900">Tiempos de recordatorio</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <Label className="text-sm">Recordar tareas con (horas de antelación)</Label>
-                      <Input
-                        type="number"
-                        value={notifPrefs.task_reminder_hours_before}
-                        onChange={(e) => setNotifPrefs({...notifPrefs, task_reminder_hours_before: Number(e.target.value)})}
-                        className="mt-1"
-                        min="1"
-                        max="168"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm">Recordar facturas con (días de antelación)</Label>
-                      <Input
-                        type="number"
-                        value={notifPrefs.invoice_reminder_days_before}
-                        onChange={(e) => setNotifPrefs({...notifPrefs, invoice_reminder_days_before: Number(e.target.value)})}
-                        className="mt-1"
-                        min="1"
-                        max="30"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
-          )}
 
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setShowSettings(false)}>
-              Cancelar
-            </Button>
-            <Button 
-              onClick={() => savePreferencesMutation.mutate(notifPrefs)}
-              disabled={savePreferencesMutation.isPending}
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {savePreferencesMutation.isPending ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</>
-              ) : (
-                "Guardar preferencias"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <div className="border-t border-c-border pt-6 space-y-4">
+              <h3 className="font-semibold text-ink">{t('notifications.settings.alertTypes')}</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="label font-medium mb-0" htmlFor="notif-new-messages">{t('notifications.settings.newMessages')}</label>
+                  <input
+                    id="notif-new-messages"
+                    type="checkbox"
+                    role="switch"
+                    className="switch"
+                    checked={notifPrefs.new_messages}
+                    onChange={(e) => setNotifPrefs({...notifPrefs, new_messages: e.target.checked})}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="label font-medium mb-0" htmlFor="notif-quote-updates">{t('notifications.settings.quoteUpdates')}</label>
+                  <input
+                    id="notif-quote-updates"
+                    type="checkbox"
+                    role="switch"
+                    className="switch"
+                    checked={notifPrefs.quote_updates}
+                    onChange={(e) => setNotifPrefs({...notifPrefs, quote_updates: e.target.checked})}
+                  />
+                </div>
+                {isProfessional && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <label className="label font-medium mb-0" htmlFor="notif-task-reminders">{t('notifications.settings.taskReminders')}</label>
+                      <input
+                        id="notif-task-reminders"
+                        type="checkbox"
+                        role="switch"
+                        className="switch"
+                        checked={notifPrefs.task_reminders}
+                        onChange={(e) => setNotifPrefs({...notifPrefs, task_reminders: e.target.checked})}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <label className="label font-medium mb-0" htmlFor="notif-invoice-reminders">{t('notifications.settings.invoiceDue')}</label>
+                      <input
+                        id="notif-invoice-reminders"
+                        type="checkbox"
+                        role="switch"
+                        className="switch"
+                        checked={notifPrefs.invoice_reminders}
+                        onChange={(e) => setNotifPrefs({...notifPrefs, invoice_reminders: e.target.checked})}
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="flex items-center justify-between">
+                  <label className="label font-medium mb-0" htmlFor="notif-subscription-alerts">{t('notifications.settings.subscriptionAlerts')}</label>
+                  <input
+                    id="notif-subscription-alerts"
+                    type="checkbox"
+                    role="switch"
+                    className="switch"
+                    checked={notifPrefs.subscription_alerts}
+                    onChange={(e) => setNotifPrefs({...notifPrefs, subscription_alerts: e.target.checked})}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {isProfessional && (
+              <div className="border-t border-c-border pt-6 space-y-4">
+                <h3 className="font-semibold text-ink">{t('notifications.settings.reminderTimes')}</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="label" htmlFor="notif-task-hours">{t('notifications.settings.taskHoursBefore')}</label>
+                    <input
+                      id="notif-task-hours"
+                      className="input mt-1"
+                      type="number"
+                      value={notifPrefs.task_reminder_hours_before}
+                      onChange={(e) => setNotifPrefs({...notifPrefs, task_reminder_hours_before: Number(e.target.value)})}
+                      min="1"
+                      max="168"
+                    />
+                  </div>
+                  <div>
+                    <label className="label" htmlFor="notif-invoice-days">{t('notifications.settings.invoiceDaysBefore')}</label>
+                    <input
+                      id="notif-invoice-days"
+                      className="input mt-1"
+                      type="number"
+                      value={notifPrefs.invoice_reminder_days_before}
+                      onChange={(e) => setNotifPrefs({...notifPrefs, invoice_reminder_days_before: Number(e.target.value)})}
+                      min="1"
+                      max="30"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-6 flex gap-3 justify-end">
+          <button type="button" className="btn-secondary btn-sm" onClick={() => setShowSettings(false)}>
+            {t('common.cancel')}
+          </button>
+          <button
+            type="button"
+            className="btn-primary btn-sm"
+            onClick={() => savePreferencesMutation.mutate(notifPrefs)}
+            disabled={savePreferencesMutation.isPending}
+          >
+            {savePreferencesMutation.isPending ? (
+              <><IconSpinner size={16} />{t('reviews.card.saving')}</>
+            ) : (
+              t('cookies.savePreferences')
+            )}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -1,39 +1,24 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Paperclip, Loader2, X } from "lucide-react";
-import { toast } from "sonner";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import Modal from "@/components/Modal";
+import { IconAttach, IconSpinner, IconClose } from "@/components/Icons";
+import { toast } from "@/lib/toast";
+import { useTranslation } from "react-i18next";
 
+// Mapa explícito tipo → clave i18n (la etiqueta se resuelve con t() en render).
 const typeConfig = {
-  soporte_cliente: { text_es: "Soporte Cliente", text_en: "Client Support" },
-  soporte_autonomo: { text_es: "Soporte Autónomo", text_en: "Professional Support" },
-  reclamo: { text_es: "Reclamo", text_en: "Complaint" },
-  problema_trabajo: { text_es: "Problema con trabajo", text_en: "Job Issue" },
-  problema_pago: { text_es: "Problema de pago", text_en: "Payment Issue" },
-  consulta_general: { text_es: "Consulta general", text_en: "General Query" }
+  soporte_cliente: "tickets.types.clientSupport",
+  soporte_autonomo: "tickets.types.proSupport",
+  reclamo: "tickets.types.complaint",
+  problema_trabajo: "tickets.types.jobIssue",
+  problema_pago: "tickets.types.paymentIssue",
+  consulta_general: "tickets.types.generalQuery"
 };
 
 export default function CreateTicketDialog({ open, onClose, user, relatedProfessionalId = null }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { language } = useLanguage();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("consulta_general");
@@ -122,13 +107,13 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
     onSuccess: (data) => {
       console.log('🎉 Ticket creado exitosamente:', data);
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      toast.success(language === 'es' ? '✅ Ticket creado correctamente' : '✅ Ticket created successfully');
+      toast.success(t('tickets.create.created'));
       resetForm();
       onClose();
     },
     onError: (error) => {
       console.error('❌ Error creando ticket:', error);
-      toast.error(language === 'es' ? 'Error al crear el ticket: ' + error.message : 'Error creating ticket: ' + error.message);
+      toast.error(t('tickets.create.createError', { message: error.message }));
     }
   });
 
@@ -150,9 +135,9 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setAttachments([...attachments, file_url]);
-      toast.success(language === 'es' ? 'Archivo adjunto' : 'File attached');
+      toast.success(t('tickets.create.fileAttached'));
     } catch (error) {
-      toast.error(language === 'es' ? 'Error subiendo archivo' : 'Error uploading file');
+      toast.error(t('tickets.toast.uploadError'));
     } finally {
       setUploadingFile(false);
     }
@@ -167,12 +152,12 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
     console.log('Usuario:', user);
 
     if (!title.trim() || !description.trim()) {
-      toast.error(language === 'es' ? 'Completa título y descripción' : 'Complete title and description');
+      toast.error(t('tickets.create.fillTitleDescription'));
       return;
     }
 
     if (!user || !user.id) {
-      toast.error(language === 'es' ? 'Error: Usuario no autenticado' : 'Error: User not authenticated');
+      toast.error(t('tickets.create.notAuthenticated'));
       console.error('❌ Usuario no disponible:', user);
       return;
     }
@@ -187,7 +172,7 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
       assigned_to_id: assignedToId || null,
       assigned_to_name: selectedProfessional?.business_name || null,
       related_professional_id: assignedToId || null,
-      tags: tags ? tags.split(',').map(t => t.trim()).filter(t => t) : [],
+      tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
       attachments: attachments || []
     };
 
@@ -196,162 +181,163 @@ export default function CreateTicketDialog({ open, onClose, user, relatedProfess
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {language === 'es' ? 'Crear Nuevo Ticket' : 'Create New Ticket'}
-          </DialogTitle>
-        </DialogHeader>
+    <Modal open={open} onClose={onClose} size="lg" title={t('tickets.create.title')}>
+      <div className="space-y-4">
+        <div>
+          <label className="label" htmlFor="ticket-title">
+            {t('tickets.create.titleLabel')}
+          </label>
+          <input
+            id="ticket-title"
+            className="input"
+            placeholder={t('tickets.create.titlePlaceholder')}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
 
-        <div className="space-y-4">
+        <div>
+          <label className="label" htmlFor="ticket-description">
+            {t('tickets.create.descriptionLabel')}
+          </label>
+          <textarea
+            id="ticket-description"
+            className="textarea"
+            placeholder={t('tickets.create.descriptionPlaceholder')}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={5}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">
-              {language === 'es' ? 'Título *' : 'Title *'}
+            <label className="label" htmlFor="ticket-type">
+              {t('tickets.create.typeLabel')}
             </label>
-            <Input
-              placeholder={language === 'es' ? "Describe brevemente el problema..." : "Briefly describe the issue..."}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              {language === 'es' ? 'Descripción *' : 'Description *'}
-            </label>
-            <Textarea
-              placeholder={language === 'es' ? "Explica detalladamente el problema..." : "Explain the issue in detail..."}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={5}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                {language === 'es' ? 'Tipo de ticket' : 'Ticket type'}
-              </label>
-              <Select value={type} onValueChange={setType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(typeConfig).map(([key, config]) => (
-                    <SelectItem key={key} value={key}>
-                      {language === 'es' ? config.text_es : config.text_en}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                {language === 'es' ? 'Prioridad' : 'Priority'}
-              </label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="baja">{language === 'es' ? 'Baja' : 'Low'}</SelectItem>
-                  <SelectItem value="media">{language === 'es' ? 'Media' : 'Medium'}</SelectItem>
-                  <SelectItem value="alta">{language === 'es' ? 'Alta' : 'High'}</SelectItem>
-                  <SelectItem value="urgente">{language === 'es' ? 'Urgente' : 'Urgent'}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {professionals.length > 0 && (
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                {language === 'es' ? 'Relacionado con profesional (opcional)' : 'Related to professional (optional)'}
-              </label>
-              <Select value={assignedToId} onValueChange={setAssignedToId}>
-                <SelectTrigger>
-                  <SelectValue placeholder={language === 'es' ? "Seleccionar profesional..." : "Select professional..."} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={null}>{language === 'es' ? 'Ninguno' : 'None'}</SelectItem>
-                  {professionals.map((prof) => (
-                    <SelectItem key={prof.user_id} value={prof.user_id}>
-                      {prof.business_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              {language === 'es' ? 'Etiquetas (separadas por comas)' : 'Tags (comma separated)'}
-            </label>
-            <Input
-              placeholder={language === 'es' ? "urgente, pago, problema técnico" : "urgent, payment, technical issue"}
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              {language === 'es' ? 'Archivos adjuntos' : 'Attachments'}
-            </label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {attachments.map((url, idx) => (
-                <div key={idx} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
-                  <span className="text-xs">Archivo {idx + 1}</span>
-                  <button
-                    onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <input
-              type="file"
-              className="hidden"
-              id="ticket-file-upload"
-              onChange={handleFileUpload}
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => document.getElementById('ticket-file-upload').click()}
-              disabled={uploadingFile}
+            <select
+              id="ticket-type"
+              className="select"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
             >
-              {uploadingFile ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Paperclip className="w-4 h-4 mr-2" />
-              )}
-              {language === 'es' ? 'Adjuntar archivo' : 'Attach file'}
-            </Button>
+              {Object.entries(typeConfig).map(([key, labelKey]) => (
+                <option key={key} value={key}>
+                  {t(labelKey)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="label" htmlFor="ticket-priority">
+              {t('admin.soporte.filter.priority')}
+            </label>
+            <select
+              id="ticket-priority"
+              className="select"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+            >
+              <option value="baja">{t('admin.soporte.priority.low')}</option>
+              <option value="media">{t('tickets.priority.medium')}</option>
+              <option value="alta">{t('admin.soporte.priority.high')}</option>
+              <option value="urgente">{t('admin.soporte.priority.urgent')}</option>
+            </select>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            {language === 'es' ? 'Cancelar' : 'Cancel'}
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={createTicketMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-700"
+        {professionals.length > 0 && (
+          <div>
+            <label className="label" htmlFor="ticket-professional">
+              {t('tickets.create.relatedPro')}
+            </label>
+            <select
+              id="ticket-professional"
+              className="select"
+              value={assignedToId}
+              onChange={(e) => setAssignedToId(e.target.value)}
+            >
+              <option value="">{t('common.none')}</option>
+              {professionals.map((prof) => (
+                <option key={prof.user_id} value={prof.user_id}>
+                  {prof.business_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        <div>
+          <label className="label" htmlFor="ticket-tags">
+            {t('tickets.create.tagsLabel')}
+          </label>
+          <input
+            id="ticket-tags"
+            className="input"
+            placeholder={t('tickets.create.tagsPlaceholder')}
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="label">
+            {t('tickets.create.attachments')}
+          </label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {attachments.map((url, idx) => (
+              <div key={idx} className="flex items-center gap-1 bg-soft px-2 py-1 rounded">
+                <span className="text-xs">{t('tickets.detail.fileN', { index: idx + 1 })}</span>
+                <button
+                  type="button"
+                  onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
+                  className="text-error hover:opacity-80"
+                  aria-label={t('common.delete')}
+                >
+                  <IconClose size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <input
+            type="file"
+            className="hidden"
+            id="ticket-file-upload"
+            onChange={handleFileUpload}
+          />
+          <button
+            type="button"
+            className="btn-secondary btn-sm"
+            onClick={() => document.getElementById('ticket-file-upload').click()}
+            disabled={uploadingFile}
           >
-            {createTicketMutation.isPending && (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            {uploadingFile ? (
+              <IconSpinner size={16} />
+            ) : (
+              <IconAttach size={16} />
             )}
-            {language === 'es' ? 'Crear Ticket' : 'Create Ticket'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            {t('messages.attach_file')}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-6 flex gap-3 justify-end">
+        <button type="button" className="btn-secondary" onClick={onClose}>
+          {t('common.cancel')}
+        </button>
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={handleSubmit}
+          disabled={createTicketMutation.isPending}
+        >
+          {createTicketMutation.isPending && (
+            <IconSpinner size={16} />
+          )}
+          {t('tickets.create.submit')}
+        </button>
+      </div>
+    </Modal>
   );
 }

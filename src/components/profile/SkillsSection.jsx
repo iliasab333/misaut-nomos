@@ -1,11 +1,6 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Sparkles, Plus, X, Award, CheckCircle } from "lucide-react";
-import { useLanguage } from "../ui/LanguageSwitcher";
+import { IconSparkles, IconPlus, IconClose, IconAward, IconCheckCircle } from "@/components/Icons";
+import { useTranslation } from "react-i18next";
 
 export default function SkillsSection({ 
   skills = [], 
@@ -16,7 +11,7 @@ export default function SkillsSection({
   onCertificationsChange,
   onYearsChange 
 }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [newSkill, setNewSkill] = useState("");
   const [newCertification, setNewCertification] = useState("");
 
@@ -52,20 +47,21 @@ export default function SkillsSection({
   return (
     <div className="space-y-6">
       {/* Años de experiencia */}
-      <Card className="shadow-sm border-0 bg-white">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Award className="w-5 h-5 text-blue-700" />
-            Experiencia Profesional
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="card">
+        <div className="p-6 pb-3">
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
+            <IconAward className="w-5 h-5 text-c-accent" />
+            {t("proProfile.skills.experienceTitle")}
+          </h3>
+        </div>
+        <div className="p-6 pt-0">
           <div>
-            <Label className="flex items-center gap-2">
-              {yearsExperience ? <CheckCircle className="w-4 h-4 text-green-600" /> : null}
-              Años de experiencia
-            </Label>
-            <Input
+            <label className="label flex items-center gap-2" htmlFor="skills-years">
+              {yearsExperience ? <IconCheckCircle className="w-4 h-4 text-success" /> : null}
+              {t("yearsExperience")}
+            </label>
+            <input
+              id="skills-years"
               type="number"
               value={yearsExperience}
               onChange={(e) => onYearsChange(e.target.value)}
@@ -73,136 +69,141 @@ export default function SkillsSection({
               placeholder="5"
               min="0"
               max="50"
-              className="max-w-32 mt-2"
+              className="input max-w-32 mt-2"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Habilidades */}
-      <Card className="shadow-sm border-0 bg-white">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-600" />
-            Habilidades Específicas
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600">
-            Añade las habilidades que te diferencian como profesional
+      <div className="card">
+        <div className="p-6 pb-3">
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
+            <IconSparkles className="w-5 h-5 text-purple-600" />
+            {t("proProfile.skills.skillsTitle")}
+          </h3>
+        </div>
+        <div className="p-6 pt-0 space-y-4">
+          <p className="text-sm text-c-muted">
+            {t("proProfile.skills.skillsIntro")}
           </p>
 
           {isEditing && (
             <div className="flex gap-2">
-              <Input
+              <input
                 value={newSkill}
                 onChange={(e) => setNewSkill(e.target.value)}
                 onKeyPress={(e) => handleKeyPress(e, addSkill)}
-                placeholder="Ej: Instalación solar, Reparación de urgencia..."
-                className="flex-1"
+                placeholder={t("proProfile.skills.skillPlaceholder")}
+                className="input flex-1"
               />
-              <Button 
+              <button 
                 type="button" 
                 onClick={addSkill}
                 disabled={!newSkill.trim()}
-                className="bg-purple-600 hover:bg-purple-700"
+                aria-label={t("proProfile.skills.skillsTitle")}
+                className="btn-primary bg-purple-600 hover:bg-purple-700"
               >
-                <Plus className="w-4 h-4" />
-              </Button>
+                <IconPlus className="w-4 h-4" />
+              </button>
             </div>
           )}
 
           <div className="flex flex-wrap gap-2">
             {skills.length === 0 && !isEditing ? (
-              <p className="text-sm text-gray-400 italic">No hay habilidades añadidas</p>
+              <p className="text-sm text-c-muted italic">{t("proProfile.skills.noSkills")}</p>
             ) : (
               skills.map((skill, idx) => (
-                <Badge 
+                <span 
                   key={idx} 
-                  className="bg-purple-100 text-purple-800 px-3 py-1.5 text-sm flex items-center gap-1"
+                  className="badge bg-purple-100 text-purple-800 px-3 py-1.5 text-sm gap-1"
                 >
-                  <Sparkles className="w-3 h-3" />
+                  <IconSparkles className="w-3 h-3" />
                   {skill}
                   {isEditing && (
                     <button
+                      type="button"
                       onClick={() => removeSkill(skill)}
+                      aria-label={t("common.delete")}
                       className="ml-1 hover:text-purple-900"
                     >
-                      <X className="w-3 h-3" />
+                      <IconClose className="w-3 h-3" />
                     </button>
                   )}
-                </Badge>
+                </span>
               ))
             )}
           </div>
 
           {isEditing && (
-            <p className="text-xs text-gray-500">
-              Sugerencias: Presupuestos gratuitos, Trabajo urgente, Garantía extendida, 
-              Atención 24h, Servicio express, Materiales incluidos
+            <p className="text-xs text-c-muted">
+              {t("proProfile.skills.suggestions")}
             </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Certificaciones */}
-      <Card className="shadow-sm border-0 bg-white">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Award className="w-5 h-5 text-amber-600" />
-            Certificaciones y Títulos
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600">
-            Muestra tus certificaciones profesionales y títulos oficiales
+      <div className="card">
+        <div className="p-6 pb-3">
+          <h3 className="text-lg font-semibold text-ink flex items-center gap-2">
+            <IconAward className="w-5 h-5 text-warning" />
+            {t("proProfile.skills.certificationsTitle")}
+          </h3>
+        </div>
+        <div className="p-6 pt-0 space-y-4">
+          <p className="text-sm text-c-muted">
+            {t("proProfile.skills.certificationsIntro")}
           </p>
 
           {isEditing && (
             <div className="flex gap-2">
-              <Input
+              <input
                 value={newCertification}
                 onChange={(e) => setNewCertification(e.target.value)}
                 onKeyPress={(e) => handleKeyPress(e, addCertification)}
-                placeholder="Ej: Carnet instalador gas, Certificado PRL..."
-                className="flex-1"
+                placeholder={t("proProfile.skills.certificationPlaceholder")}
+                className="input flex-1"
               />
-              <Button 
+              <button 
                 type="button" 
                 onClick={addCertification}
                 disabled={!newCertification.trim()}
-                className="bg-amber-600 hover:bg-amber-700"
+                aria-label={t("proProfile.skills.certificationsTitle")}
+                className="btn-primary bg-amber-600 hover:bg-amber-700"
               >
-                <Plus className="w-4 h-4" />
-              </Button>
+                <IconPlus className="w-4 h-4" />
+              </button>
             </div>
           )}
 
           <div className="flex flex-wrap gap-2">
             {certifications.length === 0 && !isEditing ? (
-              <p className="text-sm text-gray-400 italic">No hay certificaciones añadidas</p>
+              <p className="text-sm text-c-muted italic">{t("proProfile.skills.noCertifications")}</p>
             ) : (
               certifications.map((cert, idx) => (
-                <Badge 
+                <span 
                   key={idx} 
-                  className="bg-amber-100 text-amber-800 px-3 py-1.5 text-sm flex items-center gap-1"
+                  className="badge-warning px-3 py-1.5 text-sm gap-1"
                 >
-                  <Award className="w-3 h-3" />
+                  <IconAward className="w-3 h-3" />
                   {cert}
                   {isEditing && (
                     <button
+                      type="button"
                       onClick={() => removeCertification(cert)}
-                      className="ml-1 hover:text-amber-900"
+                      aria-label={t("common.delete")}
+                      className="ml-1 hover:opacity-70"
                     >
-                      <X className="w-3 h-3" />
+                      <IconClose className="w-3 h-3" />
                     </button>
                   )}
-                </Badge>
+                </span>
               ))
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

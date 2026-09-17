@@ -6,56 +6,127 @@
     "delete": "Delete",
     "edit": "Edit",
     "close": "Close",
-    "confirm": "Confirm",
     "back": "Back",
     "next": "Next",
     "search": "Search",
-    "filter": "Filter",
     "yes": "Yes",
     "no": "No",
-    "accept": "Accept",
-    "reject": "Reject",
-    "success": "Success",
     "error": "Error",
-    "required": "Required",
-    "optional": "Optional"
+    "errorGenericTitle": "Something went wrong",
+    "errorGenericBody": "We couldn't load this. Please try again.",
+    "retry": "Try again",
+    "none": "None",
+    "location": "Location"
   },
   "nav": {
     "search_professionals": "Find Professionals",
     "messages": "Messages",
     "favorites": "Favorites",
     "my_profile": "My Profile",
-    "view_plans": "Plans",
     "faq": "FAQ",
     "support": "Support",
     "home": "Home",
-    "my_clients": "My Clients",
-    "quotes": "Quotes",
-    "invoices": "Invoices",
-    "visibility": "My Visibility",
-    "my_subscription": "My Subscription",
-    "administration": "Administration",
     "payments": "Payments",
-    "admin_tickets": "Admin Tickets",
     "login": "Sign in",
     "logout": "Sign out",
     "sign_up_client": "I'm a client",
-    "sign_up_pro": "Become a professional · 7 days free"
+    "becomeProFree": "Join as a pro · Free",
+    "loginAria": "Log in to MisAutónomos",
+    "iAmPro": "I'm a pro",
+    "blog": "Blog",
+    "myProfile": "My profile",
+    "statistics": "Statistics",
+    "reviews": "Reviews",
+    "adminMetrics": "Metrics",
+    "adminUsers": "Users",
+    "newsletter": "Newsletter",
+    "profile": "Profile",
+    "saved": "Saved"
   },
   "landing": {
-    "badge": "Verified professionals · 100% free",
-    "hero_title_1": "Find the professional",
-    "hero_title_2": "you need",
-    "hero_subtitle": "Contact professionals in Spain for free.",
-    "search_placeholder": "Search professional, service...",
-    "search_button": "Search",
-    "explore_category": "Explore by category",
-    "launch_badge": "Just launched · Be one of the first",
     "cta_pro_title": "Are you a professional?",
-    "cta_pro_subtitle": "Start free · 7 days",
     "feature_direct_contact": "Direct contact",
     "feature_no_fees": "No fees",
-    "feature_verified": "Verified"
+    "feature_verified": "Verified",
+    "seo": {
+      "title": "MisAutónomos · Verified freelancers near you, no commissions",
+      "description": "Find and contact verified freelancers in Spain. Filter by service and city, direct contact, no middlemen."
+    },
+    "hero": {
+      "eyebrow": "Verified · No commissions · Direct contact",
+      "title": "Find the freelancer<1></1> you need <3>near you</3>",
+      "subtitle": "Filter by service and area. Contact the professional directly.",
+      "whatLabel": "What do you need?",
+      "whereLabel": "Where?",
+      "loadingCategories": "Loading categories…",
+      "chooseService": "Choose a service",
+      "cityLabel": "City in {{province}} (optional)",
+      "wholeProvince": "Whole province",
+      "keywordSearch": "Search by keyword",
+      "keywordPlaceholder": "E.g. install air conditioning, replace a blind…",
+      "servicesTitle": "Available services",
+      "viewAll": "See all professionals",
+      "proBannerText": "Show up in search results for your area. Direct contact, no commissions.",
+      "trustVerified": "Verified identity"
+    },
+    "howItWorks": {
+      "title": "Three steps. No catch.",
+      "client": {
+        "filter": {
+          "title": "Filter by service and area",
+          "body": "Pick the category (electrician, plumber, …) and the city. No long forms to fill in."
+        },
+        "compare": {
+          "title": "Compare verified profiles",
+          "body": "See photos of past work, indicative prices, real reviews and service area. No fake profiles."
+        },
+        "contact": {
+          "title": "Get in touch directly",
+          "body": "Chat, phone or WhatsApp with the freelancer. No middlemen. No waiting for sales calls."
+        }
+      },
+      "pro": {
+        "createProfile": {
+          "title": "Create your profile in 10 minutes",
+          "body": "Services, area, indicative prices, photos of your work. We verify your identity and publish it."
+        },
+        "appear": {
+          "title": "You show up in searches for your area",
+          "body": "You appear at /categoria/<trade>-en-<city>. No fighting for SEO or paying for ads yourself."
+        },
+        "receiveClients": {
+          "title": "Get real clients",
+          "body": "Clients reach you by chat, phone or WhatsApp. You decide who to reply to."
+        }
+      }
+    },
+    "trust": {
+      "eyebrow": "Why trust us",
+      "title": "Clear rules. Real verification.",
+      "verified": {
+        "body": "We check ID (DNI/NIE), phone and trade before publishing each profile. Visible badge."
+      },
+      "noFees": {
+        "body": "Freelancers don't pay per lead, and clients don't pay to search."
+      },
+      "reviews": {
+        "title": "Real reviews",
+        "body": "Only clients who have contacted the freelancer can leave a review. Zero anonymous reviews."
+      },
+      "promotion": {
+        "title": "Promotion included",
+        "body": "We invest in social media and Google to bring you clients in your area, at no cost to the freelancer."
+      }
+    },
+    "coverage": {
+      "eyebrow": "Coverage",
+      "title": "Cities where freelancers are already active.",
+      "note": "Don't see your city? We start with the areas with the most demand and grow every month."
+    },
+    "finalCta": {
+      "title": "Get found in your area.",
+      "body": "We get you set up in minutes. No card. No commissions. Direct contact with clients."
+    }
   },
   "categories": {
     "electrician": "Electrician",
@@ -68,174 +139,320 @@
     "carpenter": "Carpenter"
   },
   "search": {
-    "results_count": "{{count}} professionals",
     "verified_tag": "Verified · Direct contact · No fees",
-    "no_results": "No results",
     "load_more": "Load more professionals ({{count}} remaining)",
-    "filters": "Filters",
-    "filters_advanced": "Advanced filters"
+    "filters_advanced": "Advanced filters",
+    "favoritesError": "Couldn't update favorites",
+    "seo": {
+      "titleCategoryProvince": "{{category}} in {{province}} - MisAutónomos",
+      "titleCategory": "{{category}} in Spain - MisAutónomos",
+      "titleProvince": "Freelancers in {{province}} - MisAutónomos",
+      "titleDefault": "Find Professional Freelancers - MisAutónomos",
+      "description": "Find and contact verified freelance professionals in Spain. {{count}}+ professionals available."
+    },
+    "heading": {
+      "categoryProvince": "{{category}} in {{province}}",
+      "province": "Freelancers in {{province}}",
+      "resultsCount_one": "{{count}} result",
+      "resultsCount_other": "{{count}} results",
+      "hint": "Pick a category or city to get started."
+    },
+    "results": {
+      "loading": "Searching for professionals...",
+      "countHeading": "<num>{{count}}</num> professionals"
+    },
+    "view": {
+      "grid": "Grid view",
+      "map": "Map view"
+    },
+    "empty": {
+      "title": "No professionals match this search",
+      "hint": "Try removing a filter or changing the city.",
+      "suggestions": "You might be interested in these professionals:"
+    },
+    "proCta": {
+      "body": "Show up in results for your area. Direct contact with clients, no commissions."
+    },
+    "finalCta": {
+      "titleHighlight": "Get listed on MisAutónomos",
+      "body": "Set up your profile and get into the results for your area. No commissions, no middlemen, direct contact with clients."
+    },
+    "card": {
+      "featuredTitle": "Featured professional",
+      "featured": "Featured",
+      "addFavorite": "Add to favorites",
+      "saveFavorite": "Save to favorites",
+      "openWhatsAppOf": "Open WhatsApp with {{name}}",
+      "callNumber": "Call {{phone}}",
+      "showPhone": "Show phone number",
+      "openWhatsApp": "Open WhatsApp"
+    },
+    "saved": {
+      "savedToast": "Search saved",
+      "deletedToast": "Search deleted",
+      "loadAria": "Load search: {{name}}",
+      "deleteAria": "Delete saved search: {{name}}",
+      "saveThis": "Save this search",
+      "title": "Save search",
+      "namePlaceholder": "E.g. Electricians in Madrid",
+      "filtersIntro": "These filters will be saved:",
+      "filterCategory": "• Category: {{value}}",
+      "filterProvince": "• Province: {{value}}",
+      "filterCity": "• City: {{value}}",
+      "filterMinRating": "• Minimum rating: {{value}}⭐",
+      "filterAvailability": "• Availability: {{value}}",
+      "resultsFound": "{{count}} results found"
+    },
+    "trust": {
+      "subtitle": "Clear rules for clients and freelancers. No tricks.",
+      "bestOnly": {
+        "body": "A maximum of 10 freelancers per city and category. We give visibility to the best rated."
+      },
+      "promotion": {
+        "title": "We promote them",
+        "body": "We invest in social media ads so they reach more clients. At no cost to them."
+      },
+      "verifiedReviews": {
+        "body": "Only clients who have contacted the professional can leave a review."
+      },
+      "zeroTolerance": {
+        "title": "Zero tolerance",
+        "body": "Three verified negative reviews and the freelancer is removed automatically."
+      },
+      "noCommitment": {
+        "body": "Signing up is free. No card, no lock-in, no fine print."
+      },
+      "completeProfiles": {
+        "title": "Complete profiles",
+        "body": "Real photos, work area, indicative prices and years of experience on display."
+      },
+      "slideAria": "Slide {{number}}"
+    },
+    "profile": {
+      "seo": {
+        "title": "{{name}} - {{category}} in {{location}} | MisAutónomos",
+        "rating": "★{{rating}} ({{count}} reviews). ",
+        "experience": "{{years}} years of experience. ",
+        "services": "{{category}} services in {{location}}",
+        "description": "{{rating}}{{experience}}{{base}}. Contact {{name}} for free.",
+        "defaultCategory": "Professional",
+        "defaultLocation": "Spain"
+      },
+      "photoOf": "Photo of {{name}}",
+      "professionalFallback": "professional",
+      "share": {
+        "defaultTitle": "Verified professional",
+        "thisProfessional": "This professional",
+        "text": "{{name}} on MisAutónomos",
+        "button": "Share"
+      },
+      "portfolioTitle": "Work portfolio",
+      "morePhotos": "+{{count}} photos",
+      "reviewsCount_one": "{{count}} review",
+      "reviewsCount_other": "{{count}} reviews",
+      "noReviews": "No reviews yet — be the first to leave one after getting in touch"
+    },
+    "filterPanel": {
+      "category": "Category",
+      "selectProvinceFirst": "Select a province first",
+      "minRating": "Minimum rating",
+      "anyRating": "Any",
+      "ratingPlus": "{{rating}}+ ⭐",
+      "noFilter": "No filter",
+      "anyAvailability": "Any availability",
+      "weekdaysOnly": "Weekdays only",
+      "allWeek": "Available all week",
+      "clearAdvanced": "Clear advanced filters",
+      "clearAll": "✕ Clear all ({{count}})"
+    }
   },
   "allCategories": "All categories",
   "allProvinces": "All provinces",
   "allCities": "All cities",
-  "advancedFilters": "Advanced filters",
   "searchPlaceholder": "Search professional, service...",
-  "clearFilters": "Clear filters",
-  "noResults": "No results",
-  "noResultsHint": "Try another search or category",
-  "verifiedDirectNoFees": "Verified · Direct contact · No fees",
   "profile_card": {
     "contact": "Contact",
     "view_profile": "View profile",
     "whatsapp": "WhatsApp",
     "call": "Call",
-    "new_tag": "New",
-    "no_ratings": "No ratings yet",
-    "per_hour": "€/h"
+    "new_tag": "New"
   },
   "messages": {
     "title": "Messages",
-    "search_conversation": "Search conversation...",
-    "no_conversations": "No messages yet",
-    "no_conversations_subtitle": "Contact a professional to get started",
     "find_pros_cta": "Find professionals",
-    "select_conversation": "Select a conversation",
-    "select_conversation_subtitle": "Choose a contact to chat",
-    "online": "Online",
-    "write_message": "Write a message...",
-    "first_message": "Write the first message",
-    "you": "You",
     "send": "Send",
     "rate": "Rate",
-    "record_audio": "Record audio",
     "attach_file": "Attach file",
-    "default_contact_message": "Hi, I'm interested in your service. Can we talk?"
+    "default_contact_message": "Hi, I'm interested in your service. Can we talk?",
+    "professionalFallback": "the professional",
+    "guestContact": {
+      "defaultMessageWithName": "Hi {{name}}, I'm interested in your service. Can we talk?",
+      "nameRequired": "Enter your name",
+      "invalidEmail": "Invalid email",
+      "messageTooShort": "Tell the professional a bit more",
+      "sendError": "Could not send.",
+      "title": "Contact {{name}}",
+      "subtitle": "Your message reaches them and they reply straight to your email.",
+      "sentTitle": "Message sent",
+      "professionalFallbackCapital": "The professional",
+      "sentDescription": "{{name}} will reply to <email>{{email}}</email>.",
+      "messagePlaceholder": "Tell them what you need, where and when.",
+      "noAccountNeeded": "No account needed."
+    }
   },
   "profile_page": {
-    "about": "About me",
-    "experience": "{{count}} years of experience",
-    "reviews": "Customer reviews",
-    "reviews_count": "{{count}} reviews",
-    "no_reviews": "No reviews yet",
-    "no_reviews_subtitle": "Be the first to leave a review",
-    "service_area": "Service area",
-    "portfolio": "Portfolio",
     "services": "Services offered",
-    "contact_options": "Contact options",
-    "back_to_search": "← Back to search",
     "years_of_experience": "{{count}} years of experience",
     "years_of_experience_one": "{{count}} year of experience",
-    "skills": "Specialties",
-    "certifications_and_titles": "Certifications & titles",
-    "phone_contact": "Phone",
-    "chat_direct": "Direct chat",
     "whatsapp": "WhatsApp",
     "call": "Call",
-    "request_quote": "Request quote",
     "availability": "Availability",
     "available_every_day": "Available every day",
-    "schedule": "Schedule",
     "from_price": "from {{price}}€/hour",
-    "services_offered": "Services I offer",
-    "no_reviews_yet": "No reviews yet",
-    "verified_badge": "Verified profile",
-    "response_time": "Replies within 1 hour",
     "share_profile": "Share profile",
     "save_favorite": "Save",
-    "saved_favorite": "Saved",
-    "workGalleryTitle": "Portfolio",
-    "work_gallery_title": "Portfolio",
-    "socialNetworks": "Social networks",
-    "social_networks": "Social networks",
-    "clientReviews": "Customer reviews",
-    "client_reviews": "Customer reviews",
-    "reviewsTitle": "Customer reviews",
-    "reviews_title": "Customer reviews",
-    "yearsOfExperience": "{{count}} years of experience",
-    "certificationsAndTitles": "Certifications & titles",
-    "backToSearch": "Back to search",
-    "sitioWeb": "Website",
-    "statistics30Days": "Statistics last 30 days",
-    "views": "Views",
-    "searches": "Searches",
-    "contacts": "Contacts",
-    "profileNotFound": "Profile not found",
-    "profileNotFoundDescription": "This profile does not exist or has been removed.",
-    "skills_title": "Skills",
-    "certifications_title": "Certifications",
-    "be_first_review": "Be the first to review this professional",
-    "social_networks_title": "Social networks"
+    "saved_favorite": "Saved"
   },
   "auth": {
     "login_title": "Sign in",
-    "register_title": "Create your free account",
-    "register_subtitle": "Find and contact professionals in seconds",
     "name": "Name",
     "name_placeholder": "Your name",
     "email": "Email",
     "email_placeholder": "your@email.com",
-    "password": "Password",
-    "create_account": "Create free account",
-    "already_have_account": "Already have an account? Sign in",
     "continue_with_google": "Continue with Google",
-    "accept_terms": "I accept the terms and conditions",
-    "welcome_toast": "Welcome! You can now contact professionals 🎉"
-  },
-  "pricing": {
-    "title": "Choose your plan and start getting clients",
-    "subtitle": "Monthly payment, no commitment. Cancel anytime.",
-    "urgency_banner": "🚀 Launch offer — 7 days free · No credit card required",
-    "urgency_subtext": "Cancel anytime during the trial",
-    "toggle_monthly": "Monthly",
-    "toggle_yearly": "Yearly (-20%)",
-    "save_per_year": "Save {{amount}}€/year",
-    "most_chosen_badge": "⭐ Most popular",
-    "start_free": "Start free 7 days",
-    "guarantee_title": "No commitment · Cancel anytime",
-    "guarantee_text": "If you don't receive any contacts in the first 30 days, we refund you. No questions asked.",
-    "be_first_title": "Be one of the first to join",
-    "be_first_text": "MisAutónomos is a just-launched platform. Position yourself ahead of the competition in your area.",
-    "faq_title": "Payment FAQ"
-  },
-  "dashboard": {
-    "welcome": "Hi, {{name}}! 👋",
-    "subtitle": "Here's your activity summary on MisAutónomos",
-    "views_this_month": "Views this month",
-    "messages_this_month": "Messages this month",
-    "quote_requests": "Quote requests",
-    "accepted": "accepted",
-    "average_rating": "Rating",
-    "profile_completeness": "Profile completion",
-    "complete_profile": "Complete my profile",
-    "recent_activity": "Recent activity",
-    "recent_messages": "Recent messages",
-    "recent_quotes": "Recent quotes",
-    "tips_title": "Tips to stand out",
-    "subscription_title": "Your subscription",
-    "days_remaining": "{{days}} days remaining",
-    "renew_now": "Renew now",
-    "manage_subscription": "Manage subscription",
-    "views_chart_title": "Profile views — last 30 days"
+    "welcome_toast": "Welcome! You can now contact professionals 🎉",
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "invalidCredentials": "Incorrect email or password.",
+      "emailNotConfirmed": "Your email hasn't been confirmed yet. Check your inbox.",
+      "alreadyRegistered": "This email is already registered. Sign in instead.",
+      "passwordTooShort": "Password must be at least 6 characters.",
+      "rateLimit": "Too many attempts. Wait a few minutes and try again.",
+      "invalidEmail": "The email address is not valid."
+    },
+    "validation": {
+      "emailAndPassword": "Enter your email and password.",
+      "nameRequired": "Enter your name.",
+      "emailRequired": "Enter your email.",
+      "emailForReset": "Enter your email above so we can send you the recovery link."
+    },
+    "reset": {
+      "sent": "We've sent you an email with instructions to reset your password.",
+      "sending": "Sending...",
+      "link": "Forgot your password?"
+    },
+    "tagline": "Connect with the best freelancers in Spain",
+    "signup": {
+      "tab": "Create account",
+      "asPro": "Create account as a freelancer",
+      "asClient": "Create account as a client"
+    },
+    "role": {
+      "title": "How do you want to start?",
+      "proSubtitle": "Sign up and get clients",
+      "client": "I'm looking for professionals",
+      "clientSubtitle": "Find and contact freelancers",
+      "preselectedPro": "You're creating a freelancer account. Looking for professionals?",
+      "preselectedClient": "You're creating a client account. Are you a freelancer?",
+      "switch": "Switch"
+    },
+    "social": {
+      "connecting": "Connecting…",
+      "continueApple": "Continue with Apple",
+      "signupApple": "Sign up with Apple",
+      "signupGoogle": "Sign up with Google"
+    },
+    "separator": {
+      "signIn": "or sign in with email",
+      "signUp": "or create your account with email"
+    },
+    "passwordPlaceholder": "Your password",
+    "passwordMinPlaceholder": "At least 6 characters",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "submitting": {
+      "signIn": "Signing in...",
+      "signUp": "Creating account..."
+    },
+    "footer": {
+      "trust": "Verified professionals near you",
+      "noAccount": "Don't have an account?",
+      "createOne": "Create one",
+      "haveAccount": "Already have an account?"
+    },
+    "confirmEmail": {
+      "resent": "We've resent the email. Check your inbox (and the Promotions or Spam folder).",
+      "resendError": "We couldn't resend the email. Try again in a minute.",
+      "notConfirmedYet": "We don't see your confirmation yet. Open the email and click the button, then come back here.",
+      "changeEmail": "Change email",
+      "title": "Confirm your email",
+      "sentTo": "We've sent a link to",
+      "yourEmail": "your email address",
+      "howToContinue": "How to continue:",
+      "stepOpen": "Open the email from <strong>MisAutónomos</strong>.",
+      "stepClick": "Click the <strong>\"Confirm my account\"</strong> button.",
+      "stepReturn": "You'll come back here and be able to publish your profile.",
+      "spamHint": "Can't see it? Check your <strong>Promotions</strong> or <strong>Spam</strong> folder. It can take up to 2 minutes to arrive.",
+      "checking": "Checking…",
+      "confirmed": "I've confirmed it",
+      "resending": "Resending…",
+      "resendIn": "Resend the email in {{seconds}} s",
+      "resend": "Resend the email"
+    },
+    "password": "Password",
+    "passwordMinChars": "At least 8 characters"
   },
   "footer": {
     "tagline": "Your trusted professional",
-    "description": "The platform that connects clients with verified self-employed professionals across Spain.",
-    "platform": "Platform",
-    "about": "About us",
     "how_it_works": "How it works",
     "for_pros": "For professionals",
     "for_clients": "For clients",
-    "help_center": "Help center",
-    "legal": "Legal",
-    "privacy": "Privacy policy",
-    "terms": "Terms of use",
-    "cookies": "Cookie policy",
-    "legal_notice": "Legal notice",
-    "contact": "Contact",
-    "copyright": "© 2026 MisAutónomos. All rights reserved."
+    "claim": "Verified professionals, direct contact, no commission.",
+    "copyright": "© {{year}} <brand>MisAutónomos</brand>. Made in Spain.",
+    "columns": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal"
+    },
+    "links": {
+      "searchPros": "Find professionals",
+      "becomePro": "Join as a professional",
+      "pricing": "Pricing",
+      "helpCenter": "Help centre",
+      "faq": "FAQ",
+      "blog": "Blog",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies",
+      "legalNotice": "Legal notice"
+    },
+    "seo": {
+      "servicesLabel": "Services",
+      "citiesLabel": "Cities",
+      "electricians": "Electricians",
+      "plumbers": "Plumbers",
+      "builders": "Builders / Renovations",
+      "painters": "Painters",
+      "locksmiths": "Locksmiths",
+      "advisors": "Accountants / admin services",
+      "cleaning": "Cleaning"
+    },
+    "newsletter": {
+      "label": "Newsletter:",
+      "pitch": "1-2 emails a month. Zero spam.",
+      "emailPlaceholder": "you@email.com",
+      "emailAria": "Your email",
+      "sending": "Sending…",
+      "submit": "Subscribe",
+      "invalidEmail": "Enter a valid email address",
+      "reactivated": "You're back on the list. Welcome back.",
+      "alreadySubscribed": "You're already subscribed.",
+      "confirmed": "Subscription confirmed.",
+      "genericError": "That didn't go through. Try again."
+    }
   },
   "backToSearch": "Back to search",
-  "yearsOfExperience": "{{count}} years of experience",
   "skills": "Skills",
   "certificationsAndTitles": "Certifications",
   "workGalleryTitle": "Portfolio",
@@ -249,16 +466,9 @@
   "callPhone": "Call",
   "availability": "Availability",
   "availableEveryDay": "Available every day",
-  "schedule": "Schedule",
   "aboutMe": "About me",
   "serviceArea": "Service area",
   "servicesOffered": "Services offered",
-  "verifiedProfile": "Verified profile",
-  "responseTime": "Replies in under 1 hour",
-  "shareProfile": "Share profile",
-  "saveFavorite": "Save",
-  "requestQuote": "Request quote",
-  "fromPrice": "from {{price}}€/hour",
   "profileNotFound": "Profile not found",
   "profileNotFoundDesc": "This profile does not exist or has been removed.",
   "sitioWeb": "Website",
@@ -271,32 +481,15 @@
   "nifCifNie": "NIF / CIF / NIE *",
   "yearsExperience": "Years of experience",
   "emailContact": "Contact email",
-  "phoneContactLabel": "Contact phone",
   "visibleContactMethods": "Visible contact methods",
   "selectHowClientsContact": "Select how clients can contact you",
   "internalChat": "Internal chat",
   "alwaysActive": "Always active",
-  "companyData": "Company data",
-  "companyName": "Company name / Trade name",
-  "nifCif": "Tax ID",
-  "economicActivity": "Economic activity",
-  "fiscalAddress": "Fiscal address",
-  "postalCode": "Postal code",
   "cityField": "City",
   "provinceField": "Province",
-  "countryField": "Country",
-  "phoneField": "Phone",
   "emailField": "Email",
-  "websiteField": "Website",
-  "ibanField": "IBAN",
-  "ibanInvoiceHelp": "This will appear on your invoices so clients know where to pay",
-  "uploadLogo": "Upload logo",
-  "invoiceSeries": "Invoice series",
-  "defaultPaymentMethod": "Default payment method",
-  "paymentTermDays": "Payment term (days)",
   "myProfileTitle": "My Profile",
   "manageYourProfile": "Manage your public profile",
-  "editProfile": "Edit profile",
   "hiddenProfile": "Hidden profile",
   "publishedProfile": "Published profile",
   "tabPersonal": "Information",
@@ -306,7 +499,6 @@
   "tabPortfolio": "Portfolio",
   "tabAvailability": "Availability",
   "tabFAQ": "FAQ",
-  "tabInvoicing": "Invoicing",
   "personalInformation": "Personal information",
   "fullNameLabel": "Full name",
   "phoneLabel": "Phone",
@@ -314,114 +506,75 @@
   "accountType": "Account type",
   "professionalLabel": "Professional",
   "clientLabel": "Client",
-  "newInvoice": "New Invoice",
-  "editInvoice": "Edit Invoice",
-  "invoiceCreated": "Invoice created",
-  "invoiceUpdated": "Invoice updated",
-  "invoiceDeleted": "Invoice deleted",
-  "invoicePreview": "Invoice preview",
-  "settingsSaved": "Settings saved",
   "statusUpdated": "Status updated",
-  "pdfDownloaded": "PDF downloaded",
-  "errorGeneratingPDF": "Error generating PDF",
-  "issuerData": "Issuer Data",
-  "clientData": "Client Data",
-  "clientName": "Name / Company",
-  "clientNif": "Tax ID",
-  "clientAddress": "Address",
   "city": "City",
   "province": "Province",
-  "clientEmail": "Client email",
-  "editInProfile": "Edit these details in \"Billing settings\"",
-  "selectExistingClient": "Saved client",
-  "newClient": "New client...",
-  "invoiceDetails": "Invoice details",
-  "invoiceNumber": "Invoice No.",
-  "issueDate": "Issue date",
-  "dueDate": "Due date",
-  "paymentMethod": "Payment method",
   "bankTransfer": "Bank transfer",
   "card": "Card",
   "cash": "Cash",
-  "invoiceLines": "Invoice lines",
-  "addLine": "Add line",
   "description": "Description",
-  "serviceConcept": "Service concept",
-  "qty": "Qty.",
-  "unitPrice": "Unit price",
-  "discount": "Disc %",
-  "vat": "VAT %",
   "total": "Total",
-  "exemptVAT": "VAT exempt",
-  "taxableBase": "Taxable base",
-  "totalVAT": "Total VAT",
-  "applyIRPFRetention": "Apply IRPF retention",
-  "retentionPercentage": "% Retention",
-  "retentionAmount": "Retention amount",
-  "totalInvoice": "TOTAL",
-  "notesAndLegal": "Notes and legal text",
-  "observations": "Notes",
-  "notesPlaceholder": "Any additional information for the client...",
-  "legalFooter": "Legal footer text",
-  "legalTextPlaceholder": "Invoice subject to...",
-  "cancel": "Cancel",
-  "preview": "Preview",
-  "save": "Save",
   "draft": "Draft",
-  "sent": "Issued",
-  "paid": "Paid",
-  "overdue": "Overdue",
-  "cancelled": "Cancelled",
-  "markAsSent": "Issued",
   "view": "View",
-  "downloadPDF": "Download PDF",
-  "delete": "Delete",
-  "quotesPage": {
-    "title": "Quotes",
-    "subtitle": "Create, send and manage your quotes",
-    "newQuote": "New quote",
-    "sentSuccessfully": "Quote sent via chat to client",
-    "quoteAccepted": "Quote accepted",
-    "quoteRejected": "Quote rejected"
-  },
   "notifications": {
     "enable_title": "Don't miss any client",
     "enable_subtitle": "Get instant alerts when someone contacts you or sends a request.",
     "activate": "Activate",
     "not_now": "Not now",
-    "activated_toast": "✓ Notifications enabled"
-  },
-  "supportChat": {
-    "talkToSupport": "Talk to support",
-    "supportTeam": "MisAutónomos Support",
-    "responseTime": "We respond as soon as possible",
-    "supportInbox": "Support Inbox",
-    "selectConversation": "Select a conversation to reply",
-    "conversationsCount": "{{count}} conversations",
-    "needHelp": "Need help?",
-    "helpDescription": "Our team responds within 24 hours. Write to us and we'll help you with anything related to your account, payments, invoices, or platform functionality.",
-    "startSupportChat": "Start support chat",
-    "contactSupport": "Contact support",
-    "newTicketDesc": "Create a new support ticket and our team will respond as soon as possible",
-    "ticketType": "Type of inquiry",
-    "ticketTypeTechnical": "Technical issue",
-    "ticketTypeBilling": "Billing",
-    "ticketTypeComplaint": "Complaint",
-    "ticketTypeOther": "Other",
-    "ticketSubject": "Subject",
-    "ticketMessage": "Message",
-    "sendTicket": "Send",
-    "fieldRequired": "Please fill in all required fields",
-    "errorCreatingTicket": "Error creating ticket",
-    "errorLoadingUser": "Error loading your information",
-    "myTickets": "My tickets",
-    "supportSubtitle": "Help and support tickets",
-    "newTicket": "New ticket",
-    "noTicketsYet": "No tickets yet",
-    "createFirstTicket": "Create your first support ticket",
-    "supportMisautonomos": "MisAutónomos Support",
-    "typeYourReply": "Type your reply...",
-    "supportRepliedTitle": "💬 Support has replied"
+    "activated_toast": "✓ Notifications enabled",
+    "title": "Notifications",
+    "empty": "No notifications",
+    "emptyHint": "We'll let you know when there's news",
+    "center": {
+      "allRead": "All notifications marked as read",
+      "markAllRead": "Mark all as read",
+      "loading": "Loading notifications...",
+      "viewAll": "View all notifications"
+    },
+    "toast": {
+      "deleted": "Notification deleted",
+      "allRead": "All marked as read",
+      "deletedMany": "Notifications deleted"
+    },
+    "banner": {
+      "ariaLabel": "Enable notifications"
+    },
+    "page": {
+      "configure": "Settings",
+      "subtitle": "Stay up to date with all your updates",
+      "upcomingTasks": "Upcoming tasks",
+      "viewCalendar": "View in calendar →",
+      "invoicesDue": "Invoices due",
+      "viewInvoices": "View invoices →",
+      "pendingQuotes": "Pending quotes",
+      "viewQuotes": "View quotes →",
+      "tabAll": "All ({{count}})",
+      "tabUnread": "New ({{count}})",
+      "tabRead": "Read ({{count}})",
+      "markAll": "Mark all",
+      "mark": "Mark",
+      "deleteRead": "Delete read",
+      "emptyUnread": "No new notifications",
+      "emptyRead": "No read notifications",
+      "newBadge": "New"
+    },
+    "settings": {
+      "title": "Notification settings",
+      "channels": "Notification channels",
+      "email": "Email notifications",
+      "emailHint": "Get alerts in your inbox",
+      "push": "Push notifications",
+      "pushHint": "Get notifications on the platform",
+      "alertTypes": "Alert types",
+      "newMessages": "New messages",
+      "quoteUpdates": "Quote updates",
+      "taskReminders": "Task reminders",
+      "invoiceDue": "Invoice due dates",
+      "subscriptionAlerts": "Subscription alerts",
+      "reminderTimes": "Reminder timing",
+      "taskHoursBefore": "Remind me of tasks (hours in advance)",
+      "invoiceDaysBefore": "Remind me of invoices (days in advance)"
+    }
   },
   "cookies": {
     "bannerTitle": "We use cookies",
@@ -440,6 +593,1300 @@
     "marketing": "Marketing",
     "marketingDesc": "Allow us to show you relevant ads on other websites based on your interests.",
     "alwaysActive": "Always active",
-    "managePrefs": "Manage cookie preferences"
+    "preferences": {
+      "toggleOn": "{{title}}: on",
+      "toggleOff": "{{title}}: off",
+      "intro": "Manage which cookies you accept on MisAutónomos. You can change your preferences at any time.",
+      "essentialTitle": "Essential cookies",
+      "essentialBody": "They're always on so the platform works properly. They don't require your consent.",
+      "rejectOptional": "Reject all optional",
+      "fullPolicyLink": "→ Full cookie policy",
+      "fullPolicyHint": "Details of every cookie, provider and duration",
+      "privacyLink": "→ Privacy policy",
+      "privacyHint": "How we handle your personal data",
+      "contactLink": "→ Contact: {{email}}",
+      "contactHint": "Questions about cookies or privacy?"
+    },
+    "policy": {
+      "seoDescription": "Information about the cookies we use on MisAutónomos",
+      "title": "Cookie Policy",
+      "updated": "Last updated: January 15, 2025",
+      "sections": {
+        "what": {
+          "title": "1. What are Cookies?",
+          "text": "Cookies are small text files stored on your device when you visit a website. They help us improve your experience, remember your preferences and analyze how you use our platform."
+        },
+        "used": {
+          "title": "2. Cookies We Use",
+          "text": "We use the following types of cookies:"
+        },
+        "legalBasis": {
+          "title": "3. Legal Basis (GDPR + LSSI-CE)",
+          "text": "Cookie usage in MisAutónomos complies with: • GDPR (Regulation 2016/679): prior consent for non-essential cookies • LSSI-CE (Law 34/2002): clear information and right to refuse • Requirement to obtain consent before loading third-party scripts • Right to withdraw consent at any time"
+        },
+        "manage": {
+          "title": "4. How to Manage Cookies",
+          "text": "You can manage cookies in multiple ways:"
+        },
+        "withdraw": {
+          "title": "5. Right to Withdraw Consent",
+          "text": "You can change or withdraw your consent at any time by accessing the Cookie Preferences page. If you withdraw consent for analytics, associated _ga* cookies will be deleted."
+        },
+        "thirdParty": {
+          "title": "6. Third-Party Cookies",
+          "text": "We use third-party services that may set cookies: Google Analytics (analytics - only if you consent), Stripe (payments - essential), OneSignal (notifications - only if subscribed)"
+        },
+        "duration": {
+          "title": "7. Cookie Duration",
+          "text": "• Session cookies: deleted when closing browser\n• Persistent cookies: maintained between 30 days and 2 years depending on their purpose\n• See the detailed tables above for exact durations"
+        },
+        "contact": {
+          "title": "8. Contact and GDPR Rights",
+          "text": "For inquiries about cookies, privacy, or to exercise your GDPR rights (access, rectification, deletion, portability): hola@misautonomos.com"
+        }
+      },
+      "table": {
+        "essentialTitle": "Essential Cookies",
+        "analyticsTitle": "Analytics Cookies (Optional)",
+        "marketingTitle": "Marketing Cookies (Optional)",
+        "name": "Name",
+        "provider": "Provider",
+        "purpose": "Purpose",
+        "duration": "Duration",
+        "rows": {
+          "session": {
+            "purpose": "Keep session logged in",
+            "duration": "Session"
+          },
+          "language": {
+            "purpose": "Remember selected language",
+            "duration": "1 year"
+          },
+          "cookieConsent": {
+            "purpose": "Store cookie preferences",
+            "duration": "1 year"
+          },
+          "consentId": {
+            "purpose": "Unique GDPR consent ID",
+            "duration": "1 year"
+          },
+          "sessionStorage": {
+            "purpose": "User cache and consent records",
+            "duration": "Session"
+          },
+          "ga": {
+            "purpose": "Distinguish unique users",
+            "duration": "2 years"
+          },
+          "gid": {
+            "purpose": "Identify user session",
+            "duration": "24 hours"
+          },
+          "gat": {
+            "purpose": "Throttle requests to GA",
+            "duration": "1 minute"
+          },
+          "gaWildcard": {
+            "purpose": "Session persistence and events",
+            "duration": "2 years"
+          },
+          "fbp": {
+            "purpose": "Personalized ads on Facebook/Instagram",
+            "duration": "3 months"
+          },
+          "fr": {
+            "purpose": "Contain Meta user ID list",
+            "duration": "3 months"
+          }
+        }
+      },
+      "contactLead": "For cookie inquiries",
+      "goToPreferences": "Go to Cookie Preferences"
+    },
+    "regionLabel": "Cookie consent"
+  },
+  "layout": {
+    "header": {
+      "logoAlt": "MisAutónomos logo",
+      "joinAria": "Join MisAutónomos"
+    },
+    "sidebar": {
+      "tagline": "The freelancer platform",
+      "avatarAlt": "Profile",
+      "adminBadge": "Administrator",
+      "defaultUserName": "User",
+      "unreadMessages_one": "{{count}} unread message",
+      "unreadMessages_other": "{{count}} unread messages"
+    },
+    "mobileMenu": {
+      "ariaLabel": "Navigation menu",
+      "open": "Open menu",
+      "close": "Close menu"
+    },
+    "joinModal": {
+      "ariaLabel": "Sign-up options",
+      "title": "How do you want to join?",
+      "subtitle": "Choose your profile to get started",
+      "clientHint": "Find professionals (no sign-up needed)",
+      "proHint": "I want to get clients",
+      "haveAccountAria": "I already have an account, log in",
+      "haveAccount": "Already have an account? → <1>Log in</1>"
+    },
+    "bottomNav": {
+      "ariaLabel": "Main navigation",
+      "goTo": "Go to {{title}}",
+      "searchAria": "Find professionals",
+      "join": "Join"
+    }
+  },
+  "errors": {
+    "boundary": {
+      "title": "Something went wrong",
+      "subtitle": "Please reload the page or try again.",
+      "details": "Show error details",
+      "unknown": "Unknown error",
+      "reload": "Reload",
+      "goHome": "Go to home"
+    },
+    "notFound": {
+      "title": "Page Not Found",
+      "body": "The page <1>\"{{page}}\"</1> could not be found in this application.",
+      "adminNote": "Admin Note",
+      "adminNoteBody": "This could mean that the AI hasn't implemented this page yet. Ask it to implement it in the chat.",
+      "goHome": "Go Home"
+    },
+    "notRegistered": {
+      "title": "Access Restricted",
+      "body": "You are not registered to use this application. Please contact the app administrator to request access.",
+      "hint": "If you believe this is an error, you can:",
+      "checkAccount": "Verify you are logged in with the correct account",
+      "contactAdmin": "Contact the app administrator for access",
+      "relogin": "Try logging out and back in again"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "100% free for freelancers · No card · No commitment",
+      "title": "Find the <1>perfect freelancer</1><br/>in your area",
+      "subtitle": "Contact verified professionals in Spain for free",
+      "stepCategory": "Category",
+      "stepResults": "See results",
+      "change": "change",
+      "provinceQuestion": "Which province?",
+      "provincePlaceholder": "Select a province...",
+      "viewProfessionals": "See professionals",
+      "viewAllUnfiltered": "See all professionals without filters",
+      "directContact": "✓ Direct contact",
+      "proBanner": "Are you a freelancer? Get clients for free",
+      "registerFree": "Sign up for free →",
+      "categories": {
+        "renovations": "Builder/Renovations",
+        "hvac": "HVAC",
+        "itTech": "IT technician",
+        "removals": "Removals",
+        "photographer": "Photographer",
+        "catering": "Catering",
+        "masseur": "Massage therapist",
+        "lawyer": "Lawyer",
+        "taxAdvisor": "Tax advisor",
+        "pets": "Pets",
+        "plumbing": "Plumbing"
+      }
+    },
+    "whyUs": {
+      "verifiedClients": {
+        "title": "Verified clients"
+      }
+    },
+    "categories": {
+      "cleaning": "Cleaning"
+    },
+    "testimonials": {
+      "badge": "Real testimonials",
+      "title": "Real results, real professionals",
+      "perMonth": "{{revenue}}/month",
+      "extraIncome": "extra income/month",
+      "carlos": {
+        "text": "In the first month I got 4 new clients. It pays for itself. I never thought getting work would be this easy."
+      },
+      "ana": {
+        "role": "Painter",
+        "text": "What I like most is the direct chat. No middlemen, no commissions. I deal with the client from the very first moment."
+      },
+      "miguel": {
+        "text": "I've been on the platform for 8 months and I have a waiting list. I'd recommend MisAutónomos to anyone in the trade without hesitation."
+      }
+    },
+    "whyTrust": {
+      "title": "Why trust MisAutónomos?",
+      "subtitle": "What makes us different",
+      "previous": "Previous",
+      "goToSlide": "Go to slide {{number}}",
+      "slides": {
+        "bestOnly": {
+          "title": "Only the best",
+          "desc": "A maximum of 10 freelancers per city and category. We only select the best-rated professionals so you always find someone you can trust."
+        },
+        "promotion": {
+          "title": "We promote them for you",
+          "desc": "We invest in Instagram, Facebook and Google ads so the freelancers on the platform reach more clients. At no cost to them."
+        },
+        "verifiedReviews": {
+          "title": "Verified reviews",
+          "desc": "Only real clients who have contacted the professional can leave reviews. No fake reviews."
+        },
+        "zeroTolerance": {
+          "title": "Zero tolerance for bad professionals",
+          "desc": "If a freelancer gets 3 or more verified negative reviews, they're automatically removed from the platform. Your time matters."
+        },
+        "noCommitment": {
+          "title": "No strings attached",
+          "desc": "Signing up is free. No card, no small print, no subscriptions. If it doesn't work for you, you leave at no cost."
+        },
+        "completeProfiles": {
+          "title": "Complete, transparent profiles",
+          "desc": "Every freelancer shows their service area, indicative prices, photos of their work and years of experience."
+        }
+      }
+    },
+    "finalCta": {
+      "badge": "🎉 Completely free",
+      "title": "Join now —<br/><2>It's free forever</2>",
+      "subtitle": "No credit card. No commitment. No surprises. Your profile live in minutes.",
+      "createProfile": "Create my free profile",
+      "footnote": "Completely free sign-up · No credit card · No strings attached",
+      "profileTime": "Profile in 10 min"
+    }
+  },
+  "proProfile": {
+    "seo": {
+      "title": "{{name}} - {{category}} in {{city}}",
+      "defaultCategory": "Professional",
+      "description": "{{name}} offers services in {{city}}. Get in touch now.",
+      "keywords": "{{categories}}, {{city}}, freelancer"
+    },
+    "badges": {
+      "identityVerified": "Identity verified",
+      "verified": "Verified",
+      "respondsInHour": "Replies in ~1h",
+      "yearsExperience_one": "{{count}} year",
+      "yearsExperience_other": "{{count}} years",
+      "fromRate": "from {{price}}€/h"
+    },
+    "contact": {
+      "whatsappPrefill": "Hi, I'm contacting you from MisAutónomos",
+      "sendMessage": "Send message",
+      "contactWith": "Contact {{name}}",
+      "linkCopied": "Link copied"
+    },
+    "phoneModal": {
+      "title": "Phone number",
+      "description": "Call this number from your phone",
+      "copied": "Number copied",
+      "copiedButton": "✓ Copied",
+      "copyButton": "Copy number"
+    },
+    "social": {
+      "web": "Website",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "tiktok": "TikTok"
+    },
+    "sections": {
+      "paymentMethods": "Payment methods"
+    },
+    "serviceArea": {
+      "radius": "Radius: {{km}} km"
+    },
+    "gallery": {
+      "workAlt": "Job {{number}}",
+      "enlargedAlt": "Enlarged view",
+      "mainPhoto": "Main"
+    },
+    "categoryCity": {
+      "seeMore": "See more {{category}} in {{city}} →"
+    },
+    "form": {
+      "saveChanges": "Save changes"
+    },
+    "services": {
+      "hourUnit": "h",
+      "add": "Add service",
+      "intro": "Describe in detail the services you offer your clients",
+      "empty": "No services added",
+      "addFirst": "Add your first service",
+      "durationLabel": "Duration: {{duration}}",
+      "edit": "Edit service",
+      "nameLabel": "Service name *",
+      "namePlaceholder": "E.g. Full bathroom renovation",
+      "descriptionPlaceholder": "Describe what this service includes, materials, process...",
+      "priceLabel": "Price (€)",
+      "perLabel": "Per",
+      "unitHour": "Hour",
+      "unitService": "Service",
+      "unitDay": "Day",
+      "durationEstimate": "Estimated duration",
+      "durationPlaceholder": "E.g. 2-3 hours, 1 day, 1 week",
+      "requiredName": "The service name is required",
+      "updated": "Service updated",
+      "added": "Service added",
+      "deleted": "Service deleted"
+    },
+    "portfolio": {
+      "title": "Work Portfolio",
+      "add": "Add job",
+      "intro": "Show off your best work with photos and detailed descriptions",
+      "empty": "No jobs in your portfolio",
+      "addFirst": "Add your first job",
+      "morePhotos_one": "+{{count}} photo",
+      "morePhotos_other": "+{{count}} photos",
+      "edit": "Edit job",
+      "addToPortfolio": "Add job to portfolio",
+      "titleLabel": "Job title *",
+      "titlePlaceholder": "E.g. Complete bathroom renovation",
+      "descriptionPlaceholder": "Describe the work done, materials used, time taken...",
+      "dateLabel": "Date (month/year)",
+      "datePlaceholder": "E.g. March 2024",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "E.g. Renovations",
+      "imagesLabel": "Images ({{count}}/{{max}}) *",
+      "clickToAddPhotos": "Click to add photos",
+      "photoAlt": "Photo {{number}}",
+      "fileTooLarge": "{{name}} is over 5MB",
+      "uploadError": "Error uploading images",
+      "requiredTitle": "The title is required",
+      "requiredImage": "Add at least one image",
+      "updated": "Job updated",
+      "added": "Job added to your portfolio",
+      "deleted": "Job removed from your portfolio"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "add": "Add question",
+      "intro": "Set up frequently asked questions so clients can find answers quickly",
+      "empty": "No frequently asked questions",
+      "addFirst": "Add your first question",
+      "edit": "Edit question",
+      "addNew": "Add frequently asked question",
+      "quickSuggestions": "Quick suggestions:",
+      "questionLabel": "Question *",
+      "questionPlaceholder": "E.g. How much does the service cost?",
+      "answerLabel": "Answer *",
+      "answerPlaceholder": "Write a clear, concise answer...",
+      "requiredBoth": "Fill in both the question and the answer",
+      "updated": "Question updated",
+      "added": "Question added",
+      "deleted": "Question deleted",
+      "suggestions": {
+        "quoteCostQuestion": "How much does an inspection/quote cost?",
+        "quoteCostAnswer": "Quotes are free and with no obligation.",
+        "areasQuestion": "Which areas do you cover?",
+        "areasAnswer": "We work across the whole metropolitan area.",
+        "warrantyQuestion": "Do you offer a warranty?",
+        "warrantyAnswer": "Yes, all our work comes with a warranty.",
+        "responseTimeQuestion": "What is your response time?",
+        "responseTimeAnswer": "We usually reply within 24 hours.",
+        "urgentQuestion": "Do you take urgent jobs?",
+        "urgentAnswer": "Yes, we offer an emergency service.",
+        "paymentQuestion": "Which payment methods do you accept?",
+        "paymentAnswer": "We accept cash, card, bank transfer and Bizum."
+      }
+    },
+    "skills": {
+      "experienceTitle": "Professional Experience",
+      "skillsTitle": "Specific Skills",
+      "skillsIntro": "Add the skills that set you apart as a professional",
+      "skillPlaceholder": "E.g. Solar installation, Emergency repairs...",
+      "noSkills": "No skills added",
+      "suggestions": "Suggestions: Free quotes, Urgent work, Extended warranty, 24h service, Express service, Materials included",
+      "certificationsTitle": "Certifications and Qualifications",
+      "certificationsIntro": "Show your professional certifications and official qualifications",
+      "certificationPlaceholder": "E.g. Gas installer licence, Health & safety certificate...",
+      "noCertifications": "No certifications added"
+    },
+    "availability": {
+      "weekdays": "Weekdays",
+      "weekends": "Weekends",
+      "title": "Availability and hours",
+      "intro": "Set your availability so clients know when they can reach you",
+      "typeLabel": "Availability type",
+      "typeWeekdays": "Weekdays (Mon-Fri)",
+      "typeEveryDay": "Every day",
+      "workDays": "Working days",
+      "hintWeekdays": "You work Monday to Friday",
+      "hintWeekends": "You work Saturdays and Sundays",
+      "hintEveryDay": "You work every day of the week",
+      "openingTime": "Opening time",
+      "closingTime": "Closing time",
+      "summaryWeekdays": "Available Monday to Friday",
+      "summaryWeekends": "Available weekends and public holidays",
+      "scheduleRange": "Hours: {{from}} - {{to}}",
+      "days": {
+        "monday": {
+          "label": "Monday",
+          "short": "M",
+          "abbr": "Mon"
+        },
+        "tuesday": {
+          "label": "Tuesday",
+          "short": "T",
+          "abbr": "Tue"
+        },
+        "wednesday": {
+          "label": "Wednesday",
+          "short": "W",
+          "abbr": "Wed"
+        },
+        "thursday": {
+          "label": "Thursday",
+          "short": "T",
+          "abbr": "Thu"
+        },
+        "friday": {
+          "label": "Friday",
+          "short": "F",
+          "abbr": "Fri"
+        },
+        "saturday": {
+          "label": "Saturday",
+          "short": "S",
+          "abbr": "Sat"
+        },
+        "sunday": {
+          "label": "Sunday",
+          "short": "S",
+          "abbr": "Sun"
+        }
+      }
+    },
+    "picture": {
+      "tooLarge": "The image can't be larger than 5MB",
+      "imagesOnly": "Only image files are allowed",
+      "updated": "✅ Profile photo updated",
+      "uploadError": "Error uploading the photo: {{message}}",
+      "confirmRemove": "Are you sure you want to remove your profile photo?",
+      "removed": "Photo removed",
+      "removeError": "Error removing the photo",
+      "alt": "Profile photo",
+      "removeAria": "Remove photo",
+      "change": "Change photo",
+      "add": "Add profile photo",
+      "hint": "Max 5MB - JPG, PNG or WEBP"
+    }
+  },
+  "reviews": {
+    "criteria": {
+      "speed": "Speed",
+      "communication": "Communication",
+      "quality": "Quality",
+      "priceSatisfaction": "Price / Satisfaction"
+    },
+    "mine": {
+      "seoTitle": "My reviews — MisAutónomos",
+      "backToDashboard": "Back to dashboard",
+      "title": "Reviews",
+      "subtitle": "The reviews your clients leave you on MisAutónomos.",
+      "loadError": "Couldn't load your reviews.",
+      "latest": "Latest reviews",
+      "emptyState": "You don't have any reviews yet. Tap <1>Request a review</1> to invite your clients to leave one."
+    },
+    "summary": {
+      "count_one": "{{count}} review",
+      "count_other": "{{count}} reviews",
+      "priceSatisfaction": "Price/satisfaction"
+    },
+    "card": {
+      "showLess": "Show less",
+      "readAll": "Read more",
+      "yourResponse": "Your reply",
+      "verifiedReview": "Verified",
+      "price": "Price",
+      "professionalResponse": "Reply from the professional",
+      "editResponse": "Edit reply",
+      "reply": "Reply to this review",
+      "replyPlaceholder": "Write your public reply...",
+      "saving": "Saving...",
+      "publishResponse": "Publish reply",
+      "responseSaved": "Reply saved",
+      "responseError": "Error saving the reply",
+      "reportTitle": "Report inappropriate review"
+    },
+    "request": {
+      "title": "Request a review",
+      "subtitle": "Generate a link so a client can rate you.",
+      "created": "Request created.",
+      "createError": "Couldn't create the request.",
+      "copied": "Copied",
+      "copyLink": "Copy link",
+      "done": "Done",
+      "noContacts": "You haven't chatted with any clients yet. Review links are generated from your conversations.",
+      "chooseClient": "Choose the client you want to ask for a review:",
+      "generateLink": "Generate link"
+    },
+    "leave": {
+      "seoTitle": "Leave a review — MisAutónomos",
+      "ratingRequired": "Give an overall rating",
+      "submitError": "Couldn't send your review.",
+      "sendError": "Error sending",
+      "defaultProfessional": "the professional",
+      "title": "Rate {{name}}",
+      "subtitle": "Your opinion helps other people. It takes less than a minute.",
+      "ratingLabel": "Your rating",
+      "commentLabel": "Comment (optional)",
+      "commentPlaceholder": "Tell us how it went.",
+      "nameLabel": "Your name (optional)",
+      "namePlaceholder": "How your review will appear",
+      "detailsSummary": "Rate in detail (optional)",
+      "starsAria_one": "{{count}} star",
+      "starsAria_other": "{{count}} stars",
+      "goHome": "Go to MisAutónomos",
+      "thanksTitle": "Thanks for your review!",
+      "thanksBody": "Your review of {{name}} is now published."
+    },
+    "invalid": {
+      "alreadyUsedTitle": "This review has already been sent",
+      "alreadyUsedBody": "This review link can only be used once. If you need to leave another review, ask your professional for a new link.",
+      "alreadyReviewedTitle": "You've already sent your review",
+      "alreadyReviewedBody": "This link has already received a review. Thanks for your feedback.",
+      "expiredTitle": "This link has expired",
+      "expiredBody": "For security, review links are only valid for a limited time. Ask the professional for a new one.",
+      "notFoundTitle": "Link not found",
+      "notFoundBody": "We couldn't recognise this link. Check that it's complete or ask the professional for another one."
+    },
+    "form": {
+      "qualityOfWork": "Quality of work",
+      "valueForMoney": "Value for money",
+      "rateAllAspects": "Please rate every aspect",
+      "submitted": "Review sent! Thanks for your feedback.",
+      "submitError": "Error sending your review. Please try again.",
+      "editTitle": "Edit your review",
+      "newTitle": "Leave a review",
+      "commentPlaceholder": "Describe your experience (optional)...",
+      "sending": "Sending...",
+      "update": "Update review",
+      "submit": "Send review"
+    },
+    "gate": {
+      "verifyToReview": "Verify your identity to leave a review",
+      "myReview": "My review"
+    },
+    "report": {
+      "success": "Review reported. We'll look into it soon.",
+      "confirmTitle": "Report this review?",
+      "confirmDescription": "If you think this review contains inappropriate content, our team will look into it.",
+      "confirm": "Report"
+    }
+  },
+  "favorites": {
+    "page": {
+      "seoTitle": "My favourites · MisAutónomos",
+      "seoDescription": "Your saved professionals",
+      "eyebrow": "My account",
+      "title": "My favourites",
+      "subtitle": "The professionals you've saved. Tap the heart on any profile to add them.",
+      "emptyTitle": "No favourites yet",
+      "emptyBody": "When you save a professional, they'll show up here so you can get back in touch with one tap.",
+      "viewProfileOf": "View {{name}}'s profile",
+      "professionalProfileAlt": "Professional profile",
+      "unnamed": "Unnamed",
+      "removeAria": "Remove {{name}} from favourites",
+      "remove": "Remove from favourites"
+    },
+    "toast": {
+      "added": "Added to favourites",
+      "removed": "Removed from favourites"
+    }
+  },
+  "faq": {
+    "sections": {
+      "autonomos": "For the self-employed",
+      "clientes": "For clients",
+      "plataforma": "About MisAutónomos"
+    },
+    "items": {
+      "altaAutonomo": {
+        "question": "How do I register as self-employed (autónomo) in Spain in 2026?",
+        "answer": "To register as self-employed in Spain you need three steps: register with the Tax Agency (Hacienda) using form 036 or 037, register with Social Security under the RETA scheme, and notify the town hall if you open physical premises. The whole process is free if you do it yourself and can be completed online in under an hour with a digital certificate.",
+        "cta": "Need an accountant to handle it for you? Find one on MisAutónomos"
+      },
+      "cuotaAutonomos": {
+        "question": "How much is the self-employed Social Security contribution in 2026?",
+        "answer": "In 2026 the self-employed contribution works in brackets based on net income: from roughly €230/month for the lowest brackets to over €590/month for the highest. New self-employed workers can opt for the flat rate of €80/month during the first year, extendable for one more year if income is low.",
+        "cta": "Work out your exact contribution with an advisor"
+      },
+      "impuestosAutonomo": {
+        "question": "What taxes does a self-employed worker pay in Spain?",
+        "answer": "A self-employed worker in Spain mainly pays income tax (IRPF, quarterly via form 130 or through 7-15% withholdings), VAT (form 303 quarterly, generally 21%), and the monthly Social Security contribution. You must also file annual summaries (form 390 and the annual income tax return, form 100).",
+        "cta": "Talk to a specialised accountancy firm"
+      },
+      "gastosDeducibles": {
+        "question": "What expenses can a self-employed worker deduct?",
+        "answer": "You can deduct expenses directly tied to your activity: premises rent, utilities (with limits if you work from home, normally 30% of the 30% of the property), office supplies, a vehicle if used exclusively for work, meal allowances, training, activity-related insurance and professional association fees.",
+        "cta": "Optimise your deductions with a tax advisor"
+      },
+      "facturarAutonomo": {
+        "question": "How do I invoice as a self-employed worker?",
+        "answer": "A self-employed invoice must include: a sequential number, issue date, full details of issuer and recipient (name, tax ID, address), a description of the service or product, taxable base, VAT applied and total. Since 2024 electronic invoicing is mandatory between companies and self-employed workers in Spain.",
+        "cta": "Need invoicing software or an accountant?"
+      },
+      "autonomoVsSl": {
+        "question": "When is it better to be self-employed and when to set up an SL (limited company)?",
+        "answer": "Being self-employed is simpler and cheaper at the start (no minimum capital, simple admin). An SL makes sense when your net profit exceeds roughly €40,000-60,000 a year (corporate tax is a flat 25% versus the progressive income tax of the self-employed) or when you want to limit personal liability.",
+        "cta": "Ask an advisor which one suits you"
+      },
+      "tarifaPlana": {
+        "question": "What is the self-employed flat rate and who qualifies?",
+        "answer": "The flat rate is a reduced contribution of €80/month for the first 12 months for new self-employed workers. It can be extended 12 more months if net income stays below the minimum wage (SMI). It is open to those who have not been registered in the previous 2 years (3 years if they already used the flat rate before).",
+        "cta": "Check whether you meet the requirements"
+      },
+      "modelo130": {
+        "question": "When do I file form 130 and what is it for?",
+        "answer": "Form 130 is the advance income tax payment for self-employed workers under direct estimation. It is filed quarterly: by 20 April, 20 July, 20 October and 30 January of the following year. You pay 20% of the year's accumulated net profit, minus what was already paid in previous quarters.",
+        "cta": "Let an accountant file your taxes"
+      },
+      "pluriactividad": {
+        "question": "Can I be self-employed and an employee at the same time?",
+        "answer": "Yes, it's called pluriactividad. You can combine salaried employment with self-employed activity. Social Security refunds up to 50% of the self-employed contribution during the first 18 months if your salary as an employee exceeds the minimum wage (SMI).",
+        "cta": "Work out the refund you're entitled to"
+      },
+      "bajaAutonomo": {
+        "question": "How do I deregister as self-employed?",
+        "answer": "To deregister you must file the deregistration with the Tax Agency (form 036/037) and with Social Security (form TA.0521) within a maximum of 3 days from ceasing activity. Missing the deadline can lead to penalties. You are still required to file the returns for the current quarter.",
+        "cta": "Let an accountant handle your deregistration"
+      },
+      "encontrarAutonomo": {
+        "question": "How do I find a trustworthy self-employed professional near me?",
+        "answer": "To find a reliable professional check that they are registered under RETA (you can ask for the certificate), have liability insurance, reviews from other clients, a detailed written quote before starting, and always issue an invoice. On MisAutónomos every professional is verified.",
+        "cta": "Find verified professionals in my area"
+      },
+      "cuantoCobra": {
+        "question": "How much does a self-employed professional charge per hour in Spain in 2026?",
+        "answer": "Rates vary a lot by trade: a plumber or electrician bills between €30 and €50/hour, a freelance developer between €35 and €80/hour, a designer between €25 and €60/hour, an accountancy firm between €60 and €150/hour, a self-employed lawyer between €80 and €200/hour. Always ask for a fixed quote to avoid surprises.",
+        "cta": "Get free quotes from several professionals"
+      },
+      "facturaObligatoria": {
+        "question": "Is a self-employed professional required to give me an invoice?",
+        "answer": "Yes, every self-employed worker is legally required to issue an invoice for each service provided. If they refuse, you can report it to the Tax Agency. The invoice is your legal guarantee that the service was provided and, where applicable, lets you deduct VAT if you are a company or self-employed.",
+        "cta": "Work with professionals who always invoice"
+      },
+      "noTermina": {
+        "question": "What can I do if a professional doesn't finish the job or disappears?",
+        "answer": "Gather all the evidence (contract, signed quotes, messages, payments), send a burofax with a deadline to comply, and if there's no response you can file a consumer complaint (if you're a private individual) or a lawsuit. To avoid this risk, always hire professionals with verified reviews and never pay 100% up front.",
+        "cta": "Hire verified professionals with a guarantee"
+      },
+      "autonomoVsEmpresa": {
+        "question": "Is a self-employed professional cheaper than a company?",
+        "answer": "Generally yes, a self-employed professional tends to be cheaper because they have lower overheads. But there are important differences: a company usually offers more formal guarantees, greater capacity for large projects and continuity. For one-off and mid-sized jobs, a self-employed professional is the most cost-effective option.",
+        "cta": "Compare quotes from professionals in your area"
+      },
+      "queEs": {
+        "question": "What is MisAutónomos and how does it work?",
+        "answer": "MisAutónomos is a platform that connects clients with verified self-employed professionals across Spain. Clients post what they need, professionals send quotes, and after comparing, the client picks the one they prefer. For professionals it's a way to win new clients without spending on advertising.",
+        "cta": "Sign up for free"
+      },
+      "esGratis": {
+        "question": "Is it free to sign up to MisAutónomos as a professional?",
+        "answer": "Yes, signing up as a professional on MisAutónomos is completely free with no commitment. You can create your professional profile, receive quote requests and work with clients without paying anything. We offer optional paid plans (Visibility and Ads+) for professionals who want to stand out in search results.",
+        "cta": "Sign me up for free as a professional"
+      },
+      "planes": {
+        "question": "What do the Visibility Plan and the Ads+ Plan include?",
+        "answer": "The Visibility Plan highlights your profile in search results and gives you access to visit statistics. The Ads+ Plan includes all of that plus active advertising campaigns managed by our team, priority ranking in your area and dedicated support. Both plans can be cancelled at any time."
+      },
+      "verificacion": {
+        "question": "How are professionals verified on MisAutónomos?",
+        "answer": "We verify every professional by checking their RETA registration, tax ID (NIF/DNI), real contact details and, in regulated trades, their qualification or licence. Verified profiles show a specific badge. This gives clients peace of mind and sets serious professionals apart.",
+        "cta": "Verify your profile"
+      },
+      "solicitudes": {
+        "question": "How do I receive quote requests on MisAutónomos?",
+        "answer": "When a client posts a need in your category and area, you get an alert by email and in your platform dashboard. You decide whether to send a quote. The more complete your profile (photo, description, work examples, reviews), the more requests you'll receive. Complete profiles receive up to 5 times more requests.",
+        "cta": "Complete your profile now"
+      }
+    },
+    "page": {
+      "seoTitle": "FAQ about self-employed workers in Spain | MisAutónomos",
+      "seoDescription": "Answers to your questions about registering as self-employed, hiring professionals, contributions, invoicing and much more. Guide updated for 2026.",
+      "badge": "Guide updated for 2026",
+      "subtitle": "Answers to your questions about self-employment in Spain: registration, taxes, contributions and how to find the right professional.",
+      "searchPlaceholder": "Search your question...",
+      "results_one": "{{count}} result for \"{{term}}\"",
+      "results_other": "{{count}} results for \"{{term}}\"",
+      "noResults": "No results found",
+      "noResultsHint": "Try different words",
+      "viewAll": "View all questions",
+      "questionCount_one": "{{count}} question",
+      "questionCount_other": "{{count}} questions",
+      "ctaTitle": "Can't find your answer?",
+      "ctaSubtitle": "Talk directly to a professional in your area or contact us.",
+      "findPro": "Find a professional"
+    }
+  },
+  "forPros": {
+    "seo": {
+      "title": "Join MisAutónomos as a freelancer — Show up in your area, no commissions",
+      "description": "Get visibility as a freelancer in Spain. Verified identity, direct contact with clients and zero commissions per job."
+    },
+    "hero": {
+      "eyebrow": "For freelancers in Spain",
+      "title": "Show up where your clients are looking.",
+      "titleHighlight": "No commissions.",
+      "subtitle": "MisAutónomos puts you in front of the people who need your trade in your area. Direct contact, verified identity, tools to run your schedule. You do the work; we bring you the clients."
+    },
+    "benefits": {
+      "eyebrow": "Why freelancers choose MisAutónomos",
+      "title": "What a platform for freelancers should get right.",
+      "verified": {
+        "body": "We check your DNI/NIE, phone and trade before publishing your profile. Clients trust you more and you answer real requests."
+      },
+      "noFees": {
+        "title": "No commissions per job",
+        "body": "You negotiate and get paid directly. We don't take a cut of the quote or charge per contact."
+      },
+      "directContact": {
+        "body": "Chat, phone and WhatsApp. The client decides how to reach you. No middlemen."
+      },
+      "promotion": {
+        "title": "We promote you",
+        "body": "We invest in social media and Google ads to bring you clients in your area. At no cost to you."
+      },
+      "reviews": {
+        "body": "Only clients who have contacted you can leave a review. Every real review moves you up the rankings."
+      },
+      "fast": {
+        "title": "Profile live in minutes",
+        "body": "Sign up in under 10 minutes. No lock-in, no card until you decide."
+      }
+    },
+    "steps": {
+      "createAccount": {
+        "title": "Create your account",
+        "body": "Email and password. Pick the \"I'm a freelancer\" role and go straight to profile setup."
+      },
+      "completeProfile": {
+        "title": "Complete your profile"
+      },
+      "receiveClients": {
+        "title": "Get clients",
+        "body": "You show up at /categoria/<trade>-en-<city>. Clients reach you by chat, phone or WhatsApp."
+      }
+    },
+    "differences": {
+      "eyebrow": "How we differ from other platforms",
+      "title": "What we DON'T do.",
+      "noPerContact": "We don't charge for each contact you receive.",
+      "noCut": "We don't take a percentage of your quote.",
+      "noDataSale": "We don't sell your data.",
+      "noAnonymousReviews": "We don't allow anonymous or unverified reviews.",
+      "noLockIn": "We don't lock you in if you decide to leave.",
+      "noFalsePromises": "We don't promise clients we can't bring."
+    },
+    "faq": {
+      "title": "What people usually ask us.",
+      "cost": {
+        "q": "How much does it cost?",
+        "a": "There's a permanent free plan to get started. The Pro and Ads+ plans add visibility and tools; no lock-in."
+      },
+      "verified": {
+        "q": "What does \"verified\" mean?",
+        "a": "We check your DNI/NIE, phone and trade. Once you pass, a visible badge shows on your profile and in search results."
+      },
+      "badReviews": {
+        "q": "What happens if I get bad reviews?",
+        "a": "Reviews come from clients who have contacted you. If you collect three verified negative reviews, your profile is deactivated automatically."
+      },
+      "cancel": {
+        "q": "Can I cancel?",
+        "a": "Yes, whenever you want from your dashboard. No lock-in, no penalties."
+      }
+    },
+    "finalCta": {
+      "title": "Ready to show up where they're looking for you?",
+      "body": "We get you set up in minutes. No card, no lock-in."
+    }
+  },
+  "contact": {
+    "seo": {
+      "title": "Contact · MisAutónomos",
+      "description": "Questions, suggestions or need help? Write to hola@misautonomos.es or use the form. We reply within 24 working hours."
+    },
+    "validation": {
+      "nameRequired": "Enter your name.",
+      "emailInvalid": "Enter a valid email.",
+      "messageTooShort": "Tell us a bit more (at least 10 characters)."
+    },
+    "hero": {
+      "eyebrow": "We're here to help",
+      "title": "Talk to us",
+      "subtitle": "Questions about the platform, signing up as a freelancer, issues with a profile or suggestions. We reply within 24 working hours."
+    },
+    "form": {
+      "title": "Send us a message",
+      "subtitle": "Only the essential fields. No spam.",
+      "topic": "Subject",
+      "topics": {
+        "general": "General information",
+        "pro": "I'm a freelancer — sign-up / profile",
+        "client": "I'm a client — I need a service",
+        "issue": "Report an issue",
+        "press": "Press / partnerships"
+      },
+      "message": "Message",
+      "messagePlaceholder": "Tell us how we can help.",
+      "sending": "Sending…",
+      "sent": "Message received. We'll reply to {{email}}.",
+      "orEmail": "Or write to us at <link>{{email}}</link>"
+    },
+    "aside": {
+      "responseTime": "Reply within 24 working hours.",
+      "supportTitle": "Account support",
+      "supportBody": "If you already have an account, write to us from your dashboard so we can help you faster.",
+      "proBody": "Sign up for free and show up where your clients are looking.",
+      "proCta": "See how it works"
+    }
+  },
+  "category": {
+    "seo": {
+      "titleCity": "{{category}} in {{city}} - MisAutónomos",
+      "title": "{{category}} - Find verified freelancers | MisAutónomos",
+      "descriptionCity": "Find verified {{category}} in {{city}}. Contact them directly and request a free quote.",
+      "description": "Directory of freelance {{category}} in Spain. Compare prices, read reviews and get in touch for free."
+    },
+    "heading": {
+      "inCity": "{{category}} in {{city}}",
+      "inSpain": "{{category}} in Spain"
+    },
+    "loading": "Searching for professionals…",
+    "available_one": "{{count}} professional available",
+    "available_other": "{{count}} professionals available",
+    "filter": {
+      "selectCity": "Select a city",
+      "allSpain": "All of Spain"
+    },
+    "empty": {
+      "titleCity": "Be the first {{category}} in {{city}} on MisAutónomos",
+      "title": "Be the first {{category}} on MisAutónomos",
+      "body": "We're growing. If you set up your profile now, you'll show first when someone searches for this trade. No lock-in, no commissions.",
+      "allTrades": "See all trades",
+      "otherCity": "Looking for {{category}} in another city?",
+      "viewAllSpain": "See {{category}} across Spain"
+    },
+    "cta": {
+      "title": "Are you a {{category}}?",
+      "body": "Sign up and get more clients",
+      "button": "Register as a professional"
+    }
+  },
+  "newsletter": {
+    "backHome": "Back to home",
+    "unsubscribe": {
+      "processing": "Processing...",
+      "title": "You've been unsubscribed",
+      "bodyEmail": "You won't receive marketing emails at <strong>{{email}}</strong> anymore.",
+      "transactionalNoteLong": "You'll still receive important transactional notifications (confirmations, account notifications, etc.).",
+      "resubscribe": "Reactivate subscription",
+      "resubscribedTitle": "You're back on the list!",
+      "resubscribedBody": "You'll receive our marketing emails again.",
+      "errorBodySupport": "We couldn't process your request. Please try again or contact support.",
+      "notFoundTitle": "Email not found",
+      "notFoundBody": "We couldn't find this email in our system."
+    },
+    "baja": {
+      "seoTitle": "Newsletter unsubscribe · MisAutónomos",
+      "loadingTitle": "Processing your unsubscribe…",
+      "loadingBody": "One moment.",
+      "successBodyEmail": "You won't receive any more newsletter emails at {{email}}.",
+      "successBody": "You won't receive any more newsletter emails.",
+      "alreadyTitle": "You were already unsubscribed",
+      "alreadyBodyEmail": "{{email}} doesn't receive our newsletter.",
+      "alreadyBody": "Your email no longer receives our newsletter.",
+      "notFoundTitle": "Invalid link",
+      "notFoundBody": "We couldn't find this unsubscribe link. It may have expired.",
+      "noTokenTitle": "Missing token",
+      "noTokenBody": "This unsubscribe link doesn't include the identifier. Use the link from the email you received.",
+      "errorBody": "We couldn't process your unsubscribe. Try again or write to us at hola@misautonomos.es.",
+      "resubscribeHint": "Unsubscribed by mistake? You can subscribe again anytime from the footer."
+    },
+    "signup": {
+      "invalidEmail": "Enter a valid email.",
+      "alreadySubscribed": "This email is already subscribed.",
+      "error": "Something went wrong. Please try again later.",
+      "footerTitle": "Subscribe to our newsletter",
+      "footerSubtitle": "Practical tips and news once a month",
+      "thanks": "Thanks! Check your email.",
+      "button": "Subscribe",
+      "consent": "By subscribing you agree to receive our newsletter. You can unsubscribe at any time.",
+      "blogTitle": "Get the best of the blog in your inbox",
+      "blogSubtitle": "New articles, tax guides and practical tips, once a month.",
+      "both": "Both"
+    }
+  },
+  "legal": {
+    "notice": {
+      "seoDescription": "Legal notice of the MisAutónomos platform",
+      "title": "Legal Notice",
+      "updated": "Last updated: January 15, 2025",
+      "sections": {
+        "identification": {
+          "title": "1. Identifying Information",
+          "text": "In compliance with article 10 of Law 34/2002 on Information Society Services and Electronic Commerce, we inform: Owner: Astra Invest and Finance S.L., Tax ID: B10865418, Address: Calle Andalucía 18, Melilla, Spain, Email: info@misautonomos.es, Website: https://misautonomos.es"
+        },
+        "purpose": {
+          "title": "2. Purpose",
+          "text": "This legal notice regulates the use of the MisAutónomos website (hereinafter, the website). Browsing the website grants user status and implies full acceptance of all provisions included in this legal notice."
+        },
+        "termsOfUse": {
+          "title": "3. Terms of Use",
+          "text": "The user agrees to use the website and its services in accordance with the law, this legal notice, and good practices. Use of the website for unlawful purposes or that harm MisAutónomos or third parties is prohibited."
+        },
+        "intellectualProperty": {
+          "title": "4. Intellectual and Industrial Property",
+          "text": "All website content (texts, images, trademarks, logos, source code, graphic design) is property of MisAutónomos or third parties who have authorized its use. All rights thereto are reserved."
+        },
+        "liability": {
+          "title": "5. Liability",
+          "text": "MisAutónomos is not responsible for: (a) Technical availability and continuity of the website, (b) Information or content published by users, (c) Services provided by professionals to clients, (d) Damages arising from improper use of the website."
+        },
+        "links": {
+          "title": "6. Links",
+          "text": "The website may contain links to third-party websites. MisAutónomos does not control and is not responsible for the content, privacy policies or practices of such external websites."
+        },
+        "dataProtection": {
+          "title": "7. Data Protection",
+          "text": "For information on how we process your personal data, see our Privacy Policy."
+        },
+        "applicableLaw": {
+          "title": "8. Applicable Law",
+          "text": "This legal notice is governed by Spanish law. For any dispute, the jurisdiction of Madrid, Spain shall be competent."
+        },
+        "contact": {
+          "title": "9. Contact",
+          "text": "For legal communications: info@misautonomos.es"
+        }
+      },
+      "contactLead": "For legal communications"
+    },
+    "privacy": {
+      "seoDescription": "Learn how we protect your personal data at MisAutónomos",
+      "title": "Privacy Policy",
+      "updated": "Last updated: January 15, 2025",
+      "sections": {
+        "controller": {
+          "title": "1. Data Controller",
+          "text": "MisAutónomos is responsible for processing your personal data. Our commitment is to protect your privacy and ensure the security of your information."
+        },
+        "dataCollected": {
+          "title": "2. Data We Collect",
+          "text": "We collect the following information: (a) Identification data: name, email, phone, (b) Professional data: CIF/NIF, service categories, location, (c) Usage data: platform interactions, messages, favorites, (d) Payment data: billing information managed by Stripe."
+        },
+        "purpose": {
+          "title": "3. Purpose of Processing",
+          "text": "We use your data to: (a) Provide and improve our services, (b) Facilitate connection between clients and professionals, (c) Process payments and subscriptions, (d) Send service-related communications, (e) Comply with legal obligations."
+        },
+        "legalBasis": {
+          "title": "4. Legal Basis",
+          "text": "We process your data based on: (a) Performance of service contract, (b) User consent, (c) Legitimate interest of MisAutónomos, (d) Compliance with legal obligations."
+        },
+        "sharing": {
+          "title": "5. Data Sharing",
+          "text": "Your data may be shared with: (a) Professionals/clients you interact with, (b) Stripe for payment processing, (c) Technical service providers (hosting, email), (d) Authorities when legally required."
+        },
+        "retention": {
+          "title": "6. Data Retention",
+          "text": "We retain your data while: (a) You maintain your active account, (b) It's necessary to comply with legal obligations, (c) Pending claims exist. After deleting your account, your data will be erased within 30 days."
+        },
+        "rights": {
+          "title": "7. Your Rights",
+          "text": "You have the right to: (a) Access your personal data, (b) Rectify incorrect data, (c) Request deletion of your data, (d) Object to processing, (e) Data portability, (f) Revoke consent. To exercise your rights, contact: soporte@misautonomos.es"
+        },
+        "security": {
+          "title": "8. Security",
+          "text": "We implement technical and organizational measures to protect your data against unauthorized access, alteration, disclosure or destruction. We use SSL encryption, secure authentication and protected storage."
+        },
+        "cookies": {
+          "title": "9. Cookies",
+          "text": "We use cookies to improve your experience. You can manage cookie preferences in our Cookie Policy."
+        },
+        "changes": {
+          "title": "10. Policy Changes",
+          "text": "We may update this policy occasionally. We will notify you about significant changes by email or notice on the platform."
+        },
+        "contact": {
+          "title": "11. Contact",
+          "text": "For privacy inquiries: soporte@misautonomos.es"
+        }
+      },
+      "contactLead": "To exercise your rights or privacy inquiries"
+    },
+    "terms": {
+      "seoDescription": "Read our terms and conditions for using the MisAutónomos platform",
+      "title": "Terms and Conditions",
+      "updated": "Last updated: January 15, 2025",
+      "sections": {
+        "acceptance": {
+          "title": "1. Acceptance of Terms",
+          "text": "By accessing and using MisAutónomos, you agree to be legally bound by these terms and conditions. If you do not agree with any part of these terms, you should not use our services."
+        },
+        "service": {
+          "title": "2. Service Description",
+          "text": "MisAutónomos is a digital platform that connects clients with verified freelance professionals in Spain. We facilitate contact between both parties but are not responsible for the quality, safety or legality of services provided by professionals."
+        },
+        "accounts": {
+          "title": "3. User Registration and Accounts",
+          "text": "To use certain services, you must create an account providing accurate and up-to-date information. You are responsible for maintaining the confidentiality of your account and password, and for all activities that occur under your account."
+        },
+        "proObligations": {
+          "title": "4. Professional Obligations",
+          "text": "Professionals who register on MisAutónomos must: (a) Be legally authorized to work as freelancers in Spain, (b) Provide truthful and verifiable information, (c) Keep their profile and availability updated, (d) Comply with all applicable laws and regulations."
+        },
+        "clientObligations": {
+          "title": "5. Client Obligations",
+          "text": "Clients using MisAutónomos must: (a) Provide accurate information about required services, (b) Communicate respectfully with professionals, (c) Comply with agreements established with professionals."
+        },
+        "subscriptions": {
+          "title": "6. Subscriptions and Payments",
+          "text": "Professionals must maintain an active subscription to appear in searches. Subscriptions renew automatically unless canceled before the renewal date. Payments are processed through Stripe. All prices include VAT when applicable."
+        },
+        "userContent": {
+          "title": "7. User Content",
+          "text": "You retain all rights to content you publish on MisAutónomos. However, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce and display such content in connection with the operation of our services."
+        },
+        "intellectualProperty": {
+          "title": "8. Intellectual Property",
+          "text": "All content on MisAutónomos, including but not limited to text, graphics, logos, icons, images and software, is property of MisAutónomos or its licensors and is protected by Spanish and international intellectual property laws."
+        },
+        "liability": {
+          "title": "9. Limitation of Liability",
+          "text": "MisAutónomos acts only as an intermediary. We are not responsible for: (a) Quality, safety or legality of services offered, (b) Truthfulness of professional profiles, (c) Direct or indirect damages arising from platform use, (d) Disputes between clients and professionals."
+        },
+        "termination": {
+          "title": "10. Suspension and Termination",
+          "text": "We reserve the right to suspend or terminate your account if: (a) You violate these terms, (b) You provide false information, (c) You use the platform for illegal activities, (d) You abuse or harass other users."
+        },
+        "modifications": {
+          "title": "11. Modifications",
+          "text": "We may modify these terms at any time. Changes will take effect immediately after publication on the platform. Continued use of the service constitutes acceptance of the modified terms."
+        },
+        "law": {
+          "title": "12. Applicable Law and Jurisdiction",
+          "text": "These terms shall be governed and interpreted in accordance with the laws of Spain. Any dispute shall be subject to the exclusive jurisdiction of the courts of Madrid, Spain."
+        },
+        "contact": {
+          "title": "13. Contact",
+          "text": "For any questions about these terms, you can contact us at: soporte@misautonomos.es"
+        }
+      },
+      "contactLead": "For any questions, contact us at"
+    }
+  },
+  "account": {
+    "delete": {
+      "button": "Delete my account",
+      "confirmPrompt": "Type ELIMINAR to confirm",
+      "error": "The account couldn't be deleted.",
+      "success": "Account deleted.",
+      "title": "Delete your account?",
+      "subtitle": "This action is permanent and can't be undone.",
+      "loseIntro": "If you continue you'll lose:",
+      "loseProfile": "Your professional profile and public data.",
+      "loseConversations": "All your conversations, reviews and tickets.",
+      "loseSubscriptions": "Active subscriptions (no refund for the current period).",
+      "confirm": "Delete permanently"
+    }
+  },
+  "supportChat": {
+    "supportTeam": "MisAutónomos Support",
+    "ticketTypeTechnical": "Technical issue",
+    "ticketTypeBilling": "Billing",
+    "ticketTypeComplaint": "Complaint",
+    "ticketSubject": "Subject",
+    "ticketMessage": "Message",
+    "noTicketsYet": "No tickets yet"
+  },
+  "blog": {
+    "editor": {
+      "category": {
+        "legalFiscal": "Legal & tax",
+        "tools": "Tools",
+        "news": "News"
+      },
+      "upload": {
+        "notImage": "The file must be an image",
+        "tooLarge": "Image too large (max. 5 MB)",
+        "success": "Image uploaded",
+        "error": "Upload error: {{message}}",
+        "remove": "Remove image",
+        "uploading": "Uploading…",
+        "button": "Upload image",
+        "urlPlaceholder": "…or paste a URL"
+      },
+      "unknownError": "unknown",
+      "validation": {
+        "titleRequired": "The Spanish title is missing.",
+        "slugRequired": "The slug is missing.",
+        "slugFormat": "The slug can only contain lowercase letters, numbers and hyphens.",
+        "slugExists": "That slug is already used by \"{{title}}\".",
+        "contentTooShort": "The Spanish content is too short (minimum 50 characters)."
+      },
+      "saved": {
+        "published": "Article published",
+        "scheduled": "Scheduled for {{date}}",
+        "draft": "Draft saved"
+      },
+      "saveError": "Save error: {{message}}",
+      "tabs": {
+        "content": "Content",
+        "meta": "Metadata",
+        "seo": "SEO",
+        "author": "Author",
+        "publish": "Publishing",
+        "related": "Related"
+      },
+      "editArticle": "Edit article",
+      "newArticle": "New article",
+      "saveDraft": "Save draft",
+      "publishButton": "Publish",
+      "content": {
+        "titleEs": "Title (ES) *",
+        "titleEsPlaceholder": "Article title in Spanish",
+        "titleEn": "Title (EN)",
+        "titleEnPlaceholder": "Article title in English",
+        "excerptEs": "Excerpt (ES)",
+        "excerptEsPlaceholder": "Short description (≤160 characters)",
+        "excerptEn": "Excerpt (EN)",
+        "excerptEnPlaceholder": "Short description in English",
+        "bodyLabel": "Content ({{lang}})",
+        "bodyEsPlaceholder": "Write the article body in Spanish…",
+        "bodyEnPlaceholder": "Write the body in English…",
+        "readTimeEstimate": "Estimated reading time: ~{{minutes}} min"
+      },
+      "meta": {
+        "slug": "Slug (URL) *",
+        "slugPlaceholder": "my-example-article",
+        "regenerateSlug": "Regenerate from title",
+        "category": "Category",
+        "tags": "Tags (comma-separated)",
+        "tagsHint": "E.g. freelancers, tax, irpf",
+        "tagsPlaceholder": "freelancers, tax, irpf",
+        "readTime": "Reading time (minutes)"
+      },
+      "seo": {
+        "metaTitleEs": "Meta title (ES)",
+        "metaTitleEsPlaceholder": "{{title}} | Blog MisAutónomos",
+        "metaDescriptionEs": "Meta description (ES)",
+        "metaDescriptionEsPlaceholder": "Description for search engines (max. 160)",
+        "metaTitleEn": "Meta title (EN)",
+        "metaTitleEnPlaceholder": "{{title}} | MisAutónomos Blog",
+        "metaDescriptionEn": "Meta description (EN)",
+        "metaDescriptionEnPlaceholder": "SEO description in English (max 160)",
+        "charCount": "{{length}}/{{max}} characters",
+        "ogImage": "Open Graph image (1200×630 recommended)",
+        "ogImageAlt": "Open Graph image"
+      },
+      "author": {
+        "name": "Author name",
+        "avatar": "Avatar",
+        "bio": "Author bio"
+      },
+      "publish": {
+        "featuredImage": "Featured image",
+        "featuredImageHint": "Shown in the article header and in the blog listing.",
+        "status": "Status",
+        "date": "Publish date",
+        "dateHint": "If the date is in the future, the status switches to 'Scheduled' when you click Publish.",
+        "featured": "Featured article (shown up front)"
+      },
+      "status": {
+        "scheduled": "Scheduled",
+        "published": "Published",
+        "archived": "Archived"
+      },
+      "related": {
+        "title": "Related articles (max. 3)",
+        "maxReached": "Maximum 3 related articles",
+        "empty": "There are no other articles yet."
+      }
+    },
+    "list": {
+      "seo": {
+        "title": "MisAutónomos Blog · Guides and tips for freelancers in Spain",
+        "description": "Tax, tools and best practices for freelancers. Plus tips for clients hiring professionals."
+      },
+      "hero": {
+        "title": "What matters to freelancers and to the people who hire them",
+        "subtitle": "No filler. Short guides, tax explained in plain language and tools we actually use."
+      },
+      "searchPlaceholder": "Search articles...",
+      "allCategories": "All",
+      "empty": "No articles match your search.",
+      "featured": "Featured",
+      "readTime": "{{minutes}} min",
+      "readArticle": "Read the article"
+    },
+    "post": {
+      "notFound": "Article not found",
+      "backToBlog": "Back to the blog",
+      "metaTitle": "{{title}} | MisAutónomos Blog",
+      "defaultAuthor": "MisAutónomos team",
+      "readTime": "{{minutes}} min read",
+      "toc": "Table of contents",
+      "tocShort": "Contents",
+      "share": "Found it useful? Share it:",
+      "cta": {
+        "title": "Are you a freelancer? Show up where they're looking for you",
+        "body": "Create your profile in minutes, get clients and manage everything in one place. No commissions.",
+        "button": "How it works for freelancers"
+      },
+      "related": "Related articles"
+    }
+  },
+  "verification": {
+    "toasts": {
+      "fileTooLarge": "The file can't be larger than 8MB",
+      "frontRequired": "Upload the front of your ID document",
+      "backRequired": "Upload the back of your ID document",
+      "selfieRequired": "Upload a selfie holding your ID document",
+      "submitted": "Request sent! We'll review it within 24-48h.",
+      "submitError": "Error sending. Please try again."
+    },
+    "form": {
+      "title": "Verify identity",
+      "privacyNote": "Your documents are stored securely and will only be seen by platform administrators. We never share them with third parties.",
+      "documentType": "Document type",
+      "passport": "Passport",
+      "frontLabel": "Front of the document *",
+      "uploadFront": "Upload front photo",
+      "backLabel": "Back of the document *",
+      "uploadBack": "Upload back photo",
+      "selfieLabel": "Selfie holding the document *",
+      "uploadSelfie": "Upload selfie with document",
+      "submit": "Submit for verification"
+    },
+    "approved": {
+      "subtitle": "Your verified badge is active on your profile"
+    },
+    "pending": {
+      "title": "Verification under review",
+      "subtitle": "We'll review your documents within 24-48h"
+    },
+    "rejected": {
+      "reason": "Reason: {{reason}}",
+      "retry": "Try again"
+    },
+    "idle": {
+      "title": "Verify your identity",
+      "subtitle": "Get the verified badge and you'll be able to leave reviews",
+      "cta": "Verify"
+    },
+    "banner": {
+      "title": "🛡️ Verify your identity and appear as Verified",
+      "body": "Verified profiles get up to <strong>3× more contacts</strong>. It only takes 2 minutes.",
+      "cta": "Verify now →",
+      "close": "Close banner"
+    },
+    "status": {
+      "rejected": "Verification rejected"
+    }
   }
 }

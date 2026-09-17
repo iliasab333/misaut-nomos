@@ -1,24 +1,27 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Eye, MessageSquare, Star, MousePointerClick, ArrowRight, Camera,
-  ShieldCheck, Sparkles, CheckCircle2, Circle, X, BarChart3, User,
-  Loader2,
-} from 'lucide-react';
+  IconEye, IconMessageSquare, IconStar, IconStarOutline, IconPointerClick,
+  IconArrowRight, IconCamera, IconShield, IconSparkles, IconSuccess,
+  IconCircle, IconClose, IconChart, IconUser,
+} from '@/components/Icons';
 import { supabase } from '@/api/supabaseClient';
 import SEOHead from '@/components/seo/SEOHead';
-import PullToRefresh from '@/components/ui/PullToRefresh';
+import PullToRefresh from '@/components/PullToRefresh';
+import { ErrorState, SkeletonLine, SkeletonBlock } from '@/components/ListStates';
 
 const NAVY = '#00255C';
 const GOLD = '#F5C13D';
 
 const BANNER_DISMISS_KEY = 'pro_dashboard_banner_dismissed';
 
-function greetingFor(hour) {
-  if (hour < 13) return 'Buenos días';
-  if (hour < 20) return 'Buenas tardes';
-  return 'Buenas noches';
+// Recibe `t`: vive fuera del componente y debe retraducirse en cada render.
+function greetingFor(hour, t) {
+  if (hour < 13) return t('dashboard.pro.greeting.morning');
+  if (hour < 20) return t('dashboard.pro.greeting.afternoon');
+  return t('dashboard.pro.greeting.evening');
 }
 
 function fmt(n) {
@@ -26,6 +29,7 @@ function fmt(n) {
 }
 
 export default function ProfessionalDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -46,7 +50,7 @@ export default function ProfessionalDashboardPage() {
       return null;
     }
     const { data: rpc, error } = await supabase.rpc('get_my_dashboard');
-    if (error) throw new Error(error.message || 'No se pudo cargar tu panel');
+    if (error) throw new Error(error.message || t('dashboard.pro.errors.loadFailed'));
     return rpc || null;
   };
 
@@ -57,7 +61,7 @@ export default function ProfessionalDashboardPage() {
         const rpc = await fetchDashboard();
         if (!cancelled) setData(rpc);
       } catch (e) {
-        if (!cancelled) setErr(e?.message || 'Error al cargar el panel');
+        if (!cancelled) setErr(e?.message || t('dashboard.pro.errors.loadError'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -68,12 +72,26 @@ export default function ProfessionalDashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Reintento desde ErrorState: repite el fetch sin recargar la página.
+  const reload = async () => {
+    setLoading(true);
+    setErr('');
+    try {
+      const rpc = await fetchDashboard();
+      setData(rpc);
+    } catch (e) {
+      setErr(e?.message || t('dashboard.pro.errors.loadError'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRefresh = async () => {
     try {
       const rpc = await fetchDashboard();
       setData(rpc);
     } catch (e) {
-      setErr(e?.message || 'Error al cargar');
+      setErr(e?.message || t('dashboard.pro.errors.refreshError'));
     }
   };
 
@@ -83,35 +101,35 @@ export default function ProfessionalDashboardPage() {
     if (!completeness.has_photo) {
       return {
         id: 'photo',
-        icon: Camera,
-        title: 'Añade tu foto principal',
-        body: 'Los perfiles con foto reciben hasta 3× más contactos.',
-        cta: 'Añadir foto',
+        icon: IconCamera,
+        title: t('dashboard.pro.banner.photo.title'),
+        body: t('dashboard.pro.banner.photo.body'),
+        cta: t('myProfile.photoBanner.cta'),
         action: () => navigate('/mi-perfil?section=photo'),
       };
     }
     if (!data.is_verified) {
       return {
         id: 'verify',
-        icon: ShieldCheck,
-        title: 'Verifica tu identidad',
-        body: 'Aparecerás como profesional verificado y subirás posiciones.',
-        cta: 'Verificar ahora',
+        icon: IconShield,
+        title: t('verification.idle.title'),
+        body: t('dashboard.pro.banner.verify.body'),
+        cta: t('dashboard.pro.banner.verify.cta'),
         action: () => navigate('/mi-perfil?section=verify'),
       };
     }
     if ((completeness.percent || 0) < 100) {
       return {
         id: 'complete',
-        icon: Sparkles,
-        title: 'Completa tu perfil',
-        body: 'Un perfil al 100% recibe hasta 5× más contactos.',
-        cta: 'Completar',
+        icon: IconSparkles,
+        title: t('dashboard.pro.banner.complete.title'),
+        body: t('dashboard.pro.banner.complete.body'),
+        cta: t('dashboard.pro.banner.complete.cta'),
         action: () => navigate('/mi-perfil'),
       };
     }
     return null;
-  }, [data, navigate]);
+  }, [data, navigate, t]);
 
   const showBanner =
     !!banner && bannerDismissedAt !== `${banner.id}:${todayKey()}`;
@@ -121,7 +139,7 @@ export default function ProfessionalDashboardPage() {
     const v = `${banner.id}:${todayKey()}`;
     try {
       sessionStorage.setItem(BANNER_DISMISS_KEY, v);
-    } catch {}
+    } catch { /* sessionStorage inaccesible: modo privado */ }
     setBannerDismissedAt(v);
   };
 
@@ -132,18 +150,18 @@ export default function ProfessionalDashboardPage() {
     return [
       {
         key: 'views',
-        label: 'Vistas este mes',
+        label: t('dashboard.pro.stats.views'),
         value: fmt(d.views_month),
-        icon: Eye,
+        icon: IconEye,
         accent: NAVY,
         bg: 'rgba(0,37,92,0.06)',
         onClick: () => navigate('/mis-estadisticas'),
       },
       {
         key: 'unread',
-        label: 'Mensajes sin leer',
+        label: t('dashboard.pro.stats.unread'),
         value: fmt(d.unread_messages),
-        icon: MessageSquare,
+        icon: IconMessageSquare,
         accent: '#0B5394',
         bg: 'rgba(11,83,148,0.06)',
         alert: Number(d.unread_messages || 0) > 0,
@@ -151,54 +169,79 @@ export default function ProfessionalDashboardPage() {
       },
       {
         key: 'rating',
-        label: 'Valoración',
+        label: t('dashboard.average_rating'),
         value: avg ? avg.toFixed(1) : '—',
         sub: reviews
-          ? `${fmt(reviews)} ${reviews === 1 ? 'reseña' : 'reseñas'}`
-          : 'Aún sin reseñas',
-        icon: Star,
+          ? t('dashboard.pro.stats.reviewsCount', { count: reviews, n: fmt(reviews) })
+          : t('dashboard.pro.stats.noReviews'),
+        icon: IconStarOutline,
         accent: GOLD,
         bg: 'rgba(245,193,61,0.12)',
         onClick: () => navigate('/mis-valoraciones'),
       },
       {
         key: 'clicks',
-        label: 'Clics de contacto (30 d)',
+        label: t('dashboard.pro.stats.contactClicks'),
         value: fmt(d.contact_clicks_30d),
-        icon: MousePointerClick,
+        icon: IconPointerClick,
         accent: '#1E8A3D',
         bg: 'rgba(30,138,61,0.08)',
         onClick: () => navigate('/mis-estadisticas'),
       },
     ];
-  }, [data, navigate]);
+  }, [data, navigate, t]);
 
   const completenessItems = useMemo(() => {
     const c = data?.completeness || {};
     return [
-      { key: 'photo', label: 'Foto principal', done: !!c.has_photo },
-      { key: 'desc', label: 'Descripción detallada', done: !!c.has_description },
-      { key: 'photos3', label: 'Al menos 3 fotos de trabajos', done: !!c.has_3_work_photos },
+      { key: 'photo', label: t('dashboard.pro.completeness.photo'), done: !!c.has_photo },
+      { key: 'desc', label: t('dashboard.completion.fullDescription'), done: !!c.has_description },
+      { key: 'photos3', label: t('dashboard.pro.completeness.workPhotos'), done: !!c.has_3_work_photos },
     ];
-  }, [data]);
+  }, [data, t]);
 
   const completenessPct = data?.completeness?.percent ?? 0;
-  const greetingName = data?.greeting_name || 'Pro';
+  const greetingName = data?.greeting_name || t('dashboard.pro.header.defaultName');
   const hour = new Date().getHours();
-  const greeting = greetingFor(hour);
+  const greeting = greetingFor(hour, t);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin" style={{ color: NAVY }} />
+      <div className="min-h-screen bg-soft">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-7 space-y-5">
+          <SkeletonBlock lines={2} />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="rounded-2xl bg-surface border border-c-border p-3.5 sm:p-4" aria-hidden="true">
+                <SkeletonLine width={36} height={36} />
+                <SkeletonLine className="mt-3" width="55%" height={24} />
+                <SkeletonLine className="mt-2" width="80%" height={11} />
+              </div>
+            ))}
+          </div>
+          <div className="rounded-2xl bg-surface border border-c-border p-4 sm:p-5">
+            <SkeletonBlock lines={4} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error sin datos: una salida, no un callejón.
+  if (err && !data) {
+    return (
+      <div className="min-h-screen bg-soft">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
+          <ErrorState message={err} onRetry={reload} />
+        </div>
       </div>
     );
   }
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <SEOHead title="Inicio — MisAutónomos" noindex />
-      <div className="min-h-screen bg-slate-50">
+      <SEOHead title={t('dashboard.pro.seoTitle')} noindex />
+      <div className="min-h-screen bg-soft">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-7 space-y-5">
 
           {/* HEADER */}
@@ -209,11 +252,15 @@ export default function ProfessionalDashboardPage() {
             className="flex items-end justify-between gap-3"
           >
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm text-slate-500">
-                {greeting}, <span className="font-semibold text-slate-700">{greetingName}</span> 👋
+              <p className="text-xs sm:text-sm text-c-muted">
+                <Trans
+                  i18nKey="dashboard.pro.header.greetingLine"
+                  values={{ greeting, name: greetingName }}
+                  components={{ b: <span className="font-semibold text-ink" /> }}
+                />
               </p>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-0.5">
-                Tu panel
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-ink mt-0.5">
+                {t('dashboard.pro.header.title')}
               </h1>
             </div>
             {data?.is_verified && (
@@ -221,15 +268,18 @@ export default function ProfessionalDashboardPage() {
                 className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md"
                 style={{ background: `${NAVY}10`, color: NAVY }}
               >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                Verificado
+                <IconShield className="w-3.5 h-3.5" />
+                {t('proProfile.badges.verified')}
               </span>
             )}
           </motion.div>
 
           {err && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 text-amber-900 p-3 text-sm">
-              {err}
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 text-warning p-3 text-sm flex items-center justify-between gap-3">
+              <span className="min-w-0">{err}</span>
+              <button type="button" className="btn-secondary btn-sm shrink-0" onClick={reload}>
+                {t('common.retry')}
+              </button>
             </div>
           )}
 
@@ -273,13 +323,14 @@ export default function ProfessionalDashboardPage() {
 }
 
 function NextStepBanner({ banner, onDismiss }) {
+  const { t } = useTranslation();
   const Icon = banner.icon;
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
+      className="rounded-2xl border border-c-border bg-surface overflow-hidden"
     >
       <div className="p-4 sm:p-5 flex items-start gap-3">
         <div
@@ -294,15 +345,15 @@ function NextStepBanner({ banner, onDismiss }) {
               className="text-[10px] font-bold uppercase tracking-[0.1em]"
               style={{ color: NAVY }}
             >
-              Siguiente paso
+              {t('dashboard.pro.nextStep.label')}
             </span>
             <span
               className="inline-block w-1 h-1 rounded-full"
               style={{ background: GOLD }}
             />
           </div>
-          <p className="text-sm font-semibold text-slate-900">{banner.title}</p>
-          <p className="text-xs text-slate-500 mt-0.5">{banner.body}</p>
+          <p className="text-sm font-semibold text-ink">{banner.title}</p>
+          <p className="text-xs text-c-muted mt-0.5">{banner.body}</p>
           <button
             type="button"
             onClick={banner.action}
@@ -310,16 +361,16 @@ function NextStepBanner({ banner, onDismiss }) {
             style={{ background: NAVY }}
           >
             {banner.cta}
-            <ArrowRight className="w-3.5 h-3.5" />
+            <IconArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
         <button
           type="button"
           onClick={onDismiss}
-          className="w-8 h-8 inline-flex items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 -mt-1 -mr-1"
-          aria-label="Descartar"
+          className="w-8 h-8 inline-flex items-center justify-center rounded-md text-c-muted hover:bg-soft -mt-1 -mr-1"
+          aria-label={t('dashboard.pro.nextStep.dismiss')}
         >
-          <X className="w-4 h-4" />
+          <IconClose className="w-4 h-4" />
         </button>
       </div>
     </motion.div>
@@ -335,7 +386,7 @@ function StatCard({ stat, delay = 0 }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.25 }}
-      className="relative text-left rounded-2xl bg-white border border-slate-200 p-3.5 sm:p-4 hover:border-slate-300 hover:shadow-sm transition active:scale-[0.99]"
+      className="relative text-left rounded-2xl bg-surface border border-c-border p-3.5 sm:p-4 hover:border-slate-300 hover:shadow-sm transition active:scale-[0.99]"
     >
       <div className="flex items-center justify-between">
         <div
@@ -349,55 +400,56 @@ function StatCard({ stat, delay = 0 }) {
         )}
       </div>
       <div className="mt-3 flex items-baseline gap-1">
-        <span className="text-2xl sm:text-[28px] font-extrabold text-slate-900 leading-none">
+        <span className="text-2xl sm:text-[28px] font-extrabold text-ink leading-none">
           {stat.value}
         </span>
         {stat.key === 'rating' && stat.value !== '—' && (
-          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+          <IconStar className="w-4 h-4 fill-star text-star" />
         )}
       </div>
-      <p className="text-[11px] sm:text-xs text-slate-500 mt-1 leading-tight">
+      <p className="text-[11px] sm:text-xs text-c-muted mt-1 leading-tight">
         {stat.label}
       </p>
       {stat.sub && (
-        <p className="text-[11px] text-slate-400 mt-0.5">{stat.sub}</p>
+        <p className="text-[11px] text-c-muted mt-0.5">{stat.sub}</p>
       )}
     </motion.button>
   );
 }
 
 function CompletenessCard({ percent, items, isComplete, onCta }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.18, duration: 0.25 }}
-      className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-5"
+      className="rounded-2xl bg-surface border border-c-border p-4 sm:p-5"
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 mb-1">
-            <Sparkles className="w-4 h-4" style={{ color: NAVY }} />
+            <IconSparkles className="w-4 h-4" style={{ color: NAVY }} />
             <span
               className="text-[10px] font-bold uppercase tracking-[0.1em]"
               style={{ color: NAVY }}
             >
-              Completitud del perfil
+              {t('dashboard.completion.title')}
             </span>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-c-muted">
             {isComplete
-              ? 'Tu perfil está optimizado. Sigue así.'
-              : 'Cada paso multiplica las visitas y los contactos.'}
+              ? t('dashboard.pro.completeness.optimized')
+              : t('dashboard.pro.completeness.eachStep')}
           </p>
         </div>
-        <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-none">
+        <span className="text-2xl sm:text-3xl font-extrabold text-ink leading-none">
           {percent}
-          <span className="text-sm sm:text-base text-slate-400 font-bold">%</span>
+          <span className="text-sm sm:text-base text-c-muted font-bold">%</span>
         </span>
       </div>
 
-      <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden mb-4">
+      <div className="relative h-2 bg-soft rounded-full overflow-hidden mb-4">
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
           style={{ background: `linear-gradient(90deg, ${NAVY}, ${GOLD})` }}
@@ -411,11 +463,11 @@ function CompletenessCard({ percent, items, isComplete, onCta }) {
         {items.map((it) => (
           <li key={it.key} className="flex items-center gap-2 text-sm">
             {it.done ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <IconSuccess className="w-4 h-4 text-emerald-600 flex-shrink-0" />
             ) : (
-              <Circle className="w-4 h-4 text-slate-300 flex-shrink-0" />
+              <IconCircle className="w-4 h-4 text-slate-300 flex-shrink-0" />
             )}
-            <span className={it.done ? 'text-slate-700' : 'text-slate-500'}>
+            <span className={it.done ? 'text-ink' : 'text-c-muted'}>
               {it.label}
             </span>
           </li>
@@ -428,61 +480,62 @@ function CompletenessCard({ percent, items, isComplete, onCta }) {
         className="w-full h-11 rounded-xl text-sm font-semibold text-white inline-flex items-center justify-center gap-1.5"
         style={{ background: NAVY }}
       >
-        {isComplete ? 'Editar mi perfil' : 'Completar perfil'}
-        <ArrowRight className="w-4 h-4" />
+        {isComplete ? t('dashboard.pro.completeness.editProfile') : t('dashboard.pro.completeness.completeProfile')}
+        <IconArrowRight className="w-4 h-4" />
       </button>
     </motion.div>
   );
 }
 
 function RankingHint({ isVerified, percent }) {
+  const { t } = useTranslation();
   if (isVerified && percent >= 100) return null;
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.22, duration: 0.25 }}
-      className="rounded-xl border border-slate-200 bg-white px-4 py-3 flex items-start gap-2.5"
+      className="rounded-xl border border-c-border bg-surface px-4 py-3 flex items-start gap-2.5"
     >
       <div
         className="w-7 h-7 rounded-lg inline-flex items-center justify-center flex-shrink-0"
         style={{ background: `${GOLD}26`, color: '#7A5B00' }}
       >
-        <Sparkles className="w-3.5 h-3.5" />
+        <IconSparkles className="w-3.5 h-3.5" />
       </div>
-      <p className="text-xs text-slate-600 leading-relaxed">
-        Cuanto más completo y verificado esté tu perfil, más arriba apareces en las
-        búsquedas y más contactos recibes.
+      <p className="text-xs text-c-muted leading-relaxed">
+        {t('dashboard.pro.rankingHint')}
       </p>
     </motion.div>
   );
 }
 
 function QuickActions({ navigate, unread, pendingReviews }) {
+  const { t } = useTranslation();
   const items = [
     {
       key: 'profile',
-      label: 'Mi perfil',
-      icon: User,
+      label: t('nav.myProfile'),
+      icon: IconUser,
       onClick: () => navigate('/mi-perfil'),
     },
     {
       key: 'stats',
-      label: 'Estadísticas',
-      icon: BarChart3,
+      label: t('nav.statistics'),
+      icon: IconChart,
       onClick: () => navigate('/mis-estadisticas'),
     },
     {
       key: 'reviews',
-      label: 'Valoraciones',
-      icon: Star,
+      label: t('nav.reviews'),
+      icon: IconStarOutline,
       onClick: () => navigate('/mis-valoraciones'),
       badge: pendingReviews > 0 ? pendingReviews : null,
     },
     {
       key: 'messages',
-      label: 'Mensajes',
-      icon: MessageSquare,
+      label: t('nav.messages'),
+      icon: IconMessageSquare,
       onClick: () => navigate('/mensajes'),
       badge: unread > 0 ? unread : null,
     },
@@ -493,8 +546,8 @@ function QuickActions({ navigate, unread, pendingReviews }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.26, duration: 0.25 }}
     >
-      <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-2">
-        Accesos rápidos
+      <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-c-muted mb-2">
+        {t('dashboard.pro.quickActions.title')}
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         {items.map((a) => {
@@ -504,7 +557,7 @@ function QuickActions({ navigate, unread, pendingReviews }) {
               key={a.key}
               type="button"
               onClick={a.onClick}
-              className="relative rounded-xl border border-slate-200 bg-white px-3 py-3 flex flex-col items-start gap-1.5 hover:border-slate-300 hover:shadow-sm transition text-left"
+              className="relative rounded-xl border border-c-border bg-surface px-3 py-3 flex flex-col items-start gap-1.5 hover:border-slate-300 hover:shadow-sm transition text-left"
             >
               <span
                 className="w-8 h-8 rounded-lg inline-flex items-center justify-center"
@@ -512,7 +565,7 @@ function QuickActions({ navigate, unread, pendingReviews }) {
               >
                 <Icon className="w-4 h-4" />
               </span>
-              <span className="text-sm font-semibold text-slate-800">{a.label}</span>
+              <span className="text-sm font-semibold text-ink">{a.label}</span>
               {a.badge != null && (
                 <span
                   className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold text-white inline-flex items-center justify-center"

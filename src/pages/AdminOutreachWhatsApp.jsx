@@ -1,21 +1,24 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useTranslation, Trans } from 'react-i18next';
+import { toast } from '@/lib/toast';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { ErrorState, EmptyState, SkeletonBlock } from '@/components/ListStates';
 import {
-  MessageCircle,
-  CheckCircle2,
-  X,
-  AlertTriangle,
-  Loader2,
-  Phone,
-  MapPin,
-  Tag,
-  Star,
-  ExternalLink,
-  RotateCcw,
-} from 'lucide-react';
+  IconMessageCircle,
+  IconSuccess,
+  IconClose,
+  IconWarning,
+  IconSpinner,
+  IconPhone,
+  IconMapPin,
+  IconTag,
+  IconStar,
+  IconExternal,
+  IconRotateCcw,
+  IconWhatsApp,
+} from '@/components/Icons';
 
 // ─────────────────────────────────────────────────────────────────────────
 // Constantes
@@ -183,8 +186,8 @@ export default function AdminOutreachWhatsAppPage() {
 
   if (guard.loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+      <div className="min-h-screen flex items-center justify-center bg-soft">
+        <IconSpinner className="w-6 h-6 text-c-muted animate-spin" />
       </div>
     );
   }
@@ -197,6 +200,7 @@ export default function AdminOutreachWhatsAppPage() {
 }
 
 function OutreachWaContent() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const queueQ = useQueue(true);
   const sentTodayQ = useSentTodayCount(true);
@@ -245,11 +249,11 @@ function OutreachWaContent() {
       });
     },
     onSuccess: () => {
-      toast.success('Marcado como contactado');
+      toast.success(t('admin.outreach.contacted'));
       queryClient.invalidateQueries({ queryKey: ['outreach-wa-sent-today'] });
       advance();
     },
-    onError: (err) => toast.error(`Error: ${err.message || 'no se pudo actualizar'}`),
+    onError: (err) => toast.error(t('admin.outreach.updateError', { message: err.message || t('admin.outreach.updateErrorFallback') })),
   });
 
   const discardMut = useMutation({
@@ -260,10 +264,10 @@ function OutreachWaContent() {
       });
     },
     onSuccess: () => {
-      toast.success('Descartado');
+      toast.success(t('admin.outreach.discarded'));
       advance();
     },
-    onError: (err) => toast.error(`Error: ${err.message || 'no se pudo actualizar'}`),
+    onError: (err) => toast.error(t('admin.outreach.updateError', { message: err.message || t('admin.outreach.updateErrorFallback') })),
   });
 
   const advance = useCallback(() => {
@@ -291,132 +295,139 @@ function OutreachWaContent() {
     <div className="max-w-3xl mx-auto px-4 py-8 md:py-10">
       {/* Header */}
       <header className="mb-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
-          Admin · Outreach
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-c-muted mb-2">
+          {t('admin.outreach.eyebrow')}
         </p>
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900" style={{ letterSpacing: '-0.02em' }}>
-          Outreach WhatsApp
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-ink" style={{ letterSpacing: '-0.02em' }}>
+          {t('admin.outreach.title')}
         </h1>
-        <p className="mt-2 text-slate-500 text-sm">
-          Cola asistida de leads. El envío es manual vía wa.me — el sistema solo prepara el mensaje y trackea el estado.
+        <p className="mt-2 text-c-muted text-sm">
+          {t('admin.outreach.subtitle')}
         </p>
       </header>
 
       {/* Contador del día */}
-      <div className={`rounded-2xl border px-4 py-3 mb-6 flex items-center justify-between ${overCap ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
+      <div className={`card rounded-2xl px-4 py-3 mb-6 flex items-center justify-between ${overCap ? 'border-warning/40 bg-warning/10' : ''}`}>
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-slate-700 font-medium">Enviados hoy:</span>
-          <span className={`text-base font-bold ${overCap ? 'text-amber-700' : 'text-slate-900'}`}>{sentTodayQ.isLoading ? '…' : sentToday}</span>
-          <span className="text-slate-400">/ {DAILY_SOFT_CAP} recomendados</span>
+          <span className="text-ink font-medium">{t('admin.outreach.sentToday')}</span>
+          <span className={`text-base font-bold ${overCap ? 'text-warning' : 'text-ink'}`}>{sentTodayQ.isLoading ? '…' : sentToday}</span>
+          <span className="text-c-muted">{t('admin.outreach.recommendedCap', { cap: DAILY_SOFT_CAP })}</span>
         </div>
         <button
           type="button"
           onClick={() => { queryClient.invalidateQueries({ queryKey: ['outreach-wa-queue'] }); queryClient.invalidateQueries({ queryKey: ['outreach-wa-sent-today'] }); }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900"
-          aria-label="Recargar cola"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-c-muted hover:text-ink"
+          aria-label={t('admin.outreach.reloadQueue')}
         >
-          <RotateCcw className="w-3.5 h-3.5" />
-          Recargar
+          <IconRotateCcw className="w-3.5 h-3.5" />
+          {t('admin.outreach.reload')}
         </button>
       </div>
 
       {overCap && (
-        <div className="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 mb-6 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-900">
-            <p className="font-semibold mb-1">Para por hoy.</p>
-            <p>Has enviado {sentToday} mensajes en las últimas 24h. Aunque sea envío manual, pasar de {DAILY_SOFT_CAP}/día aumenta el riesgo de que WhatsApp marque tu número. Vuelve mañana.</p>
+        <div role="alert" className="card rounded-2xl border-warning/40 bg-warning/10 px-4 py-3 mb-6 flex items-start gap-3">
+          <IconWarning className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-warning">
+            <p className="font-semibold mb-1">{t('admin.outreach.capReached.title')}</p>
+            <p>{t('admin.outreach.capReached.text', { sent: sentToday, cap: DAILY_SOFT_CAP })}</p>
           </div>
         </div>
       )}
 
       {/* Estado de carga */}
       {queueQ.isLoading && (
-        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center">
-          <Loader2 className="w-6 h-6 animate-spin text-slate-400 mx-auto mb-3" />
-          <p className="text-sm text-slate-500">Cargando cola…</p>
+        <div className="card rounded-2xl px-6 py-8">
+          <SkeletonBlock lines={4} />
+          <p className="text-sm text-c-muted text-center mt-4">{t('admin.outreach.loadingQueue')}</p>
         </div>
       )}
 
       {!queueQ.isLoading && queueQ.isError && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-8">
-          <p className="text-sm text-rose-800">Error cargando la cola: {String(queueQ.error?.message || queueQ.error)}</p>
-        </div>
+        <ErrorState
+          className="rounded-2xl"
+          message={t('admin.outreach.queueError', { message: String(queueQ.error?.message || queueQ.error) })}
+          onRetry={() => queryClient.invalidateQueries({ queryKey: ['outreach-wa-queue'] })}
+        />
       )}
 
       {!queueQ.isLoading && !queueQ.isError && !current && (
-        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center">
-          <MessageCircle className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-          <h2 className="text-base font-semibold text-slate-900 mb-1">No hay leads en cola</h2>
-          <p className="text-sm text-slate-500 max-w-sm mx-auto">
-            No quedan leads con <code>status = 'nuevo'</code> y teléfono. Ejecuta <code>scripts/seed-leads.mjs</code> para descubrir más, o pulsa "Recargar".
-          </p>
-        </div>
+        <EmptyState
+          className="rounded-2xl"
+          icon={<IconMessageCircle className="w-6 h-6" />}
+          title={t('admin.outreach.empty.title')}
+          body={(
+            <Trans
+              i18nKey="admin.outreach.empty.text"
+              components={[<code key="status" />, <code key="script" />]}
+            />
+          )}
+        />
       )}
 
       {/* Lead actual */}
       {current && normalizedPhone && (
-        <article className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+        <article className="card rounded-2xl">
           {/* Cabecera del lead */}
-          <header className="px-6 py-5 border-b border-slate-100">
+          <header className="px-6 py-5 border-b border-c-border">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 leading-tight" style={{ letterSpacing: '-0.01em' }}>
-                  {current.business_name || 'Sin nombre'}
+                <h2 className="text-lg font-semibold text-ink leading-tight" style={{ letterSpacing: '-0.01em' }}>
+                  {current.business_name || t('admin.outreach.leadNoName')}
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Lead {idx + 1} de {leads.length}
+                <p className="text-xs text-c-muted mt-0.5">
+                  {t('admin.outreach.leadPosition', { index: idx + 1, total: leads.length })}
                 </p>
               </div>
               {current.user_ratings_total > 0 && (
-                <div className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-full px-2 py-1 flex-shrink-0">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                  {Number(current.rating || 0).toFixed(1)} <span className="text-slate-400">({current.user_ratings_total})</span>
+                <div className="chip-info flex-shrink-0">
+                  <IconStar className="w-3 h-3 text-star" />
+                  {Number(current.rating || 0).toFixed(1)} <span className="text-c-muted">({current.user_ratings_total})</span>
                 </div>
               )}
             </div>
 
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-              <div className="inline-flex items-center gap-1.5 text-slate-600">
-                <Tag className="w-3.5 h-3.5 text-slate-400" />
+              <div className="inline-flex items-center gap-1.5 text-ink">
+                <IconTag className="w-3.5 h-3.5 text-c-muted" />
                 <span>{categoryLabel(current.category_slug)}</span>
               </div>
               {current.city && (
-                <div className="inline-flex items-center gap-1.5 text-slate-600">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                <div className="inline-flex items-center gap-1.5 text-ink">
+                  <IconMapPin className="w-3.5 h-3.5 text-c-muted" />
                   <span>{current.city}</span>
                 </div>
               )}
-              <div className="inline-flex items-center gap-1.5 text-slate-600">
-                <Phone className="w-3.5 h-3.5 text-slate-400" />
+              <div className="inline-flex items-center gap-1.5 text-ink">
+                <IconPhone className="w-3.5 h-3.5 text-c-muted" />
                 <span className="font-mono">{normalizedPhone}</span>
               </div>
               {current.website && (
-                <a href={current.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:underline truncate">
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                <a href={current.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-ink hover:underline truncate">
+                  <IconExternal className="w-3.5 h-3.5 text-c-muted" />
                   <span className="truncate">{stripUrl(current.website)}</span>
                 </a>
               )}
             </dl>
             {current.address && (
-              <p className="text-xs text-slate-400 mt-2">{current.address}</p>
+              <p className="text-xs text-c-muted mt-2">{current.address}</p>
             )}
           </header>
 
           {/* Mensaje editable */}
           <div className="px-6 py-5">
-            <label className="block text-xs font-semibold uppercase tracking-[0.06em] text-slate-500 mb-2">
-              Mensaje (editable)
+            <label className="label block text-xs font-semibold uppercase tracking-[0.06em] text-c-muted mb-2" htmlFor="outreach-message">
+              {t('admin.outreach.messageLabel')}
             </label>
             <textarea
+              id="outreach-message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={9}
-              className="w-full text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00255C]/15 focus:border-[#00255C] resize-y"
-              placeholder="Mensaje a enviar por WhatsApp…"
+              className="textarea text-sm bg-soft rounded-xl"
+              placeholder={t('admin.outreach.messagePlaceholder')}
             />
-            <p className="mt-2 text-[11px] text-slate-400">
-              Plantilla con {'{nombre}'}, {'{oficio}'}, {'{ciudad}'} ya sustituidos. Edita lo que necesites antes de abrir WhatsApp.
+            <p className="mt-2 text-[11px] text-c-muted">
+              {t('admin.outreach.templateHint')}
             </p>
           </div>
 
@@ -425,43 +436,43 @@ function OutreachWaContent() {
             <button
               type="button"
               onClick={handleOpenWa}
-              className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl text-white font-semibold text-[15px] transition-colors"
+              className="btn-whatsapp w-full rounded-xl text-[15px] font-semibold"
               style={{ backgroundColor: '#1FAD4F' }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#168D40')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1FAD4F')}
             >
-              <WhatsAppIcon className="w-5 h-5" />
-              {waOpened ? 'Abrir WhatsApp de nuevo' : 'Abrir WhatsApp'}
+              <IconWhatsApp size={20} className="w-5 h-5" />
+              {waOpened ? t('admin.outreach.openWhatsAppAgain') : t('admin.outreach.openWhatsApp')}
             </button>
             {!waOpened && (
-              <p className="mt-2 text-[11px] text-center text-slate-400">
-                Se abre WhatsApp con el mensaje listo. Lo envías tú con un clic, después marcas el resultado abajo.
+              <p className="mt-2 text-[11px] text-center text-c-muted">
+                {t('admin.outreach.openHint')}
               </p>
             )}
           </div>
 
           {/* Acciones de resultado */}
-          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 grid grid-cols-2 gap-2">
+          <div className="px-6 py-4 border-t border-c-border bg-soft grid grid-cols-2 gap-2">
             <button
               type="button"
               disabled={markContactedMut.isPending}
               onClick={() => markContactedMut.mutate(current)}
-              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl text-white font-semibold text-sm transition-colors"
+              className="btn-primary rounded-xl text-sm font-semibold"
               style={{ backgroundColor: '#00255C' }}
               onMouseEnter={(e) => !markContactedMut.isPending && (e.currentTarget.style.backgroundColor = '#001A45')}
               onMouseLeave={(e) => !markContactedMut.isPending && (e.currentTarget.style.backgroundColor = '#00255C')}
             >
-              {markContactedMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-              Marcar contactado
+              {markContactedMut.isPending ? <IconSpinner className="w-4 h-4 animate-spin" /> : <IconSuccess className="w-4 h-4" />}
+              {t('admin.outreach.markContacted')}
             </button>
             <button
               type="button"
               disabled={discardMut.isPending}
               onClick={() => discardMut.mutate(current)}
-              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl font-semibold text-sm border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
+              className="btn-secondary rounded-xl text-sm font-semibold"
             >
-              {discardMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
-              Descartar
+              {discardMut.isPending ? <IconSpinner className="w-4 h-4 animate-spin" /> : <IconClose className="w-4 h-4" />}
+              {t('admin.outreach.discard')}
             </button>
           </div>
         </article>
@@ -487,12 +498,4 @@ async function autoSkipNoPhone(lead) {
 
 function stripUrl(u) {
   try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; }
-}
-
-function WhatsAppIcon({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-    </svg>
-  );
 }

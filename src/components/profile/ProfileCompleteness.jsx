@@ -1,7 +1,5 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Circle, Sparkles } from "lucide-react";
+import { IconSuccess, IconCircle, IconSparkles } from "@/components/Icons";
 
 const NAVY = '#00255C';
 
@@ -51,45 +49,47 @@ export default function ProfileCompleteness({ profile, user }) {
   const isComplete = percentage === 100;
 
   return (
-    <Card className="shadow-sm border-0 bg-white rounded-2xl overflow-hidden">
-      <CardContent className="p-4 sm:p-5">
+    <div className="card rounded-2xl">
+      <div className="p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 mb-1">
-              <Sparkles className="w-4 h-4" style={{ color: NAVY }} />
+              <IconSparkles className="w-4 h-4" style={{ color: NAVY }} />
               <h3 className="text-xs font-bold uppercase tracking-[0.08em]" style={{ color: NAVY }}>
                 {isComplete ? '¡Perfil completo!' : 'Completa tu perfil'}
               </h3>
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-c-muted">
               {isComplete
                 ? 'Tu perfil está optimizado. Sigue así para conseguir más contactos.'
                 : `${doneCount} de ${items.length} elementos. Los perfiles completos reciben hasta 5× más contactos.`}
             </p>
           </div>
-          <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-none">
+          <span className="text-2xl sm:text-3xl font-extrabold text-ink leading-none">
             {percentage}
-            <span className="text-sm sm:text-base text-slate-400 font-bold">%</span>
+            <span className="text-sm sm:text-base text-c-muted font-bold">%</span>
           </span>
         </div>
 
-        <Progress value={percentage} className="h-2 mb-4" />
+        <div className="h-2 mb-4 rounded-full bg-soft overflow-hidden" role="progressbar" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100}>
+          <div className="h-full bg-c-accent transition-all" style={{ width: `${percentage}%` }} />
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2">
           {items.map((item) => (
             <div key={item.field} className="flex items-center gap-2 min-w-0">
               {item.completed ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <IconSuccess className="w-4 h-4 text-success flex-shrink-0" />
               ) : (
-                <Circle className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                <IconCircle className="w-4 h-4 text-c-border flex-shrink-0" />
               )}
-              <span className={`text-xs truncate ${item.completed ? 'text-slate-700' : 'text-slate-500'}`}>
+              <span className={`text-xs truncate ${item.completed ? 'text-ink' : 'text-c-muted'}`}>
                 {item.label}
               </span>
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

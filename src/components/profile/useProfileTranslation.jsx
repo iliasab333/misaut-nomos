@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useLanguage } from '../ui/LanguageSwitcher';
+import { useLanguage } from '@/components/LanguageSwitcher';
 
 export function useProfileTranslation(profile) {
   const { language } = useLanguage();

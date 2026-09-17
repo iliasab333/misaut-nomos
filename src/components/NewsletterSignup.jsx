@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { Mail, Check, Loader2 } from 'lucide-react';
+import { IconMail, IconCheck, IconSpinner } from '@/components/Icons';
 import { notifyAdminEvent } from '@/lib/notifyAdmin';
 
 export default function NewsletterSignup({ variant = 'footer', source = 'footer' }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [userType, setUserType] = useState('ambos');
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
@@ -12,7 +14,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
-      setError('Introduce un email válido.');
+      setError(t('newsletter.signup.invalidEmail'));
       return;
     }
     setStatus('loading');
@@ -31,7 +33,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
           setStatus('success');
           return;
         }
-        setError('Este email ya está suscrito.');
+        setError(t('newsletter.signup.alreadySubscribed'));
         setStatus('error');
         return;
       }
@@ -74,7 +76,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
       setEmail('');
     } catch (err) {
       console.error(err);
-      setError('Ha habido un error. Inténtalo más tarde.');
+      setError(t('newsletter.signup.error'));
       setStatus('error');
     }
   };
@@ -82,13 +84,13 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
   if (variant === 'footer') {
     return (
       <div>
-        <h4 className="text-sm font-semibold text-white mb-2">Suscríbete a nuestra newsletter</h4>
-        <p className="text-xs text-gray-400 mb-3">Recibe consejos prácticos y novedades una vez al mes</p>
+        <h4 className="text-sm font-semibold text-white mb-2">{t('newsletter.signup.footerTitle')}</h4>
+        <p className="text-xs text-gray-400 mb-3">{t('newsletter.signup.footerSubtitle')}</p>
 
         {status === 'success' ? (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-2 flex items-center gap-2 text-sm text-green-400">
-            <Check className="w-4 h-4 flex-shrink-0" />
-            <span>¡Gracias! Revisa tu email.</span>
+          <div className="bg-success/10 border border-success/30 rounded-lg px-3 py-2 flex items-center gap-2 text-sm text-green-400">
+            <IconCheck className="w-4 h-4 flex-shrink-0" />
+            <span>{t('newsletter.signup.thanks')}</span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex gap-2">
@@ -96,7 +98,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="tu@email.com"
+              placeholder={t('auth.email_placeholder')}
               className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-0"
               required
               disabled={status === 'loading'}
@@ -104,14 +106,14 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="bg-white text-gray-900 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
+              className="bg-surface text-ink text-sm font-medium px-4 py-2 rounded-lg hover:bg-soft disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
             >
-              {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Suscribirme'}
+              {status === 'loading' ? <IconSpinner className="w-4 h-4 animate-spin" /> : t('newsletter.signup.button')}
             </button>
           </form>
         )}
         {error && <p className="text-xs text-red-400 mt-1.5">{error}</p>}
-        <p className="text-[10px] text-gray-500 mt-2">Al suscribirte aceptas recibir nuestra newsletter. Puedes darte de baja en cualquier momento.</p>
+        <p className="text-[10px] text-gray-500 mt-2">{t('newsletter.signup.consent')}</p>
       </div>
     );
   }
@@ -121,18 +123,18 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
     <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-          <Mail className="w-5 h-5" />
+          <IconMail className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-bold text-lg">Recibe lo mejor del blog en tu email</h3>
-          <p className="text-sm text-blue-100 mt-0.5">Nuevos artículos, guías fiscales y consejos prácticos, una vez al mes.</p>
+          <h3 className="font-bold text-lg">{t('newsletter.signup.blogTitle')}</h3>
+          <p className="text-sm text-blue-100 mt-0.5">{t('newsletter.signup.blogSubtitle')}</p>
         </div>
       </div>
 
       {status === 'success' ? (
         <div className="bg-white/10 rounded-lg px-4 py-3 flex items-center gap-2">
-          <Check className="w-5 h-5 flex-shrink-0" />
-          <span className="text-sm">¡Gracias! Revisa tu email.</span>
+          <IconCheck className="w-5 h-5 flex-shrink-0" />
+          <span className="text-sm">{t('newsletter.signup.thanks')}</span>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-2">
@@ -141,7 +143,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="tu@email.com"
+              placeholder={t('auth.email_placeholder')}
               className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2.5 text-sm text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white min-w-0"
               required
               disabled={status === 'loading'}
@@ -149,29 +151,29 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="bg-white text-blue-700 text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-50 disabled:opacity-50 whitespace-nowrap flex-shrink-0"
+              className="bg-surface text-c-accent text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-soft disabled:opacity-50 whitespace-nowrap flex-shrink-0"
             >
-              {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Suscribirme'}
+              {status === 'loading' ? <IconSpinner className="w-4 h-4 animate-spin" /> : t('newsletter.signup.button')}
             </button>
           </div>
           <div className="flex gap-4 text-xs flex-wrap">
             <label className="flex items-center gap-1.5 cursor-pointer">
               <input type="radio" name={`ut-${source}`} checked={userType === 'autonomo'} onChange={() => setUserType('autonomo')} className="accent-white" />
-              Soy autónomo
+              {t('nav.iAmPro')}
             </label>
             <label className="flex items-center gap-1.5 cursor-pointer">
               <input type="radio" name={`ut-${source}`} checked={userType === 'cliente'} onChange={() => setUserType('cliente')} className="accent-white" />
-              Soy cliente
+              {t('nav.sign_up_client')}
             </label>
             <label className="flex items-center gap-1.5 cursor-pointer">
               <input type="radio" name={`ut-${source}`} checked={userType === 'ambos'} onChange={() => setUserType('ambos')} className="accent-white" />
-              Ambos
+              {t('newsletter.signup.both')}
             </label>
           </div>
         </form>
       )}
       {error && <p className="text-xs text-red-200 mt-1.5">{error}</p>}
-      <p className="text-[10px] text-blue-200 mt-3">Al suscribirte aceptas recibir nuestra newsletter. Puedes darte de baja en cualquier momento.</p>
+      <p className="text-[10px] text-blue-200 mt-3">{t('newsletter.signup.consent')}</p>
     </div>
   );
 }

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Users, Send, Eye, CheckCircle, XCircle, AlertTriangle, FlaskConical } from 'lucide-react';
-import { toast } from 'sonner';
+import Modal from '@/components/Modal';
+import {
+  IconUsers, IconSend, IconEye, IconCheckCircle, IconError, IconWarning, IconFlask,
+} from '@/components/Icons';
+import { toast } from '@/lib/toast';
 
 const CAMPAIGN_TAG = 'repesca_v1_sent';
 const CAMPAIGN_SUBJECT = 'Te dejaste algo a medias en MisAutónomos 👋';
@@ -67,6 +69,7 @@ const buildHtml = (name) => `<!DOCTYPE html>
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default function CampaignRepescaV1() {
+  const { t } = useTranslation();
   const [audience, setAudience] = useState(null);
   const [loadingAudience, setLoadingAudience] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -83,7 +86,7 @@ export default function CampaignRepescaV1() {
       const res = await base44.functions.invoke('getCampaignAudience', {});
       setAudience(res.data.audience || []);
     } catch (e) {
-      toast.error('Error al calcular audiencia: ' + e.message);
+      toast.error(t('admin.campaigns.repesca.audienceError', { message: e.message }));
     } finally {
       setLoadingAudience(false);
     }
@@ -101,9 +104,9 @@ export default function CampaignRepescaV1() {
         category: 'transactional',
         vars: {},
       });
-      toast.success(`Email de prueba enviado a ${me.email}`);
+      toast.success(t('admin.campaigns.shared.testSent', { email: me.email }));
     } catch (e) {
-      toast.error('Error al enviar prueba: ' + e.message);
+      toast.error(t('admin.campaigns.shared.testError', { message: e.message }));
     } finally {
       setSendingTest(false);
     }
@@ -164,92 +167,93 @@ export default function CampaignRepescaV1() {
     setProgress({ done: audience.length, total: audience.length });
     setResult({ ok, failed, skippedBlocklist, skippedTag: 0 });
     setSending(false);
-    toast.success(`Campaña completada: ${ok} enviados, ${failed} fallidos`);
+    toast.success(t('admin.campaigns.shared.completed', { ok, failed }));
 
     // Refrescar audiencia para mostrar estado actualizado
     await fetchAudience();
   };
 
   return (
-    <Card className="p-6 border-2 border-blue-100">
+    <div className="card p-6 border-2 border-blue-100">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-          <Send className="w-5 h-5 text-blue-600" />
+        <div className="w-10 h-10 rounded-xl bg-c-accent/10 flex items-center justify-center">
+          <IconSend className="w-5 h-5 text-c-accent" />
         </div>
         <div>
-          <h3 className="font-bold text-gray-900">Repesca Clientes V1</h3>
-          <p className="text-xs text-gray-500">Audiencia: clientes sin onboarding · Tag: {CAMPAIGN_TAG}</p>
+          <h3 className="font-bold text-ink">{t('admin.campaigns.repesca.title')}</h3>
+          <p className="text-xs text-c-muted">{t('admin.campaigns.repesca.subtitle', { tag: CAMPAIGN_TAG })}</p>
         </div>
-        <span className="ml-auto text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-semibold">Lista para enviar</span>
+        <span className="ml-auto badge-warning">{t('admin.campaigns.shared.readyBadge')}</span>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-3 mb-4 text-sm text-gray-700">
-        <p><strong>Asunto:</strong> {CAMPAIGN_SUBJECT}</p>
-        <p className="mt-1"><strong>Audiencia objetivo:</strong> users con user_type = client / cliente / vacío, excluyendo {CAMPAIGN_BLOCKLIST.length} emails bloqueados y quienes ya tengan el tag.</p>
+      <div className="bg-soft rounded-lg p-3 mb-4 text-sm text-ink">
+        <p><strong>{t('admin.campaigns.shared.subjectLabel')}</strong> {CAMPAIGN_SUBJECT}</p>
+        <p className="mt-1"><strong>{t('admin.campaigns.shared.targetAudienceLabel')}</strong> {t('admin.campaigns.repesca.targetAudience', { blocked: CAMPAIGN_BLOCKLIST.length })}</p>
       </div>
 
       {/* Acciones */}
       <div className="flex gap-3 mb-4 flex-wrap">
-        <Button
-          variant="outline"
+        <button
+          type="button"
+          className="btn-secondary btn-sm"
           onClick={fetchAudience}
           disabled={loadingAudience || sending}
-          className="gap-2"
         >
-          <Eye className="w-4 h-4" />
-          {loadingAudience ? 'Calculando...' : 'Previsualizar audiencia'}
-        </Button>
+          <IconEye className="w-4 h-4" />
+          {loadingAudience ? t('admin.campaigns.repesca.calculating') : t('admin.campaigns.shared.previewAudience')}
+        </button>
 
-        <Button
-          variant="outline"
+        <button
+          type="button"
+          className="btn-secondary btn-sm border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-200"
           onClick={handleTestSend}
           disabled={sendingTest || sending}
-          className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50"
         >
-          <FlaskConical className="w-4 h-4" />
-          {sendingTest ? 'Enviando...' : 'Enviarme prueba'}
-        </Button>
+          <IconFlask className="w-4 h-4" />
+          {sendingTest ? t('admin.campaigns.shared.sending') : t('admin.campaigns.repesca.sendMeTest')}
+        </button>
 
         {audience && audience.length > 0 && !sending && (
-          <Button
-            className="gap-2 bg-red-600 hover:bg-red-700 text-white"
+          <button
+            type="button"
+            className="btn-danger-solid btn-sm"
             onClick={() => setShowConfirm(true)}
             disabled={sending}
           >
-            <Send className="w-4 h-4" />
-            Enviar campaña ({audience.length} destinatarios)
-          </Button>
+            <IconSend className="w-4 h-4" />
+            {t('admin.campaigns.repesca.sendAll', { total: audience.length })}
+          </button>
         )}
       </div>
 
       {/* Progreso */}
       {sending && (
-        <div className="mb-4 bg-blue-50 rounded-lg p-4 flex items-center gap-3">
-          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <span className="text-blue-800 font-semibold">
-            Enviando {progress.done} / {progress.total}...
+        <div className="mb-4 bg-c-accent/10 rounded-lg p-4 flex items-center gap-3">
+          <div className="w-4 h-4 border-2 border-c-accent border-t-transparent rounded-full animate-spin" />
+          <span className="text-c-accent font-semibold">
+            {t('admin.campaigns.shared.progress', { done: progress.done, total: progress.total })}
           </span>
         </div>
       )}
 
       {/* Resultado */}
       {result && (
-        <div className="mb-4 bg-green-50 rounded-lg p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="mb-4 bg-success/10 rounded-lg p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-semibold text-green-800">{result.ok} enviados OK</span>
+            <IconCheckCircle className="w-4 h-4 text-success" />
+            <span className="text-sm font-semibold text-success">{t('admin.campaigns.shared.result.sentOk', { ok: result.ok })}</span>
           </div>
           <div className="flex items-center gap-2">
-            <XCircle className="w-4 h-4 text-red-500" />
-            <span className="text-sm font-semibold text-red-700">{result.failed} fallidos</span>
+            <IconError className="w-4 h-4 text-error" />
+            <span className="text-sm font-semibold text-error">{t('admin.campaigns.shared.result.failed', { failed: result.failed })}</span>
           </div>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm font-semibold text-yellow-700">{result.skippedBlocklist} bloqueados</span>
+            <IconWarning className="w-4 h-4 text-warning" />
+            <span className="text-sm font-semibold text-warning">{t('admin.campaigns.shared.result.blocked', { blocked: result.skippedBlocklist })}</span>
           </div>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-gray-400" />
-            <span className="text-sm font-semibold text-gray-600">{result.skippedTag} ya tenían tag</span>
+            <IconWarning className="w-4 h-4 text-c-muted" />
+            <span className="text-sm font-semibold text-c-muted">{t('admin.campaigns.shared.result.alreadyTagged', { tagged: result.skippedTag })}</span>
           </div>
         </div>
       )}
@@ -258,29 +262,29 @@ export default function CampaignRepescaV1() {
       {audience && (
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Users className="w-4 h-4 text-gray-600" />
-            <span className="text-sm font-semibold text-gray-700">
-              Audiencia efectiva: <strong>{audience.length}</strong> destinatarios
+            <IconUsers className="w-4 h-4 text-c-muted" />
+            <span className="text-sm font-semibold text-ink">
+              <Trans i18nKey="admin.campaigns.repesca.effectiveAudience" values={{ total: audience.length }} />
             </span>
           </div>
           {audience.length === 0 ? (
-            <p className="text-sm text-gray-500 italic">Sin destinatarios (todos ya tienen el tag o están bloqueados).</p>
+            <p className="text-sm text-c-muted italic">{t('admin.campaigns.repesca.noRecipients')}</p>
           ) : (
-            <div className="overflow-auto max-h-64 rounded border border-gray-200">
+            <div className="overflow-auto max-h-64 rounded border border-c-border">
               <table className="w-full text-xs">
-                <thead className="bg-gray-50 sticky top-0">
+                <thead className="bg-soft sticky top-0">
                   <tr>
-                    <th className="text-left py-2 px-3 font-semibold text-gray-700">Email</th>
-                    <th className="text-left py-2 px-3 font-semibold text-gray-700">Nombre</th>
-                    <th className="text-left py-2 px-3 font-semibold text-gray-700">user_type</th>
+                    <th className="text-left py-2 px-3 font-semibold text-ink">{t('emailField')}</th>
+                    <th className="text-left py-2 px-3 font-semibold text-ink">{t('admin.campaigns.shared.table.name')}</th>
+                    <th className="text-left py-2 px-3 font-semibold text-ink">{t('admin.campaigns.repesca.table.userType')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {audience.map((u) => (
-                    <tr key={u.id} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="py-2 px-3 text-gray-800">{u.email}</td>
-                      <td className="py-2 px-3 text-gray-600">{u.full_name || '—'}</td>
-                      <td className="py-2 px-3 text-gray-500">{u.user_type || '(vacío)'}</td>
+                    <tr key={u.id} className="border-t border-c-border hover:bg-soft">
+                      <td className="py-2 px-3 text-ink">{u.email}</td>
+                      <td className="py-2 px-3 text-c-muted">{u.full_name || '—'}</td>
+                      <td className="py-2 px-3 text-c-muted">{u.user_type || t('admin.campaigns.repesca.emptyUserType')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -291,31 +295,32 @@ export default function CampaignRepescaV1() {
       )}
 
       {/* Modal confirmación */}
-      {showConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-sm p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">⚠️ Confirmar envío</h3>
-            <p className="text-gray-600 mb-6">
-              Vas a enviar <strong>{audience.length} emails</strong> reales a clientes. Esta acción no se puede deshacer. ¿Confirmar?
-            </p>
-            <div className="flex gap-3">
-              <Button
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                onClick={handleSend}
-              >
-                Sí, enviar ahora
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setShowConfirm(false)}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </Card>
+      <Modal
+        open={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        dismissible={false}
+        title={t('admin.campaigns.repesca.confirm.title')}
+      >
+        <p className="text-c-muted mb-6">
+          <Trans i18nKey="admin.campaigns.repesca.confirm.body" values={{ total: audience?.length || 0 }} />
+        </p>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            className="btn-danger-solid flex-1"
+            onClick={handleSend}
+          >
+            {t('admin.campaigns.shared.confirmSend')}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary flex-1"
+            onClick={() => setShowConfirm(false)}
+          >
+            {t('common.cancel')}
+          </button>
         </div>
-      )}
-    </Card>
+      </Modal>
+    </div>
   );
 }

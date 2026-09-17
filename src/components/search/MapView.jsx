@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Star, MapPin } from "lucide-react";
+import { IconStar, IconMapPin } from "@/components/Icons";
 import L from "leaflet";
 
 // Fix para iconos de leaflet
@@ -111,6 +110,7 @@ Object.entries(CITY_COORDS).forEach(([city, coords]) => {
 });
 
 export default function MapView({ profiles, onProfileClick }) {
+  const { t } = useTranslation();
   const mapRef = useRef(null);
 
   // Función para buscar coordenadas de una ciudad
@@ -165,7 +165,7 @@ export default function MapView({ profiles, onProfileClick }) {
     : [40.4168, -3.7038]; // Madrid por defecto
 
   return (
-    <Card className="h-[500px] relative" style={{ overflow: 'visible' }}>
+    <div className="card h-[500px] relative" style={{ overflow: 'visible' }}>
       <MapContainer
         center={center}
         zoom={6}
@@ -190,31 +190,31 @@ export default function MapView({ profiles, onProfileClick }) {
                 onClick={() => onProfileClick(profile)}
               >
                 <h3 className="font-semibold text-sm mb-1">{profile.business_name}</h3>
-                <div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
-                  <MapPin className="w-3 h-3" />
+                <div className="flex items-center gap-1 text-xs text-c-muted mb-2">
+                  <IconMapPin className="w-3 h-3" />
                   {profile.ciudad}, {profile.provincia}
                 </div>
                 {profile.average_rating > 0 && (
                   <div className="flex items-center gap-1 mb-2">
-                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                    <IconStar className="w-3 h-3 text-star" />
                     <span className="text-xs font-semibold">{profile.average_rating.toFixed(1)}</span>
                   </div>
                 )}
-                <Button
+                <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onProfileClick(profile);
                   }}
-                  size="sm"
-                  className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs"
+                  className="btn-primary btn-sm w-full text-xs"
                 >
-                  Ver perfil
-                </Button>
+                  {t('profile_card.view_profile')}
+                </button>
               </div>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
-    </Card>
+    </div>
   );
 }

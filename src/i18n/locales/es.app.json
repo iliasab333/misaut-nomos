@@ -1,0 +1,1039 @@
+{
+  "dashboard": {
+    "average_rating": "Valoración",
+    "pro": {
+      "greeting": {
+        "morning": "Buenos días",
+        "afternoon": "Buenas tardes",
+        "evening": "Buenas noches"
+      },
+      "errors": {
+        "loadFailed": "No se pudo cargar tu panel",
+        "loadError": "Error al cargar el panel",
+        "refreshError": "Error al cargar"
+      },
+      "banner": {
+        "photo": {
+          "title": "Añade tu foto principal",
+          "body": "Los perfiles con foto reciben hasta 3× más contactos."
+        },
+        "verify": {
+          "body": "Aparecerás como profesional verificado y subirás posiciones.",
+          "cta": "Verificar ahora"
+        },
+        "complete": {
+          "title": "Completa tu perfil",
+          "body": "Un perfil al 100% recibe hasta 5× más contactos.",
+          "cta": "Completar"
+        }
+      },
+      "stats": {
+        "views": "Vistas este mes",
+        "unread": "Mensajes sin leer",
+        "reviewsCount_one": "{{n}} reseña",
+        "reviewsCount_other": "{{n}} reseñas",
+        "noReviews": "Aún sin reseñas",
+        "contactClicks": "Clics de contacto (30 d)"
+      },
+      "completeness": {
+        "photo": "Foto principal",
+        "workPhotos": "Al menos 3 fotos de trabajos",
+        "optimized": "Tu perfil está optimizado. Sigue así.",
+        "eachStep": "Cada paso multiplica las visitas y los contactos.",
+        "editProfile": "Editar mi perfil",
+        "completeProfile": "Completar perfil"
+      },
+      "header": {
+        "defaultName": "Pro",
+        "title": "Tu panel",
+        "greetingLine": "{{greeting}}, <b>{{name}}</b> 👋"
+      },
+      "seoTitle": "Inicio — MisAutónomos",
+      "nextStep": {
+        "label": "Siguiente paso",
+        "dismiss": "Descartar"
+      },
+      "rankingHint": "Cuanto más completo y verificado esté tu perfil, más arriba apareces en las búsquedas y más contactos recibes.",
+      "quickActions": {
+        "title": "Accesos rápidos"
+      }
+    },
+    "completion": {
+      "fullDescription": "Descripción detallada",
+      "title": "Completitud del perfil"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "seoTitle": "Métricas · Admin",
+      "title": "Métricas",
+      "subtitle": "Datos en directo de la plataforma.",
+      "rangeDays": "{{days}}d",
+      "noData": "Sin datos.",
+      "unassigned": "Sin asignar",
+      "stats": {
+        "users": "Usuarios",
+        "activeProfessionals": "Profesionales activos",
+        "subscribers": "Suscriptores",
+        "newUsers_one": "{{count}} nuevo {{days}}d",
+        "newUsers_other": "{{count}} nuevos {{days}}d",
+        "totalCount_one": "{{count}} total",
+        "totalCount_other": "{{count}} totales",
+        "lastDays": "últimos {{days}}d",
+        "profileViews": "Vistas de perfil",
+        "searchAppearances": "Apariciones en búsqueda",
+        "contactClicks": "Clics de contacto",
+        "messagesReceived": "Mensajes recibidos"
+      },
+      "activity": "Actividad ({{days}}d)",
+      "breakdownTitle": "Reparto de profesionales activos",
+      "topCategories": "Top categorías",
+      "topProvinces": "Top provincias",
+      "topCities": "Top ciudades"
+    },
+    "soporte": {
+      "seoTitle": "Soporte · Admin",
+      "searchPlaceholder": "Título o nº ticket…",
+      "filter": {
+        "status": "Estado",
+        "priority": "Prioridad",
+        "type": "Tipo"
+      },
+      "status": {
+        "open": "Abierto",
+        "inProgress": "En curso",
+        "waitingUser": "Esperando user",
+        "resolved": "Resuelto",
+        "closed": "Cerrado"
+      },
+      "priority": {
+        "low": "Baja",
+        "normal": "Normal",
+        "high": "Alta",
+        "urgent": "Urgente"
+      },
+      "type": {
+        "bug": "Bug",
+        "question": "Pregunta",
+        "feature": "Mejora",
+        "other": "Otro"
+      },
+      "emptyState": "Sin tickets.",
+      "untitled": "Sin título",
+      "priorityUpdated": "Prioridad actualizada",
+      "errorGeneric": "Error: {{message}}",
+      "sendError": "No se ha podido enviar: {{message}}",
+      "priorityLabel": "prioridad: {{priority}}",
+      "internalNotesTitle": "Notas internas (no visibles al usuario)",
+      "internalNotePlaceholder": "Nota interna…",
+      "replyPlaceholder": "Responder al usuario…",
+      "internalNote": "Nota interna",
+      "selectTicket": "Selecciona un ticket para ver el detalle."
+    },
+    "emails": {
+      "title": "📧 Centro de Emails",
+      "subtitle": "Gestiona templates, registros y pruebas de emails transaccionales y marketing."
+    },
+    "emailsPanel": {
+      "title": "📧 Gestión de Emails",
+      "campaignsTitle": "Campañas",
+      "test": {
+        "title": "Email de prueba",
+        "emailRequired": "Ingresa un email",
+        "invalidJson": "Variables JSON inválidas",
+        "sent": "Email de prueba enviado",
+        "error": "Error: {{message}}",
+        "recipient": "Destinatario",
+        "recipientPlaceholder": "test@example.com",
+        "variables": "Variables (JSON)",
+        "sending": "Enviando...",
+        "send": "Enviar"
+      },
+      "metrics": {
+        "delivery": "Entrega",
+        "open": "Apertura",
+        "clicks": "Clics",
+        "bounces": "Rebotes"
+      },
+      "periods": {
+        "last7d": "Últimos 7d",
+        "last30d": "Últimos 30d",
+        "last90d": "Últimos 90d",
+        "all": "Todo"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar email...",
+        "allStatuses": "Todos",
+        "allCategories": "Todas",
+        "allTemplates": "Todos",
+        "statusSent": "Enviados",
+        "statusDelivered": "Entregados",
+        "statusOpened": "Abiertos",
+        "statusBounced": "Rechazados",
+        "statusFailed": "Fallidos",
+        "title": "Filtros"
+      },
+      "fields": {
+        "date": "Fecha",
+        "subject": "Asunto",
+        "template": "Template",
+        "category": "Categoría",
+        "status": "Estado",
+        "period": "Período",
+        "actions": "Acciones"
+      },
+      "category": {
+        "transactional": "Transaccional",
+        "transactionalShort": "Trans.",
+        "marketing": "Marketing"
+      },
+      "templates": {
+        "welcome": "Bienvenida",
+        "giftReceived": "Regalo",
+        "reviewRequest": "Reseña",
+        "generic": "Genérico"
+      },
+      "status": {
+        "queued": "Pendiente",
+        "sent": "Enviado",
+        "delivered": "Entregado",
+        "opened": "Abierto",
+        "clicked": "Clic",
+        "bounced": "Rechazado",
+        "spam": "Spam",
+        "failed": "Fallido",
+        "skipped": "Omitido"
+      },
+      "table": {
+        "empty": "No hay emails"
+      },
+      "detail": {
+        "title": "Detalle del Email"
+      }
+    },
+    "campaigns": {
+      "shared": {
+        "userNotFound": "(no encontrado)",
+        "audienceLoadError": "No se pudo cargar la audiencia. {{message}}",
+        "testSent": "Email de prueba enviado a {{email}}",
+        "testError": "Error al enviar prueba: {{message}}",
+        "nothingToSend": "Todos los destinatarios ya tienen el tag. No hay nada que enviar.",
+        "completed": "Campaña completada: {{ok}} enviados, {{failed}} fallidos",
+        "readyBadge": "Lista para enviar",
+        "subjectLabel": "Asunto:",
+        "targetAudienceLabel": "Audiencia objetivo:",
+        "campaignIdLabel": "campaign_id:",
+        "previewAudience": "Previsualizar audiencia",
+        "sending": "Enviando...",
+        "progress": "Enviando {{done}} / {{total}}...",
+        "result": {
+          "sentOk": "{{ok}} enviados OK",
+          "failed": "{{failed}} fallidos",
+          "blocked": "{{blocked}} bloqueados",
+          "alreadyTagged": "{{tagged}} ya tenían tag"
+        },
+        "audienceSummary": "Audiencia total: <strong>{{total}}</strong> · Pendientes: <strong>{{pending}}</strong>",
+        "reload": "🔄 Recargar",
+        "table": {
+          "status": "Estado",
+          "alreadySent": "✓ ya enviado",
+          "pending": "pendiente",
+          "name": "Nombre"
+        },
+        "confirmSend": "Sí, enviar ahora"
+      },
+      "metrics": {
+        "title": "Métricas de campañas",
+        "refreshed": "Datos actualizados",
+        "backfillDone": "Backfill completado: {{updated}} actualizados, {{failed}} errores",
+        "backfillError": "Error en backfill: {{message}}",
+        "selectCampaign": "Seleccionar campaña",
+        "allCampaigns": "Todas",
+        "transactionalOnly": "Transaccionales (sin campaña)",
+        "refresh": "Refrescar",
+        "exportCsv": "Exportar CSV",
+        "syncing": "Sincronizando...",
+        "backfill": "Backfill desde Resend",
+        "kpi": {
+          "totalSent": "Total enviados",
+          "delivered": "Entregados",
+          "opened": "Abiertos",
+          "clicks": "Clicks",
+          "bouncesSpam": "Rebotes / Spam",
+          "ofDelivered": "{{pct}} de entregados",
+          "ofOpened": "{{pct}} de abiertos"
+        },
+        "rates": {
+          "delivery": "Tasa entrega",
+          "open": "Tasa apertura",
+          "click": "Tasa click",
+          "ctr": "CTR (click/apertura)"
+        },
+        "status": {
+          "sent": "Enviado",
+          "delivered": "Entregado",
+          "opened": "Abierto",
+          "clicked": "Clic",
+          "bounced": "Rebotado",
+          "spam": "Spam",
+          "failed": "Fallido",
+          "queued": "Pendiente",
+          "skipped": "Omitido"
+        },
+        "table": {
+          "sentAt": "Enviado",
+          "deliveredAt": "Entregado",
+          "openedAt": "Abierto",
+          "clickedAt": "Clic",
+          "campaign": "Campaign",
+          "resendId": "Resend ID"
+        },
+        "empty": "Sin datos para este filtro",
+        "backfillConfirm": {
+          "title": "Confirmar Backfill",
+          "body": "Esto consultará la API de Resend para cada email con status=\"sent\" y actualizará su estado. Puede tardar varios minutos. ¿Continuar?",
+          "confirm": "Sí, ejecutar"
+        }
+      },
+      "blogPlataformas": {
+        "title": "Blog Plataformas V1",
+        "subtitle": "Audiencia: 11 usuarios hardcoded · Tag: {{tag}}",
+        "targetAudience": "11 autónomos activos. Lista fija hardcoded.",
+        "testToMe": "Test a mí mismo",
+        "sendPending": "Enviar campaña ({{pending}} pendientes)",
+        "confirm": {
+          "title": "⚠️ Confirmar envío Blog",
+          "body": "Vas a enviar <strong>{{pending}} emails de blog</strong> a autónomos. Esta acción no se puede deshacer. ¿Confirmar?"
+        }
+      },
+      "winback": {
+        "title": "Win-back Autónomos V1",
+        "subtitle": "Audiencia: 6 usuarios hardcoded · Tag: {{tag}}",
+        "cancelledBadge": "Cancelada — no enviar",
+        "targetAudience": "6 autónomos que tuvieron suscripción previa. Lista fija hardcoded.",
+        "cancelledNotice": "Campaña cancelada. El envío está bloqueado. Los datos se conservan para histórico.",
+        "sendCancelled": "Enviar campaña (cancelada)",
+        "confirm": {
+          "title": "⚠️ Confirmar envío Win-back",
+          "body": "Vas a enviar <strong>{{pending}} emails Win-back</strong> a autónomos con suscripción previa. Esta acción no se puede deshacer. ¿Confirmar?"
+        }
+      },
+      "repesca": {
+        "title": "Repesca Clientes V1",
+        "subtitle": "Audiencia: clientes sin onboarding · Tag: {{tag}}",
+        "targetAudience": "users con user_type = client / cliente / vacío, excluyendo {{blocked}} emails bloqueados y quienes ya tengan el tag.",
+        "audienceError": "Error al calcular audiencia: {{message}}",
+        "calculating": "Calculando...",
+        "sendMeTest": "Enviarme prueba",
+        "sendAll": "Enviar campaña ({{total}} destinatarios)",
+        "effectiveAudience": "Audiencia efectiva: <strong>{{total}}</strong> destinatarios",
+        "noRecipients": "Sin destinatarios (todos ya tienen el tag o están bloqueados).",
+        "table": {
+          "userType": "user_type"
+        },
+        "emptyUserType": "(vacío)",
+        "confirm": {
+          "title": "⚠️ Confirmar envío",
+          "body": "Vas a enviar <strong>{{total}} emails</strong> reales a clientes. Esta acción no se puede deshacer. ¿Confirmar?"
+        }
+      }
+    },
+    "layout": {
+      "title": "⚙️ Admin Panel",
+      "nav": {
+        "dashboard": "Dashboard",
+        "users": "Usuarios",
+        "outreach": "Outreach WhatsApp",
+        "emails": "Emails",
+        "support": "Soporte",
+        "tickets": "Tickets",
+        "newsletter": "Newsletter",
+        "blog": "Blog",
+        "faq": "FAQ"
+      }
+    },
+    "newsletter": {
+      "status": {
+        "confirmed": "Activo",
+        "pending": "Pendiente",
+        "unsubscribed": "Baja"
+      },
+      "composer": {
+        "missingSubject": "Falta el asunto",
+        "missingBody": "Falta el cuerpo del mensaje",
+        "noAdminEmail": "No detecto tu email de admin para el test",
+        "testSent": "Prueba enviada a {{email}}",
+        "testError": "Error en el envío de prueba: {{message}}",
+        "broadcastDone": "Envío completado: {{sent}}/{{total}}",
+        "sendError": "Error en el envío: {{message}}",
+        "title": "Nueva newsletter",
+        "subtitle": "Asunto + cuerpo HTML. Envío vía edge function <0>send-newsletter</0>.",
+        "subjectLabel": "Asunto",
+        "subjectPlaceholder": "Ej. Nuevas guías para tu fiscalidad de mayo",
+        "bodyLabel": "Cuerpo HTML",
+        "bodyPlaceholder": "<h1>Hola</h1>\n<p>Tu mensaje en HTML…</p>",
+        "unsubscribeHint": "El backend añadirá el enlace de baja a <0>/baja-newsletter?token=…</0> en cada email.",
+        "testResultTitle": "Prueba enviada",
+        "broadcastResultTitle": "Envío completado",
+        "resultSummary": "{{sent}} enviados · {{failed}} fallidos · {{total}} totales",
+        "sendTest": "Enviar prueba a mí ({{email}})",
+        "confirmSend": "Confirmar envío a {{recipients}} suscriptores",
+        "sendAll": "Enviar a suscriptores",
+        "clear": "Vaciar"
+      },
+      "loadError": "Error al cargar: {{message}}",
+      "deleteConfirm": "¿Eliminar este suscriptor?",
+      "deleted": "Suscriptor eliminado",
+      "errorWithMessage": "Error: {{message}}",
+      "csv": {
+        "interest": "Interés",
+        "source": "Fuente",
+        "lastSent": "Último envío"
+      },
+      "table": {
+        "language": "Idioma",
+        "source": "Origen",
+        "signup": "Alta",
+        "status": "Estado",
+        "sent": "Enviados",
+        "last": "Último"
+      },
+      "pageTitle": "Newsletter · Admin",
+      "title": "Newsletter",
+      "subtitle": "Suscriptores y envíos de newsletter.",
+      "refresh": "Actualizar",
+      "metrics": {
+        "active": "Activos",
+        "thisMonth": "Este mes",
+        "unsubscribed": "Bajas",
+        "total": "Totales"
+      },
+      "subscribersHeading": "Suscriptores",
+      "searchPlaceholder": "Email o nombre…",
+      "filters": {
+        "allStatuses": "Todos los estados",
+        "active": "Activos",
+        "pending": "Pendientes",
+        "unsubscribed": "Bajas",
+        "allLanguages": "Idioma: todos",
+        "allSources": "Origen: todos"
+      },
+      "exportCsv": "Exportar CSV",
+      "loading": "Cargando…",
+      "emptyState": "No hay suscriptores que coincidan.",
+      "footerCount": "{{shown}} de {{total}} suscriptores"
+    },
+    "users": {
+      "pagination": {
+        "results": "{{total}} resultados",
+        "page": "Página {{page}} de {{pages}}"
+      },
+      "userEnabled": "Usuario activado",
+      "userDisabled": "Usuario desactivado",
+      "errorWithMessage": "Error: {{message}}",
+      "searchPlaceholder": "Email o nombre…",
+      "searchProPlaceholder": "Nombre profesional…",
+      "filters": {
+        "allRoles": "Todos los roles",
+        "roleAdmin": "Admin",
+        "roleUser": "User",
+        "allTypes": "Tipo: todos",
+        "typeNone": "Sin tipo",
+        "allStatuses": "Estado: todos",
+        "statusActive": "Activos",
+        "statusInactive": "Inactivos",
+        "allVerified": "Verificados: todos",
+        "allCategories": "Categoría: todas",
+        "allCities": "Ciudad: todas"
+      },
+      "loading": "Cargando…",
+      "shownOfTotal": "{{shown}} de {{total}}",
+      "table": {
+        "role": "Rol",
+        "type": "Tipo",
+        "signup": "Alta",
+        "actions": "Acciones",
+        "category": "Categoría",
+        "status": "Estado",
+        "verified": "Verificado",
+        "featured": "Destacado"
+      },
+      "actions": {
+        "enable": "Activar",
+        "disable": "Desactivar",
+        "hide": "Ocultar",
+        "show": "Mostrar",
+        "toggleAdsPlus": "Toggle Ads+",
+        "removeAdsPlus": "Quitar Ads+",
+        "adsPlus": "Ads+"
+      },
+      "status": {
+        "disabled": "Desactivado",
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "emptyState": "Sin resultados.",
+      "profileHidden": "Perfil oculto en búsqueda",
+      "profileVisible": "Perfil visible en búsqueda",
+      "featuredRemoved": "Quitado destacado",
+      "featuredAdded": "Marcado como destacado",
+      "pageTitle": "Usuarios · Admin",
+      "title": "Usuarios",
+      "subtitle": "Cuentas registradas y fichas de profesionales.",
+      "tabs": {
+        "accounts": "Cuentas",
+        "professionals": "Profesionales"
+      }
+    },
+    "tickets": {
+      "status": {
+        "open": "Abierto",
+        "inProgress": "En progreso",
+        "resolved": "Resuelto",
+        "closed": "Cerrado"
+      },
+      "types": {
+        "clientSupport": "Soporte Cliente",
+        "proSupport": "Soporte Autónomo",
+        "complaint": "Reclamo",
+        "jobIssue": "Problema con trabajo",
+        "paymentIssue": "Problema de pago",
+        "generalQuery": "Consulta general"
+      },
+      "noteAdded": "Nota añadida correctamente",
+      "assign": {
+        "adminNotFound": "Admin no encontrado",
+        "success": "Ticket asignado correctamente",
+        "dialogTitle": "Asignar Ticket",
+        "emailLabel": "Email del administrador",
+        "emailPlaceholder": "admin@misautonomos.es"
+      },
+      "accessDenied": {
+        "title": "Acceso denegado",
+        "text": "Solo los administradores pueden acceder a esta página",
+        "backToTickets": "Volver a mis tickets"
+      },
+      "title": "Panel de Administración de Tickets",
+      "subtitle": "Gestiona todos los tickets de soporte · Total: {{total}}",
+      "refresh": "Actualizar",
+      "stats": {
+        "open": "Abiertos",
+        "resolved": "Resueltos",
+        "closed": "Cerrados"
+      },
+      "searchPlaceholder": "Buscar tickets...",
+      "filters": {
+        "statusPlaceholder": "Estado",
+        "allStatuses": "Todos los estados",
+        "typePlaceholder": "Tipo",
+        "allTypes": "Todos los tipos"
+      },
+      "card": {
+        "by": "Por: {{name}}",
+        "internalNote": "Nota interna:"
+      },
+      "actions": {
+        "note": "Nota",
+        "assign": "Asignar"
+      },
+      "noteDialog": {
+        "title": "Añadir Nota Interna",
+        "placeholder": "Escribe una nota solo visible para administradores...",
+        "save": "Guardar Nota"
+      }
+    },
+    "outreach": {
+      "contacted": "Marcado como contactado",
+      "updateError": "Error: {{message}}",
+      "updateErrorFallback": "no se pudo actualizar",
+      "discarded": "Descartado",
+      "eyebrow": "Admin · Outreach",
+      "title": "Outreach WhatsApp",
+      "subtitle": "Cola asistida de leads. El envío es manual vía wa.me — el sistema solo prepara el mensaje y trackea el estado.",
+      "sentToday": "Enviados hoy:",
+      "recommendedCap": "/ {{cap}} recomendados",
+      "reloadQueue": "Recargar cola",
+      "reload": "Recargar",
+      "capReached": {
+        "title": "Para por hoy.",
+        "text": "Has enviado {{sent}} mensajes en las últimas 24h. Aunque sea envío manual, pasar de {{cap}}/día aumenta el riesgo de que WhatsApp marque tu número. Vuelve mañana."
+      },
+      "loadingQueue": "Cargando cola…",
+      "queueError": "Error cargando la cola: {{message}}",
+      "empty": {
+        "title": "No hay leads en cola",
+        "text": "No quedan leads con <0>status = 'nuevo'</0> y teléfono. Ejecuta <1>scripts/seed-leads.mjs</1> para descubrir más, o pulsa \"Recargar\"."
+      },
+      "leadNoName": "Sin nombre",
+      "leadPosition": "Lead {{index}} de {{total}}",
+      "messageLabel": "Mensaje (editable)",
+      "messagePlaceholder": "Mensaje a enviar por WhatsApp…",
+      "templateHint": "Plantilla con {nombre}, {oficio}, {ciudad} ya sustituidos. Edita lo que necesites antes de abrir WhatsApp.",
+      "openWhatsAppAgain": "Abrir WhatsApp de nuevo",
+      "openWhatsApp": "Abrir WhatsApp",
+      "openHint": "Se abre WhatsApp con el mensaje listo. Lo envías tú con un clic, después marcas el resultado abajo.",
+      "markContacted": "Marcar contactado",
+      "discard": "Descartar"
+    },
+    "blog": {
+      "status": {
+        "scheduled": "Programado",
+        "published": "Publicado",
+        "archived": "Archivado"
+      },
+      "categories": {
+        "legalFiscal": "Legal y fiscal",
+        "tools": "Herramientas",
+        "news": "Actualidad"
+      },
+      "deleteConfirm": "¿Eliminar \"{{title}}\"?",
+      "loadingEditor": "Cargando editor...",
+      "title": "Gestión del Blog",
+      "totalCount": "{{count}} artículos en total",
+      "newPost": "Nuevo artículo",
+      "searchPlaceholder": "Buscar por título...",
+      "filters": {
+        "allStatuses": "Todos los estados"
+      },
+      "loadingPosts": "Cargando artículos...",
+      "emptyState": "No hay artículos que coincidan.",
+      "table": {
+        "title": "Título",
+        "category": "Categoría",
+        "status": "Estado",
+        "date": "Fecha",
+        "views": "Vistas",
+        "actions": "Acciones"
+      },
+      "actions": {
+        "duplicate": "Duplicar"
+      }
+    },
+    "faq": {
+      "created": "FAQ creado correctamente",
+      "updated": "FAQ actualizado correctamente",
+      "deleted": "FAQ eliminado correctamente",
+      "requiredFields": "Completa todos los campos obligatorios",
+      "categories": {
+        "platform": "Plataforma",
+        "clients": "Clientes",
+        "professionals": "Autónomos",
+        "security": "Seguridad",
+        "profile": "Perfil",
+        "troubleshooting": "Problemas"
+      },
+      "title": "Gestión de FAQs",
+      "subtitle": "Administra el contenido del centro de ayuda",
+      "newFaq": "Nuevo artículo",
+      "views": "{{count}} vistas",
+      "helpful": "{{count}} útiles",
+      "dialog": {
+        "editTitle": "Editar FAQ",
+        "newTitle": "Nuevo FAQ"
+      },
+      "form": {
+        "category": "Categoría *",
+        "titleEs": "Título (ES) *",
+        "titleEn": "Título (EN) *",
+        "summaryEs": "Resumen (ES)",
+        "summaryEn": "Resumen (EN)",
+        "contentEs": "Contenido (ES) *",
+        "contentEn": "Contenido (EN) *",
+        "tags": "Etiquetas (separadas por comas)",
+        "tagsPlaceholder": "registro, cuenta, contraseña",
+        "order": "Orden"
+      }
+    }
+  },
+  "support": {
+    "status": {
+      "waitingUser": "Esperando tu respuesta"
+    },
+    "types": {
+      "feature": "Sugerencia / mejora"
+    },
+    "create": {
+      "title": "Abrir un ticket",
+      "subtitle": "Soporte humano. Te respondemos en menos de 24 h laborables.",
+      "subjectPlaceholder": "Ej. No me llegan los emails de la newsletter",
+      "descriptionPlaceholder": "Cuéntanos qué pasa, qué esperabas y desde cuándo. Cuanto más concreto, mejor.",
+      "titleRequired": "Pon un título corto",
+      "descriptionTooShort": "Cuéntanos un poco más en la descripción",
+      "notLoggedIn": "No estás logueado. Vuelve a iniciar sesión.",
+      "openError": "No se pudo abrir el ticket",
+      "created": "✓ Ticket creado",
+      "unexpectedError": "Error inesperado al abrir el ticket"
+    },
+    "page": {
+      "seoTitle": "Soporte · MisAutónomos",
+      "subtitle": "Tus tickets y respuestas del equipo.",
+      "openTicket": "Abrir ticket",
+      "searchPlaceholder": "Buscar en tus tickets…",
+      "allStatuses": "Estado: todos",
+      "loading": "Cargando tickets…",
+      "emptyHint": "Cuando abras uno, lo verás aquí y nuestro equipo te responderá por hilo.",
+      "openFirst": "Abrir mi primer ticket",
+      "helpHint": "¿Una duda rápida? También puedes mirar el <help>centro de ayuda</help> o leer las <faq>preguntas frecuentes</faq>."
+    },
+    "ticket": {
+      "noAccess": "No tienes acceso a este ticket",
+      "sendError": "No se ha podido enviar: {{message}}",
+      "seoTitle": "{{title}} · Soporte",
+      "defaultTitle": "Ticket",
+      "backToTickets": "Volver a tus tickets",
+      "openedOn": "Abierto el {{date}}",
+      "waitingTeam": "Esperando respuesta de nuestro equipo. Te avisamos por email.",
+      "replyPlaceholder": "Responde aquí…",
+      "replyHint": "Al responder, este ticket vuelve a la cola del equipo.",
+      "closedHint": "Este ticket está cerrado. Si necesitas algo más, abre uno nuevo desde <support>Soporte</support>."
+    }
+  },
+  "tickets": {
+    "types": {
+      "clientSupport": "Soporte Cliente",
+      "proSupport": "Soporte Autónomo",
+      "complaint": "Reclamo",
+      "jobIssue": "Problema con trabajo",
+      "paymentIssue": "Problema de pago",
+      "generalQuery": "Consulta general"
+    },
+    "toast": {
+      "uploadError": "Error subiendo archivo"
+    },
+    "detail": {
+      "fileN": "Archivo {{index}}"
+    },
+    "create": {
+      "created": "✅ Ticket creado correctamente",
+      "createError": "Error al crear el ticket: {{message}}",
+      "fileAttached": "Archivo adjunto",
+      "fillTitleDescription": "Completa título y descripción",
+      "notAuthenticated": "Error: Usuario no autenticado",
+      "title": "Crear Nuevo Ticket",
+      "titlePlaceholder": "Describe brevemente el problema...",
+      "descriptionLabel": "Descripción *",
+      "descriptionPlaceholder": "Explica detalladamente el problema...",
+      "typeLabel": "Tipo de ticket",
+      "relatedPro": "Relacionado con profesional (opcional)",
+      "tagsLabel": "Etiquetas (separadas por comas)",
+      "tagsPlaceholder": "urgente, pago, problema técnico",
+      "attachments": "Archivos adjuntos",
+      "submit": "Crear Ticket",
+      "titleLabel": "Título *"
+    },
+    "public": {
+      "types": {
+        "clientHelp": "Soy cliente y necesito ayuda",
+        "proHelp": "Soy autónomo y necesito ayuda",
+        "paymentBilling": "Problema con pago/facturación"
+      },
+      "fillAllFields": "Por favor completa todos los campos",
+      "invalidEmail": "Email inválido",
+      "sentToast": "¡Ticket enviado correctamente!",
+      "sendError": "Error al enviar el ticket",
+      "emailSubject": "Ticket recibido: {{number}} - MisAutónomos",
+      "emailBody": "Hola {{name}},\n\nHemos recibido tu consulta. Tu número de ticket es: {{number}}\n\nAsunto: {{title}}\n\nNos pondremos en contacto contigo lo antes posible.\n\nGracias,\nEquipo MisAutónomos",
+      "sentTitle": "¡Ticket enviado!",
+      "sentBody": "Hemos recibido tu consulta. Te responderemos lo antes posible.",
+      "ticketNumber": "Número de ticket:",
+      "saveNumber": "Guarda este número para futuras referencias. Recibirás una confirmación en tu email.",
+      "sendAnother": "Enviar otro ticket",
+      "sendInquiry": "Enviar consulta",
+      "subtitle": "Completa el formulario y nos pondremos en contacto contigo",
+      "nameLabel": "Tu nombre *",
+      "namePlaceholder": "Ej: Juan Pérez",
+      "emailLabel": "Tu email *",
+      "emailPlaceholder": "email@ejemplo.com",
+      "typeLabel": "Tipo de consulta *",
+      "subjectLabel": "Asunto *",
+      "subjectPlaceholder": "Describe brevemente tu consulta",
+      "messageLabel": "Mensaje *",
+      "messagePlaceholder": "Explica tu consulta con el mayor detalle posible...",
+      "consent": "Al enviar, aceptas que procesemos tus datos para responder a tu consulta."
+    },
+    "priority": {
+      "medium": "Media"
+    }
+  },
+  "myProfile": {
+    "toasts": {
+      "onboardingCompleted": "🎉 ¡Enhorabuena! Tu perfil está publicado y visible para clientes.",
+      "personalDataUpdated": "✅ Datos personales actualizados",
+      "professionalProfileUpdated": "✅ Perfil profesional actualizado",
+      "profileNowVisible": "✅ Tu perfil ahora es visible en búsquedas",
+      "profileNowHidden": "🔒 Tu perfil está oculto en búsquedas",
+      "exceedsSize": "{{filename}} supera los 5MB",
+      "photosAdded": "✅ {{number}} foto(s) añadida(s)",
+      "errorUploadingPhotos": "Error al subir las fotos",
+      "photoRemoved": "Foto eliminada",
+      "accountDeleted": "Tu cuenta ha sido eliminada correctamente",
+      "accountDeleteError": "Error al eliminar la cuenta. Contacta con soporte."
+    },
+    "header": {
+      "manageYourInformation": "Gestiona tu información",
+      "viewPublicProfile": "Ver perfil público"
+    },
+    "alerts": {
+      "profileUpdated": "✅ Tu perfil se ha actualizado correctamente."
+    },
+    "cta": {
+      "wantOfferServices": "¿Quieres ofrecer tus servicios?",
+      "becomeProfessionalAppear": "Conviértete en autónomo y aparece en las búsquedas de clientes",
+      "becomeProfessional": "Hazte autónomo"
+    },
+    "photoBanner": {
+      "title": "Añade una foto principal a tu perfil",
+      "body": "Los perfiles con foto reciben <strong>3× más contactos</strong>. Sube una foto en la pestaña <strong>Trabajos</strong> para activarla.",
+      "cta": "Añadir foto"
+    },
+    "tabs": {
+      "myReviews": "Mis reseñas"
+    },
+    "sections": {
+      "label": "Sección"
+    },
+    "personal": {
+      "selectYourCity": "Selecciona tu ciudad",
+      "identityVerification": "Verificación de identidad"
+    },
+    "visibility": {
+      "activeVisible": "Perfil activo y visible para clientes",
+      "pausedHidden": "Tu perfil está pausado. No apareces en búsquedas mientras te tomes un descanso.",
+      "activeAndVisible": "Activo y visible",
+      "clientsCanSee": "Los clientes pueden ver tu perfil",
+      "paused": "Perfil pausado",
+      "usefulIfBusy": "Útil si tienes mucho trabajo y no puedes atender nuevos clientes"
+    },
+    "deleteAccount": {
+      "irreversibleNote": "Esta acción es irreversible y eliminará todos tus datos.",
+      "title": "¿Eliminar tu cuenta?",
+      "body": "Esta acción es permanente e irreversible. Se eliminarán:",
+      "items": {
+        "profile": "Tu perfil profesional completo",
+        "messages": "Todos tus mensajes y conversaciones",
+        "history": "Tu historial de clientes y trabajos",
+        "invoices": "Facturas y presupuestos",
+        "reviews": "Valoraciones recibidas"
+      },
+      "deleting": "Eliminando...",
+      "confirm": "Sí, eliminar mi cuenta"
+    },
+    "reviews": {
+      "title": "Reseñas que he dejado",
+      "empty": "Aún no has dejado ninguna valoración.",
+      "emptyHint": "Cuando tengas conversaciones con autónomos, podrás valorar su trabajo aquí."
+    },
+    "business": {
+      "companyPlaceholder": "Tu Empresa S.L.",
+      "ibanForInvoices": "IBAN (para recibir pagos de facturas)",
+      "ibanPlaceholder": "ES91 2100 0418 4502 0005 1332",
+      "ibanHelp": "Necesario para recibir los pagos de facturas procesadas por MisAutónomos (transferencia en 7 días)"
+    },
+    "contact": {
+      "addPhoneFirstWhatsApp": "Añade un teléfono primero para activar WhatsApp",
+      "requiresPhone": "Requiere teléfono",
+      "addPhoneFirstCall": "Añade un teléfono primero para activar las llamadas",
+      "phoneCall": "Llamada telefónica"
+    },
+    "services": {
+      "title": "Servicios y Descripción",
+      "category": "Categoría de servicio (elige solo una)",
+      "noCategory": "Sin categoría",
+      "specifyServicePlaceholder": "Ej: Instalador de paneles solares, Técnico de fibra óptica, etc.",
+      "description": "Descripción de tus servicios"
+    },
+    "location": {
+      "firstChooseProvince": "Primero elige provincia"
+    },
+    "rates": {
+      "title": "Tarifas y Pagos",
+      "baseRateOptional": "Tarifa base (€/hora) - opcional",
+      "acceptedPaymentMethods": "Formas de pago aceptadas"
+    },
+    "portfolio": {
+      "galleryTitle": "Galería de Fotos",
+      "additionalPhotos": "Fotos adicionales de tus trabajos",
+      "clickToAddPhotos": "Haz clic para añadir fotos ({{current}}/10)",
+      "selectMultiple": "Puedes seleccionar varias a la vez"
+    },
+    "social": {
+      "title": "Redes Sociales",
+      "handlePlaceholder": "@tuperfil",
+      "facebookPlaceholder": "tupagina"
+    }
+  },
+  "onboarding": {
+    "toasts": {
+      "draftRestored": "Hemos recuperado lo que tenías a medias",
+      "referralBonus": "🎁 30 días extra de prueba añadidos gracias a tu código de referido",
+      "published": "Perfil publicado. Ya apareces en búsquedas.",
+      "saveError": "Error al guardar el perfil: {{message}}",
+      "photoAdded": "✅ Foto añadida",
+      "photoUploadError": "Error al subir la foto"
+    },
+    "validation": {
+      "nameMinLength": "El nombre profesional debe tener al menos 2 caracteres",
+      "emailInvalid": "El email no es válido",
+      "phoneMinDigits": "El teléfono debe tener al menos 9 dígitos",
+      "contactMethodRequired": "Selecciona al menos un método de contacto",
+      "categoryRequired": "Selecciona una categoría de servicio",
+      "otherServiceRequired": "Especifica tu servicio cuando seleccionas 'Otro tipo de servicio'",
+      "descriptionMinLength": "La descripción debe tener al menos 20 caracteres",
+      "yearsRequired": "Indica tus años de experiencia (mínimo 0)",
+      "provinceRequired": "Selecciona una provincia",
+      "cityRequired": "Selecciona una ciudad",
+      "paymentRequired": "Selecciona al menos una forma de pago",
+      "termsRequired": "Debes aceptar los Términos y Condiciones",
+      "privacyRequired": "Debes aceptar la Política de Privacidad",
+      "contactConsentRequired": "Debes consentir ser contactado por clientes",
+      "minTwoChars": "Mínimo 2 caracteres",
+      "correct": "Correcto",
+      "invalidEmail": "Email no válido",
+      "minNineDigits": "Mínimo 9 dígitos",
+      "required": "Campo obligatorio"
+    },
+    "header": {
+      "howItWorks": "¿Cómo funciona el sistema?"
+    },
+    "identity": {
+      "subtitle": "Información básica de tu negocio",
+      "nameTooltip": "Tu nombre profesional es lo primero que ven los clientes. Usa tu nombre real o el de tu negocio. Ejemplos: 'Juan Pérez - Fontanero', 'Electricidad Rodríguez', etc.",
+      "nameHint": "Se mostrará así a los clientes",
+      "namePlaceholder": "Ej: Juan Pérez - Electricista",
+      "emailLabel": "Email profesional *",
+      "phoneLabel": "Teléfono *",
+      "contactTooltip": "Elige cómo quieres que los clientes te contacten. El chat interno es obligatorio y seguro. WhatsApp y teléfono son opcionales pero aumentan tus contactos.",
+      "directChatAlwaysOn": "Chat directo (siempre activo)"
+    },
+    "activity": {
+      "title": "Actividad y servicios",
+      "subtitle": "¿Qué servicios ofreces?",
+      "categoryTooltip": "Elige la categoría que mejor describa tu actividad principal. Los clientes buscan por categorías, así que elige la más relevante para aparecer en búsquedas correctas.",
+      "categoryLabel": "Categoría de servicio * (elige solo una)",
+      "otherServiceLabel": "Especifica tu servicio *",
+      "otherServicePlaceholder": "Ej: Instalador de paneles solares...",
+      "yearsLabel": "Años de experiencia *",
+      "descriptionTooltip": "Esta descripción aparecerá en las búsquedas. Sé claro, profesional y menciona tus servicios clave. Buenos ejemplos: 'Electricista con 15 años de experiencia en instalaciones residenciales y comerciales' o 'Fontanero especializado en reparaciones urgentes 24/7'.",
+      "descriptionLabel": "Descripción corta *",
+      "descriptionHint": "Describe brevemente tus servicios (mínimo 20 caracteres)",
+      "descriptionPlaceholder": "Describe brevemente tus servicios...",
+      "minCharsCounter": "{{current}}/{{min}} caracteres mínimos"
+    },
+    "location": {
+      "title": "Ubicación y portfolio",
+      "subtitle": "Completa tu ubicación y añade fotos de tus trabajos",
+      "provinceLabel": "Provincia *",
+      "selectProvince": "Selecciona provincia",
+      "cityLabel": "Ciudad *",
+      "selectCity": "Selecciona ciudad",
+      "selectProvinceFirst": "Primero selecciona provincia",
+      "baseRateLabel": "Tarifa base €/hora (opcional)",
+      "paymentTooltip": "Indica qué formas de pago aceptas. Cuantas más opciones ofrezcas, más fácil será para los clientes contratarte. Bizum y transferencia son las más populares en España.",
+      "paymentMethodsLabel": "Formas de pago aceptadas * (mínimo una)",
+      "bizum": "Bizum"
+    },
+    "portfolio": {
+      "tooltip": "Las fotos de tus trabajos son CLAVE. Los perfiles con más fotos reciben 3x más contactos. Puedes publicar sin foto y añadirla después desde tu perfil.",
+      "title": "Portfolio de trabajos",
+      "recommended": "(recomendado — x3 contactos)",
+      "addPhoto": "Añadir foto ({{current}}/{{max}})",
+      "clickToAddPhoto": "Haz clic para añadir foto ({{current}}/{{max}})",
+      "photosAdded": "{{number}} foto(s) añadida(s)"
+    },
+    "social": {
+      "title": "Redes sociales (opcional)",
+      "instagramPlaceholder": "https://instagram.com/tuperfil",
+      "facebookPlaceholder": "https://facebook.com/tupagina",
+      "websitePlaceholder": "https://tuweb.com",
+      "tiktokPlaceholder": "https://tiktok.com/@tuperfil"
+    },
+    "consents": {
+      "title": "Consentimientos legales",
+      "acceptAll": "Aceptar todo",
+      "acceptTerms": "Acepto los <terms>Términos y Condiciones</terms> de uso de la plataforma",
+      "acceptPrivacy": "Acepto la <privacy>Política de Privacidad</privacy> y tratamiento de datos",
+      "allowContact": "Consiento en que los clientes puedan contactarme a través de la plataforma"
+    },
+    "nav": {
+      "publishing": "Publicando...",
+      "publish": "Publicar perfil"
+    },
+    "client": {
+      "welcomeEmailSubject": "¡Bienvenido a MisAutónomos!",
+      "welcomeEmailBody": "Hola {{name}}, tu cuenta ha sido creada. ¡Ya puedes buscar profesionales!",
+      "errors": {
+        "createFailed": "Error al crear la cuenta: {{message}}"
+      },
+      "validation": {
+        "nameRequired": "Introduce tu nombre",
+        "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+        "termsRequired": "Debes aceptar los términos"
+      },
+      "seoTitle": "Crea tu cuenta gratis - MisAutónomos",
+      "seoDescription": "Encuentra y contacta autónomos en segundos. Registro gratuito.",
+      "title": "Crea tu cuenta",
+      "subtitle": "Contacta con autónomos verificados en segundos.",
+      "passwordPlaceholder": "Mínimo 6 caracteres",
+      "hidePassword": "Ocultar contraseña",
+      "showPassword": "Mostrar contraseña",
+      "acceptTerms": "Acepto los <terms>Términos</terms> y la <privacy>Política de Privacidad</privacy>",
+      "newsletterNotice": "Al crear tu cuenta aceptarás recibir nuestra newsletter (1-2 emails al mes). Puedes darte de baja en cualquier momento.",
+      "creating": "Creando cuenta...",
+      "createAccount": "Crear cuenta",
+      "alreadyHaveAccount": "¿Ya tienes cuenta? <login>Inicia sesión</login>"
+    },
+    "userType": {
+      "loading": "Cargando"
+    },
+    "preview": {
+      "title": "👁️ Vista previa de tu perfil",
+      "liveBadge": "Live Preview",
+      "namePlaceholder": "Tu nombre profesional",
+      "yearsExp": "{{years}} años exp.",
+      "footer": "Así verán los clientes tu perfil 👆"
+    },
+    "tutorial": {
+      "steps": {
+        "messages": {
+          "title": "📨 Recibirás mensajes de clientes",
+          "description": "Los clientes interesados te escribirán directamente por el chat interno de la plataforma.",
+          "tip": "💡 Responde rápido para mejorar tu reputación"
+        },
+        "quotes": {
+          "title": "📋 Sistema de presupuestos integrado",
+          "description": "Los clientes pueden solicitar presupuestos formales. Tú respondes con detalles y el cliente acepta o rechaza.",
+          "tip": "💡 Presupuestos detallados = más confianza"
+        },
+        "jobs": {
+          "title": "🗓️ Gestiona tus trabajos",
+          "description": "Cuando un cliente acepta, puedes gestionar el trabajo en tu dashboard, marcar progreso y finalizarlo.",
+          "tip": "💡 Marca trabajos completados para pedir reseñas"
+        },
+        "reviews": {
+          "title": "⭐ Las reseñas mejoran tu visibilidad",
+          "description": "Anima a tus clientes satisfechos a dejar reseñas. Las buenas valoraciones te posicionan mejor en búsquedas.",
+          "tip": "💡 Más reseñas = más clientes nuevos"
+        }
+      },
+      "title": "¿Cómo funciona MisAutónomos?",
+      "done": "¡Entendido!"
+    },
+    "checklist": {
+      "servicesTitle": "Servicios y experiencia",
+      "categorySelected": "Categoría seleccionada",
+      "descriptionComplete": "Descripción completa",
+      "consents": "Consentimientos",
+      "progressTitle": "✓ Progreso del paso actual",
+      "completeAllFields": "Completa todos los campos para continuar",
+      "nifCifLabel": "NIF/CIF",
+      "businessNameLabel": "Nombre profesional",
+      "workPhotosLabel": "Fotos de trabajos"
+    },
+    "progress": {
+      "step": "Paso {{current}} de {{total}}"
+    },
+    "success": {
+      "stepCompleteProfile": "Completa tu perfil profesional"
+    }
+  }
+}

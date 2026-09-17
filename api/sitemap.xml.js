@@ -19,7 +19,6 @@ const SUPABASE_ANON_KEY =
 const STATIC_PATHS = [
   { path: '/', priority: 1.0, changefreq: 'daily' },
   { path: '/buscar', priority: 0.95, changefreq: 'daily' },
-  { path: '/precios', priority: 0.85, changefreq: 'monthly' },
   { path: '/preguntas-frecuentes', priority: 0.7, changefreq: 'monthly' },
   { path: '/ayuda', priority: 0.6, changefreq: 'monthly' },
   { path: '/blog', priority: 0.7, changefreq: 'weekly' },

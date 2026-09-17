@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { IconStarOutline, IconSuccess, IconSpinner, IconAlert } from '@/components/Icons';
 import SEOHead from '@/components/seo/SEOHead';
-import InitialsAvatar from '@/components/ui/InitialsAvatar';
+import InitialsAvatar from '@/components/InitialsAvatar';
 import { optimizeSupabaseImage } from '@/lib/supabaseImage';
 import { getReviewRequest, submitReview } from '@/lib/reviewRpc';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
+import { useTranslation } from 'react-i18next';
 
 const NAVY = '#00255C';
 const GOLD = '#F5C13D';
@@ -18,6 +19,7 @@ const GOLD = '#F5C13D';
 export default function LeaveReviewPage() {
   const { token: paramToken } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState(null);
@@ -66,7 +68,7 @@ export default function LeaveReviewPage() {
   const onSubmit = async (e) => {
     e?.preventDefault?.();
     if (!rating) {
-      toast.error('Pon una nota global');
+      toast.error(t('reviews.leave.ratingRequired'));
       return;
     }
     setSubmitting(true);
@@ -86,7 +88,7 @@ export default function LeaveReviewPage() {
         if (r === 'ya_valorado' || r === 'token_caducado' || r === 'no_existe') {
           setReason(r);
         } else {
-          toast.error('No se ha podido enviar la valoración.');
+          toast.error(t('reviews.leave.submitError'));
         }
         return;
       }
@@ -96,7 +98,7 @@ export default function LeaveReviewPage() {
       if (m.includes('ya_valorado')) setReason('ya_valorado');
       else if (m.includes('caducado') || m.includes('expir')) setReason('token_caducado');
       else if (m.includes('no_existe') || m.includes('invalid')) setReason('no_existe');
-      else toast.error(e?.message || 'Error al enviar');
+      else toast.error(e?.message || t('reviews.leave.sendError'));
     } finally {
       setSubmitting(false);
     }
@@ -105,16 +107,16 @@ export default function LeaveReviewPage() {
   const photo = info?.photo
     ? optimizeSupabaseImage(info.photo, { width: 200, height: 200 })
     : null;
-  const businessName = info?.business_name || 'el profesional';
+  const businessName = info?.business_name || t('reviews.leave.defaultProfessional');
 
   return (
     <>
-      <SEOHead title="Dejar una reseña — MisAutónomos" noindex />
-      <div className="min-h-screen bg-slate-50">
+      <SEOHead title={t('reviews.leave.seoTitle')} noindex />
+      <div className="min-h-screen bg-soft">
         <div className="max-w-md mx-auto px-4 sm:px-6 py-6 pb-24">
           {loading ? (
             <div className="flex items-center justify-center py-24">
-              <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+              <IconSpinner className="w-6 h-6 animate-spin text-c-muted" />
             </div>
           ) : reason ? (
             <InvalidTokenView
@@ -135,68 +137,68 @@ export default function LeaveReviewPage() {
                     alt={businessName}
                     width="72"
                     height="72"
-                    className="w-[72px] h-[72px] rounded-full object-cover border border-slate-200"
+                    className="w-[72px] h-[72px] rounded-full object-cover border border-c-border"
                     loading="eager"
                   />
                 ) : (
                   <InitialsAvatar name={businessName} size={72} />
                 )}
-                <h1 className="text-xl font-extrabold text-slate-900 mt-3">
-                  Valora a {businessName}
+                <h1 className="text-xl font-extrabold text-ink mt-3">
+                  {t('reviews.leave.title', { name: businessName })}
                 </h1>
-                <p className="text-sm text-slate-500 mt-1">
-                  Tu opinión ayuda a otras personas. Tarda menos de un minuto.
+                <p className="text-sm text-c-muted mt-1">
+                  {t('reviews.leave.subtitle')}
                 </p>
               </div>
 
               <form onSubmit={onSubmit} className="mt-6 space-y-5">
-                <Field label="Tu valoración" required>
+                <Field label={t('reviews.leave.ratingLabel')} required>
                   <RatingRow value={rating} onChange={setRating} big />
                 </Field>
 
-                <Field label="Comentario (opcional)">
+                <Field label={t('reviews.leave.commentLabel')}>
                   <textarea
                     rows={4}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder="Cuenta cómo fue la experiencia."
-                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                    placeholder={t('reviews.leave.commentPlaceholder')}
+                    className="w-full px-3 py-2 text-sm border border-c-border rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                   />
                 </Field>
 
-                <Field label="Tu nombre (opcional)">
+                <Field label={t('reviews.leave.nameLabel')}>
                   <input
                     type="text"
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
-                    placeholder="Cómo aparecerá tu valoración"
+                    placeholder={t('reviews.leave.namePlaceholder')}
                     autoComplete="name"
-                    className="w-full h-10 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                    className="w-full h-10 px-3 text-sm border border-c-border rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
                   />
                 </Field>
 
-                <details className="rounded-xl border border-slate-200 bg-white p-3">
-                  <summary className="text-sm font-semibold text-slate-700 cursor-pointer select-none">
-                    Detallar valoración (opcional)
+                <details className="rounded-xl border border-c-border bg-surface p-3">
+                  <summary className="text-sm font-semibold text-ink cursor-pointer select-none">
+                    {t('reviews.leave.detailsSummary')}
                   </summary>
                   <div className="mt-3 space-y-3">
                     <SubratingRow
-                      label="Comunicación"
+                      label={t('reviews.criteria.communication')}
                       value={sub.comunicacion}
                       onChange={(v) => setSub((s) => ({ ...s, comunicacion: v }))}
                     />
                     <SubratingRow
-                      label="Calidad"
+                      label={t('reviews.criteria.quality')}
                       value={sub.calidad}
                       onChange={(v) => setSub((s) => ({ ...s, calidad: v }))}
                     />
                     <SubratingRow
-                      label="Rapidez"
+                      label={t('reviews.criteria.speed')}
                       value={sub.rapidez}
                       onChange={(v) => setSub((s) => ({ ...s, rapidez: v }))}
                     />
                     <SubratingRow
-                      label="Precio / Satisfacción"
+                      label={t('reviews.criteria.priceSatisfaction')}
                       value={sub.precio_satisfaccion}
                       onChange={(v) => setSub((s) => ({ ...s, precio_satisfaccion: v }))}
                     />
@@ -211,10 +213,10 @@ export default function LeaveReviewPage() {
                 >
                   {submitting ? (
                     <span className="inline-flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" /> Enviando...
+                      <IconSpinner className="w-4 h-4 animate-spin" /> {t('reviews.form.sending')}
                     </span>
                   ) : (
-                    'Enviar valoración'
+                    t('reviews.form.submit')
                   )}
                 </button>
               </form>
@@ -229,8 +231,8 @@ export default function LeaveReviewPage() {
 function Field({ label, required, children }) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">
-        {label} {required && <span className="text-rose-500">*</span>}
+      <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">
+        {label} {required && <span className="text-error">*</span>}
       </span>
       <div className="mt-1.5">{children}</div>
     </label>
@@ -238,6 +240,7 @@ function Field({ label, required, children }) {
 }
 
 function RatingRow({ value, onChange, big }) {
+  const { t } = useTranslation();
   return (
     <div className="inline-flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((n) => {
@@ -249,12 +252,12 @@ function RatingRow({ value, onChange, big }) {
             key={n}
             onClick={() => onChange(n)}
             className="p-1 -m-1 rounded"
-            aria-label={`${n} estrellas`}
+            aria-label={t('reviews.leave.starsAria', { count: n })}
           >
-            <Star
+            <IconStarOutline
               width={size}
               height={size}
-              className={active ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}
+              className={active ? 'fill-star text-star' : 'text-c-border'}
             />
           </button>
         );
@@ -266,70 +269,72 @@ function RatingRow({ value, onChange, big }) {
 function SubratingRow({ label, value, onChange }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-sm text-slate-700">{label}</span>
+      <span className="text-sm text-ink">{label}</span>
       <RatingRow value={value} onChange={onChange} />
     </div>
   );
 }
 
 function InvalidTokenView({ reason, onHome }) {
+  const { t } = useTranslation();
   const map = {
     ya_usado: {
-      title: 'Esta valoración ya se envió',
-      body: 'Este enlace de valoración solo puede usarse una vez. Si tienes que volver a opinar, pídele a tu profesional uno nuevo.',
+      title: t('reviews.invalid.alreadyUsedTitle'),
+      body: t('reviews.invalid.alreadyUsedBody'),
     },
     ya_valorado: {
-      title: 'Ya has enviado tu valoración',
-      body: 'Este enlace ya ha recibido una reseña. Gracias por tu opinión.',
+      title: t('reviews.invalid.alreadyReviewedTitle'),
+      body: t('reviews.invalid.alreadyReviewedBody'),
     },
     caducado: {
-      title: 'El enlace ha caducado',
-      body: 'Por seguridad, los enlaces de valoración tienen una duración limitada. Pídele al profesional uno nuevo.',
+      title: t('reviews.invalid.expiredTitle'),
+      body: t('reviews.invalid.expiredBody'),
     },
     token_caducado: {
-      title: 'El enlace ha caducado',
-      body: 'Por seguridad, los enlaces de valoración tienen una duración limitada. Pídele al profesional uno nuevo.',
+      title: t('reviews.invalid.expiredTitle'),
+      body: t('reviews.invalid.expiredBody'),
     },
     no_existe: {
-      title: 'Enlace no encontrado',
-      body: 'No hemos podido reconocer este enlace. Revisa que esté completo o pide otro al profesional.',
+      title: t('reviews.invalid.notFoundTitle'),
+      body: t('reviews.invalid.notFoundBody'),
     },
   };
   const v = map[reason] || map.no_existe;
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+    <div className="rounded-2xl border border-c-border bg-surface p-6 text-center">
       <div
         className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
         style={{ background: '#FEF3C7', color: '#92400E' }}
       >
-        <AlertCircle className="w-6 h-6" />
+        <IconAlert className="w-6 h-6" />
       </div>
-      <h1 className="font-semibold text-slate-900 mt-3">{v.title}</h1>
-      <p className="text-sm text-slate-600 mt-1">{v.body}</p>
+      <h1 className="font-semibold text-ink mt-3">{v.title}</h1>
+      <p className="text-sm text-c-muted mt-1">{v.body}</p>
       <button
         type="button"
         onClick={onHome}
         className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg text-sm font-semibold text-white"
         style={{ background: NAVY }}
       >
-        Ir a MisAutónomos
+        {t('reviews.leave.goHome')}
       </button>
     </div>
   );
 }
 
 function SubmittedView({ businessName, onHome }) {
+  const { t } = useTranslation();
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
+    <div className="rounded-2xl border border-c-border bg-surface p-6 text-center">
       <div
         className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center"
         style={{ background: 'rgba(0,37,92,0.06)' }}
       >
-        <CheckCircle2 className="w-6 h-6" style={{ color: NAVY }} />
+        <IconSuccess className="w-6 h-6" style={{ color: NAVY }} />
       </div>
-      <h1 className="font-semibold text-slate-900 mt-3">¡Gracias por tu reseña!</h1>
-      <p className="text-sm text-slate-600 mt-1">
-        Tu opinión sobre {businessName} ya está publicada.
+      <h1 className="font-semibold text-ink mt-3">{t('reviews.leave.thanksTitle')}</h1>
+      <p className="text-sm text-c-muted mt-1">
+        {t('reviews.leave.thanksBody', { name: businessName })}
       </p>
       <button
         type="button"
@@ -337,7 +342,7 @@ function SubmittedView({ businessName, onHome }) {
         className="mt-5 inline-flex items-center justify-center h-10 px-5 rounded-lg text-sm font-semibold text-white"
         style={{ background: NAVY }}
       >
-        Ir a MisAutónomos
+        {t('reviews.leave.goHome')}
       </button>
     </div>
   );

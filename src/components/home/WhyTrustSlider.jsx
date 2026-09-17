@@ -1,68 +1,39 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { IconChevronLeft, IconChevronRight } from "@/components/Icons";
+import { useTranslation } from "react-i18next";
 
-const SLIDES = [
-  {
-    emoji: "🏆",
-    title: "Solo los mejores",
-    desc: "Máximo 10 autónomos por ciudad y categoría. Seleccionamos solo a los profesionales más valorados para que siempre encuentres a alguien de confianza.",
-    from: "#1e3a8a",
-    to: "#2563eb",
-    accent: "#93c5fd",
-  },
-  {
-    emoji: "📣",
-    title: "Les promocionamos nosotros",
-    desc: "Invertimos en publicidad en Instagram, Facebook y Google para que los autónomos de la plataforma lleguen a más clientes. Sin coste para ellos.",
-    from: "#7c3aed",
-    to: "#a855f7",
-    accent: "#e9d5ff",
-  },
-  {
-    emoji: "⭐",
-    title: "Reseñas verificadas",
-    desc: "Solo clientes reales que han contactado al profesional pueden dejar reseñas. No hay opiniones falsas.",
-    from: "#d97706",
-    to: "#f59e0b",
-    accent: "#fef3c7",
-  },
-  {
-    emoji: "🚫",
-    title: "Tolerancia cero con malos profesionales",
-    desc: "Si un autónomo acumula 3 o más reseñas negativas verificadas, es expulsado automáticamente de la plataforma. Tu tiempo vale.",
-    from: "#dc2626",
-    to: "#ef4444",
-    accent: "#fee2e2",
-  },
-  {
-    emoji: "🔒",
-    title: "Sin compromisos",
-    desc: "Registrarte es gratis. Sin tarjeta, sin letra pequeña, sin suscripciones. Si no funciona para ti, te vas sin coste.",
-    from: "#065f46",
-    to: "#059669",
-    accent: "#d1fae5",
-  },
-  {
-    emoji: "📋",
-    title: "Perfiles completos y transparentes",
-    desc: "Cada autónomo muestra su zona de trabajo, precios orientativos, fotos de sus trabajos y años de experiencia.",
-    from: "#0e7490",
-    to: "#06b6d4",
-    accent: "#cffafe",
-  },
-];
+// Animación de entrada del slide: CSS, no texto.
+const FADE_IN_KEYFRAMES = `
+  @keyframes trustFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+`;
 
 export default function WhyTrustSlider() {
+  const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  // Antes constante de módulo (SLIDES): vive aquí para que se retraduzca al
+  // cambiar de idioma. Colores y emojis no son texto y se quedan tal cual.
+  const slides = [
+    { emoji: "🏆", title: t('home.whyTrust.slides.bestOnly.title'), desc: t('home.whyTrust.slides.bestOnly.desc'), from: "#1e3a8a", to: "#2563eb", accent: "#93c5fd" },
+    { emoji: "📣", title: t('home.whyTrust.slides.promotion.title'), desc: t('home.whyTrust.slides.promotion.desc'), from: "#7c3aed", to: "#a855f7", accent: "#e9d5ff" },
+    { emoji: "⭐", title: t('home.whyTrust.slides.verifiedReviews.title'), desc: t('home.whyTrust.slides.verifiedReviews.desc'), from: "#d97706", to: "#f59e0b", accent: "#fef3c7" },
+    { emoji: "🚫", title: t('home.whyTrust.slides.zeroTolerance.title'), desc: t('home.whyTrust.slides.zeroTolerance.desc'), from: "#dc2626", to: "#ef4444", accent: "#fee2e2" },
+    { emoji: "🔒", title: t('home.whyTrust.slides.noCommitment.title'), desc: t('home.whyTrust.slides.noCommitment.desc'), from: "#065f46", to: "#059669", accent: "#d1fae5" },
+    { emoji: "📋", title: t('home.whyTrust.slides.completeProfiles.title'), desc: t('home.whyTrust.slides.completeProfiles.desc'), from: "#0e7490", to: "#06b6d4", accent: "#cffafe" },
+  ];
+  const slideCount = slides.length;
+
   const next = useCallback(() => {
-    setCurrent((c) => (c + 1) % SLIDES.length);
-  }, []);
+    setCurrent((c) => (c + 1) % slideCount);
+  }, [slideCount]);
 
   const prev = useCallback(() => {
-    setCurrent((c) => (c - 1 + SLIDES.length) % SLIDES.length);
-  }, []);
+    setCurrent((c) => (c - 1 + slideCount) % slideCount);
+  }, [slideCount]);
 
   useEffect(() => {
     if (isPaused) return;
@@ -70,17 +41,17 @@ export default function WhyTrustSlider() {
     return () => clearInterval(id);
   }, [next, isPaused]);
 
-  const slide = SLIDES[current];
+  const slide = slides[current];
 
   return (
-    <section className="py-14 md:py-20 bg-white" style={{ overflow: "hidden" }}>
+    <section className="py-14 md:py-20 bg-surface" style={{ overflow: "hidden" }}>
       <div className="max-w-4xl mx-auto px-4">
         {/* Título */}
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-            ¿Por qué confiar en MisAutónomos?
+          <h2 className="text-2xl md:text-4xl font-extrabold text-ink tracking-tight">
+            {t('home.whyTrust.title')}
           </h2>
-          <p className="text-gray-500 mt-2 text-base">Lo que nos hace diferentes</p>
+          <p className="text-c-muted mt-2 text-base">{t('home.whyTrust.subtitle')}</p>
         </div>
 
         {/* Slider */}
@@ -115,19 +86,19 @@ export default function WhyTrustSlider() {
           {/* Flechas */}
           <button
             onClick={prev}
-            aria-label="Anterior"
+            aria-label={t('home.whyTrust.previous')}
             className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center transition-all backdrop-blur-sm"
             style={{ touchAction: "manipulation" }}
           >
-            <ChevronLeft className="w-5 h-5 text-white" />
+            <IconChevronLeft className="w-5 h-5 text-white" />
           </button>
           <button
             onClick={next}
-            aria-label="Siguiente"
+            aria-label={t('common.next')}
             className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center transition-all backdrop-blur-sm"
             style={{ touchAction: "manipulation" }}
           >
-            <ChevronRight className="w-5 h-5 text-white" />
+            <IconChevronRight className="w-5 h-5 text-white" />
           </button>
 
           {/* Decoración de fondo */}
@@ -159,11 +130,11 @@ export default function WhyTrustSlider() {
 
         {/* Dots */}
         <div className="flex items-center justify-center gap-2 mt-6">
-          {SLIDES.map((s, i) => (
+          {slides.map((s, i) => (
             <button
               key={i}
               onClick={() => { setCurrent(i); setIsPaused(true); setTimeout(() => setIsPaused(false), 6000); }}
-              aria-label={`Ir al slide ${i + 1}`}
+              aria-label={t('home.whyTrust.goToSlide', { number: i + 1 })}
               className="transition-all duration-300 rounded-full"
               style={{
                 width: i === current ? "28px" : "10px",
@@ -175,17 +146,12 @@ export default function WhyTrustSlider() {
         </div>
 
         {/* Slide counter */}
-        <p className="text-center text-gray-400 text-xs mt-3">
-          {current + 1} / {SLIDES.length}
+        <p className="text-center text-c-muted text-xs mt-3">
+          {current + 1} / {slides.length}
         </p>
       </div>
 
-      <style>{`
-        @keyframes trustFadeIn {
-          from { opacity: 0; transform: translateY(12px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      <style>{FADE_IN_KEYFRAMES}</style>
     </section>
   );
 }

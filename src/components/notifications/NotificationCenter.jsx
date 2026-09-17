@@ -1,27 +1,45 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Bell, Check, CheckCheck, Trash2, Mail, Star, AlertCircle, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
+  IconBell,
+  IconCheckCheck,
+  IconTrash,
+  IconMail,
+  IconStarOutline,
+  IconAlert,
+  IconInfo,
+} from "@/components/Icons";
+import { SkeletonList, EmptyState } from "@/components/ListStates";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 export default function NotificationCenter({ user }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // El DropdownMenu de Radix cerraba con click fuera y con Escape; aquí lo
+  // hace este efecto. `mousedown` y no `click`: un arrastre que empieza
+  // dentro del panel y suelta fuera no debe cerrarlo.
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onDown = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setIsOpen(false);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') setIsOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [isOpen]);
 
   // ✅ Query para cargar notificaciones
   const { data: notifications = [], isLoading } = useQuery({
@@ -62,7 +80,7 @@ export default function NotificationCenter({ user }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Todas las notificaciones marcadas como leídas');
+      toast.success(t('notifications.center.allRead'));
     }
   });
 
@@ -73,7 +91,7 @@ export default function NotificationCenter({ user }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Notificación eliminada');
+      toast.success(t('notifications.toast.deleted'));
     }
   });
 
@@ -97,14 +115,18 @@ export default function NotificationCenter({ user }) {
       }
       // Corregir rutas legacy que ya no existen
       const LEGACY_MAP = {
-        '/Messages': '/mensajes',
-        '/messages': '/mensajes',
+        // El chat interno se retiró; una notificación antigua que apuntase
+        // ahí llevaría a un 404. Mejor la portada que un callejón.
+        '/Messages': '/',
+        '/messages': '/',
         '/Notifications': '/notificaciones',
         '/notifications': '/notificaciones',
         '/Dashboard': '/dashboard',
         '/ProfessionalDashboard': '/dashboard',
-        '/SubscriptionManagement': '/suscripcion',
-        '/subscriptionmanagement': '/suscripcion',
+        // Las suscripciones se retiraron; una notificación antigua que
+        // apuntase ahí llevaría a un 404.
+        '/SubscriptionManagement': '/',
+        '/subscriptionmanagement': '/',
         '/MyProfile': '/mi-perfil',
         '/myprofile': '/mi-perfil',
       };
@@ -120,142 +142,145 @@ export default function NotificationCenter({ user }) {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'new_message':
-        return <Mail className="w-4 h-4 text-blue-600" />;
+        return <IconMail className="w-4 h-4 text-c-accent" />;
       case 'new_review':
-        return <Star className="w-4 h-4 text-amber-500" />;
+        return <IconStarOutline className="w-4 h-4 text-star" />;
       case 'review_reminder':
-        return <Star className="w-4 h-4 text-amber-500" />;
+        return <IconStarOutline className="w-4 h-4 text-star" />;
       case 'subscription_expiring':
-        return <AlertCircle className="w-4 h-4 text-orange-500" />;
+        return <IconAlert className="w-4 h-4 text-warning" />;
       case 'subscription_expired':
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
+        return <IconAlert className="w-4 h-4 text-error" />;
       case 'profile_approved':
-        return <CheckCheck className="w-4 h-4 text-green-500" />;
+        return <IconCheckCheck className="w-4 h-4 text-success" />;
       case 'system_update':
-        return <Info className="w-4 h-4 text-blue-500" />;
+        return <IconInfo className="w-4 h-4 text-c-accent" />;
       default:
-        return <Bell className="w-4 h-4 text-gray-500" />;
+        return <IconBell className="w-4 h-4 text-c-muted" />;
     }
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', background: 'none', border: 'none', padding: 0 }}
-          className="relative w-14 h-14 flex items-center justify-center rounded-lg text-gray-700 active:bg-gray-100"
-          aria-label="Notificaciones"
-        >
-          <Bell className="w-5 h-5 pointer-events-none" />
-          {unreadCount > 0 && (
-            <span className="absolute top-2 right-2 h-4 w-4 flex items-center justify-center bg-red-500 text-white text-[9px] font-bold rounded-full pointer-events-none">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
-        </button>
-      </DropdownMenuTrigger>
-      
-      <DropdownMenuContent align="end" className="w-80 md:w-96">
-        <DropdownMenuLabel className="flex items-center justify-between">
-          <span className="text-base font-bold">Notificaciones</span>
-          {unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => markAllAsReadMutation.mutate()}
-              disabled={markAllAsReadMutation.isPending}
-              className="h-7 text-xs"
-            >
-              <CheckCheck className="w-3 h-3 mr-1" />
-              Marcar todas como leídas
-            </Button>
-          )}
-        </DropdownMenuLabel>
-        
-        <DropdownMenuSeparator />
-        
-        <ScrollArea className="h-[400px]">
-          {isLoading ? (
-            <div className="p-8 text-center text-gray-500">
-              <p className="text-sm">Cargando notificaciones...</p>
-            </div>
-          ) : notifications.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p className="text-sm font-medium">Sin notificaciones</p>
-              <p className="text-xs">Te avisaremos cuando haya novedades</p>
-            </div>
-          ) : (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${
-                  !notification.is_read ? 'bg-blue-50' : ''
-                }`}
-                onClick={() => handleNotificationClick(notification)}
+    <div className="relative" ref={menuRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        aria-expanded={isOpen}
+        style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', background: 'none', border: 'none', padding: 0 }}
+        className="relative w-14 h-14 flex items-center justify-center rounded-lg text-ink active:bg-soft"
+        aria-label={t('notifications.title')}
+      >
+        <IconBell className="w-5 h-5 pointer-events-none" />
+        {unreadCount > 0 && (
+          <span className="absolute top-2 right-2 h-4 w-4 flex items-center justify-center bg-error text-white text-[9px] font-bold rounded-full pointer-events-none">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-1 z-50 w-80 md:w-96 card shadow-lg">
+          <div className="flex items-center justify-between gap-2 px-4 py-2">
+            <span className="text-base font-bold text-ink">{t('notifications.title')}</span>
+            {unreadCount > 0 && (
+              <button
+                type="button"
+                onClick={() => markAllAsReadMutation.mutate()}
+                disabled={markAllAsReadMutation.isPending}
+                className="btn-ghost btn-sm text-xs"
               >
-                <div className="flex items-start gap-3">
-                  <div className="mt-1">
-                    {getNotificationIcon(notification.type)}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className={`text-sm font-semibold ${!notification.is_read ? 'text-gray-900' : 'text-gray-700'}`}>
-                        {notification.title}
-                      </p>
-                      {!notification.is_read && (
-                        <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
-                      )}
+                <IconCheckCheck className="w-3 h-3" />
+                {t('notifications.center.markAllRead')}
+              </button>
+            )}
+          </div>
+
+          <hr className="separator" />
+
+          <div className="h-[400px] overflow-y-auto">
+            {isLoading ? (
+              <div className="p-3" role="status" aria-live="polite">
+                <span className="sr-only">{t('notifications.center.loading')}</span>
+                <SkeletonList count={4} avatar={false} />
+              </div>
+            ) : notifications.length === 0 ? (
+              <EmptyState
+                className="border-0 shadow-none"
+                icon={<IconBell size={24} />}
+                title={t('notifications.empty')}
+                body={t('notifications.emptyHint')}
+              />
+            ) : (
+              notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`px-4 py-3 border-b border-c-border hover:bg-soft transition-colors cursor-pointer ${
+                    !notification.is_read ? 'bg-c-accent/10' : ''
+                  }`}
+                  onClick={() => handleNotificationClick(notification)}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1">
+                      {getNotificationIcon(notification.type)}
                     </div>
-                    
-                    <p className="text-xs text-gray-600 mb-2">
-                      {notification.message}
-                    </p>
-                    
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-gray-400">
-                        {format(new Date(notification.created_date), "d MMM HH:mm", { locale: es })}
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className={`text-sm font-semibold ${!notification.is_read ? 'text-ink' : 'text-ink/70'}`}>
+                          {notification.title}
+                        </p>
+                        {!notification.is_read && (
+                          <span className="w-2 h-2 bg-c-accent rounded-full"></span>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-c-muted mb-2">
+                        {notification.message}
                       </p>
-                      
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteNotificationMutation.mutate(notification.id);
-                        }}
-                      >
-                        <Trash2 className="w-3 h-3 text-gray-400 hover:text-red-500" />
-                      </Button>
+
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-c-muted">
+                          {format(new Date(notification.created_date), "d MMM HH:mm", { locale: es })}
+                        </p>
+
+                        <button
+                          type="button"
+                          className="btn-icon text-c-muted hover:text-error"
+                          aria-label={t('common.delete')}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteNotificationMutation.mutate(notification.id);
+                          }}
+                        >
+                          <IconTrash size={16} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
+              ))
+            )}
+          </div>
+
+          {notifications.length > 0 && (
+            <>
+              <hr className="separator" />
+              <div className="p-2">
+                <button
+                  type="button"
+                  className="btn-ghost w-full text-xs"
+                  onClick={() => {
+                    navigate('/notificaciones');
+                    setIsOpen(false);
+                  }}
+                >
+                  {t('notifications.center.viewAll')}
+                </button>
               </div>
-            ))
+            </>
           )}
-        </ScrollArea>
-        
-        {notifications.length > 0 && (
-          <>
-            <DropdownMenuSeparator />
-            <div className="p-2">
-              <Button
-                variant="ghost"
-                className="w-full text-xs"
-                onClick={() => {
-                  navigate('/notificaciones');
-                  setIsOpen(false);
-                }}
-              >
-                Ver todas las notificaciones
-              </Button>
-            </div>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </div>
+      )}
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" fill="white" width="18" height="18">
@@ -19,6 +20,7 @@ const ChatIcon = () => (
 );
 
 export function ActionButtonsCard({ profile, onChat, onWhatsApp, onCall }) {
+  const { t } = useTranslation();
   const showPhone = profile.metodos_contacto?.includes('telefono') && profile.telefono_contacto;
   const showWhatsApp = profile.metodos_contacto?.includes('whatsapp') && profile.telefono_contacto;
   const showChat = profile.metodos_contacto?.includes('chat_interno');
@@ -39,7 +41,7 @@ export function ActionButtonsCard({ profile, onChat, onWhatsApp, onCall }) {
           className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
         >
           <ChatIcon />
-          Contactar
+          {t('profile_card.contact')}
         </button>
       )}
 
@@ -51,7 +53,7 @@ export function ActionButtonsCard({ profile, onChat, onWhatsApp, onCall }) {
           rel="noopener noreferrer"
           onClick={e => e.stopPropagation()}
           className="w-10 h-10 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
-          title="WhatsApp"
+          title={t('profile_page.whatsapp')}
         >
           <WhatsAppIcon />
         </a>
@@ -91,6 +93,7 @@ export function ActionButtonsCard({ profile, onChat, onWhatsApp, onCall }) {
 
 // Versión para la página de perfil — con número grande visible
 export function ActionButtonsProfile({ profile, onChat, onWhatsApp, onCall }) {
+  const { t } = useTranslation();
   const showPhone = profile.metodos_contacto?.includes('telefono') && profile.telefono_contacto;
   const showWhatsApp = profile.metodos_contacto?.includes('whatsapp') && profile.telefono_contacto;
   const showChat = profile.metodos_contacto?.includes('chat_interno');
@@ -107,7 +110,7 @@ export function ActionButtonsProfile({ profile, onChat, onWhatsApp, onCall }) {
       {/* Mostrar número grande en desktop si hay teléfono */}
       {showPhone && (
         <div className="hidden md:block bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
-          <p className="text-xs text-gray-600 mb-2">Teléfono de contacto</p>
+          <p className="text-xs text-gray-600 mb-2">{t('phoneContact')}</p>
           <p className="text-2xl font-bold text-gray-900">{profile.telefono_contacto}</p>
         </div>
       )}
@@ -121,7 +124,7 @@ export function ActionButtonsProfile({ profile, onChat, onWhatsApp, onCall }) {
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
           >
             <ChatIcon />
-            Chat directo
+            {t('chatDirect')}
           </button>
         )}
 
@@ -134,7 +137,7 @@ export function ActionButtonsProfile({ profile, onChat, onWhatsApp, onCall }) {
             className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-lg py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
           >
             <WhatsAppIcon />
-            WhatsApp
+            {t('profile_page.whatsapp')}
           </a>
         )}
 
@@ -145,7 +148,7 @@ export function ActionButtonsProfile({ profile, onChat, onWhatsApp, onCall }) {
             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-colors md:hidden"
           >
             <PhoneIcon />
-            Llamar
+            {t('callPhone')}
           </button>
         )}
       </div>

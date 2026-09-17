@@ -1,18 +1,21 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
 import { createPageUrl } from "@/utils";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Briefcase, Search, ShieldCheck, Zap, BadgeCheck } from "lucide-react";
-
-const TRUST_ITEMS = [
-  { icon: Zap, label: "Perfil en 10 min" },
-  { icon: ShieldCheck, label: "Sin comisiones" },
-  { icon: BadgeCheck, label: "Clientes verificados" },
-];
+import { IconBriefcase, IconSearch, IconShield, IconZap, IconVerified } from "@/components/Icons";
 
 export default function FinalCTASection() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  // Antes constante de módulo (TRUST_ITEMS): vive aquí para que se retraduzca
+  // al cambiar de idioma.
+  const trustItems = [
+    { icon: IconZap, label: t('home.finalCta.profileTime') },
+    { icon: IconShield, label: t('landing.feature_no_fees') },
+    { icon: IconVerified, label: t('home.whyUs.verifiedClients.title') },
+  ];
 
   return (
     <section className="relative py-20 md:py-28 overflow-hidden bg-gradient-to-br from-[#0d2a5e] via-[#1040a0] to-[#0a5940] text-white">
@@ -34,41 +37,41 @@ export default function FinalCTASection() {
           transition={{ duration: 0.6 }}
         >
           <div className="inline-flex items-center gap-2 bg-white/15 text-white border border-white/20 text-sm px-4 py-1.5 rounded-full font-semibold mb-6">
-            🎉 Completamente gratuito
+            {t('home.finalCta.badge')}
           </div>
 
           <h2 className="text-4xl md:text-6xl font-extrabold mb-5 leading-tight tracking-tight">
-            Únete ahora —
-            <br />
-            <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">
-              Es gratis para siempre
-            </span>
+            <Trans
+              i18nKey="home.finalCta.title"
+              components={{ 2: <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent" /> }}
+            />
           </h2>
 
           <p className="text-white/80 text-xl mb-10 max-w-xl mx-auto leading-relaxed">
-            Sin tarjeta de crédito. Sin permanencia. Sin sorpresas. Tu perfil activo en minutos.
+            {t('home.finalCta.subtitle')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
-            <Button
+            <button
+              type="button"
               onClick={() => navigate('/completar-perfil')}
-              className="group h-14 px-10 text-lg font-bold bg-gradient-to-r from-emerald-400 to-green-400 hover:from-emerald-300 hover:to-green-300 text-gray-900 rounded-2xl shadow-[0_15px_50px_-10px_rgba(52,211,153,0.6)] hover:scale-[1.03] transition-all"
+              className="btn-primary group h-14 px-10 text-lg font-bold bg-gradient-to-r from-emerald-400 to-green-400 hover:from-emerald-300 hover:to-green-300 text-ink rounded-2xl shadow-[0_15px_50px_-10px_rgba(52,211,153,0.6)] hover:scale-[1.03] transition-all"
             >
-              <Briefcase className="w-5 h-5 mr-2 group-hover:rotate-6 transition-transform" />
-              Crear mi perfil gratis
-            </Button>
-            <Button
+              <IconBriefcase className="w-5 h-5 mr-2 group-hover:rotate-6 transition-transform" />
+              {t('home.finalCta.createProfile')}
+            </button>
+            <button
+              type="button"
               onClick={() => navigate(createPageUrl("Search"))}
-              variant="outline"
-              className="h-14 px-8 text-lg font-semibold rounded-2xl border-white/25 text-white hover:bg-white/10 hover:border-white/40 transition-all"
+              className="btn-secondary h-14 px-8 text-lg font-semibold rounded-2xl bg-transparent border-white/25 text-white hover:bg-white/10 hover:border-white/40 transition-all"
             >
-              <Search className="w-5 h-5 mr-2" />
-              Ver profesionales
-            </Button>
+              <IconSearch className="w-5 h-5 mr-2" />
+              {t('home.hero.viewProfessionals')}
+            </button>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
-            {TRUST_ITEMS.map((item, i) => (
+            {trustItems.map((item, i) => (
               <div key={i} className="flex items-center gap-2 text-sm text-white/70">
                 <item.icon className="w-4 h-4 text-emerald-300" />
                 <span>{item.label}</span>
@@ -77,7 +80,7 @@ export default function FinalCTASection() {
           </div>
 
           <p className="mt-8 text-white/50 text-sm">
-            Registro totalmente gratuito · Sin tarjeta de crédito · Sin compromisos
+            {t('home.finalCta.footnote')}
           </p>
         </motion.div>
       </div>

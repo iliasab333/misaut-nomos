@@ -1,27 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ChevronDown, ArrowRight } from "lucide-react";
-
-const CATEGORIES = [
-  { emoji: "🔌", label: "Electricista" },
-  { emoji: "🔧", label: "Fontanero" },
-  { emoji: "🎨", label: "Pintor" },
-  { emoji: "🏗️", label: "Albañil/Reformas" },
-  { emoji: "🌿", label: "Jardinero" },
-  { emoji: "🧹", label: "Limpieza" },
-  { emoji: "🔑", label: "Cerrajero" },
-  { emoji: "❄️", label: "Climatización" },
-  { emoji: "💻", label: "Informático" },
-  { emoji: "🪟", label: "Carpintero" },
-  { emoji: "🚚", label: "Mudanzas" },
-  { emoji: "📸", label: "Fotógrafo" },
-  { emoji: "🍽️", label: "Catering" },
-  { emoji: "💆", label: "Masajista" },
-  { emoji: "⚖️", label: "Abogado" },
-  { emoji: "📊", label: "Asesor fiscal" },
-  { emoji: "🐾", label: "Mascotas" },
-  { emoji: "🚿", label: "Fontanería" },
-];
+import { IconSparkles, IconChevronDown, IconArrowRight } from "@/components/Icons";
+import { useTranslation, Trans } from "react-i18next";
 
 const PROVINCIAS = [
   "Álava","Albacete","Alicante","Almería","Asturias","Ávila","Badajoz","Barcelona",
@@ -33,14 +13,39 @@ const PROVINCIAS = [
   "Teruel","Toledo","Valencia","Valladolid","Vizcaya","Zamora","Zaragoza",
 ];
 
-const STEPS = ["Categoría", "Provincia", "Ver resultados"];
-
 export default function HeroSection() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1, 2, 3
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProvincia, setSelectedProvincia] = useState("");
   const [provinciaOpen, setProvinciaOpen] = useState(false);
+
+  // Antes constantes de módulo (CATEGORIES, STEPS): viven aquí para que se
+  // retraduzcan al cambiar de idioma. `value` es el nombre en español que va
+  // en la URL (?categoria=…) y entiende el buscador; `label` es lo que se ve.
+  const categories = [
+    { emoji: "🔌", value: "Electricista", label: t('categories.electrician') },
+    { emoji: "🔧", value: "Fontanero", label: t('categories.plumber') },
+    { emoji: "🎨", value: "Pintor", label: t('categories.painter') },
+    { emoji: "🏗️", value: "Albañil/Reformas", label: t('home.hero.categories.renovations') },
+    { emoji: "🌿", value: "Jardinero", label: t('categories.gardener') },
+    { emoji: "🧹", value: "Limpieza", label: t('home.categories.cleaning') },
+    { emoji: "🔑", value: "Cerrajero", label: t('categories.locksmith') },
+    { emoji: "❄️", value: "Climatización", label: t('home.hero.categories.hvac') },
+    { emoji: "💻", value: "Informático", label: t('home.hero.categories.itTech') },
+    { emoji: "🪟", value: "Carpintero", label: t('categories.carpenter') },
+    { emoji: "🚚", value: "Mudanzas", label: t('home.hero.categories.removals') },
+    { emoji: "📸", value: "Fotógrafo", label: t('home.hero.categories.photographer') },
+    { emoji: "🍽️", value: "Catering", label: t('home.hero.categories.catering') },
+    { emoji: "💆", value: "Masajista", label: t('home.hero.categories.masseur') },
+    { emoji: "⚖️", value: "Abogado", label: t('home.hero.categories.lawyer') },
+    { emoji: "📊", value: "Asesor fiscal", label: t('home.hero.categories.taxAdvisor') },
+    { emoji: "🐾", value: "Mascotas", label: t('home.hero.categories.pets') },
+    { emoji: "🚿", value: "Fontanería", label: t('home.hero.categories.plumbing') },
+  ];
+  const steps = [t('home.hero.stepCategory'), t('provinceField'), t('home.hero.stepResults')];
+  const selectedCat = categories.find((c) => c.value === selectedCategory);
 
   const handleCategorySelect = (label) => {
     setSelectedCategory(label);
@@ -84,26 +89,23 @@ export default function HeroSection() {
         {/* Badge */}
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "999px", padding: "6px 16px", fontSize: "12px", fontWeight: 600 }}>
-            <Sparkles style={{ width: "14px", height: "14px", color: "#fbbf24", flexShrink: 0 }} />
-            <span>100% gratuito para autónomos · Sin tarjeta · Sin permanencia</span>
+            <IconSparkles style={{ width: "14px", height: "14px", color: "#fbbf24", flexShrink: 0 }} />
+            <span>{t('home.hero.badge')}</span>
           </div>
         </div>
 
         {/* Headline */}
         <h1 style={{ textAlign: "center", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-0.02em", marginBottom: "12px", fontSize: "clamp(1.7rem, 6vw, 3.5rem)" }}>
-          Encuentra al{" "}
-          <span style={{ color: "#67e8f9" }}>autónomo perfecto</span>
-          <br />
-          en tu zona
+          <Trans i18nKey="home.hero.title" components={{ 1: <span style={{ color: "#67e8f9" }} /> }} />
         </h1>
 
         <p style={{ textAlign: "center", color: "rgba(219,234,254,0.9)", fontSize: "clamp(0.9rem, 2.2vw, 1.1rem)", lineHeight: 1.6, marginBottom: "36px", maxWidth: "520px", marginLeft: "auto", marginRight: "auto" }}>
-          Contacta gratis con profesionales verificados en España
+          {t('home.hero.subtitle')}
         </p>
 
         {/* STEP INDICATOR */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "28px" }}>
-          {STEPS.map((label, i) => {
+          {steps.map((label, i) => {
             const stepNum = i + 1;
             const isActive = step === stepNum;
             const isDone = step > stepNum;
@@ -128,7 +130,7 @@ export default function HeroSection() {
                     {label}
                   </span>
                 </div>
-                {i < STEPS.length - 1 && (
+                {i < steps.length - 1 && (
                   <div style={{ width: "24px", height: "2px", background: step > stepNum ? "#10b981" : "rgba(255,255,255,0.2)", transition: "background 0.3s ease", flexShrink: 0 }} />
                 )}
               </React.Fragment>
@@ -143,7 +145,7 @@ export default function HeroSection() {
           {step >= 1 && (
             <div>
               <p style={{ fontSize: "13px", fontWeight: 700, color: "rgba(191,219,254,0.7)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
-                {step === 1 ? "¿Qué necesitas?" : `✓ ${selectedCategory}`}
+                {step === 1 ? t('landing.hero.whatLabel') : `✓ ${selectedCat?.label ?? selectedCategory}`}
               </p>
 
               {step === 1 && (
@@ -152,17 +154,17 @@ export default function HeroSection() {
                   gridTemplateColumns: "repeat(3, 1fr)",
                   gap: "8px",
                 }}>
-                  {CATEGORIES.map((cat) => (
+                  {categories.map((cat) => (
                     <button
-                      key={cat.label}
-                      onClick={() => handleCategorySelect(cat.label)}
+                      key={cat.value}
+                      onClick={() => handleCategorySelect(cat.value)}
                       style={{
                         display: "flex",
                         alignItems: "center",
                         gap: "8px",
                         padding: "10px 12px",
-                        background: selectedCategory === cat.label ? "rgba(251,191,36,0.15)" : "rgba(255,255,255,0.08)",
-                        border: selectedCategory === cat.label ? "2px solid #fbbf24" : "1px solid rgba(255,255,255,0.15)",
+                        background: selectedCategory === cat.value ? "rgba(251,191,36,0.15)" : "rgba(255,255,255,0.08)",
+                        border: selectedCategory === cat.value ? "2px solid #fbbf24" : "1px solid rgba(255,255,255,0.15)",
                         borderRadius: "12px",
                         cursor: "pointer",
                         color: "white",
@@ -172,8 +174,8 @@ export default function HeroSection() {
                         transition: "all 0.15s ease",
                         width: "100%",
                       }}
-                      onMouseEnter={e => { if (selectedCategory !== cat.label) { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }}}
-                      onMouseLeave={e => { if (selectedCategory !== cat.label) { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}}
+                      onMouseEnter={e => { if (selectedCategory !== cat.value) { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; }}}
+                      onMouseLeave={e => { if (selectedCategory !== cat.value) { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}}
                     >
                       <span style={{ fontSize: "20px", lineHeight: 1, flexShrink: 0 }}>{cat.emoji}</span>
                       <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cat.label}</span>
@@ -187,9 +189,9 @@ export default function HeroSection() {
                   onClick={() => setStep(1)}
                   style={{ background: "rgba(251,191,36,0.15)", border: "2px solid #fbbf24", borderRadius: "12px", padding: "10px 16px", color: "white", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
                 >
-                  <span style={{ fontSize: "18px" }}>{CATEGORIES.find(c => c.label === selectedCategory)?.emoji}</span>
-                  {selectedCategory}
-                  <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", marginLeft: "4px" }}>cambiar</span>
+                  <span style={{ fontSize: "18px" }}>{selectedCat?.emoji}</span>
+                  {selectedCat?.label ?? selectedCategory}
+                  <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", marginLeft: "4px" }}>{t('home.hero.change')}</span>
                 </button>
               )}
             </div>
@@ -204,7 +206,7 @@ export default function HeroSection() {
           {step >= 2 && (
             <div>
               <p style={{ fontSize: "13px", fontWeight: 700, color: "rgba(191,219,254,0.7)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
-                ¿En qué provincia?
+                {t('home.hero.provinceQuestion')}
               </p>
               <div style={{ position: "relative" }}>
                 <button
@@ -225,8 +227,8 @@ export default function HeroSection() {
                     transition: "border-color 0.2s ease",
                   }}
                 >
-                  <span>{selectedProvincia || "Selecciona una provincia..."}</span>
-                  <ChevronDown style={{ width: "18px", height: "18px", color: "#6b7280", transform: provinciaOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease", flexShrink: 0 }} />
+                  <span>{selectedProvincia || t('home.hero.provincePlaceholder')}</span>
+                  <IconChevronDown style={{ width: "18px", height: "18px", color: "#6b7280", transform: provinciaOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease", flexShrink: 0 }} />
                 </button>
 
                 {provinciaOpen && (
@@ -300,8 +302,8 @@ export default function HeroSection() {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(245,158,11,0.6)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 30px rgba(245,158,11,0.5)"; }}
             >
-              Ver profesionales
-              <ArrowRight style={{ width: "20px", height: "20px" }} />
+              {t('home.hero.viewProfessionals')}
+              <IconArrowRight style={{ width: "20px", height: "20px" }} />
             </button>
           )}
 
@@ -311,28 +313,28 @@ export default function HeroSection() {
               onClick={() => navigate("/buscar")}
               style={{ background: "none", border: "none", color: "rgba(191,219,254,0.6)", fontSize: "13px", cursor: "pointer", textDecoration: "underline" }}
             >
-              Ver todos los profesionales sin filtrar
+              {t('home.hero.viewAllUnfiltered')}
             </button>
           </div>
         </div>
 
         {/* Trust pills */}
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "12px", color: "rgba(191,219,254,0.8)", marginTop: "28px" }}>
-          <span>✓ Contacto directo</span>
+          <span>{t('home.hero.directContact')}</span>
           <span>·</span>
-          <span>Sin comisiones</span>
+          <span>{t('landing.feature_no_fees')}</span>
           <span>·</span>
-          <span>Verificados</span>
+          <span>{t('landing.feature_verified')}</span>
         </div>
 
         {/* Banner autónomos */}
         <div style={{ marginTop: "24px", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: "14px", padding: "14px 20px", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "12px", maxWidth: "520px", marginLeft: "auto", marginRight: "auto" }}>
-          <span style={{ fontSize: "14px", color: "rgba(167,243,208,0.9)", fontWeight: 500 }}>¿Eres autónomo? Consigue clientes gratis</span>
+          <span style={{ fontSize: "14px", color: "rgba(167,243,208,0.9)", fontWeight: 500 }}>{t('home.hero.proBanner')}</span>
           <button
             onClick={() => navigate("/completar-perfil")}
             style={{ background: "linear-gradient(135deg, #10b981, #059669)", border: "none", borderRadius: "10px", padding: "8px 18px", color: "white", fontSize: "13px", fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
           >
-            Registrarme gratis →
+            {t('home.hero.registerFree')}
           </button>
         </div>
       </div>
@@ -340,7 +342,7 @@ export default function HeroSection() {
       {/* Wave divider */}
       <div style={{ position: "relative", lineHeight: 0 }}>
         <svg style={{ display: "block", width: "100%", height: "48px" }} viewBox="0 0 1440 74" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 40L60 36C120 32 240 24 360 26C480 28 600 40 720 44C840 48 960 44 1080 38C1200 32 1320 24 1380 20L1440 16V74H0V40Z" fill="rgb(249 250 251)" />
+          <path d="M0 40L60 36C120 32 240 24 360 26C480 28 600 40 720 44C840 48 960 44 1080 38C1200 32 1320 24 1380 20L1440 16V74H0V40Z" style={{ fill: "rgb(var(--c-soft))" }} />
         </svg>
       </div>
     </section>
