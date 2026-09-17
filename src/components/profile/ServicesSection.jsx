@@ -187,7 +187,7 @@ export default function ServicesSection({
               <label className="label" htmlFor="svc-description">{t("description")}</label>
               <textarea
                 id="svc-description"
-                className="textarea h-24"
+                className="textarea"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 placeholder={t("proProfile.services.descriptionPlaceholder")}

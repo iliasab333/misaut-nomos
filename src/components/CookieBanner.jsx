@@ -132,7 +132,7 @@ export default function CookieBanner() {
                 </h3>
                 <p className="text-xs md:text-sm text-c-muted mt-1 leading-relaxed">
                   {t('cookies.bannerText')}{' '}
-                  <Link to="/cookies" className="text-c-accent hover:underline font-medium" aria-label={t('cookies.policyLinkAria')}>
+                  <Link to="/cookies" className="text-c-accent hover:underline font-medium">
                    {t('cookies.moreInfo')}
                   </Link>
                 </p>

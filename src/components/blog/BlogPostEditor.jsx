@@ -228,7 +228,7 @@ export default function BlogPostEditor({ post, allPosts = [], onSave, onCancel }
               type="button"
               onClick={() => handleSave('published')}
               disabled={saving}
-              className="btn btn-sm text-white font-semibold"
+              className="btn-primary btn-sm text-white font-semibold"
               style={{ background: NAVY }}
               onMouseEnter={(e) => (e.currentTarget.style.background = NAVY_INK)}
               onMouseLeave={(e) => (e.currentTarget.style.background = NAVY)}

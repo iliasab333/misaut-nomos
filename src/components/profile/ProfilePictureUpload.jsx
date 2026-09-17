@@ -142,6 +142,7 @@ export default function ProfilePictureUpload({ user, currentPicture, onUpdate, s
           <input
             type="file"
             accept="image/jpeg,image/jpg,image/png,image/webp"
+            aria-label={previewUrl ? t("proProfile.picture.change") : t("proProfile.picture.add")}
             className="hidden"
             onChange={handleUpload}
             disabled={uploading}

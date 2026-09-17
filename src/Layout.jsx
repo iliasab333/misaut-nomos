@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense, lazy, useCallback, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
+import { uiLang } from "@/i18n";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import {
@@ -194,7 +195,7 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const language = i18n.language.split('-')[0];
+  const language = uiLang(i18n.language);
   const changeLanguage = (code) => i18n.changeLanguage(code);
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -343,21 +344,24 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
   const loadUser = React.useCallback(async () => {
     try {
       const urlParams = new URLSearchParams(window.location.search);
-      const isPostPayment = urlParams.get('session_id') || 
-                            urlParams.get('onboarding') || 
-                            false;
+      // Saltarse el caché al volver del alta: el perfil acaba de crearse y el
+      // caché de 5 minutos mostraría al usuario como si aún no fuera
+      // profesional. `session_id` era el retorno del checkout de Stripe, que
+      // ya no existe; se mantiene por si alguna URL antigua sigue viva.
+      const skipCache = urlParams.get('onboarding') || urlParams.get('session_id') || false;
 
       // CAMBIO: cache extendido a 5 minutos (antes 60s) — el perfil no cambia con frecuencia
       const cached = sessionStorage.getItem('current_user');
-      if (cached && !isPostPayment) {
+      if (cached && !skipCache) {
         const parsed = JSON.parse(cached);
-        const { user: cachedUser, profile: cachedProfile, plan: cachedPlan, timestamp } = parsed;
-        // Solo usar cache si tiene el campo "plan" (caches viejos sin plan deben recargarse)
-        const hasPlanField = 'plan' in parsed;
-        if (hasPlanField && Date.now() - timestamp < 300000) {
+        const { user: cachedUser, profile: cachedProfile, timestamp } = parsed;
+        // Los cachés escritos antes de retirar las suscripciones llevan un
+        // campo `plan`. Ya no significa nada, y arrastrarlo sólo confunde: se
+        // descartan para que la sesión se recargue limpia una vez.
+        const isStalePlanCache = 'plan' in parsed;
+        if (!isStalePlanCache && Date.now() - timestamp < 300000) {
           setUser(cachedUser);
           setProfessionalProfile(cachedProfile);
-          setUserPlan(cachedPlan || null);
           setLoadingUser(false);
           return;
         }
@@ -428,12 +432,11 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
         setProfessionalProfile(profile);
 
 
-        if (!isPostPayment) {
+        if (!skipCache) {
           try {
             sessionStorage.setItem('current_user', JSON.stringify({
               user: currentUser,
               profile,
-              plan: effective?.planId || null,
               timestamp: Date.now()
             }));
           } catch (e) {

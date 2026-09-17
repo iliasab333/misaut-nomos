@@ -151,7 +151,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="bg-surface text-c-accent text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-c-accent/5 disabled:opacity-50 whitespace-nowrap flex-shrink-0"
+              className="bg-surface text-c-accent text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-soft disabled:opacity-50 whitespace-nowrap flex-shrink-0"
             >
               {status === 'loading' ? <IconSpinner className="w-4 h-4 animate-spin" /> : t('newsletter.signup.button')}
             </button>

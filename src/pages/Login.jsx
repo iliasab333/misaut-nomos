@@ -328,11 +328,10 @@ export default function LoginPage() {
         {/* Tarjeta principal */}
         <div className="card rounded-2xl shadow-sm p-4 sm:p-7">
           {/* Segmented control */}
-          <div role="tablist" className="grid grid-cols-2 gap-1 p-1 bg-soft rounded-xl mb-3 sm:mb-6">
+          <div className="grid grid-cols-2 gap-1 p-1 bg-soft rounded-xl mb-3 sm:mb-6">
             <button
               type="button"
-              role="tab"
-              aria-selected={isSignIn}
+              aria-pressed={isSignIn}
               onClick={() => switchMode(MODES.SIGN_IN)}
               className={`text-sm font-medium py-2 rounded-lg transition ${
                 isSignIn
@@ -344,8 +343,7 @@ export default function LoginPage() {
             </button>
             <button
               type="button"
-              role="tab"
-              aria-selected={!isSignIn}
+              aria-pressed={!isSignIn}
               onClick={() => switchMode(MODES.SIGN_UP)}
               className={`text-sm font-medium py-2 rounded-lg transition ${
                 !isSignIn

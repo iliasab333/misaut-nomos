@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { IconSearch, IconChevronDown, IconArrowRight, IconBriefcase, IconUsers, IconHelp } from "@/components/Icons";
 import SEOHead from "../components/seo/SEOHead";
 
-// ─── Datos de las 20 preguntas ────────────────────────────────────────────────
+// ─── Datos de las 17 preguntas ────────────────────────────────────────────────
 // Se construyen con `t` (no como constante de módulo) para que se retraduzcan
 // al cambiar de idioma. Los ids y las URLs no se traducen.
 
@@ -186,7 +186,7 @@ export default function FAQPage() {
               </p>
               {filteredFaqs.length === 0 ? (
                 <div className="text-center py-16 text-c-muted">
-                  <IconHelp className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <IconHelp className="w-12 h-12 mx-auto mb-3 text-c-muted opacity-60" />
                   <p className="text-lg font-medium">{t("faq.page.noResults")}</p>
                   <p className="text-sm mt-1">{t("faq.page.noResultsHint")}</p>
                   <button
@@ -221,6 +221,8 @@ export default function FAQPage() {
                       key={s.id}
                       type="button"
                       role="tab"
+                      id={`faq-tab-${s.id}`}
+                      aria-controls={`faq-panel-${s.id}`}
                       aria-selected={isActive}
                       onClick={() => { setActiveSection(s.id); setOpenIndex(null); }}
                       className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
@@ -238,7 +240,11 @@ export default function FAQPage() {
 
               {/* Preguntas de la sección activa */}
               {activeSectionData && (
-                <div>
+                <div
+                  role="tabpanel"
+                  id={`faq-panel-${activeSection}`}
+                  aria-labelledby={`faq-tab-${activeSection}`}
+                >
                   <div className="flex items-center gap-3 mb-6">
                     <div className={`w-10 h-10 ${activeSectionData.color} rounded-xl flex items-center justify-center`}>
                       <activeSectionData.icon className="w-5 h-5 text-white" />

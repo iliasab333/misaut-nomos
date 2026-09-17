@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { uiLang } from '@/i18n';
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +41,7 @@ const typeConfig = {
 export default function TicketsPage() {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
-  const language = i18n.language.split('-')[0];
+  const language = uiLang(i18n.language);
   const [user, setUser] = useState(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");

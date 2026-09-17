@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Modal from "@/components/Modal";
-import { EmptyState, SkeletonList } from "@/components/ListStates";
+import { EmptyState, SkeletonLine } from "@/components/ListStates";
 import { IconPlus, IconPencil, IconTrash, IconEye, IconEyeOff } from "@/components/Icons";
 import { useTranslation } from "react-i18next";
 import { toast } from "@/lib/toast";
@@ -127,7 +127,34 @@ export default function AdminFAQPage() {
         </div>
 
         {isLoading ? (
-          <SkeletonList count={6} avatar={false} />
+          /* El esqueleto calca la tarjeta real: misma rejilla, mismo p-5,
+             misma pila (categoría + acciones, título de 2 líneas, resumen de
+             2 líneas, pie). Un esqueleto de otra forma hace saltar el
+             contenido al llegar. */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-busy="true" aria-label={t('common.loading')}>
+            {Array.from({ length: 6 }, (_, i) => (
+              <div key={i} className="card" aria-hidden="true">
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <SkeletonLine width={96} height={20} />
+                    <SkeletonLine width={112} height={20} />
+                  </div>
+                  <div className="space-y-2 mb-2">
+                    <SkeletonLine width="100%" height={18} />
+                    <SkeletonLine width="70%" height={18} />
+                  </div>
+                  <div className="space-y-2 mb-3">
+                    <SkeletonLine width="100%" height={12} />
+                    <SkeletonLine width="85%" height={12} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <SkeletonLine width={72} height={12} />
+                    <SkeletonLine width={72} height={12} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : faqs.length === 0 ? (
           <EmptyState
             title={t('proProfile.faq.empty')}

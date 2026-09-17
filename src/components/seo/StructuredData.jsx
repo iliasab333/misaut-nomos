@@ -119,6 +119,8 @@ export function FAQPageSchema({ faqs }) {
   return null;
 }
 
+const FALLBACK_IMAGE = 'https://misautonomos.es/og-image.png';
+
 export function MerchantListingSchema({ profile, reviews, professionalUser }) {
   useEffect(() => {
     if (!profile) return;

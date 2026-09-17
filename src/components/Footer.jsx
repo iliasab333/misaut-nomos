@@ -174,6 +174,7 @@ export default function Footer() {
   const COLUMN_PRODUCTO = [
     { label: t('footer.links.searchPros'), to: "/buscar" },
     { label: t('footer.links.becomePro'), to: "/registro?tipo=autonomo" },
+    { label: t('footer.links.pricing'), to: "/precios" },
   ];
 
   const COLUMN_EMPRESA = [

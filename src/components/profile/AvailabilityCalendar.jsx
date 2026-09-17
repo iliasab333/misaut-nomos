@@ -172,12 +172,12 @@ export default function AvailabilityCalendar({
             <div className="flex items-start gap-3">
               <IconCheckCircle className="w-5 h-5 text-c-accent mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-blue-900 mb-1">
+                <p className="text-sm font-semibold text-ink mb-1">
                   {disponibilidadTipo === "ambos" ? t("availableEveryDay") :
                    disponibilidadTipo === "laborables" ? t("proProfile.availability.summaryWeekdays") :
                    t("proProfile.availability.summaryWeekends")}
                 </p>
-                <p className="text-xs text-blue-800">
+                <p className="text-xs text-c-muted">
                   {t("proProfile.availability.scheduleRange", { from: horarioApertura, to: horarioCierre })}
                 </p>
               </div>

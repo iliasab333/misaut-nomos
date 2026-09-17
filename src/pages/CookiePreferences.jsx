@@ -118,8 +118,8 @@ export default function CookiePreferencesPage() {
         {/* Info Box */}
         <div className="bg-c-accent/5 border border-c-accent/20 rounded-xl p-4 mb-8 flex items-start gap-3">
           <IconAlert className="w-5 h-5 text-c-accent flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-c-accent">
-            <p className="font-medium mb-1">{t('cookies.preferences.essentialTitle')}</p>
+          <div className="text-sm text-ink">
+            <p className="font-medium mb-1 text-c-accent">{t('cookies.preferences.essentialTitle')}</p>
             <p>{t('cookies.preferences.essentialBody')}</p>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { uiLang } from '@/i18n';
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, Link } from "react-router-dom";
@@ -39,7 +40,7 @@ export default function FAQDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { i18n } = useTranslation();
-  const language = i18n.language.split('-')[0];
+  const language = uiLang(i18n.language);
   const [hasVoted, setHasVoted] = useState(false);
   
   const urlParams = new URLSearchParams(window.location.search);

@@ -170,14 +170,14 @@ export default function SoporteTicket() {
                 rows={4}
                 placeholder={t('support.ticket.replyPlaceholder')}
                 aria-label={t('support.ticket.replyPlaceholder')}
-                className="w-full px-3 py-2 text-sm border border-c-border rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                className="textarea"
               />
               <div className="mt-2 flex items-center justify-between gap-2">
                 <p className="text-[11px] text-c-muted">{t('support.ticket.replyHint')}</p>
                 <button
                   type="submit"
                   disabled={!reply.trim() || sending}
-                  className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50"
+                  className="btn-primary btn-sm"
                   style={{ background: NAVY }}
                 >
                   {sending ? <IconSpinner className="w-4 h-4 animate-spin" /> : <IconSend className="w-4 h-4" />}

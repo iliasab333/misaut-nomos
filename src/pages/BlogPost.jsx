@@ -75,7 +75,7 @@ export default function BlogPostPage() {
       <EmptyState
         className="max-w-md w-full"
         title={t('blog.post.notFound')}
-        ctaLabel={t('blog.post.backToBlogArrow')}
+        ctaLabel={t('blog.post.backToBlog')}
         ctaTo="/blog"
       />
     </div>

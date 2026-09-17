@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { uiLang } from '@/i18n';
 import { useNavigate } from 'react-router-dom';
 import {
   IconStarOutline, IconArrowLeft, IconSpinner, IconSend, IconCopy, IconCheck, IconMessageSquare,
@@ -230,7 +231,7 @@ function ReviewCard({ review }) {
         </div>
         <div className="text-[11px] text-c-muted flex-shrink-0">
           {review.created_date
-            ? new Date(review.created_date).toLocaleDateString(i18n.language, {
+            ? new Date(review.created_date).toLocaleDateString(uiLang(i18n.language) === 'en' ? 'en-US' : 'es-ES', {
                 day: '2-digit',
                 month: 'short',
                 year: 'numeric',

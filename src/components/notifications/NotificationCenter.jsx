@@ -226,7 +226,7 @@ export default function NotificationCenter({ user }) {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <p className={`text-sm font-semibold ${!notification.is_read ? 'text-ink' : 'text-c-muted'}`}>
+                        <p className={`text-sm font-semibold ${!notification.is_read ? 'text-ink' : 'text-ink/70'}`}>
                           {notification.title}
                         </p>
                         {!notification.is_read && (

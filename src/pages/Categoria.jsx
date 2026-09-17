@@ -454,9 +454,10 @@ export default function CategoriaPage() {
                           <button
                             type="button"
                             onClick={() => handleToggleFavorite(profile)}
-                            aria-label={t('search.card.addFavorite')}
+                            aria-label={favorites.some(f => f.professional_id === profile.user_id)
+                              ? t('favorites.page.remove') : t('search.card.addFavorite')}
                             className={`btn-icon ${favorites.some(f => f.professional_id === profile.user_id)
-                              ? 'text-error' : 'text-gray-300'}`}
+                              ? 'text-error' : 'text-c-muted'}`}
                           >
                             {favorites.some(f => f.professional_id === profile.user_id)
                               ? <IconHeartFilled size={16} />
@@ -503,7 +504,7 @@ export default function CategoriaPage() {
               <p className="text-blue-100 mb-5">{t('category.cta.body')}</p>
               <button
                 type="button"
-                onClick={() => navigate('/registro?tipo=autonomo')}
+                onClick={() => navigate(createPageUrl("PricingPlans"))}
                 className="btn bg-surface hover:bg-soft text-c-accent px-8 font-semibold"
               >
                 <IconBriefcase size={20} />

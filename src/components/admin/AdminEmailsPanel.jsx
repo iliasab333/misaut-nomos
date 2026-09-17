@@ -338,7 +338,7 @@ export default function AdminEmailsPanel() {
                       <td className="py-3 px-4">
                         <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
                           log.category === 'transactional' 
-                            ? 'bg-blue-100 text-blue-800' 
+                            ? 'bg-c-accent/10 text-c-accent' 
                             : 'bg-orange-100 text-orange-800'
                         }`}>
                           {log.category === 'transactional' ? t('admin.emailsPanel.category.transactionalShort') : t('admin.emailsPanel.category.marketing')}

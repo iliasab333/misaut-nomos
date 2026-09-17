@@ -101,7 +101,7 @@ export default function SkillsSection({
                 type="button" 
                 onClick={addSkill}
                 disabled={!newSkill.trim()}
-                aria-label={t("proProfile.skills.skillsIntro")}
+                aria-label={t("proProfile.skills.skillsTitle")}
                 className="btn-primary bg-purple-600 hover:bg-purple-700"
               >
                 <IconPlus className="w-4 h-4" />
@@ -169,7 +169,7 @@ export default function SkillsSection({
                 type="button" 
                 onClick={addCertification}
                 disabled={!newCertification.trim()}
-                aria-label={t("proProfile.skills.certificationsIntro")}
+                aria-label={t("proProfile.skills.certificationsTitle")}
                 className="btn-primary bg-amber-600 hover:bg-amber-700"
               >
                 <IconPlus className="w-4 h-4" />
@@ -184,7 +184,7 @@ export default function SkillsSection({
               certifications.map((cert, idx) => (
                 <span 
                   key={idx} 
-                  className="badge bg-amber-100 text-amber-800 px-3 py-1.5 text-sm gap-1"
+                  className="badge-warning px-3 py-1.5 text-sm gap-1"
                 >
                   <IconAward className="w-3 h-3" />
                   {cert}
@@ -193,7 +193,7 @@ export default function SkillsSection({
                       type="button"
                       onClick={() => removeCertification(cert)}
                       aria-label={t("common.delete")}
-                      className="ml-1 hover:text-amber-900"
+                      className="ml-1 hover:opacity-70"
                     >
                       <IconClose className="w-3 h-3" />
                     </button>

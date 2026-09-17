@@ -76,10 +76,10 @@ export default function PullToRefresh({ onRefresh, children }) {
           style={{ height: isRefreshing ? '48px' : `${Math.max(pullDistance, 0)}px`, overflow: 'hidden', transition: 'height 200ms' }}
         >
           {isRefreshing ? (
-            <IconSpinner className="w-5 h-5 text-blue-500 animate-spin" />
+            <IconSpinner className="w-5 h-5 text-c-accent animate-spin" />
           ) : (
             <IconRefresh
-              className="w-5 h-5 text-blue-400"
+              className="w-5 h-5 text-c-accent/70"
               style={{ transform: `rotate(${Math.min(pullDistance * 3, 360)}deg)` }}
             />
           )}

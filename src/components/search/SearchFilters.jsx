@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useId } from "react";
 import { useTranslation } from "react-i18next";
 import { useCategoryName } from '@/hooks/useCategoryName';
 import { IconFilter, IconStarOutline, IconClock } from "@/components/Icons";
@@ -13,6 +13,10 @@ export default function SearchFilters({
 }) {
   const { t } = useTranslation();
   const categoryName = useCategoryName();
+  // Search.jsx monta este componente dos veces a la vez (una por breakpoint),
+  // así que los id no pueden ser literales: se duplicarían en el DOM y los
+  // <label htmlFor> apuntarían todos a la primera instancia.
+  const uid = useId();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const advancedRef = useRef(null);
 
@@ -46,31 +50,24 @@ export default function SearchFilters({
       <div className="flex flex-col md:flex-row gap-2.5 items-center">
 
         {/* ── CATEGORÍA ── */}
-        {/* Desktop: <select> nativo (antes Radix Select) */}
-        <div className="hidden md:block w-full md:w-[220px]">
-          <label htmlFor="select-categoria-desktop" className="sr-only">{t('search.filterPanel.category')}</label>
+        {/* <select> nativo (antes Radix Select). Un solo bloque para los dos
+            breakpoints: el par escritorio/móvil no desmontaba nada («hidden»
+            es sólo CSS), duplicaba cada id y repetía el marcado entero. */}
+        <div className="w-full md:w-[220px]">
+          <label htmlFor={`${uid}-categoria`} className="sr-only">{t('search.filterPanel.category')}</label>
           <select
-            id="select-categoria-desktop"
+            id={`${uid}-categoria`}
             value={filters.category}
             onChange={(e) => onFilterChange({ ...filters, category: e.target.value })}
             className="select"
           >
             <option value="all">{t('allCategories')}</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.name}>{categoryName(cat.slug, cat.name)}</option>
-            ))}
-          </select>
-        </div>
-        {/* Mobile: native <select> — iOS system picker, zero animation */}
-        <div className="md:hidden w-full">
-          <label htmlFor="select-categoria-mobile" className="sr-only">{t('search.filterPanel.category')}</label>
-          <select
-            id="select-categoria-mobile"
-            value={filters.category}
-            onChange={(e) => onFilterChange({ ...filters, category: e.target.value })}
-            className="select"
-          >
-            <option value="all">{t('allCategories')}</option>
+            {/* Respaldo del <SelectValue> de Radix: filters.category se inicializa
+                desde la URL (?categoria=…). Si ese valor no está en `categories`,
+                un <select> nativo sin esta opción se queda en blanco. */}
+            {filters.category !== 'all' && !categories.some((c) => c.name === filters.category) && (
+              <option value={filters.category}>{filters.category}</option>
+            )}
             {categories.map((cat) => (
               <option key={cat.id} value={cat.name}>{categoryName(cat.slug, cat.name)}</option>
             ))}
@@ -78,26 +75,10 @@ export default function SearchFilters({
         </div>
 
         {/* ── PROVINCIA ── */}
-        {/* Desktop: <select> nativo */}
-        <div className="hidden md:block w-full md:w-[200px]">
-          <label htmlFor="select-provincia-desktop" className="sr-only">{t('provinceField')}</label>
+        <div className="w-full md:w-[200px]">
+          <label htmlFor={`${uid}-provincia`} className="sr-only">{t('provinceField')}</label>
           <select
-            id="select-provincia-desktop"
-            value={filters.provincia}
-            onChange={(e) => onFilterChange({ ...filters, provincia: e.target.value, ciudad: "all" })}
-            className="select"
-          >
-            <option value="all">{t('allProvinces')}</option>
-            {provinces.map((prov) => (
-              <option key={prov} value={prov}>{prov}</option>
-            ))}
-          </select>
-        </div>
-        {/* Mobile: native <select> */}
-        <div className="md:hidden w-full">
-          <label htmlFor="select-provincia-mobile" className="sr-only">{t('provinceField')}</label>
-          <select
-            id="select-provincia-mobile"
+            id={`${uid}-provincia`}
             value={filters.provincia}
             onChange={(e) => onFilterChange({ ...filters, provincia: e.target.value, ciudad: "all" })}
             className="select"
@@ -110,27 +91,10 @@ export default function SearchFilters({
         </div>
 
         {/* ── CIUDAD ── */}
-        {/* Desktop: <select> nativo */}
-        <div className="hidden md:block w-full md:w-[200px]">
-          <label htmlFor="select-ciudad-desktop" className="sr-only">{t('cityField')}</label>
+        <div className="w-full md:w-[200px]">
+          <label htmlFor={`${uid}-ciudad`} className="sr-only">{t('cityField')}</label>
           <select
-            id="select-ciudad-desktop"
-            value={filters.ciudad}
-            onChange={(e) => onFilterChange({ ...filters, ciudad: e.target.value })}
-            disabled={filters.provincia === "all"}
-            className="select disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <option value="all">{filters.provincia === "all" ? t('search.filterPanel.selectProvinceFirst') : t('allCities')}</option>
-            {availableCities.map((ciudad) => (
-              <option key={ciudad} value={ciudad}>{ciudad}</option>
-            ))}
-          </select>
-        </div>
-        {/* Mobile: native <select> */}
-        <div className="md:hidden w-full">
-          <label htmlFor="select-ciudad-mobile" className="sr-only">{t('cityField')}</label>
-          <select
-            id="select-ciudad-mobile"
+            id={`${uid}-ciudad`}
             value={filters.ciudad}
             onChange={(e) => onFilterChange({ ...filters, ciudad: e.target.value })}
             disabled={filters.provincia === "all"}
@@ -166,13 +130,13 @@ export default function SearchFilters({
               <div className="card p-4 absolute end-0 top-full mt-2 w-80 z-20">
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="filter-min-rating" className="text-sm font-medium flex items-center gap-2 mb-2">
+                    <label htmlFor={`${uid}-min-rating`} className="text-sm font-medium flex items-center gap-2 mb-2">
                       <IconStarOutline className="text-star" />
                       {t('search.filterPanel.minRating')}
                     </label>
                     <div className="space-y-2">
                       <input
-                        id="filter-min-rating"
+                        id={`${uid}-min-rating`}
                         type="range"
                         value={filters.minRating}
                         onChange={(e) => onFilterChange({ ...filters, minRating: Number(e.target.value) })}
@@ -192,12 +156,12 @@ export default function SearchFilters({
                   </div>
 
                   <div>
-                    <label htmlFor="filter-availability" className="text-sm font-medium flex items-center gap-2 mb-2">
+                    <label htmlFor={`${uid}-availability`} className="text-sm font-medium flex items-center gap-2 mb-2">
                       <IconClock size={16} className="text-c-accent" />
                       {t('availability')}
                     </label>
                     <select
-                      id="filter-availability"
+                      id={`${uid}-availability`}
                       value={filters.availability}
                       onChange={(e) => onFilterChange({ ...filters, availability: e.target.value })}
                       className="select"

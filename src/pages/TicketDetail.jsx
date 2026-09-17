@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { uiLang } from '@/i18n';
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +43,7 @@ export default function TicketDetailPage() {
   
   const urlParams = new URLSearchParams(window.location.search);
   const ticketId = urlParams.get("id");
-  const locale = i18n.language;
+  const locale = uiLang(i18n.language) === 'en' ? 'en-US' : 'es-ES';
 
   useEffect(() => {
     loadUser();

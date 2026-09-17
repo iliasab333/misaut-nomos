@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { SkeletonList } from '@/components/ListStates';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -115,7 +116,7 @@ function CreateTicketDialog({ user, onClose, onCreated }) {
       console.log('[soporte] ticket creado:', data?.id);
       toast.success(t('support.create.created'));
       try { onCreated?.(data); } catch (_e) { /* el padre no debe romper el flujo */ }
-      try { onClose?.(); } catch (_e) {}
+      try { onClose?.(); } catch (_e) { /* cerrar el modal nunca debe romper el flujo */ }
     } catch (err) {
       console.error('[tickets.insert] exception:', err);
       toast.error(err?.message || t('support.create.unexpectedError'));
@@ -132,50 +133,52 @@ function CreateTicketDialog({ user, onClose, onCreated }) {
       description={t('support.create.subtitle')}
     >
       <form onSubmit={submit} className="space-y-4">
-        <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('supportChat.ticketSubject')}</span>
+        <div>
+          <label className="label" htmlFor="ticket-subject">{t('supportChat.ticketSubject')}</label>
           <input
+            id="ticket-subject"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t('support.create.subjectPlaceholder')}
-            className="mt-1.5 w-full h-10 px-3 text-sm border border-c-border rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+            className="input"
           />
-        </label>
+        </div>
         <div className="grid grid-cols-2 gap-3">
-          <label className="block">
-            <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.soporte.filter.type')}</span>
-            <select value={type} onChange={(e) => setType(e.target.value)} className="mt-1.5 w-full h-10 px-2 text-sm border border-c-border rounded-lg bg-surface">
+          <div>
+            <label className="label" htmlFor="ticket-type">{t('admin.soporte.filter.type')}</label>
+            <select id="ticket-type" value={type} onChange={(e) => setType(e.target.value)} className="select">
               {TYPES.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>
-          </label>
-          <label className="block">
-            <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('admin.soporte.filter.priority')}</span>
-            <select value={priority} onChange={(e) => setPriority(e.target.value)} className="mt-1.5 w-full h-10 px-2 text-sm border border-c-border rounded-lg bg-surface">
+          </div>
+          <div>
+            <label className="label" htmlFor="ticket-priority">{t('admin.soporte.filter.priority')}</label>
+            <select id="ticket-priority" value={priority} onChange={(e) => setPriority(e.target.value)} className="select">
               {PRIORITIES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
-          </label>
+          </div>
         </div>
-        <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-c-muted">{t('description')}</span>
+        <div>
+          <label className="label" htmlFor="ticket-description">{t('description')}</label>
           <textarea
+            id="ticket-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={6}
             placeholder={t('support.create.descriptionPlaceholder')}
-            className="mt-1.5 w-full px-3 py-2 text-sm border border-c-border rounded-lg resize-y focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+            className="textarea"
           />
-        </label>
+        </div>
 
         <div className="flex justify-end gap-2 pt-1">
-          <button type="button" onClick={onClose} className="h-10 px-4 text-sm font-semibold text-ink hover:bg-soft rounded-lg">
+          <button type="button" onClick={onClose} className="btn-secondary">
             {t('common.cancel')}
           </button>
           <button
             type="button"
             disabled={submitting}
             onClick={submit}
-            className="inline-flex items-center gap-1.5 h-10 px-4 text-sm font-semibold text-white rounded-lg disabled:opacity-60"
+            className="btn-primary"
             style={{ background: NAVY }}
           >
             {submitting ? <IconSpinner className="w-4 h-4 animate-spin" /> : null}
@@ -251,7 +254,7 @@ export default function Soporte() {
             <button
               type="button"
               onClick={() => setOpenDialog(true)}
-              className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg text-sm font-semibold text-white"
+              className="btn-primary btn-sm"
               style={{ background: NAVY }}
             >
               <IconPlus className="w-4 h-4" /> {t('support.page.openTicket')}
@@ -267,15 +270,15 @@ export default function Soporte() {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder={t('support.page.searchPlaceholder')}
-                  aria-label={t('support.page.searchPlaceholder')}
-                  className="w-full pl-9 pr-3 h-9 text-sm border border-c-border rounded-lg focus:outline-none focus-visible:border-[#00255C] focus-visible:ring-2 focus-visible:ring-[#00255C]/15"
+                  aria-label={t('common.search')}
+                  className="input pl-9"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                aria-label={t('support.page.allStatuses')}
-                className="h-9 px-2 text-sm border border-c-border rounded-lg bg-surface"
+                aria-label={t('admin.soporte.filter.status')}
+                className="select w-auto"
               >
                 <option value="all">{t('support.page.allStatuses')}</option>
                 {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{t(v.key)}</option>)}
@@ -283,7 +286,10 @@ export default function Soporte() {
             </div>
 
             {isLoading ? (
-              <div className="p-10 text-center text-c-muted text-sm">{t('support.page.loading')}</div>
+              <div className="p-3" role="status" aria-live="polite">
+                <span className="sr-only">{t('support.page.loading')}</span>
+                <SkeletonList count={3} avatar={false} />
+              </div>
             ) : filtered.length === 0 ? (
               <div className="p-10 text-center">
                 <div className="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center" style={{ background: NAVY_SOFT, color: NAVY }}>
@@ -296,7 +302,7 @@ export default function Soporte() {
                 <button
                   type="button"
                   onClick={() => setOpenDialog(true)}
-                  className="mt-5 inline-flex items-center gap-1.5 h-10 px-5 rounded-lg text-sm font-semibold text-white"
+                  className="btn-primary btn-sm mt-5"
                   style={{ background: NAVY }}
                 >
                   <IconPlus className="w-4 h-4" /> {t('support.page.openFirst')}

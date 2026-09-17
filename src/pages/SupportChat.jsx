@@ -100,9 +100,6 @@ export default function SupportChat() {
 
   return (
     <div className="flex flex-col h-[calc(100dvh-56px)] md:h-[calc(100vh-56px)] bg-surface">
-      {/* Tabs Mensajes / Soporte */}
-      <div className="px-4 pt-3 bg-surface border-b border-c-border">
-      </div>
       {/* Header */}
       <div className="border-b border-c-border px-4 py-3 flex items-center gap-3 bg-surface sticky top-0">
         <button
@@ -145,7 +142,7 @@ export default function SupportChat() {
                 <p className="whitespace-pre-line break-words">{msg.content}</p>
                 <span
                   className={`text-[10px] block mt-0.5 ${
-                    isFromMe ? "text-blue-100" : "text-c-muted"
+                    isFromMe ? "text-white/70" : "text-c-muted"
                   }`}
                 >
                   {new Date(msg.created_date).toLocaleTimeString("es-ES", {

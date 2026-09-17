@@ -200,7 +200,7 @@ const LEGACY_REDIRECTS = {
   '/crmautomations': '/automatizaciones',
   '/clientdetail': '/clientes',
   '/jobs': '/trabajos',
-  '/onboarding': '/bienvenida',
+  '/onboarding': '/completar-perfil',
   '/admindashboard': '/admin',
   '/adminpayments': '/admin/pagos',
   '/admintickets': '/admin/soporte',
@@ -323,7 +323,6 @@ const AuthenticatedApp = () => {
           <Route path="/perfil/:slug" element={<Pages.ProfessionalProfile />} />
           <Route path="/completar-perfil" element={<Pages.ProfileOnboarding />} />
           {/* /clientes/:id ANTES que /clientes para que matchee primero */}
-          <Route path="/bienvenida" element={<Pages.Onboarding />} />
           
           {/* ===== RUTAS PLAN ADS+ ===== */}
 

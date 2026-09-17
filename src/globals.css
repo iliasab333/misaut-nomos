@@ -269,18 +269,6 @@ a:hover {
   opacity: 0.9;
 }
 
-/* ✨ SKELETON SHIMMER */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    #f3f4f6 0%,
-    #e5e7eb 50%,
-    #f3f4f6 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
 /* Font rendering optimizado */
 * {
   font-synthesis: none;
@@ -343,11 +331,6 @@ button, a, [role="button"] {
   min-height: 220px;
 }
 
-/* Skeleton con altura mínima */
-.skeleton {
-  min-height: 48px;
-}
-
 /* Will-change solo en elementos que lo necesiten */
 button:active,
 a:active {
@@ -389,12 +372,6 @@ a:active {
   min-height: 280px;
   display: flex;
   flex-direction: column;
-}
-
-/* Skeleton loaders — mismas dimensiones que contenido real */
-.skeleton {
-  min-height: 48px;
-  contain: layout style;
 }
 
 .skeleton-avatar {

@@ -81,6 +81,32 @@ if (typeof window !== 'undefined') {
 
 export const isRTL = (code) => RTL_CODES.includes((code || '').split('-')[0]);
 
+// El idioma con el que una pantalla debe DECIDIR, no el que i18next tiene
+// puesto. No son lo mismo, y confundirlos rompió tres páginas.
+//
+// `i18n.language` puede valer 'fr', 'de', 'nl' o 'ar': `supportedLngs` los
+// acepta todos y el detector lee `?lang=XX`. Pero sólo `es` y `en` tienen
+// JSON completo (los demás están `ready: false` en langs.js), así que en esos
+// idiomas `t()` cae al español por `fallbackLng`.
+//
+// El problema aparece en las pantallas que eligen texto a mano —
+// `language === 'es' ? textoEs : textoEn`, con contenido de la base de datos
+// en dos columnas. Con `?lang=fr`, `i18n.language.split('-')[0]` devolvía
+// 'fr', la comparación fallaba y esas pantallas se pintaban en INGLÉS
+// mientras la cabecera, que usa `t()`, seguía en español. Medido en
+// /ayuda?lang=fr: menú en español, cuerpo en inglés, en la misma pantalla.
+//
+// `uiLang()` devuelve siempre uno de los idiomas realmente publicados,
+// cayendo a `es`. Es lo que hacía `useLanguage()` antes del swap de UI, y lo
+// que se perdió al migrarlo a `useTranslation()` a mano.
+//
+//   const { i18n } = useTranslation();
+//   const language = uiLang(i18n.language);   // 'es' | 'en', nunca 'fr'
+export function uiLang(language) {
+  const short = (language || DEFAULT_LANG).split('-')[0];
+  return SUPPORTED_CODES.includes(short) ? short : DEFAULT_LANG;
+}
+
 // Cargador perezoso: el import() con variable interpolada crea un chunk por
 // JSON (Vite lo resuelve en build porque `./locales/${code}.json` apunta a un
 // directorio conocido). Cada idioma se descarga una sola vez.

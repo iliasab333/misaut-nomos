@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import Modal from "@/components/Modal";
-import { SkeletonList } from "@/components/ListStates";
+import { SkeletonLine } from "@/components/ListStates";
 import {
   IconSearch,
   IconClock,
@@ -324,7 +324,38 @@ export default function AdminTicketsPage() {
         </div>
 
         {loadingTickets ? (
-          <SkeletonList count={4} avatar={false} />
+          /* Misma altura que la tarjeta de ticket real (card p-6: fila de
+             etiquetas, título, descripción de una línea, pie de metadatos y
+             los tres botones a la derecha), para que nada salte al llegar. */
+          <div className="space-y-4" aria-busy="true" aria-label={t('common.loading')}>
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="card" aria-hidden="true">
+                <div className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <SkeletonLine width={88} height={20} />
+                        <SkeletonLine width={104} height={20} />
+                        <SkeletonLine width={80} height={20} />
+                      </div>
+                      <SkeletonLine width="55%" height={28} className="mb-2" />
+                      <SkeletonLine width="90%" height={24} className="mb-3" />
+                      <div className="flex items-center gap-4">
+                        <SkeletonLine width={128} height={20} />
+                        <SkeletonLine width={40} height={20} />
+                        <SkeletonLine width={80} height={20} />
+                      </div>
+                    </div>
+                    <div className="hidden sm:flex gap-2 shrink-0">
+                      <SkeletonLine width={96} height={40} />
+                      <SkeletonLine width={96} height={40} />
+                      <SkeletonLine width={96} height={40} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="space-y-4">
             {filteredTickets.map((ticket) => {
