@@ -23,7 +23,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import {
   IconSearch,
   IconMapPin,
@@ -64,7 +64,7 @@ const EMPTY_FILTERS = { category: "all", provincia: "all", ciudad: "all", minRat
 // formulario de correo (Edge Function `contact-professional`): es el único
 // canal garantizado, y dejar una ficha sin ninguna puerta sería peor que
 // apartarse del modelo.
-const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite, professionalUser, priority }) => {
+const ProfileCard = React.memo(({ profile, href, onToggleFavorite, isFavorite, professionalUser, priority }) => {
   const { t } = useTranslation();
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [guestModal, setGuestModal] = useState(false);
@@ -104,13 +104,11 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
         {/* Columna 1 — avatar (abre la ficha) y, debajo, el corazón. El
             corazón va FUERA del enlace: un toque ahí no debe cargar la ficha. */}
         <div className="flex flex-col items-center gap-2 flex-shrink-0">
-          <button
-            type="button"
-            onClick={onClick}
-            aria-hidden="true"
-            tabIndex={-1}
-            className="focus:outline-none"
-          >
+          {/* Enlaces de verdad, no `onClick` sobre un <div>: el buscador es
+              la puerta a las 39 fichas y un robot no dispara manejadores de
+              clic. El del avatar va `aria-hidden` + fuera del recorrido del
+              teclado — el de al lado ya anuncia el mismo destino. */}
+          <Link to={href} aria-hidden="true" tabIndex={-1} className="focus:outline-none">
             <InitialsAvatar
               name={profile.business_name || ""}
               src={optimizedPhotoUrl || undefined}
@@ -118,7 +116,7 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
               square
               priority={priority}
             />
-          </button>
+          </Link>
           {onToggleFavorite && (
             <button
               type="button"
@@ -136,12 +134,7 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
 
         {/* Columna 2 — nombre / oficio / ciudad·nota. Tres informaciones,
             tres líneas: juntas en una se cortaban a la mitad. */}
-        <button
-          type="button"
-          onClick={onClick}
-          title={name}
-          className="flex-1 min-w-0 text-start focus:outline-none"
-        >
+        <Link to={href} title={name} className="flex-1 min-w-0 focus:outline-none">
           <div className="flex items-center gap-1.5 min-w-0">
             <p className="text-ink font-semibold truncate leading-tight m-0" style={{ fontSize: 15 }}>
               {name}
@@ -210,7 +203,7 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
               </span>
             )}
           </div>
-        </button>
+        </Link>
 
         {/* Columna 3 — como mucho dos botones redondos. Una sola pastilla
             saturada por tarjeta, y es la verde. */}
@@ -270,7 +263,6 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
 });
 
 export default function SearchPage() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
   const [user, setUser] = useState(null);
@@ -395,8 +387,6 @@ export default function SearchPage() {
     if (filters.provincia === "all") return [];
     return CIUDADES_POR_PROVINCIA[filters.provincia] || [];
   }, [filters.provincia]);
-
-  const handleViewProfile = (profile) => navigate(getProfileSeoUrl(profile));
 
   const handleToggleFavorite = async (profile) => {
     if (!user) { base44.auth.redirectToLogin(); return; }
@@ -584,7 +574,7 @@ export default function SearchPage() {
                           <ProfileCard
                             key={profile.id}
                             profile={profile}
-                            onClick={() => handleViewProfile(profile)}
+                            href={getProfileSeoUrl(profile)}
                             onToggleFavorite={user ? () => handleToggleFavorite(profile) : undefined}
                             isFavorite={favorites.some(fav => fav.professional_id === profile.user_id)}
                             professionalUser={professionalUsers.find(u => u.id === profile.user_id)}
@@ -601,7 +591,7 @@ export default function SearchPage() {
                       <ProfileCard
                         key={profile.id}
                         profile={profile}
-                        onClick={() => handleViewProfile(profile)}
+                        href={getProfileSeoUrl(profile)}
                         onToggleFavorite={user ? () => handleToggleFavorite(profile) : undefined}
                         isFavorite={favorites.some(fav => fav.professional_id === profile.user_id)}
                         professionalUser={professionalUsers.find(u => u.id === profile.user_id)}

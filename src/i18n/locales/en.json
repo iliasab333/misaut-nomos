@@ -1131,6 +1131,13 @@
       "change": "Change photo",
       "add": "Add profile photo",
       "hint": "Max 5MB - JPG, PNG or WEBP"
+    },
+    "breadcrumbAria": "Breadcrumb",
+    "findMeOn": "Find me on",
+    "contactCard": {
+      "title": "Contact this freelancer",
+      "body": "Message them on WhatsApp or call them directly. They answer themselves, no middlemen.",
+      "noFees": "MisAutónomos takes no commission. You agree the price directly with the freelancer."
     }
   },
   "reviews": {

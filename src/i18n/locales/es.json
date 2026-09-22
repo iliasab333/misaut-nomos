@@ -1131,6 +1131,13 @@
       "change": "Cambiar foto",
       "add": "Añadir foto de perfil",
       "hint": "Máx 5MB - JPG, PNG o WEBP"
+    },
+    "breadcrumbAria": "Ruta de navegación",
+    "findMeOn": "Encuéntrame en",
+    "contactCard": {
+      "title": "Contacta con este autónomo",
+      "body": "Escríbele por WhatsApp o llámale directamente. Responde él, sin intermediarios.",
+      "noFees": "MisAutónomos no cobra comisión. El precio lo acuerdas directamente con el autónomo."
     }
   },
   "reviews": {

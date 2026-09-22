@@ -4,8 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
-  IconMapPin,
-  IconEuro,
   IconGlobe,
   IconHeart,
   IconPhone,
@@ -20,12 +18,9 @@ import {
   IconMusic,
   IconCopy,
   IconCheck,
-  IconArrowLeft,
   IconChevronLeft,
   IconChevronRight,
-  IconSparkles,
   IconVerified,
-  IconBriefcase,
   IconClock,
   IconShare,
   IconWhatsApp,
@@ -40,11 +35,10 @@ import { LocalBusinessSchema, FAQPageSchema, ProfessionalPersonSchema, Breadcrum
 import { toast } from "@/lib/toast";
 import { useTranslation } from "react-i18next";
 import { useProfileTranslation } from "../components/profile/useProfileTranslation";
-import { ActionButtonsProfile } from "../components/profile/ActionButtons";
 import { generateSlug, isSlugDirty } from "../utils/slugUtils";
 import { getProfileSeoUrl } from '@/lib/seoUrl';
 import { slugify } from '@/lib/slugify';
-import CategoryCityLink from "../components/profile/CategoryCityLink";
+import ProfileBreadcrumb from "../components/profile/ProfileBreadcrumb";
 import GuestContactModal from "@/components/GuestContactModal";
 
 // Limpiar slug antiguo que puede tener IDs hex al final (ej: -5e8405).
@@ -468,113 +462,101 @@ export default function AutonomoPage() {
         <FAQPageSchema faqs={profileFaqData} />
       )}
       
-      <div className="min-h-screen bg-soft py-3 px-3 md:py-4 md:px-4">
-        <div className="max-w-5xl mx-auto space-y-3">
+      {/* La ficha, con la maqueta de khdemlidaba/professionnel:
+          migas de pan, dos columnas y la tarjeta de contacto pegada a la
+          derecha. Antes eran diez cartas blancas apiladas a lo ancho sobre
+          gris: el teléfono quedaba arriba del todo y, en cuanto se leía la
+          descripción, dejaba de estar en pantalla. */}
+      {/* `pb-28` en móvil: la barra fija de abajo mide ~76 px y taparía el
+          final de las opiniones y el arranque del pie. */}
+      <section className="section-tight pb-28 lg:pb-16">
+        <div className="container-page">
 
-          <button
-            type="button"
-            onClick={() => navigate(createPageUrl("Search"))}
-            className="btn-ghost no-underline hover:bg-surface mb-2 text-ink font-medium"
-          >
-            <IconArrowLeft className="w-4 h-4 mr-2" />
-            {t('backToSearch')}
-          </button>
+          <ProfileBreadcrumb
+            categoryName={profile.categories?.[0]}
+            ciudad={profile.ciudad}
+            provincia={profile.provincia}
+          />
 
-          {/* CABECERA */}
-          <div className="card rounded-xl p-4">
-            <div className="flex items-center gap-4 mb-3">
-              {(() => {
-                // Mismo orden que en la tarjeta del buscador: imagen_principal
-                // → photos[0] → profile_picture. El usuario hace clic para
-                // abrir lightbox con la ORIGINAL (no la transformada).
-                const rawPhoto =
-                  profile.imagen_principal ||
-                  (Array.isArray(profile.photos) && profile.photos[0]) ||
-                  professionalUser?.profile_picture ||
-                  null;
-                const optimized = optimizeSupabaseImage(rawPhoto, { width: 160, quality: 75 });
-                return (
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => {
-                      if (rawPhoto) {
-                        setSelectedImage(rawPhoto);
-                        setSelectedImageIndex(-1);
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if ((e.key === 'Enter' || e.key === ' ') && rawPhoto) {
-                        setSelectedImage(rawPhoto);
-                        setSelectedImageIndex(-1);
-                      }
-                    }}
-                    className="cursor-pointer flex-shrink-0"
-                    aria-label={t('search.profile.photoOf', { name: profile.business_name || t('search.profile.professionalFallback') })}
-                  >
-                    <InitialsAvatar
-                      name={profile.business_name || ""}
-                      src={optimized || undefined}
-                      size={56}
-                      priority
-                      className="ring-2 ring-white shadow-sm"
-                    />
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 lg:gap-12">
+
+            {/* ── COLUMNA PRINCIPAL ─────────────────────────────────── */}
+            <div className="min-w-0">
+
+              {/* Cabecera: foto, nombre, oficio·ciudad, nota y distintivos */}
+              <div className="flex items-start gap-4">
+                {(() => {
+                  // Mismo orden que en la tarjeta del buscador:
+                  // imagen_principal → photos[0] → profile_picture. El clic
+                  // abre la ORIGINAL en el visor, no la transformada.
+                  const rawPhoto =
+                    profile.imagen_principal ||
+                    (Array.isArray(profile.photos) && profile.photos[0]) ||
+                    professionalUser?.profile_picture ||
+                    null;
+                  const optimized = optimizeSupabaseImage(rawPhoto, { width: 200, quality: 75 });
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => { if (rawPhoto) { setSelectedImage(rawPhoto); setSelectedImageIndex(-1); } }}
+                      className="flex-shrink-0 focus:outline-none"
+                      aria-label={t('search.profile.photoOf', { name: profile.business_name || t('search.profile.professionalFallback') })}
+                    >
+                      <InitialsAvatar
+                        name={profile.business_name || ""}
+                        src={optimized || undefined}
+                        size={72}
+                        square
+                        priority
+                      />
+                    </button>
+                  );
+                })()}
+
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink m-0 leading-tight">
+                    {profile.business_name}
+                  </h1>
+                  {(profile.categories?.[0] || profile.ciudad) && (
+                    <p className="text-c-muted mt-1">
+                      {profile.categories?.[0]}
+                      {profile.categories?.[0] && profile.ciudad && <span className="mx-1.5" aria-hidden="true">·</span>}
+                      {profile.ciudad}
+                    </p>
+                  )}
+
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                    {profile.total_reviews > 0 && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <IconStarOutline className="w-4 h-4 fill-star text-star" />
+                        <span className="font-semibold text-ink">{profile.average_rating?.toFixed(1)}</span>
+                        <span className="text-c-muted text-sm">
+                          {t('search.profile.reviewsCount', { count: profile.total_reviews })}
+                        </span>
+                      </span>
+                    )}
+                    {isVerified && (
+                      <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-success">
+                        <IconVerified className="w-4 h-4" />
+                        {t('proProfile.badges.identityVerified')}
+                      </span>
+                    )}
+                    {profile.is_ads_plus && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full font-bold text-white"
+                        style={{ background: '#7B5400', padding: '2px 9px', fontSize: 11.5, letterSpacing: '0.03em' }}
+                      >
+                        <IconStarOutline className="w-3 h-3 fill-current" />
+                        {t('search.card.featured')}
+                      </span>
+                    )}
                   </div>
-                );
-              })()}
-              
-              <div className="flex-1">
-              <h1 className="text-xl font-bold text-ink mb-1">{profile.business_name}</h1>
-              {(profile.categories?.[0] || profile.ciudad) && (
-                <p className="text-sm text-c-muted mb-1">
-                  {profile.categories?.[0] && profile.ciudad
-                    ? t('category.heading.inCity', { category: profile.categories[0], city: profile.ciudad })
-                    : (profile.categories?.[0] || profile.ciudad)}
-                </p>
-              )}
-
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                {profile.categories?.[0] && (
-                  <span className="badge text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ background: 'rgba(0,37,92,0.06)', color: '#00255C' }}>
-                    {profile.categories[0]}
-                  </span>
-                )}
-                {profile.is_ads_plus && (
-                  <span className="badge text-[11px] font-semibold uppercase tracking-[0.06em] border" style={{ background: '#FBF4DA', color: '#7B5400', borderColor: '#EFD68A' }}>
-                    {t('search.card.featured')}
-                  </span>
-                )}
-                {isVerified && (
-                  <span className="badge text-[11px] font-semibold uppercase tracking-[0.06em] inline-flex items-center gap-1" style={{ background: 'rgba(0,37,92,0.06)', color: '#00255C' }}>
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                    </svg>
-                    {t('proProfile.badges.verified')}
-                  </span>
-                )}
-                {profile.total_reviews > 0 && (
-                  <div className="flex items-center gap-1">
-                    <IconStarOutline className="w-3.5 h-3.5 fill-star text-star" />
-                    <span className="text-sm font-semibold">{profile.average_rating?.toFixed(1)}</span>
-                    <span className="text-xs text-c-muted">({profile.total_reviews})</span>
-                  </div>
-                )}
+                </div>
               </div>
 
-                {(profile.ciudad || profile.provincia) && (
-                  <div className="flex items-center gap-1 text-xs text-c-muted">
-                    <IconMapPin className="w-3 h-3" />
-                    {profile.ciudad ? `${profile.ciudad}, ${profile.provincia}` : profile.provincia}
-                  </div>
-                )}
-
-              {/* Internal link → listado categoría+ciudad */}
-              {profile.categories?.[0] && profile.ciudad && (
-                <CategoryCityLink categoryName={profile.categories[0]} ciudad={profile.ciudad} />
-              )}
-              </div>
-
-              <div className="flex items-center gap-2">
+              {/* Compartir y guardar — acciones sobre la ficha, no sobre el
+                  profesional: van aparte de los botones de contacto. */}
+              <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={async () => {
@@ -586,332 +568,272 @@ export default function AutonomoPage() {
                       dialogTitle: t('profile_page.share_profile'),
                     });
                   }}
-                  aria-label={t('profile_page.share_profile')}
-                  title={t('search.profile.share.button')}
-                  className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-c-border bg-surface text-ink hover:bg-soft transition-colors"
+                  className="btn-secondary btn-sm"
                 >
                   <IconShare className="w-4 h-4" />
+                  {t('search.profile.share.button')}
                 </button>
                 <button
                   type="button"
                   onClick={() => { haptic('light'); handleToggleFavorite(); }}
-                  aria-label={isFavorite ? t('favorites.page.remove') : t('search.card.saveFavorite')}
-                  title={isFavorite ? t('favorites.page.remove') : t('search.card.saveFavorite')}
-                  className={`inline-flex items-center gap-1.5 px-3 h-9 rounded-full border text-sm font-medium transition-colors ${
-                    isFavorite
-                      ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
-                      : 'bg-surface border-c-border text-ink hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
-                  }`}
+                  className={`btn-secondary btn-sm ${isFavorite ? 'text-rose-600 border-rose-200' : ''}`}
                 >
                   <IconHeart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
                   {isFavorite ? t('profile_page.saved_favorite') : t('profile_page.save_favorite')}
                 </button>
               </div>
-            </div>
 
-            {/* BOTONES CONTACTO */}
-            <div className="flex gap-2 flex-wrap">
-              {showChat && (
-                <button
-                  type="button"
-                  onClick={handleStartChat}
-                  className="flex-1 min-w-[140px] text-white text-sm font-semibold py-2.5 rounded-lg inline-flex items-center justify-center gap-2 transition-colors"
-                  style={{ background: '#00255C' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#001A45')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = '#00255C')}
-                >
-                  <IconMessageCircle className="w-4 h-4" /> {t('proProfile.contact.sendMessage')}
-                </button>
+              {/* Descripción */}
+              {(displayProfile.descripcion_corta || displayProfile.description) && (
+                <div className="mt-6 space-y-3">
+                  {displayProfile.descripcion_corta && (
+                    <p className="text-ink leading-relaxed whitespace-pre-line">{displayProfile.descripcion_corta}</p>
+                  )}
+                  {displayProfile.description && displayProfile.description !== displayProfile.descripcion_corta && (
+                    <p className="text-c-muted leading-relaxed whitespace-pre-line">{displayProfile.description}</p>
+                  )}
+                </div>
               )}
-              {showWhatsApp && (
-                <button
-                  type="button"
-                  onClick={handleWhatsAppClick}
-                  className="text-white text-sm font-semibold px-4 py-2.5 rounded-lg inline-flex items-center justify-center gap-2 transition-colors"
-                  style={{ background: '#1FAD4F' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#168D40')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = '#1FAD4F')}
-                >
-                  <IconWhatsApp className="w-4 h-4" />
-                  {t('profile_page.whatsapp')}
-                </button>
+
+              {/* Datos sueltos en chips: experiencia, tarifa, habilidades y
+                  certificaciones. Eran cuatro cartas con su título cada una
+                  para, entre todas, cuatro palabras. */}
+              {(profile.years_experience > 0 || profile.tarifa_base > 0
+                || displayProfile.skills?.length > 0 || displayProfile.certifications?.length > 0) && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {profile.years_experience > 0 && (
+                    <span className="chip">{t('profile_page.years_of_experience', { count: profile.years_experience })}</span>
+                  )}
+                  {profile.tarifa_base > 0 && (
+                    <span className="chip">{t('profile_page.from_price', { price: profile.tarifa_base })}</span>
+                  )}
+                  {displayProfile.skills?.map((skill, idx) => (
+                    <span key={`s-${idx}`} className="chip">{skill}</span>
+                  ))}
+                  {displayProfile.certifications?.map((cert, idx) => (
+                    <span key={`c-${idx}`} className="chip inline-flex items-center gap-1.5">
+                      <IconAward className="w-3.5 h-3.5" />
+                      {cert}
+                    </span>
+                  ))}
+                </div>
               )}
-              {showPhone && (
-                <button
-                  type="button"
-                  onClick={handlePhoneClick}
-                  className="border border-c-border bg-surface hover:bg-soft text-ink text-sm font-semibold px-4 py-2.5 rounded-lg inline-flex items-center justify-center gap-2 transition-colors"
-                >
-                  <IconPhone className="w-4 h-4" style={{ color: '#00255C' }} />
-                  <span className="hidden md:inline">{profile.telefono_contacto}</span>
-                  <span className="md:hidden">{t('profile_page.call')}</span>
-                </button>
+
+              {/* Disponibilidad */}
+              {(displayProfile.horario_apertura || displayProfile.horario_cierre) && (
+                <div className="mt-8">
+                  <h2 className="text-lg font-semibold text-ink mb-3">{t('profile_page.availability')}</h2>
+                  <p className="text-ink">
+                    {displayProfile.disponibilidad_tipo === "ambos" && t('profile_page.available_every_day')}
+                    {displayProfile.disponibilidad_tipo === "laborables" && t('proProfile.availability.summaryWeekdays')}
+                    {displayProfile.disponibilidad_tipo === "festivos" && t('proProfile.availability.summaryWeekends')}
+                  </p>
+                  <p className="text-sm text-c-muted mt-1 inline-flex items-center gap-2">
+                    <IconClock className="w-4 h-4" />
+                    {t('proProfile.availability.scheduleRange', { from: displayProfile.horario_apertura, to: displayProfile.horario_cierre })}
+                  </p>
+                </div>
               )}
-            </div>
-          </div>
 
-          {/* DESCRIPCIÓN */}
-          <div className="card rounded-xl p-4">
-            {displayProfile.descripcion_corta && (
-              <p className="text-sm text-ink mb-3">{displayProfile.descripcion_corta}</p>
-            )}
-            {displayProfile.description && displayProfile.description !== displayProfile.descripcion_corta && (
-              <p className="text-sm text-c-muted">{displayProfile.description}</p>
-            )}
-
-            {(profile.years_experience > 0 || profile.tarifa_base > 0) && (
-              <div className="flex flex-wrap gap-2 pt-3 border-t border-c-border mt-3">
-                {profile.years_experience > 0 && (
-                  <span className="badge bg-c-accent/10 text-c-accent px-3 py-1.5 text-sm font-medium">
-                    <IconBriefcase className="w-3.5 h-3.5 mr-1.5" />
-                    {t('profile_page.years_of_experience', { count: profile.years_experience })}
-                  </span>
-                )}
-                {profile.tarifa_base > 0 && (
-                  <span className="badge bg-c-accent/10 text-c-accent px-3 py-1.5 text-sm font-medium">
-                    <IconEuro className="w-3.5 h-3.5 mr-1.5" />
-                    {t('profile_page.from_price', { price: profile.tarifa_base })}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* SERVICIOS OFRECIDOS */}
-          {displayProfile.services_offered && displayProfile.services_offered.length > 0 && (
-            <div className="card rounded-xl p-4">
-              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
-                <IconBriefcase className="w-4 h-4 text-c-accent" />
-                {t('profile_page.services')}
-              </h3>
-              <div className="space-y-3">
-                {displayProfile.services_offered.map((service) => (
-                  <div key={service.id} className="border border-c-border rounded-lg p-3 bg-soft">
-                    <h4 className="font-semibold text-ink mb-1">{service.name}</h4>
-                    {service.description && (
-                      <p className="text-sm text-c-muted mb-2">{service.description}</p>
-                    )}
-                    <div className="flex gap-2 text-xs">
-                      {service.price && (
-                        <span className="bg-success/10 text-success px-2 py-1 rounded flex items-center gap-1">
-                          <IconEuro className="w-3 h-3" />
-                          {service.price}€/{service.unit}
-                        </span>
-                      )}
-                      {service.duration && (
-                        <span className="bg-c-accent/10 text-c-accent px-2 py-1 rounded">
-                          {service.duration}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* DISPONIBILIDAD */}
-          {(displayProfile.horario_apertura || displayProfile.horario_cierre) && (
-            <div className="card rounded-xl p-4">
-              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
-                <IconClock className="w-4 h-4 text-success" />
-                {t('profile_page.availability')}
-              </h3>
-              <div className="space-y-2">
-                <p className="text-sm text-ink">
-                  {displayProfile.disponibilidad_tipo === "ambos" && t('profile_page.available_every_day')}
-                  {displayProfile.disponibilidad_tipo === "laborables" && t('proProfile.availability.summaryWeekdays')}
-                  {displayProfile.disponibilidad_tipo === "festivos" && t('proProfile.availability.summaryWeekends')}
-                </p>
-                <p className="text-sm text-c-muted flex items-center gap-2">
-                  <IconClock className="w-3.5 h-3.5" />
-                  {t('proProfile.availability.scheduleRange', { from: displayProfile.horario_apertura, to: displayProfile.horario_cierre })}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* PORTFOLIO DE TRABAJOS */}
-          {displayProfile.portfolio_items && displayProfile.portfolio_items.length > 0 && (
-            <div className="card rounded-xl p-4">
-              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
-                <IconBriefcase className="w-4 h-4 text-indigo-600" />
-                {t('search.profile.portfolioTitle')}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {displayProfile.portfolio_items.map((item) => (
-                  <div 
-                    key={item.id} 
-                    className="border border-c-border rounded-xl overflow-hidden bg-soft hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => {
-                      if (item.images?.[0]) {
-                        setSelectedImage(item.images[0]);
-                        setSelectedImageIndex(-2);
-                      }
-                    }}
-                  >
-                    {item.images?.[0] && (
-                      <div className="relative h-32 bg-soft">
-                        <img 
-                          src={item.images[0]} 
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                        />
-                        {item.images.length > 1 && (
-                          <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                            {t('search.profile.morePhotos', { count: item.images.length - 1 })}
+              {/* Servicios */}
+              {displayProfile.services_offered?.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="text-lg font-semibold text-ink mb-4">{t('profile_page.services')}</h2>
+                  <div className="space-y-3">
+                    {displayProfile.services_offered.map((service) => (
+                      <div key={service.id} className="card p-4">
+                        <h3 className="font-semibold text-ink text-base m-0">{service.name}</h3>
+                        {service.description && (
+                          <p className="text-sm text-c-muted mt-1">{service.description}</p>
+                        )}
+                        {(service.price || service.duration) && (
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            {service.price && (
+                              <span className="chip">{service.price}€/{service.unit}</span>
+                            )}
+                            {service.duration && <span className="chip">{service.duration}</span>}
                           </div>
                         )}
                       </div>
-                    )}
-                    <div className="p-3">
-                      <h4 className="font-semibold text-ink text-sm mb-1">{item.title}</h4>
-                      {item.description && (
-                        <p className="text-xs text-c-muted line-clamp-2">{item.description}</p>
-                      )}
-                      <div className="flex items-center gap-2 mt-2 text-xs text-c-muted">
-                        {item.date && <span>{item.date}</span>}
-                        {item.category && (
-                          <span className="bg-c-accent/10 text-c-accent px-2 py-0.5 rounded">
-                            {item.category}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* HABILIDADES */}
-          {displayProfile.skills && displayProfile.skills.length > 0 && (
-            <div className="card rounded-xl p-4">
-              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
-                <IconSparkles className="w-4 h-4 text-purple-600" />
-                {t('skills')}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {displayProfile.skills.map((skill, idx) => (
-                  <span
-                    key={idx}
-                    className="badge bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 text-sm"
-                  >
-                    <IconSparkles className="w-3 h-3 mr-1.5" />
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* CERTIFICACIONES */}
-          {displayProfile.certifications && displayProfile.certifications.length > 0 && (
-            <div className="card rounded-xl p-4">
-              <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
-                <IconVerified className="w-4 h-4 text-warning" />
-                {t('certificationsAndTitles')}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {displayProfile.certifications.map((cert, idx) => (
-                  <span
-                    key={idx}
-                    className="badge bg-amber-50 text-warning border border-amber-200 px-3 py-1.5 text-sm"
-                  >
-                    <IconAward className="w-3 h-3 mr-1.5" />
-                    {cert}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* GALERÍA */}
-          {profile.photos && profile.photos.length > 0 && (
-            <div className="card rounded-xl p-4">
-              <h3 className="text-sm font-bold text-ink mb-3">{t('workGalleryTitle')}</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {profile.photos.map((photo, idx) => (
-                <div 
-                  key={idx} 
-                  className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group bg-soft shadow-sm hover:shadow-md transition-shadow"
-                  onClick={() => {
-                    setSelectedImage(photo);
-                    setSelectedImageIndex(idx);
-                  }}
-                >
-                  <img src={photo} alt={t('proProfile.gallery.workAlt', { number: idx + 1 })} className="w-full h-full object-cover" loading="lazy" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* REDES SOCIALES */}
-          {(profile.website || profile.social_links?.facebook || profile.social_links?.instagram || profile.social_links?.linkedin || profile.social_links?.tiktok) && (
-            <div className="card rounded-xl p-4">
-              <h3 className="text-sm font-bold text-ink mb-3">{t('socialNetworks')}</h3>
-              <div className="flex flex-wrap gap-2">
-                {profile.website && (
-                  <a href={formatSocialLink(profile.website, 'website')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
-                    <IconGlobe className="w-4 h-4 mr-2" />{t('proProfile.social.web')}
-                  </a>
-                )}
-                {profile.social_links?.instagram && (
-                  <a href={formatSocialLink(profile.social_links.instagram, 'instagram')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
-                    <IconInstagram className="w-4 h-4 mr-2 text-pink-600" />{t('proProfile.social.instagram')}
-                  </a>
-                )}
-                {profile.social_links?.facebook && (
-                  <a href={formatSocialLink(profile.social_links.facebook, 'facebook')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
-                    <IconFacebook className="w-4 h-4 mr-2 text-c-accent" />{t('proProfile.social.facebook')}
-                  </a>
-                )}
-                {profile.social_links?.linkedin && (
-                  <a href={formatSocialLink(profile.social_links.linkedin, 'linkedin')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
-                    <IconLinkedin className="w-4 h-4 mr-2 text-c-accent" />{t('proProfile.social.linkedin')}
-                  </a>
-                )}
-                {profile.social_links?.tiktok && (
-                  <a href={formatSocialLink(profile.social_links.tiktok, 'tiktok')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
-                    <IconMusic className="w-4 h-4 mr-2 text-black" />{t('proProfile.social.tiktok')}
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* RESEÑAS — bloque prominente con rating summary */}
-          <div className="card rounded-xl p-4">
-            {/* Rating hero */}
-            {profile.average_rating > 0 && profile.total_reviews > 0 ? (
-              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-c-border">
-                <div className="text-4xl font-extrabold text-ink">{profile.average_rating?.toFixed(1)}</div>
-                <div>
-                  <div className="flex gap-0.5 mb-0.5">
-                    {[1,2,3,4,5].map(s => (
-                      <IconStarOutline key={s} className={`w-5 h-5 ${s <= Math.round(profile.average_rating) ? "fill-star text-star" : "text-c-border"}`} />
                     ))}
                   </div>
-                  <p className="text-sm text-c-muted">{t('search.profile.reviewsCount', { count: profile.total_reviews })}</p>
                 </div>
+              )}
+
+              {/* Trabajos realizados — galería y portfolio en la MISMA
+                  sección. Eran dos cartas separadas («Portfolio de trabajos»
+                  y «Galería») que enseñaban lo mismo: fotos del trabajo. */}
+              {(profile.photos?.length > 0 || displayProfile.portfolio_items?.length > 0) && (
+                <div className="mt-8">
+                  <h2 className="text-lg font-semibold text-ink mb-4">{t('search.profile.portfolioTitle')}</h2>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
+                    {(profile.photos || []).map((photo, idx) => (
+                      <button
+                        key={`p-${idx}`}
+                        type="button"
+                        onClick={() => { setSelectedImage(photo); setSelectedImageIndex(idx); }}
+                        className="relative aspect-square rounded-lg overflow-hidden bg-soft border border-c-border focus:outline-none"
+                        aria-label={t('proProfile.gallery.workAlt', { number: idx + 1 })}
+                      >
+                        <img src={photo} alt={t('proProfile.gallery.workAlt', { number: idx + 1 })} className="w-full h-full object-cover" loading="lazy" />
+                      </button>
+                    ))}
+                    {(displayProfile.portfolio_items || []).map((item) => item.images?.[0] && (
+                      <button
+                        key={`pf-${item.id}`}
+                        type="button"
+                        onClick={() => { setSelectedImage(item.images[0]); setSelectedImageIndex(-2); }}
+                        title={item.title}
+                        className="relative aspect-square rounded-lg overflow-hidden bg-soft border border-c-border focus:outline-none"
+                      >
+                        <img src={item.images[0]} alt={item.title || ''} className="w-full h-full object-cover" loading="lazy" />
+                        {item.images.length > 1 && (
+                          <span className="absolute bottom-1.5 right-1.5 bg-black/70 text-white text-[11px] px-1.5 py-0.5 rounded">
+                            +{item.images.length - 1}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Redes */}
+              {(profile.website || profile.social_links?.facebook || profile.social_links?.instagram
+                || profile.social_links?.linkedin || profile.social_links?.tiktok) && (
+                <div className="mt-8">
+                  <h2 className="text-lg font-semibold text-ink mb-4">{t('proProfile.findMeOn')}</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.website && (
+                      <a href={formatSocialLink(profile.website, 'website')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                        <IconGlobe className="w-4 h-4" />{t('proProfile.social.web')}
+                      </a>
+                    )}
+                    {profile.social_links?.instagram && (
+                      <a href={formatSocialLink(profile.social_links.instagram, 'instagram')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                        <IconInstagram className="w-4 h-4" />{t('proProfile.social.instagram')}
+                      </a>
+                    )}
+                    {profile.social_links?.facebook && (
+                      <a href={formatSocialLink(profile.social_links.facebook, 'facebook')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                        <IconFacebook className="w-4 h-4" />{t('proProfile.social.facebook')}
+                      </a>
+                    )}
+                    {profile.social_links?.linkedin && (
+                      <a href={formatSocialLink(profile.social_links.linkedin, 'linkedin')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                        <IconLinkedin className="w-4 h-4" />{t('proProfile.social.linkedin')}
+                      </a>
+                    )}
+                    {profile.social_links?.tiktok && (
+                      <a href={formatSocialLink(profile.social_links.tiktok, 'tiktok')} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+                        <IconMusic className="w-4 h-4" />{t('proProfile.social.tiktok')}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Reseñas */}
+              <div className="mt-8">
+                <h2 className="text-lg font-semibold text-ink mb-4">{t('clientReviews')}</h2>
+                {profile.average_rating > 0 && profile.total_reviews > 0 && (
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="text-4xl font-extrabold text-ink leading-none">{profile.average_rating?.toFixed(1)}</div>
+                    <div>
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <IconStarOutline key={s} className={`w-5 h-5 ${s <= Math.round(profile.average_rating) ? "fill-star text-star" : "text-c-border"}`} />
+                        ))}
+                      </div>
+                      <p className="text-sm text-c-muted mt-0.5">
+                        {t('search.profile.reviewsCount', { count: profile.total_reviews })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {reviews.length === 0 && (
+                  <p className="text-sm text-c-muted mb-4">{t('search.profile.noReviews')}</p>
+                )}
+                <ReviewSection professionalId={profile.user_id} reviews={reviews} currentUser={user} />
               </div>
-            ) : null}
+            </div>
 
-            <h3 className="text-sm font-bold text-ink mb-3 flex items-center gap-2">
-              <IconStarOutline className="w-4 h-4 text-star fill-star" />
-              {t('clientReviews')}
-            </h3>
+            {/* ── TARJETA DE CONTACTO ───────────────────────────────────
+                Pegajosa en escritorio: acompaña la lectura en vez de quedarse
+                arriba. En móvil no cabe una columna, así que los dos botones
+                viven en la barra inferior fija (más abajo). */}
+            <aside className="hidden lg:block">
+              <div className="sticky top-24 card p-5">
+                <h2 className="text-base font-semibold text-ink m-0">{t('proProfile.contactCard.title')}</h2>
+                <p className="text-sm text-c-muted mt-2 leading-relaxed">{t('proProfile.contactCard.body')}</p>
 
-            {reviews.length === 0 && (
-              <div className="bg-soft rounded-xl p-4 mb-4 text-sm text-c-muted text-center">
-                {t('search.profile.noReviews')}
+                {(showPhone || showWhatsApp) && (
+                  <div className="mt-5 rounded-lg border border-c-border p-3 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-c-muted m-0">{t('proProfile.phoneModal.title')}</p>
+                      <p className="text-ink font-semibold truncate m-0" dir="ltr">{profile.telefono_contacto}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(profile.telefono_contacto)}
+                      aria-label={t('proProfile.phoneModal.copyButton')}
+                      className="w-10 h-10 flex-shrink-0 rounded-lg border border-c-border hover:bg-soft inline-flex items-center justify-center"
+                    >
+                      {copiedPhone ? <IconCheck className="w-4 h-4 text-success" /> : <IconCopy className="w-4 h-4 text-c-muted" />}
+                    </button>
+                  </div>
+                )}
+
+                <div className="mt-3 space-y-2">
+                  {showWhatsApp && (
+                    <button type="button" onClick={handleWhatsAppClick} className="btn w-full bg-whatsapp text-white hover:bg-whatsapp-hover">
+                      <IconWhatsApp className="w-4 h-4" />
+                      {t('profile_page.whatsapp')}
+                    </button>
+                  )}
+                  {showPhone && (
+                    <button type="button" onClick={handlePhoneClick} className="btn-secondary w-full">
+                      <IconPhone className="w-4 h-4" />
+                      {t('profile_page.call')}
+                    </button>
+                  )}
+                  <button type="button" onClick={handleStartChat} className="btn w-full bg-brand-navy text-white hover:bg-brand-navy-deep">
+                    <IconMessageCircle className="w-4 h-4" />
+                    {t('proProfile.contact.sendMessage')}
+                  </button>
+                </div>
+
+                <p className="text-xs text-c-muted mt-4 leading-relaxed">{t('proProfile.contactCard.noFees')}</p>
               </div>
-            )}
-
-            <ReviewSection professionalId={profile.user_id} reviews={reviews} currentUser={user} />
+            </aside>
           </div>
         </div>
+      </section>
+
+      {/* Barra inferior fija en móvil: los dos botones que importan, siempre
+          a la vista. z-30 la deja por debajo del cajón de la cabecera (z-50),
+          que debe poder taparla. */}
+      <div
+        className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-surface border-t border-c-border px-4 py-3 flex gap-2"
+        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
+      >
+        {showWhatsApp && (
+          <button type="button" onClick={handleWhatsAppClick} className="btn flex-1 bg-whatsapp text-white hover:bg-whatsapp-hover">
+            <IconWhatsApp className="w-4 h-4" />
+            {t('profile_page.whatsapp')}
+          </button>
+        )}
+        {showPhone ? (
+          <button type="button" onClick={handlePhoneClick} className="btn-secondary flex-1">
+            <IconPhone className="w-4 h-4" />
+            {t('profile_page.call')}
+          </button>
+        ) : (
+          <button type="button" onClick={handleStartChat} className="btn flex-1 bg-brand-navy text-white hover:bg-brand-navy-deep">
+            <IconMessageCircle className="w-4 h-4" />
+            {t('proProfile.contact.sendMessage')}
+          </button>
+        )}
       </div>
 
       {/* MODALES */}
