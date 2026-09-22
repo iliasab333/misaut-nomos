@@ -12,7 +12,6 @@ const PAGE_ROUTES: Record<string, string> = {
     Autonomo: "/autonomo",
     Categoria: "/categoria",
     FAQ: "/preguntas-frecuentes",
-    FAQDetail: "/preguntas-frecuentes",
     HelpCenter: "/ayuda",
     ClientOnboarding: "/registro-cliente",
     UserTypeSelection: "/registro",
@@ -48,7 +47,6 @@ const PAGE_ROUTES: Record<string, string> = {
     AdminDashboard: "/admin",
     AdminPayments: "/admin/pagos",
     AdminTickets: "/admin/soporte",
-    AdminFAQ: "/admin/faq",
     AdminMessagesStats: "/admin/mensajes",
 };
 

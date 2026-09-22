@@ -110,6 +110,11 @@
       "source": "/categoria/:cat/:ciudad-",
       "destination": "/categoria/:cat/:ciudad",
       "statusCode": 301
+    },
+    {
+      "source": "/preguntas-frecuentes/(.*)",
+      "destination": "/preguntas-frecuentes",
+      "statusCode": 301
     }
   ],
   "rewrites": [
@@ -167,10 +172,6 @@
     },
     {
       "source": "/valorar/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/preguntas-frecuentes/(.*)",
       "destination": "/index.html"
     },
     {

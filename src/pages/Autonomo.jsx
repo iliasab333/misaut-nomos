@@ -184,7 +184,11 @@ export default function AutonomoPage() {
     queryKey: ['professionalUser', profile?.user_id],
     queryFn: async () => {
       const users = await base44.entities.User.filter({ id: profile.user_id });
-      return users[0];
+      // `?? null`: React Query v5 lanza si una consulta devuelve undefined, y
+      // `users[0]` lo es cuando la fila del usuario ya no está (perfil creado
+      // antes de borrar la cuenta). La ficha ya sabe vivir sin ella —cae a
+      // `profile.imagen_principal`—, pero la consola se llenaba de errores.
+      return users[0] ?? null;
     },
     enabled: !!profile?.user_id,
   });

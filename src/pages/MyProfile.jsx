@@ -157,7 +157,8 @@ export default function MyProfilePage() {
     queryKey: ['myProfile', user?.id],
     queryFn: async () => {
       const profiles = await base44.entities.ProfessionalProfile.filter({ user_id: user.id });
-      return profiles[0];
+      // Ver la nota en Autonomo.jsx: undefined hace saltar a React Query v5.
+      return profiles[0] ?? null;
     },
     enabled: !!user,
     staleTime: 0,

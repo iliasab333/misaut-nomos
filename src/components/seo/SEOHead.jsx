@@ -49,7 +49,7 @@ export default function SEOHead({
     // Rutas privadas adicionales (Search Console legacy en inglés)
     '/Tickets', '/tickets', '/TicketDetail', '/Invoices', '/UserTypeSelection',
     '/ProfileOnboarding', '/MyProfile', '/NewsletterUnsubscribe', '/CookiePreferences',
-    '/Favorites', '/Notifications', '/AdminFAQ',
+    '/Favorites', '/Notifications',
     '/AdminReferrals', '/BriefingMensual', '/PayInvoice',
   ];
   const isPrivatePage = NOINDEX_PATHS.some(p => location.pathname === p || location.pathname.startsWith(p + '/'));

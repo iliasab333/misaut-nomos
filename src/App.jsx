@@ -129,7 +129,6 @@ class ErrorBoundary extends Component {
 // Lazy load de páginas pesadas (admin, invoicing, CRM)
 const AdminDashboard = lazyApp(() => import('./pages/AdminDashboard'));
 const AdminTickets = lazyApp(() => import('./pages/AdminTickets'));
-const AdminFAQ = lazyApp(() => import('./pages/AdminFAQ'));
 const AdminNewsletter = lazyApp(() => import('./pages/AdminNewsletter'));
 const AdminEmails = lazyApp(() => import('./pages/AdminEmails'));
 const AdminUsuarios = lazyApp(() => import('./pages/AdminUsuarios'));
@@ -165,6 +164,8 @@ const LEGACY_REDIRECTS = {
   '/autonomo': '/autonomo',
   '/categoria': '/categoria',
   '/faq': '/preguntas-frecuentes',
+  // /faqdetail era el detalle de artículo, retirado con el sistema de
+  // artículos de ayuda (tabla vacía). La dirección vieja lleva al índice.
   '/faqdetail': '/preguntas-frecuentes',
   '/helpcenter': '/ayuda',
   '/home': '/inicio',
@@ -198,7 +199,7 @@ const LEGACY_REDIRECTS = {
   '/admindashboard': '/admin',
   '/adminpayments': '/admin/pagos',
   '/admintickets': '/admin/soporte',
-  '/adminfaq': '/admin/faq',
+  '/adminfaq': '/admin',
   '/adminmessagesstats': '/admin/mensajes',
 };
 
@@ -220,7 +221,7 @@ const EXPLICIT_301s = {
   '/ProfileOnboarding': '/completar-perfil',
   '/ClientOnboarding': '/registro-cliente',
   '/AdminDashboard': '/admin',
-  '/AdminFAQ': '/admin/faq',
+  '/AdminFAQ': '/admin',
   '/HelpCenter': '/ayuda',
 };
 
@@ -290,7 +291,6 @@ const AuthenticatedApp = () => {
           <Route path="/para-autonomos" element={<ParaAutonomos />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/preguntas-frecuentes" element={<Pages.FAQ />} />
-          <Route path="/preguntas-frecuentes/:slug" element={<Pages.FAQDetail />} />
           <Route path="/ayuda" element={<Pages.HelpCenter />} />
           {/* /inicio retirada: 301 → / via vercel.json. */}
           <Route path="/registro-cliente" element={<Pages.ClientOnboarding />} />
@@ -324,7 +324,6 @@ const AuthenticatedApp = () => {
           {/* Subrutas admin ANTES que /admin para matchear primero */}
           <Route path="/admin/tickets" element={<Suspense fallback={<PageLoader />}><AdminTickets /></Suspense>} />
           <Route path="/admin/soporte" element={<Suspense fallback={<PageLoader />}><AdminSoporte /></Suspense>} />
-          <Route path="/admin/faq" element={<Suspense fallback={<PageLoader />}><AdminFAQ /></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
           <Route path="/admin/usuarios" element={<Suspense fallback={<PageLoader />}><AdminUsuarios /></Suspense>} />
           <Route path="/admin/blog" element={<Suspense fallback={<PageLoader />}><AdminBlog /></Suspense>} />

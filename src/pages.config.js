@@ -22,7 +22,6 @@ const Search = lazyWithRetry(() => import('./pages/Search'));
 
 // 🔴 PÁGINAS ADMIN — muy pesadas, solo las usa el admin
 const AdminDashboard     = lazyApp(() => import('./pages/AdminDashboard'));
-const AdminFAQ           = lazyApp(() => import('./pages/AdminFAQ'));
 const AdminTickets       = lazyApp(() => import('./pages/AdminTickets'));
 
 // 🟠 PÁGINAS PRO — pesadas, solo usuarios profesionales
@@ -44,11 +43,6 @@ const UserTypeSelection  = lazyApp(() => import('./pages/UserTypeSelection'));
 const CookiePolicy       = lazyWithRetry(() => import('./pages/CookiePolicy'));
 const CookiePreferences  = lazyWithRetry(() => import('./pages/CookiePreferences'));
 const FAQ                = lazyWithRetry(() => import('./pages/FAQ'));
-// FAQDetail pasa a `lazyApp`: sus textos («¿Te ha servido este artículo?»,
-// «Vistos recientemente») dejaron de estar escritos a mano en dos idiomas
-// dentro del JSX y viven en `helpCenter.detail`, que es un namespace de
-// aplicación. Con `lazyWithRetry` la página pintaría las claves crudas.
-const FAQDetail          = lazyApp(() => import('./pages/FAQDetail'));
 const HelpCenter         = lazyApp(() => import('./pages/HelpCenter'));
 const LegalNotice        = lazyWithRetry(() => import('./pages/LegalNotice'));
 const PrivacyPolicy      = lazyWithRetry(() => import('./pages/PrivacyPolicy'));
@@ -56,7 +50,6 @@ const TermsConditions    = lazyWithRetry(() => import('./pages/TermsConditions')
 
 export const PAGES = {
     "AdminDashboard": AdminDashboard,
-    "AdminFAQ": AdminFAQ,
     "AdminTickets": AdminTickets,
     "Autonomo": Autonomo,
     "Categoria": Categoria,
@@ -65,7 +58,6 @@ export const PAGES = {
     "CookiePolicy": CookiePolicy,
     "CookiePreferences": CookiePreferences,
     "FAQ": FAQ,
-    "FAQDetail": FAQDetail,
     "Favorites": Favorites,
     "HelpCenter": HelpCenter,
     "LegalNotice": LegalNotice,

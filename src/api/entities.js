@@ -21,7 +21,6 @@ export const TicketMessage = base44.entities.TicketMessage;
 export const TicketEvent = base44.entities.TicketEvent;
 export const IdentityVerification = base44.entities.IdentityVerification;
 export const CookieConsent = base44.entities.CookieConsent;
-export const FAQ = base44.entities.FAQ;
 export const BlogPost = base44.entities.BlogPost;
 export const NewsletterSubscriber = base44.entities.NewsletterSubscriber;
 export const ReviewRequest = base44.entities.ReviewRequest;

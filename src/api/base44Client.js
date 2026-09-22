@@ -25,7 +25,6 @@ const TABLE_MAP = {
   TicketEvent: 'ticket_events',
   IdentityVerification: 'identity_verifications',
   CookieConsent: 'cookie_consents',
-  FAQ: 'faqs',
   BlogPost: 'blog_posts',
   NewsletterSubscriber: 'newsletter_subscribers',
   ReviewRequest: 'review_requests',
