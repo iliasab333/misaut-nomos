@@ -139,7 +139,7 @@ export default function BlogListPage() {
 
       {/* Cabecera */}
       <section style={{ background: '#FBFCFE' }}>
-        <div className="max-w-5xl mx-auto px-4 pt-14 pb-10 md:pt-20 md:pb-12">
+        <div className="container-page pt-14 pb-10 md:pt-20 md:pb-12">
           <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium" style={{ backgroundColor: 'rgba(0,37,92,0.06)', color: NAVY }}>
             <IconSparkles className="w-3.5 h-3.5" /> {t('nav.blog')}
           </div>
@@ -168,7 +168,7 @@ export default function BlogListPage() {
 
       {/* Filtros sticky */}
       <div className="sticky top-0 bg-surface/95 backdrop-blur border-b border-c-border z-10">
-        <div className="max-w-5xl mx-auto px-4 overflow-x-auto">
+        <div className="container-page overflow-x-auto">
           <div className="flex gap-1 min-w-max">
             <button
               type="button"
@@ -199,7 +199,7 @@ export default function BlogListPage() {
 
       {/* Contenido */}
       <section className="bg-canvas">
-        <div className="max-w-5xl mx-auto px-4 py-10 md:py-12">
+        <div className="container-page py-10 md:py-12">
           {loading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (

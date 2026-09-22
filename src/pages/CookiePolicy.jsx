@@ -1,9 +1,11 @@
 import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { createPageUrl } from "@/utils";
-import { IconArrowLeft, IconCookie, IconSettings } from "@/components/Icons";
+import { IconSettings } from "@/components/Icons";
 import SEOHead from "../components/seo/SEOHead";
+import PageTitle from "@/components/PageTitle";
+
+const BRAND = "MisAutónomos";
 
 const SUPPORT_EMAIL = "hola@misautonomos.com";
 
@@ -48,7 +50,6 @@ const COOKIE_TABLES = [
 ];
 
 export default function CookiePolicyPage() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
   return (
@@ -58,26 +59,16 @@ export default function CookiePolicyPage() {
         description={t('cookies.policy.seoDescription')}
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-8">
-        <div className="max-w-4xl mx-auto">
-          <button
-            type="button"
-            onClick={() => navigate(createPageUrl("Search"))}
-            className="btn-ghost mb-6 hover:bg-c-accent/5"
-          >
-            <IconArrowLeft className="w-4 h-4 mr-2" />
-            {t('common.back')}
-          </button>
+      {/* Página de texto con la maqueta del modelo: sobretítulo, titular
+          y UNA carta con el contenido. La banda de color en degradado que
+          había aquí arriba no decía nada que el titular no dijera ya, y su
+          azul no es el de la marca. */}
+      <section className="section-tight">
+        <div className="container-page max-w-3xl">
+          <PageTitle eyebrow={BRAND} className="mb-2">{t('cookies.policy.title')}</PageTitle>
+          <p className="text-sm text-c-muted mb-8">{t('cookies.policy.updated')}</p>
 
-          <div className="card shadow-xl border-0">
-            <div className="bg-gradient-to-r from-c-accent to-accent-hover text-white p-8">
-              <div className="flex items-center gap-3 mb-2">
-                <IconCookie className="w-8 h-8" />
-                <h1 className="text-3xl font-bold">{t('cookies.policy.title')}</h1>
-              </div>
-              <p className="text-blue-100">{t('cookies.policy.updated')}</p>
-            </div>
-            <div className="p-8 space-y-8">
+          <div className="card p-6 sm:p-8 space-y-8 text-ink leading-relaxed">
               {SECTIONS.map((key) => (
                 <div key={key} className="space-y-3">
                   <h2 className="text-xl font-semibold text-ink">{t(`cookies.policy.sections.${key}.title`)}</h2>
@@ -140,10 +131,9 @@ export default function CookiePolicyPage() {
                   {t('cookies.policy.goToPreferences')}
                 </Link>
               </div>
-            </div>
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

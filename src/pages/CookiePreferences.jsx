@@ -100,7 +100,7 @@ export default function CookiePreferencesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div>
       <div className="max-w-2xl mx-auto p-4 md:p-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">

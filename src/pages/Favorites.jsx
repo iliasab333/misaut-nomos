@@ -100,7 +100,7 @@ export default function FavoritesPage() {
       />
 
       <main className="min-h-screen bg-canvas">
-        <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
+        <div className="container-page max-w-3xl py-10 md:py-14">
           <header className="mb-8">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-c-muted mb-2">
               {t('favorites.page.eyebrow')}

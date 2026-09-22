@@ -215,7 +215,7 @@ export default function NotificationsPage() {
   const isProfessional = user.user_type === 'professionnel';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-3 md:p-8 pb-24 md:pb-8">
+    <div className="section-tight">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-2">

@@ -55,7 +55,7 @@ export default function Contacto() {
       <main className="bg-canvas text-ink">
         {/* HERO sobrio */}
         <section style={{ background: '#FBFCFE' }}>
-          <div className="max-w-4xl mx-auto px-4 pt-14 pb-10 md:pt-20 md:pb-12 text-center">
+          <div className="container-page max-w-4xl pt-14 pb-10 md:pt-20 md:pb-12 text-center">
             <div
               className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
               style={{ backgroundColor: 'rgba(0,37,92,0.06)', color: NAVY }}
@@ -76,7 +76,7 @@ export default function Contacto() {
 
         {/* CUERPO con dos columnas: formulario y datos directos */}
         <section className="bg-canvas">
-          <div className="max-w-5xl mx-auto px-4 pb-16 md:pb-20">
+          <div className="container-page pb-16 md:pb-20">
             <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 md:gap-10">
               {/* Formulario */}
               <form

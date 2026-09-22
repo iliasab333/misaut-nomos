@@ -21,6 +21,8 @@ import {
   IconMessageSquare,
 } from "@/components/Icons";
 import SEOHead from "../components/seo/SEOHead";
+import { faqUrl } from "@/lib/faqUrl";
+import PageTitle from "@/components/PageTitle";
 import { FAQPageSchema } from "../components/seo/StructuredData";
 import PublicTicketForm from "../components/support/PublicTicketForm";
 
@@ -71,7 +73,7 @@ const categoryConfig = {
 
 export default function HelpCenterPage() {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const language = uiLang(i18n.language);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -129,39 +131,32 @@ export default function HelpCenterPage() {
   return (
     <>
       <SEOHead 
-        title={language === 'es' ? "Centro de Ayuda - MisAutónomos" : "Help Center - MisAutónomos"}
-        description={language === 'es' 
-          ? "Encuentra respuestas a tus preguntas sobre MisAutónomos. Guías para clientes y profesionales."
-          : "Find answers to your questions about MisAutónomos. Guides for clients and professionals."}
+        title={t('helpCenter.seoTitle')}
+        description={t('helpCenter.seoDescription')}
         keywords="ayuda, soporte, FAQ, guías, tutoriales, help center"
       />
       
       <FAQPageSchema faqs={popularArticles} language={language} />
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <IconHelp className="w-16 h-16 mx-auto mb-4 opacity-90" />
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              {language === 'es' ? '¿En qué podemos ayudarte?' : 'How can we help you?'}
-            </h1>
-            <p className="text-xl text-blue-100 mb-8">
-              {language === 'es' 
-                ? 'Busca en nuestra base de conocimientos o explora por categorías'
-                : 'Search our knowledge base or browse by categories'}
-            </p>
+      {/* Abría con una banda de blue-600 a blue-800 y el titular centrado
+          dentro. Ni ese azul es de la marca ni el modelo usa bandas de color
+          para abrir: rótulo, titular a la izquierda y el contenido. */}
+      <section className="section-tight pb-0">
+        <div className="container-page max-w-3xl">
+          <PageTitle eyebrow={t('nav.support')} className="mb-3">{t('helpCenter.title')}</PageTitle>
+          <p className="text-lg text-c-muted">{t('helpCenter.subtitle')}</p>
 
-            <div className="relative max-w-2xl mx-auto">
-              <IconSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-c-muted pointer-events-none z-10" />
-              <input
-                type="text"
-                placeholder={language === 'es' ? "Buscar en el centro de ayuda..." : "Search help center..."}
-                aria-label={language === 'es' ? "Buscar en el centro de ayuda" : "Search help center"}
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="input pl-12 h-14 text-lg bg-surface text-ink border-0 shadow-lg"
-              />
-              
+          <div className="relative mt-8">
+            <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-c-muted pointer-events-none z-10" />
+            <label htmlFor="help-search" className="sr-only">{t('helpCenter.searchLabel')}</label>
+            <input
+              id="help-search"
+              type="text"
+              placeholder={t('helpCenter.searchPlaceholder')}
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="input ps-12"
+            />
               {searchResults.length > 0 && (
                 <div className="card absolute w-full mt-2 z-50 shadow-xl animate-slide-down">
                   <div className="p-2">
@@ -170,7 +165,7 @@ export default function HelpCenterPage() {
                         key={faq.id}
                         type="button"
                         onClick={() => {
-                          navigate(createPageUrl("FAQDetail") + `?id=${faq.id}`);
+                          navigate(faqUrl(faq));
                           setSearchTerm("");
                           setSearchResults([]);
                         }}
@@ -187,30 +182,31 @@ export default function HelpCenterPage() {
                   </div>
                 </div>
               )}
-            </div>
+          </div>
 
-            <div className="flex items-center justify-center gap-4 mt-6">
-              <Link
-                to={createPageUrl("FAQ")}
-                className="btn-secondary btn-lg bg-surface text-c-accent hover:bg-c-accent/10"
-              >
-                {language === 'es' ? 'Ver todas las FAQs' : 'View all FAQs'}
-                <IconArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+          <div className="mt-6">
+            <Link to={createPageUrl("FAQ")} className="btn-secondary btn-sm">
+              {t('helpCenter.allFaqs')}
+              <IconArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
+      </section>
 
-        <div className="max-w-7xl mx-auto px-4 py-12">
+      <div>
+        <div className="container-page py-12">
+          {/* La tabla `faqs` está VACÍA en producción (0 filas, comprobado).
+              Sin esta guarda, la página pintaba dos titulares —«Artículos
+              populares» y «Explorar por categoría»— con nada debajo, que es
+              peor que no tener la sección: parece que algo se ha roto. */}
+          {popularArticles.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-3xl font-bold text-ink mb-2 flex items-center gap-2">
-              <IconTrending className="w-8 h-8 text-c-accent" />
-              {language === 'es' ? 'Artículos populares' : 'Popular articles'}
+            <h2 className="text-2xl font-semibold text-ink mb-2 flex items-center gap-2">
+              <IconTrending className="w-7 h-7 text-c-accent" />
+              {t('helpCenter.popularTitle')}
             </h2>
             <p className="text-c-muted mb-6">
-              {language === 'es' 
-                ? 'Los artículos más consultados por nuestra comunidad'
-                : 'Most viewed articles by our community'}
+              {t('helpCenter.popularSubtitle')}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {popularArticles.map((faq) => (
@@ -222,7 +218,7 @@ export default function HelpCenterPage() {
                       })}
                       <h3 
                         className="font-semibold text-ink line-clamp-2 hover:text-c-accent transition-colors"
-                        onClick={() => navigate(createPageUrl("FAQDetail") + `?id=${faq.id}`)}
+                        onClick={() => navigate(faqUrl(faq))}
                       >
                         {language === 'es' ? faq.title_es : faq.title_en}
                       </h3>
@@ -236,10 +232,10 @@ export default function HelpCenterPage() {
                       </span>
                       <button
                         type="button"
-                        onClick={() => navigate(createPageUrl("FAQDetail") + `?id=${faq.id}`)}
+                        onClick={() => navigate(faqUrl(faq))}
                         className="btn-ghost btn-sm text-c-accent hover:text-accent-hover"
                       >
-                        {language === 'es' ? 'Leer más' : 'Read more'}
+                        {t('helpCenter.readMore')}
                         <IconChevronRight className="w-4 h-4" />
                       </button>
                     </div>
@@ -248,10 +244,12 @@ export default function HelpCenterPage() {
               ))}
             </div>
           </div>
+          )}
 
+          {Object.keys(faqsByCategory).length > 0 && (
           <div>
-            <h2 className="text-3xl font-bold text-ink mb-6">
-              {language === 'es' ? 'Explorar por categoría' : 'Browse by category'}
+            <h2 className="text-2xl font-semibold text-ink mb-6">
+              {t('helpCenter.browseTitle')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Object.entries(categoryConfig).map(([key, config]) => {
@@ -274,10 +272,10 @@ export default function HelpCenterPage() {
                         {language === 'es' ? config.label_es : config.label_en}
                       </h3>
                       <p className="text-c-muted mb-4">
-                        {count} {language === 'es' ? 'artículos' : 'articles'}
+                        {t('helpCenter.articlesCount', { count })}
                       </p>
                       <button type="button" className="btn-ghost p-0 text-c-accent hover:text-accent-hover">
-                        {language === 'es' ? 'Ver artículos' : 'View articles'}
+                        {t('helpCenter.viewArticles')}
                         <IconChevronRight className="w-4 h-4" />
                       </button>
                     </div>
@@ -286,17 +284,16 @@ export default function HelpCenterPage() {
               })}
             </div>
           </div>
+          )}
 
           {/* FORMULARIO DE CONTACTO PÚBLICO */}
           <div className="mt-12" id="contact-form">
-            <h2 className="text-3xl font-bold text-ink mb-2 flex items-center gap-2">
-              <IconMessageSquare className="w-8 h-8 text-c-accent" />
-              {language === 'es' ? '¿No encuentras lo que buscas?' : "Can't find what you're looking for?"}
+            <h2 className="text-2xl font-semibold text-ink mb-2 flex items-center gap-2">
+              <IconMessageSquare className="w-7 h-7 text-c-accent" />
+              {t('helpCenter.contactTitle')}
             </h2>
             <p className="text-c-muted mb-6">
-              {language === 'es' 
-                ? 'Envíanos tu consulta y te responderemos lo antes posible'
-                : 'Send us your inquiry and we will respond as soon as possible'}
+              {t('helpCenter.contactSubtitle')}
             </p>
             <div className="max-w-2xl">
               <PublicTicketForm language={language} />

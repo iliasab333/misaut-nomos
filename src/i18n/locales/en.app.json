@@ -1035,5 +1035,42 @@
     "success": {
       "stepCompleteProfile": "Complete your professional profile"
     }
+  },
+  "helpCenter": {
+    "seoTitle": "Help Center - MisAutónomos",
+    "seoDescription": "Find answers to your questions about MisAutónomos. Guides for clients and freelancers.",
+    "title": "How can we help you?",
+    "subtitle": "Search for an answer, check the FAQ, or write to us directly.",
+    "searchPlaceholder": "Search the help center…",
+    "searchLabel": "Search the help center",
+    "allFaqs": "See all frequently asked questions",
+    "popularTitle": "Popular articles",
+    "popularSubtitle": "The ones people on MisAutónomos read most.",
+    "readMore": "Read more",
+    "browseTitle": "Browse by category",
+    "articlesCount_one": "{{count}} article",
+    "articlesCount_other": "{{count}} articles",
+    "viewArticles": "View articles",
+    "contactTitle": "Can't find what you are looking for?",
+    "contactSubtitle": "Write to us and we will get back to you as soon as possible.",
+    "detail": {
+      "notFoundTitle": "Article not found",
+      "notFoundBody": "The article you are looking for does not exist or has been removed.",
+      "backToHelp": "Back to the help center",
+      "thanksFeedback": "Thanks! That helps us improve it.",
+      "linkCopied": "Link copied",
+      "helpCenter": "Help center",
+      "faqs": "Frequently asked questions",
+      "views_one": "{{count}} view",
+      "views_other": "{{count}} views",
+      "updatedOn": "Updated on {{date}}",
+      "tags": "Tags:",
+      "helpful": "Was this article helpful?",
+      "yes": "Yes",
+      "no": "No",
+      "share": "Share",
+      "related": "Related articles",
+      "recentlyViewed": "Recently viewed"
+    }
   }
 }

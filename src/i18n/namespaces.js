@@ -34,6 +34,12 @@
 export const APP_NAMESPACES = [
   'admin',
   'dashboard',
+  // `helpCenter` es la única excepción que PARECE pública y va aquí a
+  // propósito: /ayuda se sirve con `lazyApp` porque su formulario de
+  // contacto usa `support` y `tickets`, así que el bundle de aplicación ya
+  // viaja con la página. Meter sus claves en el público sólo añadiría peso
+  // a la portada, que nunca las pinta.
+  'helpCenter',
   'myProfile',
   'onboarding',
   'support',

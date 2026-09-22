@@ -71,7 +71,7 @@ export default function ParaAutonomos() {
       <main className="bg-canvas text-ink">
         {/* HERO */}
         <section className="relative" style={{ background: '#FBFCFE' }}>
-          <div className="max-w-5xl mx-auto px-4 pt-16 pb-12 md:pt-24 md:pb-16">
+          <div className="container-page pt-16 pb-12 md:pt-24 md:pb-16">
             <div
               className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
               style={{ backgroundColor: 'rgba(0,37,92,0.06)', color: NAVY }}
@@ -113,7 +113,7 @@ export default function ParaAutonomos() {
 
         {/* BENEFICIOS — banda gris suave */}
         <section style={{ background: 'hsl(var(--brand-surface))' }}>
-          <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
+          <div className="container-page py-16 md:py-20">
             <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-3">{t('forPros.benefits.eyebrow')}</h2>
             <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink max-w-2xl">
               {t('forPros.benefits.title')}
@@ -138,7 +138,7 @@ export default function ParaAutonomos() {
 
         {/* CÓMO FUNCIONA — banda blanca */}
         <section className="bg-canvas">
-          <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
+          <div className="container-page py-16 md:py-20">
             <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-3">{t('footer.how_it_works')}</h2>
             <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink max-w-2xl">
               {t('landing.howItWorks.title')}
@@ -158,7 +158,7 @@ export default function ParaAutonomos() {
 
         {/* COMPARATIVA HONESTA — banda gris muy suave */}
         <section style={{ background: 'hsl(var(--brand-surface))' }}>
-          <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
+          <div className="container-page py-16 md:py-20">
             <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-3">{t('forPros.differences.eyebrow')}</h2>
             <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink max-w-2xl">
               {t('forPros.differences.title')}
@@ -179,7 +179,7 @@ export default function ParaAutonomos() {
 
         {/* FAQ — banda blanca */}
         <section className="bg-canvas">
-          <div className="max-w-3xl mx-auto px-4 py-16 md:py-20">
+          <div className="container-page max-w-3xl py-16 md:py-20">
             <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-c-muted mb-3">{t('nav.faq')}</h2>
             <p className="text-2xl md:text-[28px] font-semibold tracking-tight text-ink">{t('forPros.faq.title')}</p>
 
@@ -199,7 +199,7 @@ export default function ParaAutonomos() {
 
         {/* CTA FINAL — banda navy */}
         <section style={{ background: NAVY }}>
-          <div className="max-w-4xl mx-auto px-4 py-16 md:py-24 text-center text-white">
+          <div className="container-page max-w-4xl py-16 md:py-24 text-center text-white">
             <h2 className="font-semibold tracking-tight" style={{ fontSize: 'clamp(1.7rem, 4.4vw, 2.5rem)', lineHeight: 1.1 }}>
               {t('forPros.finalCta.title')}
             </h2>

@@ -44,7 +44,11 @@ const UserTypeSelection  = lazyApp(() => import('./pages/UserTypeSelection'));
 const CookiePolicy       = lazyWithRetry(() => import('./pages/CookiePolicy'));
 const CookiePreferences  = lazyWithRetry(() => import('./pages/CookiePreferences'));
 const FAQ                = lazyWithRetry(() => import('./pages/FAQ'));
-const FAQDetail          = lazyWithRetry(() => import('./pages/FAQDetail'));
+// FAQDetail pasa a `lazyApp`: sus textos («¿Te ha servido este artículo?»,
+// «Vistos recientemente») dejaron de estar escritos a mano en dos idiomas
+// dentro del JSX y viven en `helpCenter.detail`, que es un namespace de
+// aplicación. Con `lazyWithRetry` la página pintaría las claves crudas.
+const FAQDetail          = lazyApp(() => import('./pages/FAQDetail'));
 const HelpCenter         = lazyApp(() => import('./pages/HelpCenter'));
 const LegalNotice        = lazyWithRetry(() => import('./pages/LegalNotice'));
 const PrivacyPolicy      = lazyWithRetry(() => import('./pages/PrivacyPolicy'));

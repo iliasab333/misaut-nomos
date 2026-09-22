@@ -61,7 +61,7 @@ export default function BlogPostPage() {
 
   if (post === null) return (
     <div className="min-h-screen bg-canvas">
-      <div className="max-w-3xl mx-auto px-4 py-10 space-y-5">
+      <div className="container-page max-w-3xl py-10 space-y-5">
         <SkeletonLine width="30%" height={20} />
         <SkeletonLine width="85%" height={34} />
         <SkeletonLine width="60%" height={34} />
@@ -136,13 +136,13 @@ export default function BlogPostPage() {
       )}
 
       {/* Back link */}
-      <div className="max-w-3xl mx-auto px-4 pt-6">
+      <div className="container-page max-w-3xl pt-6">
         <Link to="/blog" className="inline-flex items-center gap-1 text-sm text-c-muted hover:text-ink">
           <IconArrowLeft className="w-4 h-4" /> {t('blog.post.backToBlog')}
         </Link>
       </div>
 
-      <article className="max-w-3xl mx-auto px-4 py-10">
+      <article className="container-page max-w-3xl py-10">
         <CategoryBadge category={post.category} />
         <h1
           className="font-semibold mt-4 tracking-tight"

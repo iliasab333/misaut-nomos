@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { IconSearch, IconChevronDown, IconArrowRight, IconBriefcase, IconUsers, IconHelp } from "@/components/Icons";
 import SEOHead from "../components/seo/SEOHead";
+import PageTitle from "@/components/PageTitle";
 
 // ─── Datos de las 17 preguntas ────────────────────────────────────────────────
 // Se construyen con `t` (no como constante de módulo) para que se retraduzcan
@@ -148,36 +149,32 @@ export default function FAQPage() {
       />
       <FAQSchema faqs={allFaqs} />
 
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-        {/* ── Hero ── */}
-        <div className="bg-gradient-to-br from-blue-700 to-blue-900 text-white py-16 px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <span className="badge mb-4 bg-blue-600/50 text-blue-100 border border-blue-500/40 text-sm font-medium">
-              {t("faq.page.badge")}
-            </span>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">
-              {t("nav.faq")}
-            </h1>
-            <p className="text-blue-200 text-lg mb-8 max-w-xl mx-auto">
-              {t("faq.page.subtitle")}
-            </p>
+      {/* Abría con una banda azul de blue-700 a blue-900 y el titular
+          centrado dentro. Ni ese azul es el de la marca ni el modelo usa
+          bandas de color para abrir una página: rótulo, titular a la
+          izquierda y el contenido. */}
+      <section className="section-tight pb-0">
+        <div className="container-page max-w-3xl">
+          <PageTitle eyebrow={t("faq.page.badge")} className="mb-3">{t("nav.faq")}</PageTitle>
+          <p className="text-lg text-c-muted">{t("faq.page.subtitle")}</p>
 
-            {/* Buscador */}
-            <div className="relative max-w-xl mx-auto">
-              <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-c-muted pointer-events-none" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={e => { setSearchTerm(e.target.value); setOpenIndex(null); }}
-                placeholder={t("faq.page.searchPlaceholder")}
-                aria-label={t("faq.page.searchPlaceholder")}
-                className="input pl-12 text-base bg-surface text-ink border-0 shadow-lg rounded-xl py-3.5"
-              />
-            </div>
+          <div className="relative mt-8">
+            <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-c-muted pointer-events-none" />
+            <label htmlFor="faq-search" className="sr-only">{t("faq.page.searchPlaceholder")}</label>
+            <input
+              id="faq-search"
+              type="text"
+              value={searchTerm}
+              onChange={e => { setSearchTerm(e.target.value); setOpenIndex(null); }}
+              placeholder={t("faq.page.searchPlaceholder")}
+              className="input ps-12"
+            />
           </div>
         </div>
+      </section>
 
-        <div className="max-w-4xl mx-auto px-4 py-12">
+      <div>
+        <div className="container-page max-w-3xl py-12">
           {/* Resultados de búsqueda */}
           {filteredFaqs ? (
             <div>
@@ -269,17 +266,12 @@ export default function FAQPage() {
           )}
 
           {/* ── CTA final ── */}
-          <div className="mt-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-8 text-center text-white">
-            <h2 className="text-2xl font-bold mb-2">{t("faq.page.ctaTitle")}</h2>
-            <p className="text-blue-200 mb-6">{t("faq.page.ctaSubtitle")}</p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                to="/buscar"
-                className="inline-flex items-center justify-center gap-2 bg-surface text-c-accent font-bold px-6 py-3 rounded-xl hover:bg-c-accent/10 transition-colors"
-              >
-                {t("faq.page.findPro")} <IconArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+          <div className="mt-16 rounded-xl bg-brand-navy text-white p-8 sm:p-10 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("faq.page.ctaTitle")}</h2>
+            <p className="text-white/80 mt-3 mb-6 max-w-lg mx-auto leading-relaxed">{t("faq.page.ctaSubtitle")}</p>
+            <Link to="/buscar" className="btn bg-brand-gold text-brand-navy font-semibold hover:bg-brand-gold-deep">
+              {t("faq.page.findPro")} <IconArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </div>
