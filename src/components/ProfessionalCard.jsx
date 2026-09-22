@@ -128,7 +128,11 @@ const ProfessionalCard = React.memo(function ProfessionalCard({ profile, href, o
           )}
 
           <div className="mt-1 flex items-center gap-2 justify-between" style={{ fontSize: 14 }}>
-            {/* Una sola línea, pase lo que pase: `flex-wrap` dejaba que
+            {/* De los 39 autónomos visibles, 37 no tienen ni una reseña: una
+                etiqueta «Nuevo» en casi todas las tarjetas no informa de nada
+                y, en 200 px, le robaba el sitio a la CIUDAD —que es lo que
+                de verdad decide si alguien llama— dejándola en «B…».
+                Una sola línea, pase lo que pase: `flex-wrap` dejaba que
                 «Nuevo» y el precio cayeran a un segundo renglón cuando la
                 ficha lleva distintivo, y entonces unas tarjetas medían tres
                 líneas y otras cuatro. Lo que cede es la ciudad, truncada. */}
@@ -139,29 +143,20 @@ const ProfessionalCard = React.memo(function ProfessionalCard({ profile, href, o
                   <span className="truncate">{cityLabel}</span>
                 </span>
               )}
-              {profile.average_rating > 0 ? (
+              {profile.average_rating > 0 && (
                 <>
                   {cityLabel && <span className="text-c-muted" aria-hidden="true" style={{ opacity: 0.55 }}>·</span>}
-                  <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                  <span className="inline-flex items-center gap-1 whitespace-nowrap flex-shrink-0">
                     <IconStar size={13} className="text-brand-gold" />
                     <span className="font-semibold text-ink">{profile.average_rating.toFixed(1)}</span>
                     <span className="text-c-muted">({profile.total_reviews || 0})</span>
                   </span>
                 </>
-              ) : (
-                <>
-                  {/* «Sin valoraciones aún» ocupaba la línea entera y
-                      empujaba el precio y el distintivo a una segunda,
-                      alargando la tarjeta un 30 %. Una palabra dice lo
-                      mismo en el sitio donde hay una palabra. */}
-                  {cityLabel && <span className="text-c-muted" aria-hidden="true" style={{ opacity: 0.55 }}>·</span>}
-                  <span className="text-c-muted whitespace-nowrap">{t('search.card.newPro')}</span>
-                </>
               )}
               {profile.tarifa_base > 0 && (
                 <>
-                  <span className="text-c-muted" aria-hidden="true" style={{ opacity: 0.55 }}>·</span>
-                  <span className="font-semibold text-ink whitespace-nowrap">{profile.tarifa_base} €/h</span>
+                  <span className="text-c-muted flex-shrink-0" aria-hidden="true" style={{ opacity: 0.55 }}>·</span>
+                  <span className="font-semibold text-ink whitespace-nowrap flex-shrink-0">{profile.tarifa_base} €/h</span>
                 </>
               )}
             </div>

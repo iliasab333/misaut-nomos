@@ -207,7 +207,7 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-c-border bg-surface text-c-muted">
-      <div className="max-w-6xl mx-auto px-5 py-6 md:py-8">
+      <div className="container-page py-6 md:py-8">
         {/* Cabecera del footer: marca + 3 columnas. Gaps más ajustados. */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-6 md:gap-x-8 md:gap-y-6">
           {/* Marca */}
