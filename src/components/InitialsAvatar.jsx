@@ -36,6 +36,7 @@ export default function InitialsAvatar({
   size = 48,
   className = "",
   priority = false,
+  square = false,
 }) {
   const [errored, setErrored] = useState(false);
 
@@ -46,6 +47,11 @@ export default function InitialsAvatar({
   const fontSize = size <= 28 ? 11 : size <= 40 ? 13 : size <= 56 ? 16 : Math.round(size * 0.34);
 
   const baseStyle = { width: size, height: size, minWidth: size, minHeight: size };
+  // Cuadrado con esquinas suaves en las listas (la forma de khdemlidaba),
+  // círculo en cabeceras y fichas. El radio va en `style` y no en una clase:
+  // así gana siempre al `rounded-*` que pueda traer `className`, sin depender
+  // del orden con que Tailwind emita las dos reglas.
+  const radiusStyle = square ? { borderRadius: 12 } : { borderRadius: 9999 };
   const showImage = src && !errored;
 
   if (showImage) {
@@ -56,11 +62,13 @@ export default function InitialsAvatar({
         width={size}
         height={size}
         loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : "low"}
+        // `fetchpriority` en minúscula: React 18 no conoce la forma camelCase
+        // y la deja pasar al DOM con un warning en cada tarjeta.
+        fetchpriority={priority ? "high" : "low"}
         decoding={priority ? "sync" : "async"}
         onError={() => setErrored(true)}
-        className={`rounded-full object-cover object-center ${className}`}
-        style={baseStyle}
+        className={`object-cover object-center ${className}`}
+        style={{ ...baseStyle, ...radiusStyle }}
       />
     );
   }
@@ -69,9 +77,10 @@ export default function InitialsAvatar({
     <div
       role="img"
       aria-label={name || "Sin foto"}
-      className={`rounded-full flex items-center justify-center font-semibold select-none flex-shrink-0 ${className}`}
+      className={`flex items-center justify-center font-semibold select-none flex-shrink-0 ${className}`}
       style={{
         ...baseStyle,
+        ...radiusStyle,
         backgroundColor: bgColor,
         color: textColor,
         fontSize,

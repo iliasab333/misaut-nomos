@@ -1,7 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy, useCallback, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTranslation, Trans } from "react-i18next";
-import { uiLang } from "@/i18n";
+import { useTranslation } from "react-i18next";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import {
@@ -9,41 +8,18 @@ import {
   IconMessageSquare,
   IconUser,
   IconHeart,
-  IconMenu,
-  IconArrowLeft,
-  IconLogout,
-  IconBriefcase,
   IconDashboard,
-  IconCard,
-  IconClose,
   IconUsers,
   IconHome,
-  IconHelp,
   IconHeadphones,
-  IconShieldPlain,
   IconBook,
   IconMail,
   IconStarOutline,
 } from "@/components/Icons";
 
-// Link reutilizable para los logos de la cabecera/sidebars. Apunta SIEMPRE a /,
-// y si ya estás en /, hace scroll arriba en vez de no hacer nada.
-function HomeLogoLink({ children, className, ariaLabel }) {
-  const location = useLocation();
-  const handleClick = (e) => {
-    if (location.pathname === '/') {
-      e.preventDefault();
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    }
-  };
-  return (
-    <Link to="/" className={className} aria-label={ariaLabel} onClick={handleClick}>
-      {children}
-    </Link>
-  );
-}
-
 // Lazy load componentes no críticos
+import Header from "@/components/Header";
+
 const Footer = lazy(() => import("@/components/Footer").catch(() => ({ default: () => null })));
 const CookieBanner = lazy(() => import("@/components/CookieBanner").catch(() => ({ default: () => null })));
 const NotificationCenter = lazy(() => import("@/components/notifications/NotificationCenter").catch(() => ({ default: () => null })));
@@ -51,20 +27,14 @@ const NotificationPermissionBanner = lazy(() => import("@/components/notificatio
 const WebsiteSchema = lazy(() => import("@/components/seo/WebsiteSchema").catch(() => ({ default: () => null })));
 import { setUserId, setUserTags, onesignalLogout } from "@/services/onesignalService";
 
-import LanguageSwitcher, { LanguageProvider } from "@/components/LanguageSwitcher";
+import { LanguageProvider } from "@/components/LanguageSwitcher";
 
 
 // Logo servido como asset estático de Vercel (no depende de Base44 ni de
 // Image Transform). 192px sirve perfectamente para todas las cajas de hasta
 // 96px en 2x.
 const LOGO_URL = '/logo-192.png';
-const LOGO_48 = '/logo-192.png';
-const LOGO_96 = '/logo-192.png';
-const LOGO_32 = '/logo-192.png';
-const LOGO_64 = '/logo-192.png';
 
-// La marca va literal: no pasa por t().
-const BRAND = 'MisAutónomos';
 
 // Preload para mejorar LCP del header
 if (typeof window !== 'undefined') {
@@ -76,132 +46,14 @@ if (typeof window !== 'undefined') {
   document.head.appendChild(link);
 }
 
-// Sidebar optimizado con memo
-const SidebarContentComponent = React.memo(function SidebarContentComponent({ navigationItems, location, user, isProfessional, isAdmin, isClient, language, onChangeLanguage, onLogout }) {
-  const { t } = useTranslation();
-  return (
-    // El carril es fijo (como hacía shadcn): el div de arriba reserva su
-    // ancho en el flujo para que el contenido no quede debajo.
-    <div className="hidden lg:block">
-      <div className="relative h-svh w-64 shrink-0" />
-      <aside className="fixed inset-y-0 left-0 z-10 flex h-svh w-64 flex-col border-r border-c-border bg-surface shadow-sm">
-        <div className="flex flex-col gap-2 border-b border-c-border p-6">
-          <HomeLogoLink className="flex items-center gap-3" ariaLabel={t('nav.home')}>
-            <img
-              src={LOGO_48}
-              srcSet={`${LOGO_48} 1x, ${LOGO_96} 2x`}
-              alt={t('layout.header.logoAlt')}
-              className="w-12 h-12 rounded-lg"
-              width="48"
-              height="48"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              style={{ width: '48px', height: '48px' }}
-            />
-            <div>
-              <h2 className="font-bold text-xl text-ink notranslate" translate="no">{BRAND}</h2>
-              <p className="text-xs text-c-muted">{t('layout.sidebar.tagline')}</p>
-            </div>
-          </HomeLogoLink>
-        </div>
-
-        <div className="flex min-h-0 flex-1 flex-col overflow-auto p-3">
-          <ul className="flex w-full min-w-0 flex-col gap-1 p-2">
-            {navigationItems.map((item) => {
-              const isActive = location.pathname === item.url;
-              const itemClass = `flex w-full items-center gap-3 px-4 py-3 text-left text-sm rounded-xl mb-1 relative transition-all duration-150 hover:bg-blue-50 hover:text-blue-900 ${
-                isActive ? 'bg-gradient-to-r from-c-accent to-accent-hover text-white shadow-md' : ''
-              }`;
-              return (
-                <li key={item.title} className="relative">
-                  {item.action ? (
-                    <button onClick={item.action} aria-label={item.title} className={`${itemClass} cursor-pointer`}>
-                      <item.icon className="w-5 h-5" aria-hidden="true" />
-                      <span className="font-medium">{item.title}</span>
-                      {item.badge && (
-                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={t('layout.sidebar.unreadMessages', { count: item.badge })}>
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  ) : (
-                    <Link to={item.url} className={itemClass} aria-label={item.title}
-                      onMouseEnter={item.prefetch ? () => item.prefetch() : undefined}
-                    >
-                      <item.icon className="w-5 h-5" aria-hidden="true" />
-                      <span className="font-medium">{item.title}</span>
-                      {item.badge && (
-                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold" aria-label={t('layout.sidebar.unreadMessages', { count: item.badge })}>
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        <div className="flex flex-col gap-2 border-t border-c-border p-4">
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 px-2">
-              <div className="relative flex w-10 h-10 shrink-0 overflow-hidden rounded-full border-2 border-c-accent">
-                {user?.profile_picture ? (
-                  <img src={user.profile_picture} alt={t('layout.sidebar.avatarAlt')} className="object-cover object-center w-full h-full" />
-                ) : (
-                  <span className={`flex h-full w-full items-center justify-center font-semibold text-white ${isAdmin ? 'bg-gradient-to-br from-purple-600 to-purple-800' : 'bg-gradient-to-br from-c-accent to-blue-800'}`}>
-                    {user?.full_name?.charAt(0) || 'U'}
-                  </span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-ink text-sm truncate">
-                  {user?.full_name || t('layout.sidebar.defaultUserName')}
-                </p>
-                {isAdmin && (
-                  <span className="inline-flex items-center gap-1 text-[10px] text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded font-medium mt-0.5">
-                    <IconShieldPlain className="w-2.5 h-2.5" />
-                    {t('layout.sidebar.adminBadge')}
-                  </span>
-                )}
-                {isProfessional && <p className="text-xs text-c-muted">{t('professionalLabel')}</p>}
-                {isClient && <p className="text-xs text-c-muted">{t('clientLabel')}</p>}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 px-2">
-              <div className="flex-1">
-                <LanguageSwitcher />
-              </div>
-              <button
-                type="button"
-                className="btn-ghost btn-icon no-underline hover:bg-red-50 hover:text-error transition-colors flex-shrink-0"
-                onClick={onLogout}
-                aria-label={t('nav.logout')}
-              >
-                <IconLogout className="w-4 h-4 text-c-muted" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </div>
-  );
-});
 
 const LayoutContent = React.memo(function LayoutContent({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
-  const language = uiLang(i18n.language);
-  const changeLanguage = (code) => i18n.changeLanguage(code);
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [professionalProfile, setProfessionalProfile] = useState(undefined);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [joinModalOpen, setJoinModalOpen] = useState(false);
 
   // Redirect from old domain to new domain + www/http → canonical https (sin www)
   useEffect(() => {
@@ -281,30 +133,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       });
     }
   }, [location.pathname, currentPageName]);
-
-  const hideBottomBarRoutes = [
-    createPageUrl("UserTypeSelection"),    // /registro
-    createPageUrl("ProfileOnboarding"),   // /completar-perfil
-    createPageUrl("ClientOnboarding"),    // /registro-cliente
-  ];
-
-  const shouldShowSidebar = () => {
-    if (!user || loadingUser) return false;
-    if (hideBottomBarRoutes.includes(location.pathname)) return false;
-    
-    // 🔥 CLIENTES: SIEMPRE mostrar sidebar
-    if (user.user_type === "client") return true;
-    
-    // PROFESIONALES: verificar onboarding
-    if (user.user_type === "professionnel") {
-      if (professionalProfile === undefined) return false;
-      if (professionalProfile && (!professionalProfile.onboarding_completed)) {
-        return false;
-      }
-    }
-    
-    return true;
-  };
 
   // Guard de onboarding: SOLO redirige a /completar-perfil cuando un profesional
   // sin ficha entra en una ruta PRIVADA propia de pros (dashboard, mi-perfil,
@@ -477,10 +305,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
     loadUser();
   }, [loadUser]);
 
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
-
   const isAdmin = user?.role === "admin";
   const isProfessional = React.useMemo(() => {
     if (!user) return false;
@@ -499,9 +323,6 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
     base44.auth.logout(createPageUrl("Search"));
   };
 
-  const handleLogin = () => {
-    base44.auth.redirectToLogin();
-  };
 
   const getDisplayName = () => {
     if (!user) return "";
@@ -579,456 +400,50 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
   // CAMBIO: bloque <style> eliminado — todas estas reglas ya existen en globals.css.
   // Eliminar el inline style evita: CSS duplicado, conflictos de especificidad y ~20KB extra en el bundle.
   return (
-    <>
-        <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-slate-50 to-blue-50" style={{ marginLeft: 0, width: '100%', maxWidth: '100vw', overflow: 'visible' }}>
-          <div className="flex flex-1" style={{ minWidth: 0, overflow: 'visible' }}>
-            {user && shouldShowSidebar() && (
-              <SidebarContentComponent 
-                navigationItems={navigationItems}
-                location={location}
-                user={user}
-                isProfessional={isProfessional}
-                isAdmin={isAdmin}
-                isClient={isClient}
-                language={language}
-                onChangeLanguage={changeLanguage}
-                onLogout={handleLogout}
-              />
-            )}
-
-            {/* ── MENÚ HAMBURGUESA MÓVIL ── */}
-            {mobileMenuOpen && (
-              <>
-                <div
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(3px)', zIndex: 9998 }}
-                  aria-hidden="true"
-                />
-                <nav
-                  style={{ position: 'fixed', left: 0, top: 0, bottom: 0, width: '280px', background: '#fff', zIndex: 9999, overflowY: 'auto', boxShadow: '4px 0 24px rgba(0,0,0,0.18)' }}
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label={t('layout.mobileMenu.ariaLabel')}
-                >
-                  {/* Header */}
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-c-border">
-                    <div className="flex items-center gap-2">
-                      <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt="" className="w-8 h-8 rounded" width="32" height="32" />
-                      <span className="font-bold text-ink notranslate" translate="no">{BRAND}</span>
-                    </div>
-                    <button
-                      onClick={() => setMobileMenuOpen(false)}
-                      style={{ width: '44px', height: '44px', touchAction: 'manipulation' }}
-                      className="flex items-center justify-center rounded-lg hover:bg-soft"
-                      aria-label={t('layout.mobileMenu.close')}
-                    >
-                      <IconClose className="w-5 h-5 text-c-muted" />
-                    </button>
-                  </div>
-
-                  <div className="py-2">
-                    {/* Usuario logueado: avatar + nombre */}
-                    {user && (
-                      <div className="flex items-center gap-3 mx-3 mb-2 p-3 bg-blue-50 rounded-xl">
-                        <div className="relative flex w-10 h-10 border-2 border-c-accent overflow-hidden rounded-full flex-shrink-0">
-                          {getProfilePicture() ? (
-                            <img src={getProfilePicture()} alt={getDisplayName()} className="object-cover w-full h-full" />
-                          ) : (
-                            <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-c-accent to-blue-800 text-white font-semibold">
-                              {getDisplayName().charAt(0).toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-semibold text-ink text-sm truncate">{getDisplayName()}</p>
-                          <p className="text-xs text-c-muted">{isProfessional ? t('professionalLabel') : t('clientLabel')}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Nav items (logueado) */}
-                    {user && navigationItems.map((item) => (
-                      <Link
-                        key={item.title}
-                        to={item.url}
-                        onClick={() => setMobileMenuOpen(false)}
-                        onMouseEnter={item.prefetch ? () => item.prefetch() : undefined}
-                        className={`flex items-center gap-3 mx-2 rounded-xl ${
-                          location.pathname === item.url
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-ink hover:bg-soft active:bg-gray-100'
-                        }`}
-                        style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
-                      >
-                        <item.icon className={`w-5 h-5 flex-shrink-0 ${location.pathname === item.url ? 'text-c-accent' : 'text-c-muted'}`} />
-                        <span className="font-medium flex-1">{item.title}</span>
-                        {item.badge && (
-                          <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold min-w-[20px] text-center">{item.badge}</span>
-                        )}
-                      </Link>
-                    ))}
-
-                    {/* Sin sesión: opciones */}
-                    {!user && (
-                      <div className="px-3 space-y-1">
-                        <Link
-                          to="/buscar"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-xl text-ink hover:bg-soft"
-                          style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
-                        >
-                          <IconSearch className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                          <span className="font-medium">{t('nav.search_professionals')}</span>
-                        </Link>
-                        <Link
-                          to="/blog"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-xl text-ink hover:bg-soft"
-                          style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
-                        >
-                          <IconBook className="w-5 h-5 text-c-muted flex-shrink-0" />
-                          <span className="font-medium">{t('nav.blog')}</span>
-                        </Link>
-
-                        <div className="pt-2 border-t border-c-border space-y-2 mt-2">
-                          <Link
-                            to="/registro?tipo=autonomo"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold"
-                            style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation', background: '#F5C13D', color: '#00255C' }}
-                          >
-                            <IconBriefcase className="w-5 h-5" />
-                            {t('nav.becomeProFree')}
-                          </Link>
-                          <button
-                            onClick={() => { handleLogin(); setMobileMenuOpen(false); }}
-                            aria-label={t('nav.loginAria')}
-                            className="flex items-center justify-center gap-2 w-full rounded-xl font-semibold text-ink border-2 border-c-border hover:bg-soft"
-                            style={{ padding: '14px', fontSize: '15px', touchAction: 'manipulation' }}
-                          >
-                            <IconUser className="w-5 h-5" />
-                            {t('nav.login')}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Cerrar sesión */}
-                    {user && (
-                      <>
-                        <div className="mx-3 mt-2 border-t border-c-border pt-2">
-                          <button
-                          onClick={handleLogout}
-                          aria-label={t('nav.logout')}
-                          className="flex items-center gap-3 w-full rounded-xl text-error hover:bg-red-50 active:bg-red-100"
-                          style={{ padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
-                          >
-                            <IconLogout className="w-5 h-5 flex-shrink-0" />
-                            <span className="font-medium">{t('nav.logout')}</span>
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </nav>
-              </>
-            )}
-
-            {/* ── MODAL "UNIRSE" (bottom sheet) ── */}
-            {joinModalOpen && (
-              <>
-                <div
-                  onClick={() => setJoinModalOpen(false)}
-                  style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 9998 }}
-                  aria-hidden="true"
-                />
-                <div
-                  style={{
-                    position: 'fixed', bottom: 0, left: 0, right: 0,
-                    background: '#fff', zIndex: 9999, borderRadius: '20px 20px 0 0',
-                    padding: '24px 20px', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))',
-                    boxShadow: '0 -8px 32px rgba(0,0,0,0.18)'
-                  }}
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label={t('layout.joinModal.ariaLabel')}
-                >
-                  <div className="w-10 h-1 bg-c-border rounded-full mx-auto mb-5" />
-                  <h2 className="text-xl font-bold text-ink text-center mb-2">{t('layout.joinModal.title')}</h2>
-                  <p className="text-sm text-c-muted text-center mb-6">{t('layout.joinModal.subtitle')}</p>
-                  <div className="space-y-3">
-                    <Link
-                      to="/buscar"
-                      onClick={() => setJoinModalOpen(false)}
-                      className="flex items-center gap-4 w-full rounded-2xl p-4 font-semibold border"
-                      style={{ background: '#F8FAFF', borderColor: 'rgba(0,37,92,0.15)', color: '#0f172a', touchAction: 'manipulation' }}
-                    >
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: '#00255C' }}>
-                        <IconSearch className="w-5 h-5" />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-bold">{t('nav.sign_up_client')}</div>
-                        <div className="text-xs text-slate-500">{t('layout.joinModal.clientHint')}</div>
-                      </div>
-                    </Link>
-                    <Link
-                      to="/registro?tipo=autonomo"
-                      onClick={() => setJoinModalOpen(false)}
-                      className="flex items-center gap-4 w-full rounded-2xl p-4 font-semibold"
-                      style={{ background: '#F5C13D', color: '#00255C', touchAction: 'manipulation' }}
-                    >
-                      <div className="w-10 h-10 bg-white/40 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <IconBriefcase className="w-5 h-5" style={{ color: '#00255C' }} />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-bold">{t('nav.iAmPro')}</div>
-                        <div className="text-xs" style={{ color: 'rgba(0,37,92,0.7)' }}>{t('layout.joinModal.proHint')}</div>
-                      </div>
-                    </Link>
-                    <button
-                      onClick={() => { handleLogin(); setJoinModalOpen(false); }}
-                      aria-label={t('layout.joinModal.haveAccountAria')}
-                      className="w-full text-center text-sm text-c-muted py-3 font-medium"
-                      style={{ touchAction: 'manipulation' }}
-                    >
-                      <Trans i18nKey="layout.joinModal.haveAccount" components={{ 1: <span className="text-c-accent font-semibold" /> }} />
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* ── HEADER MÓVIL — SIEMPRE VISIBLE, fuera del main para evitar margin-left del sidebar ── */}
-            <header
-              className="lg:hidden bg-surface border-b border-c-border flex items-center justify-between px-4"
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '56px',
-                zIndex: 45,
-                paddingTop: 'env(safe-area-inset-top, 0px)',
-              }}
-            >
-              {/* Show back button on child screens, hamburger on root nav tabs */}
-              {(() => {
-                const rootPaths = [
-                  '/buscar', '/favoritos', '/mi-perfil',
-                  '/dashboard', '/',
-                ];
-                const isChildScreen = user && !rootPaths.some(p => location.pathname === p || location.pathname === p + '/');
-                return isChildScreen ? (
-                  <button
-                    type="button"
-                    onPointerDown={() => navigate(-1)}
-                    style={{ width: '56px', height: '56px', minWidth: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', cursor: 'pointer', background: 'none', border: 'none', padding: 0, margin: '-4px' }}
-                    className="inline-flex items-center justify-center rounded-lg flex-shrink-0 active:bg-gray-200"
-                    aria-label={t('common.back')}
-                  >
-                    <IconArrowLeft className="w-6 h-6 text-ink pointer-events-none" />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onPointerDown={() => setMobileMenuOpen(true)}
-                    style={{ width: '56px', height: '56px', minWidth: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', cursor: 'pointer', background: 'none', border: 'none', padding: 0, margin: '-4px' }}
-                    className="inline-flex items-center justify-center rounded-lg flex-shrink-0 active:bg-gray-200"
-                    aria-label={t('layout.mobileMenu.open')}
-                  >
-                    <IconMenu className="w-6 h-6 text-ink pointer-events-none" />
-                  </button>
-                );
-              })()}
-
-              <HomeLogoLink className="flex items-center gap-2" ariaLabel={t('nav.home')}>
-                <img src={LOGO_32} srcSet={`${LOGO_32} 1x, ${LOGO_64} 2x`} alt={t('layout.header.logoAlt')} className="w-8 h-8 rounded" width="32" height="32" loading="eager" fetchPriority="high" decoding="async" />
-                <span className="font-bold text-lg text-ink notranslate" translate="no">{BRAND}</span>
-              </HomeLogoLink>
-
-              <div style={{ width: '56px', height: '56px', margin: '-4px' }} className="flex items-center justify-end flex-shrink-0">
-                {user ? (
-                  <Suspense fallback={<div className="w-9 h-9" />}>
-                    <NotificationCenter user={user} />
-                  </Suspense>
-                ) : (
-                  <button
-                    type="button"
-                    onPointerDown={() => setJoinModalOpen(true)}
-                    style={{ width: '56px', height: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', background: 'none', border: 'none', padding: 0 }}
-                    className="flex items-center justify-center rounded-lg text-c-accent"
-                    aria-label={t('layout.header.joinAria')}
-                  >
-                    <IconUser className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-            </header>
-
-            <main className="flex-1 flex flex-col min-h-0 min-w-0" style={{ width: '100%', maxWidth: '100vw', overflow: 'visible' }}>
-              {!user && (
-                  <header className="bg-surface border-b border-c-border px-6 py-4 hidden lg:block sticky top-0 z-20 shadow-sm will-change-transform">
-                  <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <HomeLogoLink className="flex items-center gap-3" ariaLabel={t('nav.home')}>
-                      <img
-                        src={LOGO_48}
-                        srcSet={`${LOGO_48} 1x, ${LOGO_96} 2x`}
-                        alt={t('layout.header.logoAlt')}
-                        className="w-12 h-12 rounded-lg"
-                        width="48"
-                        height="48"
-                        loading="eager"
-                        fetchPriority="high"
-                        decoding="async"
-                      />
-                      <div style={{ minWidth: '150px' }}>
-                        <h1 className="font-bold text-xl text-ink notranslate" translate="no">{BRAND}</h1>
-                        <p className="text-xs text-c-muted">{t('footer.tagline')}</p>
-                      </div>
-                      </HomeLogoLink>
-                    
-                    <div className="flex items-center gap-3">
-                      {!user && (
-                        <button
-                          type="button"
-                          className="btn-ghost no-underline text-ink hover:text-blue-700 hover:bg-blue-50"
-                          onClick={handleLogin}
-                          aria-label={t('nav.loginAria')}
-                        >
-                          <IconUser className="w-4 h-4 mr-2" aria-hidden="true" />
-                          {t('nav.login')}
-                        </button>
-                      )}
-                      {!user && (
-                        <Link to="/buscar" className="btn-secondary hover:bg-soft">
-                          <IconSearch className="w-4 h-4 mr-2" aria-hidden="true" />
-                          {t('nav.sign_up_client')}
-                        </Link>
-                      )}
-                      {(!user || user.user_type !== 'professionnel') ? (
-                        <Link
-                          to="/registro?tipo=autonomo"
-                          className="btn-primary font-semibold shadow-sm"
-                          style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
-                        >
-                          <IconBriefcase className="w-4 h-4 mr-2" aria-hidden="true" />
-                          {t('nav.becomeProFree')}
-                        </Link>
-                      ) : null}
-                      <LanguageSwitcher />
-                      {user && (
-                        <button
-                          type="button"
-                          className="btn-ghost btn-icon no-underline hover:bg-red-50 hover:text-error transition-colors"
-                          onClick={handleLogout}
-                          aria-label={t('nav.logout')}
-                        >
-                          <IconLogout className="w-5 h-5" aria-hidden="true" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </header>
-              )}
-
-              <div className="flex-1 pb-16 md:pb-0 transition-opacity duration-150 ease-in-out mobile-main-content">
-                {/* Suspense reserva 100svh para que el footer NUNCA nazca pegado
-                    al header mientras la página lazy carga. Sin esto, la home
-                    aporta un CLS de ~0.92 porque el footer se desplaza hacia
-                    abajo cuando llega el contenido. */}
-                <Suspense fallback={<div className="min-h-[100svh]" aria-hidden="true" />}>
-                  {children}
-                </Suspense>
-
-                {!location.pathname.startsWith("/soporte") && !location.pathname.startsWith("/admin") && (
-                  <Suspense fallback={null}>
-                    <Footer />
-                  </Suspense>
-                )}
-              </div>
-
-              {/* Bottom nav móvil — solo visible en móvil (< 768px) */}
-              <nav
-                className="mobile-bottom-nav"
-                data-role="bottom-nav"
-                role="navigation"
-                aria-label={t('layout.bottomNav.ariaLabel')}
-                style={{
-                  gridTemplateColumns: (user && isProfessional) ? 'repeat(5, 1fr)' : user ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)',
-                  paddingBottom: 'env(safe-area-inset-bottom, 8px)',
-                  height: 'calc(56px + env(safe-area-inset-bottom, 8px))',
-                }}
-              >
-                {user ? (
-                  <>
-                    {(isProfessional ? [
-                      { title: t('nav.home'), url: createPageUrl("ProfessionalDashboard"), root: createPageUrl("ProfessionalDashboard"), icon: IconHome },
-                      { title: t('nav.reviews'), url: '/mis-valoraciones', root: '/mis-valoraciones', icon: IconStarOutline },
-                      { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: IconUser },
-                    ] : [
-                      { title: t('common.search'), url: createPageUrl("Search"), root: '/buscar', icon: IconSearch },
-                      { title: t('nav.saved'), url: createPageUrl("Favorites"), root: createPageUrl("Favorites"), icon: IconHeart },
-                      { title: t('nav.profile'), url: createPageUrl("MyProfile"), root: createPageUrl("MyProfile"), icon: IconUser },
-                    ]).map((item) => (
-                      <Link
-                        key={item.title}
-                        to={location.pathname === item.url || location.pathname.startsWith(item.url + '?') ? item.root : item.url}
-                        className={`mobile-bottom-nav-item ${location.pathname === item.url || location.pathname.startsWith(item.root) ? 'active' : ''}`}
-                        aria-label={t('layout.bottomNav.goTo', { title: item.title })}
-                        aria-current={location.pathname === item.url ? 'page' : undefined}
-                        style={{ touchAction: 'manipulation', flex: 1, minWidth: 0 }}
-                      >
-                        <div className="relative">
-                          <item.icon className="w-5 h-5" />
-                          {item.badge && (
-                            <span className="absolute -top-1 -right-2 bg-red-500 text-white font-bold rounded-full flex items-center justify-center px-1" style={{ fontSize: '10px', minWidth: '16px', height: '16px' }}>
-                              {item.badge > 9 ? '9+' : item.badge}
-                            </span>
-                          )}
-                        </div>
-                        <span style={{ fontSize: '10px', fontWeight: 500, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{item.title}</span>
-                      </Link>
-                    ))}
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to={createPageUrl("Search")}
-                        className={`mobile-bottom-nav-item ${location.pathname === createPageUrl("Search") ? 'active' : ''}`}
-                        aria-label={t('layout.bottomNav.searchAria')}
-                      style={{ touchAction: 'manipulation', flex: 1, minWidth: 0 }}
-                    >
-                      <IconSearch className="w-5 h-5" />
-                      <span style={{ fontSize: '10px', fontWeight: 500 }}>{t('common.search')}</span>
-                    </Link>
-                    <button
-                      onClick={() => setJoinModalOpen(true)}
-                      className="mobile-bottom-nav-item"
-                      aria-label={t('layout.header.joinAria')}
-                      style={{ touchAction: 'manipulation', border: 'none', background: 'none', cursor: 'pointer', flex: 1, minWidth: 0 }}
-                    >
-                      <IconBriefcase className="w-5 h-5" />
-                      <span style={{ fontSize: '10px', fontWeight: 500 }}>{t('layout.bottomNav.join')}</span>
-                    </button>
-                  </>
-                )}
-              </nav>
-            </main>
-          </div>
-
-          {user && 'Notification' in window && (
-            <Suspense fallback={null}>
-              <NotificationPermissionBanner user={user} />
-            </Suspense>
-          )}
-          <Suspense fallback={null}>
-            <CookieBanner />
+    <div className="min-h-screen flex flex-col bg-canvas">
+      <Header
+        user={user}
+        isAdmin={isAdmin}
+        isProfessional={isProfessional}
+        navigationItems={navigationItems}
+        displayName={getDisplayName()}
+        avatarUrl={getProfilePicture()}
+        notificationsSlot={user ? (
+          <Suspense fallback={<div className="w-9 h-9" />}>
+            <NotificationCenter user={user} />
           </Suspense>
-          <Suspense fallback={null}>
-            <WebsiteSchema />
-          </Suspense>
-        </div>
-    </>
+        ) : null}
+        onLogout={handleLogout}
+      />
+
+      {/* El <Suspense> reserva 100svh para que el pie NUNCA nazca pegado a la
+          cabecera mientras el chunk de la página viaja. Sin esto la portada
+          aportaba un CLS de ~0,92: el pie se desplazaba hacia abajo al llegar
+          el contenido. */}
+      <main className="flex-1 flex flex-col min-w-0">
+        <Suspense fallback={<div className="min-h-[100svh]" aria-hidden="true" />}>
+          {children}
+        </Suspense>
+      </main>
+
+      {!location.pathname.startsWith("/soporte") && !location.pathname.startsWith("/admin") && (
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
+      )}
+
+      {user && typeof window !== 'undefined' && 'Notification' in window && (
+        <Suspense fallback={null}>
+          <NotificationPermissionBanner user={user} />
+        </Suspense>
+      )}
+      <Suspense fallback={null}>
+        <CookieBanner />
+      </Suspense>
+      <Suspense fallback={null}>
+        <WebsiteSchema />
+      </Suspense>
+    </div>
   );
 });
 

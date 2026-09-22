@@ -1,8 +1,29 @@
-import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
+// /buscar — la página de resultados, con la maqueta de khdemlidaba.
+//
+// Qué cambia respecto a la versión de Base44
+// ──────────────────────────────────────────
+// Antes: una franja de título pequeño, debajo una caja blanca con cuatro
+// desplegables en fila (y un botón «Filtros avanzados» que abría otro panel
+// encima), y los resultados en una rejilla de hasta cuatro columnas de
+// tarjetas altas de 288 px con tres botones cada una. A 1.280 px los nombres
+// se cortaban en «Rub…», «Guc…», «Zaid…»: la primera cosa que alguien mira de
+// una ficha era justo la que no cabía.
+//
+// Ahora, como en khdemlidaba/recherche:
+//   - h1 grande, y debajo la MISMA barra de búsqueda de la portada
+//     (HeroSearch con `onAutoSearch`), así que la lista se refresca al elegir.
+//   - columna de filtros a la izquierda en escritorio (260 px, pegajosa) y
+//     hoja inferior en móvil detrás del botón «Filtros».
+//   - resultados en dos columnas de tarjetas compactas: avatar, nombre,
+//     oficio, ciudad·nota, y dos botones redondos de contacto a la derecha.
+//
+// Se retiran el mapa, las búsquedas guardadas y el autocompletar: ninguno
+// existe en khdemlidaba y los tres vivían sólo aquí.
+
+import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import {
   IconSearch,
   IconMapPin,
@@ -10,81 +31,43 @@ import {
   IconHeartFilled,
   IconPhone,
   IconStar,
-  IconZap,
-  IconDroplets,
-  IconHammer,
-  IconHardHat,
-  IconPaintbrush,
-  IconTrees,
-  IconSparkles,
-  IconKey,
-  IconBriefcase,
   IconMessageSquare,
   IconClose,
   IconVerified,
-  IconWhatsApp
+  IconWhatsApp,
 } from "@/components/Icons";
-import LandingHero from "@/components/home/LandingHero";
 import { toast } from "@/lib/toast";
 import { EmptyState } from "@/components/ListStates";
 import SEOHead from "../components/seo/SEOHead";
 import { ServiceSchema, BreadcrumbSchema } from "../components/seo/StructuredData";
-import { Trans, useTranslation } from "react-i18next";
-import { useProfileTranslation } from "../components/profile/useProfileTranslation";
+import { useTranslation } from "react-i18next";
 import { PROVINCIAS, CIUDADES_POR_PROVINCIA } from "../components/utils/locationsData";
-import SearchAutocomplete from "../components/search/SearchAutocomplete";
-import SavedSearches from "../components/search/SavedSearches";
-const PullToRefresh = lazy(() => import("@/components/PullToRefresh"));
-const SearchFilters = lazy(() => import("../components/search/SearchFilters"));
-const MapView = lazy(() => import("../components/search/MapView"));
-const TrustSlider = lazy(() => import("../components/search/TrustSlider"));
-import { generateSlug } from "../utils/slugUtils";
 import { getProfileSeoUrl } from '@/lib/seoUrl';
 import { optimizeSupabaseImage } from '@/lib/supabaseImage';
 import { trackMetric, trackSearchAppearance } from '@/lib/trackMetric';
 import GuestContactModal from "@/components/GuestContactModal";
 import InitialsAvatar from "@/components/InitialsAvatar";
+import HeroSearch, { useServiceCategories } from "@/components/home/HeroSearch";
+import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debouncedValue;
-};
+const EMPTY_FILTERS = { category: "all", provincia: "all", ciudad: "all", minRating: 0, availability: "all" };
 
-const QUICK_CATEGORIES = [
-  { name: "Electricista", icon: IconZap, color: "from-yellow-400 to-orange-400" },
-  { name: "Fontanero", icon: IconDroplets, color: "from-blue-400 to-cyan-400" },
-  { name: "Pintor", icon: IconPaintbrush, color: "from-pink-400 to-rose-400" },
-  { name: "Albañil / Reformas", icon: IconHardHat, color: "from-orange-400 to-amber-400" },
-  { name: "Jardinero", icon: IconTrees, color: "from-green-400 to-emerald-400" },
-  { name: "Autónomo de limpieza", icon: IconSparkles, color: "from-purple-400 to-violet-400" },
-  { name: "Cerrajero", icon: IconKey, color: "from-slate-400 to-gray-500" },
-  { name: "Carpintero", icon: IconHammer, color: "from-amber-500 to-yellow-500" },
-];
-
-const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite, professionalUser, currentUserId, currentUser, priority }) => {
-  const navigate = useNavigate();
+// Tarjeta de resultado — tres columnas, la forma de khdemlidaba.
+//
+//   [avatar 56 + corazón]   [nombre · oficio · ciudad/nota]   [2 botones 44]
+//
+// La altura de la fila la marca la columna de botones (44+8+44 = 96 px) y la
+// de la izquierda mide 56+8+28 = 92: la tarjeta no crece por el corazón.
+//
+// Los botones redondos son los dos canales que el profesional ha declarado.
+// Si no tiene ninguno —o sólo uno— el hueco lo ocupa «Contactar», que abre el
+// formulario de correo (Edge Function `contact-professional`): es el único
+// canal garantizado, y dejar una ficha sin ninguna puerta sería peor que
+// apartarse del modelo.
+const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite, professionalUser, priority }) => {
   const { t } = useTranslation();
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [guestModal, setGuestModal] = useState(false);
-
-  // Botón "Contactar": abre el formulario que envía un EMAIL al profesional
-  // (Edge Function `contact-professional`), tenga o no cuenta quien escribe.
-  //
-  // Antes esto creaba una conversación en la tabla `messages` y entraba al
-  // chat interno. Ese chat se retiró —10 mensajes en toda la vida de la web,
-  // el último hace un mes— y con él la asimetría que tenía: el visitante sin
-  // cuenta mandaba un correo y el registrado abría un hilo que el profesional
-  // sólo veía si entraba a mirar. Ahora los dos caminos son el mismo, y el
-  // profesional se entera en su bandeja de correo de siempre.
-  const handleContactDirect = (e) => {
-    e.stopPropagation();
-    trackMetric(profile.id, 'contact_click');
-    setGuestModal(true);
-  };
 
   const formatPhoneForWhatsApp = (phone) => {
     if (!phone) return null;
@@ -93,245 +76,258 @@ const ProfileCard = React.memo(({ profile, onClick, onToggleFavorite, isFavorite
     return cleaned;
   };
 
-  // Orden de fallback verificado en BD: 16/27 tienen imagen_principal, 15/27
-  // photos[], y profile_picture está vacío en todos. Probamos en ese orden.
+  // Orden de respaldo verificado en BD: 16/27 tienen imagen_principal, 15/27
+  // photos[], y profile_picture está vacío en todos.
   const photoUrl =
     profile.imagen_principal ||
     (Array.isArray(profile.photos) && profile.photos[0]) ||
     professionalUser?.profile_picture ||
     null;
-  const isVerified = profile.identity_verified === true;
-  // Avatares de tarjeta: 56 px en pantalla → 128 px (≈2.3x retina). WebP.
   const optimizedPhotoUrl = optimizeSupabaseImage(photoUrl, { width: 128, quality: 70 });
 
+  const isVerified = profile.identity_verified === true;
   const hasWhatsapp = profile.metodos_contacto?.includes('whatsapp') && profile.telefono_contacto;
   const hasPhone = profile.metodos_contacto?.includes('telefono') && profile.telefono_contacto;
   const categoryLabel = profile.categories?.[0];
+  const name = profile.business_name || t('favorites.page.unnamed');
+  const cityLabel = [profile.ciudad, profile.provincia !== profile.ciudad ? profile.provincia : null]
+    .filter(Boolean)
+    .join(', ');
+
+  const roundBtn = 'inline-flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-95';
+  const openContact = (e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); setGuestModal(true); };
+  const channels = (hasWhatsapp ? 1 : 0) + (hasPhone ? 1 : 0);
 
   return (
-    <article
-      onClick={onClick}
-      className="card-skeleton cursor-pointer bg-surface rounded-2xl border border-c-border hover:border-[#00255C] hover:shadow-[0_10px_30px_-15px_rgba(0,37,92,0.18)] transition-all flex flex-col"
-      style={{ minHeight: '288px', contain: 'layout style' }}
-    >
-      <div className="flex flex-col flex-1 p-4">
-        {/* Cabecera: avatar + nombre + meta + badges */}
-        <div className="flex items-start gap-3">
-          <InitialsAvatar
-            name={profile.business_name || ""}
-            src={optimizedPhotoUrl || undefined}
-            size={56}
-            priority={priority}
-            className="ring-2 ring-white shadow-sm"
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h3 className="font-semibold text-ink text-[15px] leading-snug truncate">
-                {profile.business_name || t('favorites.page.unnamed')}
-              </h3>
-              {isVerified && (
-                <span title={t('proProfile.badges.identityVerified')}>
-                  <IconVerified size={16} className="flex-shrink-0" style={{ color: '#00255C' }} aria-label={t('proProfile.badges.identityVerified')} />
-                </span>
-              )}
-            </div>
-            {categoryLabel && (
-              <p className="text-[12px] truncate mt-0.5" style={{ color: '#00255C' }}>
-                {categoryLabel}
-              </p>
-            )}
-            <p className="text-c-muted text-[12px] mt-0.5 inline-flex items-center gap-1 truncate">
-              <IconMapPin size={12} className="flex-shrink-0" aria-hidden="true" />
-              {profile.ciudad}{profile.provincia && profile.ciudad !== profile.provincia ? `, ${profile.provincia}` : ''}
-            </p>
-          </div>
-          {/* Badge Destacado sutil arriba a la derecha (icono pequeño, no banda) */}
-          {profile.is_ads_plus && (
-            <span
-              className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.06em] border px-1.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0"
-              style={{ color: '#7B5400', backgroundColor: '#FBF4DA', borderColor: '#EFD68A' }}
-              title={t('search.card.featuredTitle')}
-            >
-              <IconStar size={10} />
-              {t('search.card.featured')}
-            </span>
-          )}
-          {/* Botón Favorito: solo para clientes logueados, esquina sup. derecha.
-              Discreto pero visible, no ocupa espacio en la grilla principal. */}
+    <div className="card transition-transform hover:-translate-y-0.5">
+      <div className="flex items-center gap-3 p-4">
+        {/* Columna 1 — avatar (abre la ficha) y, debajo, el corazón. El
+            corazón va FUERA del enlace: un toque ahí no debe cargar la ficha. */}
+        <div className="flex flex-col items-center gap-2 flex-shrink-0">
+          <button
+            type="button"
+            onClick={onClick}
+            aria-hidden="true"
+            tabIndex={-1}
+            className="focus:outline-none"
+          >
+            <InitialsAvatar
+              name={profile.business_name || ""}
+              src={optimizedPhotoUrl || undefined}
+              size={56}
+              square
+              priority={priority}
+            />
+          </button>
           {onToggleFavorite && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
               aria-label={isFavorite ? t('favorites.page.remove') : t('search.card.addFavorite')}
               title={isFavorite ? t('favorites.page.remove') : t('search.card.saveFavorite')}
-              className="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-full border border-c-border bg-surface hover:bg-rose-50 transition-colors"
+              className="w-7 h-7 inline-flex items-center justify-center rounded-full border border-c-border bg-surface hover:bg-rose-50 transition-colors"
             >
               {isFavorite
-                ? <IconHeartFilled size={16} className="text-rose-500" />
-                : <IconHeart size={16} className="text-c-muted" />}
+                ? <IconHeartFilled size={14} className="text-rose-500" />
+                : <IconHeart size={14} className="text-c-muted" />}
             </button>
           )}
         </div>
 
-        {/* Descripción 2 líneas (altura reservada para uniformidad) */}
-        <p className="text-c-muted text-[13px] mt-3 line-clamp-2 leading-relaxed" style={{ minHeight: '2.6em' }}>
-          {profile.descripcion_corta || ''}
-        </p>
+        {/* Columna 2 — nombre / oficio / ciudad·nota. Tres informaciones,
+            tres líneas: juntas en una se cortaban a la mitad. */}
+        <button
+          type="button"
+          onClick={onClick}
+          title={name}
+          className="flex-1 min-w-0 text-start focus:outline-none"
+        >
+          <div className="flex items-center gap-1.5 min-w-0">
+            <p className="text-ink font-semibold truncate leading-tight m-0" style={{ fontSize: 15 }}>
+              {name}
+            </p>
+            {isVerified && (
+              <IconVerified
+                size={15}
+                className="flex-shrink-0 text-brand-navy"
+                aria-label={t('proProfile.badges.identityVerified')}
+              />
+            )}
+          </div>
 
-        {/* Valoración + tarifa en la misma línea */}
-        <div className="flex items-center justify-between mt-3" style={{ minHeight: '20px' }}>
-          {profile.average_rating > 0 ? (
-            <div className="flex items-center gap-1">
-              <IconStar size={14} style={{ color: '#F5C13D' }} />
-              <span className="text-[13px] font-semibold text-ink">
-                {profile.average_rating.toFixed(1)}
-              </span>
-              <span className="text-[12px] text-c-muted">
-                ({profile.total_reviews || 0})
-              </span>
-            </div>
-          ) : (
-            <span className="text-[12px] text-c-muted">{t('noReviewsYet')}</span>
+          {categoryLabel && (
+            <p className="mt-1 text-c-muted leading-snug truncate" style={{ fontSize: 15 }} title={categoryLabel}>
+              {categoryLabel}
+            </p>
           )}
-          {profile.tarifa_base > 0 && (
-            <span className="text-[13px] font-semibold text-ink">
-              {profile.tarifa_base} €/h
-            </span>
-          )}
-        </div>
 
-        {/* Acciones: patrón fijo. Fila 1 = Contactar full-width;
-            Fila 2 = WhatsApp + Llamar 50/50 (cada uno ocupa la mitad aunque
-            falte el otro: usamos invisible spacer si solo hay uno). */}
-        <div className="mt-auto pt-3 space-y-2" onClick={(e) => e.stopPropagation()}>
-          <button
-            type="button"
-            onClick={handleContactDirect}
-            className="w-full inline-flex items-center justify-center gap-1.5 h-10 rounded-lg text-[13px] font-semibold text-white transition-colors"
-            style={{ backgroundColor: '#00255C' }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#001A45')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00255C')}
-            aria-label={t('proProfile.contact.contactWith', { name: profile.business_name })}
-          >
-            <IconMessageSquare size={16} />
-            {t('profile_card.contact')}
-          </button>
-
-          {(hasWhatsapp || hasPhone) && (
-            <div className="grid grid-cols-2 gap-2">
-              {hasWhatsapp ? (
-                <a
-                  href={`https://wa.me/${formatPhoneForWhatsApp(profile.telefono_contacto)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); }}
-                  className="inline-flex items-center justify-center gap-1.5 h-10 rounded-lg text-[13px] font-semibold text-white transition-colors"
-                  style={{ backgroundColor: '#1FAD4F' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#168D40')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1FAD4F')}
-                  aria-label={t('search.card.openWhatsAppOf', { name: profile.business_name })}
-                >
-                  <IconWhatsApp size={14} />
-                  {t('profile_card.whatsapp')}
-                </a>
-              ) : (
-                <span aria-hidden="true" />
+          <div className="mt-1 flex items-center gap-2 justify-between" style={{ fontSize: 14 }}>
+            {/* Una sola línea, pase lo que pase: `flex-wrap` dejaba que
+                «Nuevo» y el precio cayeran a un segundo renglón cuando la
+                ficha lleva distintivo, y entonces unas tarjetas medían tres
+                líneas y otras cuatro. Lo que cede es la ciudad, truncada. */}
+            <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+              {cityLabel && (
+                <span className="text-c-muted truncate inline-flex items-center gap-1 min-w-0">
+                  <IconMapPin size={13} className="flex-shrink-0" aria-hidden="true" />
+                  <span className="truncate">{cityLabel}</span>
+                </span>
               )}
-              {hasPhone ? (
-                phoneRevealed ? (
-                  <a
-                    href={`tel:${profile.telefono_contacto}`}
-                    onClick={(e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); }}
-                    className="inline-flex items-center justify-center gap-1.5 h-10 rounded-lg text-[12px] font-semibold border border-c-border bg-surface text-ink hover:bg-soft transition-colors truncate"
-                    aria-label={t('search.card.callNumber', { phone: profile.telefono_contacto })}
-                  >
-                    <IconPhone size={14} style={{ color: '#00255C' }} />
-                    {profile.telefono_contacto}
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); setPhoneRevealed(true); }}
-                    className="inline-flex items-center justify-center gap-1.5 h-10 rounded-lg text-[13px] font-semibold border border-c-border bg-surface text-ink hover:bg-soft transition-colors"
-                    aria-label={t('search.card.showPhone')}
-                  >
-                    <IconPhone size={14} style={{ color: '#00255C' }} />
-                    {t('profile_card.call')}
-                  </button>
-                )
+              {profile.average_rating > 0 ? (
+                <>
+                  {cityLabel && <span className="text-c-muted" aria-hidden="true" style={{ opacity: 0.55 }}>·</span>}
+                  <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                    <IconStar size={13} className="text-brand-gold" />
+                    <span className="font-semibold text-ink">{profile.average_rating.toFixed(1)}</span>
+                    <span className="text-c-muted">({profile.total_reviews || 0})</span>
+                  </span>
+                </>
               ) : (
-                <span aria-hidden="true" />
+                <>
+                  {/* «Sin valoraciones aún» ocupaba la línea entera y
+                      empujaba el precio y el distintivo a una segunda,
+                      alargando la tarjeta un 30 %. Una palabra dice lo
+                      mismo en el sitio donde hay una palabra. */}
+                  {cityLabel && <span className="text-c-muted" aria-hidden="true" style={{ opacity: 0.55 }}>·</span>}
+                  <span className="text-c-muted whitespace-nowrap">{t('search.card.newPro')}</span>
+                </>
+              )}
+              {profile.tarifa_base > 0 && (
+                <>
+                  <span className="text-c-muted" aria-hidden="true" style={{ opacity: 0.55 }}>·</span>
+                  <span className="font-semibold text-ink whitespace-nowrap">{profile.tarifa_base} €/h</span>
+                </>
               )}
             </div>
+            {profile.is_ads_plus && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full font-bold text-white flex-shrink-0 ms-auto"
+                style={{ background: '#7B5400', padding: '1px 7px', fontSize: 11, letterSpacing: '0.03em', lineHeight: 1.4 }}
+                title={t('search.card.featuredTitle')}
+              >
+                <IconStar size={10} />
+                {t('search.card.featured')}
+              </span>
+            )}
+          </div>
+        </button>
+
+        {/* Columna 3 — como mucho dos botones redondos. Una sola pastilla
+            saturada por tarjeta, y es la verde. */}
+        <div className="flex-shrink-0 self-start flex flex-col gap-2 items-end" onClick={(e) => e.stopPropagation()}>
+          {hasWhatsapp && (
+            <a
+              href={`https://wa.me/${formatPhoneForWhatsApp(profile.telefono_contacto)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); }}
+              aria-label={t('search.card.openWhatsAppOf', { name })}
+              className={`${roundBtn} bg-whatsapp text-white hover:bg-whatsapp-hover`}
+            >
+              <IconWhatsApp size={18} />
+            </a>
+          )}
+          {hasPhone && (
+            phoneRevealed ? (
+              <a
+                href={`tel:${profile.telefono_contacto}`}
+                onClick={(e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); }}
+                aria-label={t('search.card.callNumber', { phone: profile.telefono_contacto })}
+                className={`${roundBtn} bg-soft text-ink border border-c-border hover:opacity-90`}
+              >
+                <IconPhone size={18} />
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); trackMetric(profile.id, 'contact_click'); setPhoneRevealed(true); }}
+                aria-label={t('search.card.showPhone')}
+                className={`${roundBtn} bg-soft text-ink border border-c-border hover:opacity-90`}
+              >
+                <IconPhone size={18} />
+              </button>
+            )
+          )}
+          {channels < 2 && (
+            <button
+              type="button"
+              onClick={openContact}
+              aria-label={t('proProfile.contact.contactWith', { name })}
+              title={t('profile_card.contact')}
+              className={`${roundBtn} bg-brand-navy text-white hover:bg-brand-navy-deep`}
+            >
+              <IconMessageSquare size={18} />
+            </button>
           )}
         </div>
       </div>
+
       {guestModal && (
-        <GuestContactModal
-          professional={profile}
-          onClose={() => setGuestModal(false)}
-        />
+        <GuestContactModal professional={profile} onClose={() => setGuestModal(false)} />
       )}
-    </article>
+    </div>
   );
 });
 
 export default function SearchPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [params, setParams] = useSearchParams();
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
-  const [filters, setFilters] = useState(() => {
-    // Leer filtros iniciales desde query params (hero → resultados)
-    const params = new URLSearchParams(window.location.search);
-    return {
-      category: params.get("categoria") || "all",
-      provincia: params.get("provincia") || "all",
-      ciudad: params.get("ciudad") || "all",
-      minRating: 0,
-      availability: "all",
-    };
-  });
-  // En móvil renderamos solo 6 tarjetas iniciales para reducir trabajo del main thread
-  const [displayLimit, setDisplayLimit] = useState(() => window.innerWidth < 768 ? 6 : 12);
-  const [viewMode, setViewMode] = useState("grid");
-  // Filtros SIEMPRE desplegados por defecto. Sin "toggle" inicial.
-  const [showFilters, setShowFilters] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [displayLimit, setDisplayLimit] = useState(12);
 
-  useEffect(() => {
-    loadUser();
-  }, []);
+  // Los filtros VIVEN en la URL, como en khdemlidaba: una búsqueda se puede
+  // compartir, y el botón «atrás» deshace el último filtro en vez de sacarte
+  // de la página.
+  const filters = useMemo(() => ({
+    category: params.get('categoria') || 'all',
+    provincia: params.get('provincia') || 'all',
+    ciudad: params.get('ciudad') || 'all',
+    minRating: Number(params.get('nota')) || 0,
+    availability: params.get('disponibilidad') || 'all',
+  }), [params]);
 
-  const loadUser = async () => {
-    try {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
-        setUser(null);
-        setLoadingUser(false);
-        return;
-      }
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-    } catch {
-      setUser(null);
-    } finally {
-      setLoadingUser(false);
-    }
+  const setFilters = (next) => {
+    const value = typeof next === 'function' ? next(filters) : next;
+    const qs = new URLSearchParams();
+    if (value.category && value.category !== 'all') qs.set('categoria', value.category);
+    if (value.provincia && value.provincia !== 'all') qs.set('provincia', value.provincia);
+    if (value.ciudad && value.ciudad !== 'all') qs.set('ciudad', value.ciudad);
+    if (value.minRating) qs.set('nota', String(value.minRating));
+    if (value.availability && value.availability !== 'all') qs.set('disponibilidad', value.availability);
+    setParams(qs, { replace: true });
   };
 
-  const FALLBACK_CATEGORIES = [
-    "Abogado", "Albañil / Reformas", "Asesoría o gestoría", "Autónomo de limpieza",
-    "Carpintero", "Cerrajero", "Climatización / Calefacción", "Electricista",
-    "Empresa multiservicios", "Fontanero", "Informático a domicilio / soporte IT",
-    "Jardinero", "Marketing digital / diseño web", "Peluquería y estética a domicilio",
-    "Persianas y toldos", "Pintor", "Transportista"
-  ].map((name, idx) => ({ id: `fallback_${idx}`, name }));
+  useBodyScrollLock(filtersOpen);
 
-  // NO hacer fetch de categorías — usar FALLBACK_CATEGORIES directamente
-  const categories = FALLBACK_CATEGORIES;
-  const loadingCategories = false;
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth) { if (alive) setUser(null); return; }
+        const currentUser = await base44.auth.me();
+        if (alive) setUser(currentUser);
+      } catch {
+        if (alive) setUser(null);
+      } finally {
+        if (alive) setLoadingUser(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  // La barra de arriba habla en slugs (es lo que viaja en las URL SEO de
+  // /categoria); los filtros de la lista, en nombres (es lo que guarda
+  // `professional_profiles.categories`). La traducción entre los dos vive
+  // aquí, en un sitio, y no repartida por cada handler.
+  const { categories: dbCategories } = useServiceCategories();
+  const slugOfCategory = useMemo(() => {
+    if (filters.category === 'all') return '';
+    return dbCategories.find((c) => c.name === filters.category)?.slug || '';
+  }, [dbCategories, filters.category]);
 
   const { data: profiles = [], isLoading: loadingProfiles } = useQuery({
     queryKey: ['professionalProfiles'],
@@ -346,10 +342,8 @@ export default function SearchPage() {
     queryKey: ['professionalUsers', profiles.map(p => p.user_id).join(',')],
     queryFn: async () => {
       if (profiles.length === 0) return [];
-      // Solo traer los usuarios necesarios con filter en lugar de list() completo
       const userIds = profiles.map(p => p.user_id);
-      const allUsers = await base44.entities.User.filter({ id: { $in: userIds } });
-      return allUsers;
+      return await base44.entities.User.filter({ id: { $in: userIds } });
     },
     enabled: profiles.length > 0,
     staleTime: 1000 * 60 * 10, gcTime: 1000 * 60 * 30, refetchOnWindowFocus: false,
@@ -365,14 +359,12 @@ export default function SearchPage() {
     staleTime: 1000 * 60 * 10, gcTime: 1000 * 60 * 30, refetchOnWindowFocus: false,
   });
 
-  // Orden: Ads+ primero (por rating), luego resto en orden aleatorio estable
+  // Orden: Ads+ primero (por nota), el resto en orden aleatorio estable.
   const shuffledProfiles = useMemo(() => {
     if (!profiles.length) return profiles;
     const ads = profiles.filter(p => p.is_ads_plus);
     const rest = profiles.filter(p => !p.is_ads_plus);
-    // Ads+: ordenar por rating desc, luego fecha desc
     ads.sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0) || new Date(b.created_date) - new Date(a.created_date));
-    // Resto: orden aleatorio estable
     for (let i = rest.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [rest[i], rest[j]] = [rest[j], rest[i]];
@@ -380,35 +372,23 @@ export default function SearchPage() {
     return [...ads, ...rest];
   }, [profiles]);
 
-  // Métricas: cuando React tiene la lista filtrada estable, registramos
-  // search_appearance para cada profesional VISIBLE (límite display).
-  // Dedupe interno de trackMetric evita inflar contadores.
-  const filteredProfilesRaw = useMemo(() => {
-    return shuffledProfiles.filter(profile => {
-      const matchesSearch = !debouncedSearchTerm ||
-        profile.business_name?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        profile.descripcion_corta?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        profile.categories?.some(cat => cat.toLowerCase().includes(debouncedSearchTerm.toLowerCase()));
-      const matchesCategory = filters.category === "all" || profile.categories?.includes(filters.category);
-      const matchesProvincia = filters.provincia === "all" || profile.provincia === filters.provincia;
-      const matchesCiudad = filters.ciudad === "all" || profile.ciudad === filters.ciudad;
-      const matchesRating = !filters.minRating || profile.average_rating >= filters.minRating;
-      const matchesAvailability = filters.availability === "all" || profile.disponibilidad_tipo === filters.availability;
-      return matchesSearch && matchesCategory && matchesProvincia && matchesCiudad && matchesRating && matchesAvailability;
-    });
-  }, [shuffledProfiles, debouncedSearchTerm, filters]);
+  const filteredProfiles = useMemo(() => shuffledProfiles.filter((profile) => {
+    const matchesCategory = filters.category === "all" || profile.categories?.includes(filters.category);
+    const matchesProvincia = filters.provincia === "all" || profile.provincia === filters.provincia;
+    const matchesCiudad = filters.ciudad === "all" || profile.ciudad === filters.ciudad;
+    const matchesRating = !filters.minRating || profile.average_rating >= filters.minRating;
+    const matchesAvailability = filters.availability === "all" || profile.disponibilidad_tipo === filters.availability;
+    return matchesCategory && matchesProvincia && matchesCiudad && matchesRating && matchesAvailability;
+  }), [shuffledProfiles, filters]);
 
-  const filteredProfiles = filteredProfilesRaw;
-
-  // Dispara search_appearance cuando se asienta la lista visible.
+  // `search_appearance` cuando la lista visible se asienta. El dedupe interno
+  // de trackMetric evita inflar contadores.
   useEffect(() => {
-    if (!filteredProfiles.length) return;
+    if (!filteredProfiles.length) return undefined;
     const id = setTimeout(() => {
-      const ids = filteredProfiles.slice(0, displayLimit).map((p) => p.id).filter(Boolean);
-      trackSearchAppearance(ids);
+      trackSearchAppearance(filteredProfiles.slice(0, displayLimit).map((p) => p.id).filter(Boolean));
     }, 600);
     return () => clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredProfiles, displayLimit]);
 
   const availableCities = useMemo(() => {
@@ -416,9 +396,7 @@ export default function SearchPage() {
     return CIUDADES_POR_PROVINCIA[filters.provincia] || [];
   }, [filters.provincia]);
 
-  const handleViewProfile = (profile) => {
-    navigate(getProfileSeoUrl(profile));
-  };
+  const handleViewProfile = (profile) => navigate(getProfileSeoUrl(profile));
 
   const handleToggleFavorite = async (profile) => {
     if (!user) { base44.auth.redirectToLogin(); return; }
@@ -434,23 +412,83 @@ export default function SearchPage() {
     } catch { toast.error(t('search.favoritesError')); }
   };
 
-  const isInitialLoading = loadingProfiles || loadingCategories;
-  const hasActiveFilters = filters.category !== "all" || filters.provincia !== "all" || filters.minRating > 0;
-  // /buscar muestra TODOS los profesionales visibles por defecto. Al aplicar
-  // filtros se reduce la lista; sin filtros, lista completa.
-  const isEmptyQuery = false;
+  const hasActiveFilters = filters.category !== "all" || filters.provincia !== "all"
+    || filters.ciudad !== "all" || filters.minRating > 0 || filters.availability !== "all";
+  const activeCount = [
+    filters.category !== "all", filters.provincia !== "all", filters.ciudad !== "all",
+    filters.minRating > 0, filters.availability !== "all",
+  ].filter(Boolean).length;
 
-  // Diferir la hidratación de filtros móvil hasta después del primer paint
-  const [filtersReady, setFiltersReady] = useState(false);
-  useEffect(() => {
-    const id = requestIdleCallback
-      ? requestIdleCallback(() => setFiltersReady(true), { timeout: 1500 })
-      : setTimeout(() => setFiltersReady(true), 300);
-    return () => {
-      if (requestIdleCallback) cancelIdleCallback(id);
-      else clearTimeout(id);
-    };
-  }, []);
+  const heading = filters.category !== "all" && filters.provincia !== "all"
+    ? t('search.heading.categoryProvince', { category: filters.category, province: filters.provincia })
+    : filters.category !== "all"
+      ? filters.category
+      : filters.provincia !== "all"
+        ? t('search.heading.province', { province: filters.provincia })
+        : t('search.title');
+
+  const filtersPanel = (
+    <>
+      <div>
+        <label htmlFor="flt-ciudad" className="text-sm font-semibold text-ink block mb-2">{t('cityField')}</label>
+        <select
+          id="flt-ciudad"
+          className="select"
+          value={filters.ciudad}
+          onChange={(e) => setFilters({ ...filters, ciudad: e.target.value })}
+          disabled={filters.provincia === 'all'}
+        >
+          <option value="all">
+            {filters.provincia === 'all' ? t('search.filterPanel.selectProvinceFirst') : t('allCities')}
+          </option>
+          {availableCities.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="flt-nota" className="text-sm font-semibold text-ink block mb-2">{t('search.filterPanel.minRating')}</label>
+        <select
+          id="flt-nota"
+          className="select"
+          value={filters.minRating || ''}
+          onChange={(e) => setFilters({ ...filters, minRating: Number(e.target.value) || 0 })}
+        >
+          <option value="">{t('search.filterPanel.anyRating')}</option>
+          <option value="3">{t('search.filterPanel.ratingPlus', { rating: 3 })}</option>
+          <option value="4">{t('search.filterPanel.ratingPlus', { rating: 4 })}</option>
+          <option value="4.5">{t('search.filterPanel.ratingPlus', { rating: 4.5 })}</option>
+        </select>
+      </div>
+
+      <div>
+        <span className="text-sm font-semibold text-ink block mb-2">{t('availability')}</span>
+        <div className="flex flex-wrap gap-2">
+          {[
+            ['all', t('search.filterPanel.anyAvailability')],
+            ['laborables', t('search.filterPanel.weekdaysOnly')],
+            ['completa', t('search.filterPanel.allWeek')],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setFilters({ ...filters, availability: value })}
+              className={filters.availability === value ? 'chip-active' : 'chip'}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <button type="button" className="btn-secondary w-full" onClick={() => setFilters(EMPTY_FILTERS)}>
+        {t('search.resetFilters')}
+      </button>
+    </>
+  );
+
+  const resultsLine = loadingProfiles
+    ? t('search.results.loading')
+    : t('search.heading.resultsCount', { count: filteredProfiles.length });
 
   return (
     <>
@@ -459,312 +497,198 @@ export default function SearchPage() {
           filters.category !== "all" && filters.provincia !== "all"
             ? t('search.seo.titleCategoryProvince', { category: filters.category, province: filters.provincia })
             : filters.category !== "all"
-            ? t('search.seo.titleCategory', { category: filters.category })
-            : filters.provincia !== "all"
-            ? t('search.seo.titleProvince', { province: filters.provincia })
-            : t('search.seo.titleDefault')
+              ? t('search.seo.titleCategory', { category: filters.category })
+              : filters.provincia !== "all"
+                ? t('search.seo.titleProvince', { province: filters.provincia })
+                : t('search.seo.titleDefault')
         }
         description={t('search.seo.description', { count: filteredProfiles.length })}
         keywords="autónomos, profesionales verificados, servicios a domicilio, contactar gratis"
       />
-      <ServiceSchema categories={categories.map(c => c.name)} location={filters.provincia !== "all" ? filters.provincia : "España"} />
+      <ServiceSchema
+        categories={dbCategories.map((c) => c.name)}
+        location={filters.provincia !== "all" ? filters.provincia : "España"}
+      />
       <BreadcrumbSchema items={[
         { name: "Inicio", url: "https://misautonomos.es" },
-        { name: "Buscar Profesionales", url: "https://misautonomos.es/buscar" }
+        { name: "Buscar Profesionales", url: "https://misautonomos.es/buscar" },
       ]} />
 
-      <div className="min-h-screen bg-surface" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <section className="section-tight">
+        <div className="container-page">
+          <h1>{heading}</h1>
 
-        {/* Cabecera de página de resultados (la home / es Landing, no Search). */}
-        <div className="border-b border-c-border bg-surface">
-          <div className="max-w-7xl mx-auto px-4 py-6">
-            <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-ink">
-              {filters.category !== "all" && filters.provincia !== "all"
-                ? t('search.heading.categoryProvince', { category: filters.category, province: filters.provincia })
-                : filters.category !== "all"
-                ? filters.category
-                : filters.provincia !== "all"
-                ? t('search.heading.province', { province: filters.provincia })
-                : t('messages.find_pros_cta')}
-            </h1>
-            <p className="text-sm text-c-muted mt-1">
-              {hasActiveFilters
-                ? t('search.heading.resultsCount', { count: filteredProfiles.length })
-                : t('search.heading.hint')}
-            </p>
-          </div>
-        </div>
-
-        {/* ── CONTENIDO PRINCIPAL ── */}
-        <div id="results-section">
-        <div className="max-w-7xl mx-auto px-4 py-5 overflow-visible">
-
-          {/* Panel de filtros — SIEMPRE desplegado. Sin botón "Filtros avanzados".
-              Para usuarios logueados muestra encima el autocompletar de búsqueda libre. */}
-          <div className="mb-5 bg-surface rounded-2xl p-4 shadow-sm border border-c-border" style={{ position: 'relative', zIndex: 10 }}>
-            {user && (
-              <div className="mb-3">
-                <SearchAutocomplete
-                  value={searchTerm}
-                  onChange={setSearchTerm}
-                  onSelect={handleViewProfile}
-                />
-              </div>
-            )}
-
-            {/* Chips de filtros activos (visitantes) */}
-            {!user && (filters.category !== "all" || filters.provincia !== "all") && (
-              <div className="hidden md:flex gap-2 items-center flex-wrap mb-3">
-                {filters.category !== "all" && (
-                  <span
-                    className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium"
-                    style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: '#00255C' }}
-                  >
-                    {filters.category}
-                    <button type="button" onClick={() => setFilters(f => ({...f, category: "all"}))} aria-label={`${t('common.delete')}: ${t('search.filterPanel.category')} ${filters.category}`}>
-                      <IconClose size={12} />
-                    </button>
-                  </span>
-                )}
-                {filters.provincia !== "all" && (
-                  <span
-                    className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium"
-                    style={{ backgroundColor: 'rgba(0,37,92,0.08)', color: '#00255C' }}
-                  >
-                    {filters.provincia}
-                    <button type="button" onClick={() => setFilters(f => ({...f, provincia: "all", ciudad: "all"}))} aria-label={`${t('common.delete')}: ${t('province')} ${filters.provincia}`}>
-                      <IconClose size={12} />
-                    </button>
-                  </span>
-                )}
-              </div>
-            )}
-
-            {/* Desktop: SearchFilters siempre visible */}
-            <div className="hidden md:block">
-              <Suspense fallback={null}>
-                <SearchFilters
-                  filters={filters}
-                  onFilterChange={setFilters}
-                  availableCities={availableCities}
-                  categories={categories}
-                  provinces={PROVINCIAS}
-                />
-              </Suspense>
-            </div>
-
-            {/* Mobile: deferred render until after first paint (también siempre visible) */}
-            <div className="md:hidden">
-              {filtersReady && (
-                <Suspense fallback={null}>
-                  <SearchFilters
-                    filters={filters}
-                    onFilterChange={setFilters}
-                    availableCities={availableCities}
-                    categories={categories}
-                    provinces={PROVINCIAS}
-                    isMobile={true}
-                  />
-                </Suspense>
-              )}
-            </div>
+          <div className="mt-8">
+            <HeroSearch
+              initialCategory={slugOfCategory}
+              initialProvincia={filters.provincia === 'all' ? '' : filters.provincia}
+              initialCiudad={filters.ciudad === 'all' ? '' : filters.ciudad}
+              hideSubmitButton
+              categoryPlaceholder={t('allCategories')}
+              provincePlaceholder={t('allProvinces')}
+              onAutoSearch={({ category, provincia, ciudad }) => setFilters({
+                ...filters,
+                category: category ? (dbCategories.find((c) => c.slug === category)?.name || 'all') : 'all',
+                provincia: provincia || 'all',
+                ciudad: ciudad || 'all',
+              })}
+            />
           </div>
 
-          <SavedSearches
-            user={user}
-            currentFilters={filters}
-            resultsCount={filteredProfiles.length}
-            onLoadSearch={(savedFilters) => setFilters(savedFilters)}
-          />
+          {/* Móvil: el recuento a la izquierda, la puerta a los filtros a la
+              derecha. En escritorio el recuento vive sobre la lista y los
+              filtros están siempre a la vista. */}
+          <div className="mt-8 lg:hidden flex items-center justify-between gap-3">
+            <p className="text-sm text-c-muted min-w-0 truncate">{resultsLine}</p>
+            <button type="button" className="btn-secondary btn-sm flex-shrink-0" onClick={() => setFiltersOpen(true)}>
+              {t('search.filters')}{activeCount > 0 && ` · ${activeCount}`}
+            </button>
+          </div>
 
-          {/* Header resultados */}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-10">
+            <aside className="hidden lg:block sticky top-24 h-fit">
+              <h2 className="text-lg font-semibold text-ink mb-5">{t('search.filters')}</h2>
+              <div className="space-y-6">{filtersPanel}</div>
+            </aside>
+
             <div>
-              <h2 className="text-lg font-bold text-ink">
-                {isInitialLoading ? (
-                  <span className="text-c-muted">{t('search.results.loading')}</span>
-                ) : (
-                  <Trans
-                    i18nKey="search.results.countHeading"
-                    values={{ count: filteredProfiles.length }}
-                    components={{ num: <span className="text-c-accent" /> }}
-                  />
-                )}
-              </h2>
-              <p className="text-xs text-c-muted">{t('search.verified_tag')}</p>
-            </div>
-            {!isInitialLoading && filteredProfiles.length > 0 && (
-              <div className="flex gap-1.5" role="group">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("grid")}
-                  aria-pressed={viewMode === "grid"}
-                  aria-label={t('search.view.grid')}
-                  className={`btn-icon border ${viewMode === "grid" ? "bg-c-accent border-c-accent text-white" : "bg-surface border-c-border text-ink hover:border-ink"}`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("map")}
-                  aria-pressed={viewMode === "map"}
-                  aria-label={t('search.view.map')}
-                  className={`btn-icon border ${viewMode === "map" ? "bg-c-accent border-c-accent text-white" : "bg-surface border-c-border text-ink hover:border-ink"}`}
-                >
-                  <IconMapPin size={16} aria-hidden="true" />
-                </button>
-              </div>
-            )}
-          </div>
+              <p className="hidden lg:block text-sm text-c-muted mb-6">{resultsLine}</p>
 
-          {/* Skeleton loading — MISMA altura (288 px) que la tarjeta real
-              para que al swap no se empuje el contenido de abajo (anti-CLS). */}
-          {isInitialLoading && (
-            <div className="grid gap-4 search-results-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
-              {[...Array(8)].map((_, idx) => (
-                <div key={idx} className="bg-surface rounded-2xl overflow-hidden border border-c-border" style={{ minHeight: '288px', contain: 'layout style paint' }}>
-                  {/* Desktop: blue header bar */}
-                  <div className="hidden md:block" style={{ height: '48px', background: '#e5e7eb' }} />
-                  {/* Mobile: avatar + name row (matches real card mobile layout) */}
-                  <div className="md:hidden flex items-center gap-3 px-3 pt-3 pb-1">
-                    <div style={{ width: '48px', height: '48px', minWidth: '48px', borderRadius: '9999px', background: '#e5e7eb' }} />
-                    <div className="flex-1 space-y-2">
-                      <div style={{ height: '14px', width: '60%', borderRadius: '4px', background: '#e5e7eb' }} />
-                      <div style={{ height: '11px', width: '40%', borderRadius: '4px', background: '#f3f4f6' }} />
+              {loadingProfiles ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  {[...Array(6)].map((_, idx) => (
+                    <div key={idx} className="card p-4 flex items-center gap-3" style={{ minHeight: 128 }}>
+                      <div className="rounded-xl bg-soft" style={{ width: 56, height: 56 }} />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-3/5 rounded bg-soft" />
+                        <div className="h-3 w-2/5 rounded bg-soft" />
+                        <div className="h-3 w-1/2 rounded bg-soft" />
+                      </div>
                     </div>
-                  </div>
-                  {/* Shared content area */}
-                  <div className="px-3 pb-3 md:pt-8 pt-2 space-y-2">
-                    <div className="hidden md:block h-4 w-3/4 rounded" style={{ background: '#e5e7eb' }} />
-                    <div className="hidden md:block h-3 w-1/2 rounded" style={{ background: '#f3f4f6' }} />
-                    <div style={{ height: '11px', width: '55%', borderRadius: '4px', background: '#f3f4f6' }} />
-                    <div style={{ height: '32px', width: '100%', borderRadius: '6px', background: '#f3f4f6', marginTop: '8px' }} />
-                    <div style={{ height: '32px', width: '100%', borderRadius: '8px', background: '#e5e7eb', marginTop: '8px' }} />
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-
-          {/* Sin resultados */}
-          {!isInitialLoading && filteredProfiles.length === 0 && (
-            <div className="space-y-4">
-              <EmptyState
-                icon={<IconSearch size={28} />}
-                title={t('search.empty.title')}
-                body={t('search.empty.hint')}
-                ctaLabel={hasActiveFilters ? t('landing.hero.viewAll') : undefined}
-                onCta={() => setFilters({ category: "all", provincia: "all", ciudad: "all", minRating: 0, availability: "all" })}
-              />
-              {/* Fix #11: Show related suggestions when no results */}
-              {profiles.length > 0 && (
-                <div>
-                  <p className="text-sm text-c-muted mb-3 font-medium">{t('search.empty.suggestions')}</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-                    {profiles.slice(0, 4).map((profile) => (
-                      <ProfileCard
-                        key={profile.id}
-                        profile={profile}
-                        onClick={() => handleViewProfile(profile)}
-                        onToggleFavorite={() => handleToggleFavorite(profile)}
-                        isFavorite={favorites.some(fav => fav.professional_id === profile.user_id)}
-                        professionalUser={professionalUsers.find(u => u.id === profile.user_id)}
-                        currentUserId={user?.id}
-                        currentUser={user}
-                      />
-                    ))}
-                  </div>
+              ) : filteredProfiles.length === 0 ? (
+                <div className="space-y-6">
+                  <EmptyState
+                    icon={<IconSearch size={28} />}
+                    title={t('search.empty.title')}
+                    body={t('search.empty.hint')}
+                    ctaLabel={hasActiveFilters ? t('search.resetFilters') : undefined}
+                    onCta={() => setFilters(EMPTY_FILTERS)}
+                  />
+                  {profiles.length > 0 && (
+                    <div>
+                      <p className="text-sm text-c-muted mb-3 font-medium">{t('search.empty.suggestions')}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                        {profiles.slice(0, 4).map((profile) => (
+                          <ProfileCard
+                            key={profile.id}
+                            profile={profile}
+                            onClick={() => handleViewProfile(profile)}
+                            onToggleFavorite={user ? () => handleToggleFavorite(profile) : undefined}
+                            isFavorite={favorites.some(fav => fav.professional_id === profile.user_id)}
+                            professionalUser={professionalUsers.find(u => u.id === profile.user_id)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-              {(!user || user.user_type === "client") && (
-                <div className="card p-8 text-center border rounded-2xl overflow-hidden" style={{ borderColor: 'rgba(0,37,92,0.12)', background: '#F8FAFF' }}>
-                  <IconBriefcase size={40} className="mx-auto mb-3" style={{ color: '#00255C' }} />
-                  <h3 className="text-xl font-bold mb-2 text-ink">{t('landing.cta_pro_title')}</h3>
-                  <p className="text-c-muted mb-5 text-sm max-w-md mx-auto">
-                    {t('search.proCta.body')}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/registro?tipo=autonomo')}
-                    className="btn px-6 font-semibold rounded-xl"
-                    style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
-                  >
-                    {t('nav.becomeProFree')}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Grid de resultados */}
-          {!isInitialLoading && filteredProfiles.length > 0 && (
-            <>
-              {viewMode === "grid" ? (
+              ) : (
                 <>
-                  <div className="grid gap-4 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     {filteredProfiles.slice(0, displayLimit).map((profile, idx) => (
                       <ProfileCard
                         key={profile.id}
                         profile={profile}
                         onClick={() => handleViewProfile(profile)}
-                        onToggleFavorite={() => handleToggleFavorite(profile)}
+                        onToggleFavorite={user ? () => handleToggleFavorite(profile) : undefined}
                         isFavorite={favorites.some(fav => fav.professional_id === profile.user_id)}
                         professionalUser={professionalUsers.find(u => u.id === profile.user_id)}
-                        currentUserId={user?.id}
-                        currentUser={user}
                         priority={idx < 4}
                       />
                     ))}
                   </div>
+
                   {filteredProfiles.length > displayLimit && (
-                    <div className="text-center mt-10">
+                    <div className="text-center mt-8">
                       <button
                         type="button"
                         onClick={() => setDisplayLimit(prev => prev + 12)}
-                        className="btn-secondary btn-lg px-10 rounded-2xl font-semibold"
+                        className="btn-secondary"
                       >
                         {t('search.load_more', { count: filteredProfiles.length - displayLimit })}
                       </button>
                     </div>
                   )}
                 </>
-              ) : (
-                <Suspense fallback={<div className="h-96 bg-soft rounded-xl animate-pulse" />}>
-                  <MapView profiles={filteredProfiles} onProfileClick={handleViewProfile} />
-                </Suspense>
               )}
-            </>
-          )}
 
-          {/* CTA final para registrarse como autónomo */}
-          {!isInitialLoading && !loadingUser && (!user || user.user_type === "client") && (
-            <div className="mt-14 rounded-3xl overflow-hidden" style={{ background: '#00255C' }}>
-              <div className="p-8 md:p-12 text-white text-center">
-                <h3 className="text-3xl md:text-4xl font-extrabold mb-3 tracking-tight">
-                  {t('landing.cta_pro_title')}<br />
-                  <span style={{ color: '#F5C13D' }}>{t('search.finalCta.titleHighlight')}</span>
-                </h3>
-                <p className="text-white/80 mb-8 text-base max-w-lg mx-auto leading-relaxed">
-                  {t('search.finalCta.body')}
-                </p>
-                <div className="flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/registro?tipo=autonomo')}
-                    className="btn px-8 text-base font-semibold rounded-xl"
-                    style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
-                  >
+              {/* Cierre de página: la invitación a darse de alta. Sólo para
+                  quien no es ya profesional. */}
+              {!loadingUser && (!user || user.user_type === "client") && (
+                <div className="mt-10 rounded-xl bg-brand-navy text-white p-8 sm:p-10 text-center">
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                    {t('landing.cta_pro_title')}{' '}
+                    <span className="text-brand-gold">{t('search.finalCta.titleHighlight')}</span>
+                  </h2>
+                  <p className="text-white/80 mt-3 mb-6 max-w-lg mx-auto leading-relaxed">
+                    {t('search.finalCta.body')}
+                  </p>
+                  <Link to="/registro?tipo=autonomo" className="btn bg-brand-gold text-brand-navy font-semibold hover:bg-brand-gold-deep">
                     {t('nav.becomeProFree')}
-                  </button>
+                  </Link>
                 </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
+      </section>
+
+      {/* Hoja de filtros en móvil. El botón de cerrar va PEGADO ABAJO: en una
+          lista larga se iba bajo la línea de flotación y había que desplazarse
+          para encontrarlo. */}
+      {filtersOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('search.filters')}
+          className="lg:hidden fixed inset-0 z-50 bg-ink/40"
+          onClick={() => setFiltersOpen(false)}
+        >
+          <div
+            className="absolute inset-x-0 bottom-0 bg-surface rounded-t-xl p-6 max-h-[85vh] overflow-y-auto"
+            style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-1.5 rounded-full bg-c-border mx-auto mb-6" />
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold">{t('search.filters')}</h2>
+              <button
+                type="button"
+                aria-label={t('common.close')}
+                className="w-11 h-11 rounded-lg flex items-center justify-center hover:bg-soft"
+                onClick={() => setFiltersOpen(false)}
+              >
+                <IconClose />
+              </button>
+            </div>
+            <div className="space-y-6">{filtersPanel}</div>
+            <div
+              className="sticky bottom-0 pt-4 -mx-6 px-6 pb-1"
+              style={{ background: 'linear-gradient(to bottom, rgb(var(--c-surface) / 0) 0%, rgb(var(--c-surface)) 28%)' }}
+            >
+              <button
+                type="button"
+                className="btn w-full bg-brand-navy text-white hover:bg-brand-navy-deep"
+                onClick={() => setFiltersOpen(false)}
+              >
+                {t('search.showResults', { count: filteredProfiles.length })}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

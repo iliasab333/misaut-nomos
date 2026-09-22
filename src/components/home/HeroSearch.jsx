@@ -12,7 +12,7 @@
 //   - sin categoría           → /buscar?provincia=…&ciudad=…
 // `/buscar` lee `categoria`, `provincia` y `ciudad` de la query string.
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -123,12 +123,43 @@ function StackedField({ id, label, icon: Icon, value, onChange, placeholder, opt
   );
 }
 
-export default function HeroSearch() {
+// La misma barra sirve en la portada y en /buscar, como en khdemlidaba:
+//   - portada  → `onAutoSearch` sin definir: al enviar, navega a la URL
+//                canónica que toque (/categoria/... o /buscar?...).
+//   - /buscar  → `onAutoSearch` definido y `hideSubmitButton`: cada cambio
+//                avisa al padre, que reescribe los filtros y la lista de
+//                debajo se refresca sola. El botón «Buscar» sobra ahí — no
+//                hay nada que enviar, ya estás en los resultados.
+export default function HeroSearch({
+  initialCategory = '',
+  initialProvincia = '',
+  initialCiudad = '',
+  hideSubmitButton = false,
+  // En la portada el campo vacío INVITA a elegir («Elige un servicio»); en
+  // /buscar describe lo que ya estás viendo («Todas las categorías»), que es
+  // como lo dice el modelo. Misma barra, distinto verbo.
+  categoryPlaceholder,
+  provincePlaceholder,
+  onAutoSearch,
+}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [category, setCategory] = useState('');
-  const [provincia, setProvincia] = useState('');
-  const [ciudad, setCiudad] = useState('');
+  const [category, setCategory] = useState(initialCategory);
+  const [provincia, setProvincia] = useState(initialProvincia);
+  const [ciudad, setCiudad] = useState(initialCiudad);
+
+  // El padre puede cambiar los filtros por su cuenta (chip de «quitar
+  // filtro», botón de reiniciar): la barra tiene que seguirle.
+  useEffect(() => { setCategory(initialCategory); }, [initialCategory]);
+  useEffect(() => { setProvincia(initialProvincia); }, [initialProvincia]);
+  useEffect(() => { setCiudad(initialCiudad); }, [initialCiudad]);
+
+  const emit = (next) => {
+    onAutoSearch?.({ category, provincia, ciudad, ...next });
+  };
+  const pickCategory = (v) => { setCategory(v); emit({ category: v }); };
+  const pickProvincia = (v) => { setProvincia(v); setCiudad(''); emit({ provincia: v, ciudad: '' }); };
+  const pickCiudad = (v) => { setCiudad(v); emit({ ciudad: v }); };
 
   const { categories, isLoading } = useServiceCategories();
 
@@ -164,7 +195,8 @@ export default function HeroSearch() {
 
   const tradePlaceholder = isLoading
     ? t('landing.hero.loadingCategories')
-    : t('landing.hero.chooseService');
+    : (categoryPlaceholder || t('landing.hero.chooseService'));
+  const provPlaceholder = provincePlaceholder || t('provinceField');
 
   return (
     <form onSubmit={submit} role="search" className="w-full">
@@ -175,7 +207,7 @@ export default function HeroSearch() {
           label={t('landing.hero.whatLabel')}
           icon={IconBriefcase}
           value={category}
-          onChange={setCategory}
+          onChange={pickCategory}
           placeholder={tradePlaceholder}
           options={categoryOptions}
           disabled={isLoading || categoryOptions.length === 0}
@@ -185,27 +217,29 @@ export default function HeroSearch() {
           label={t('landing.hero.whereLabel')}
           icon={IconMapPin}
           value={provincia}
-          onChange={(v) => { setProvincia(v); setCiudad(''); }}
-          placeholder={t('provinceField')}
+          onChange={pickProvincia}
+          placeholder={provPlaceholder}
           options={provinciaOptions}
         />
-        <button type="submit" className="btn btn-lg w-full bg-brand-navy text-white hover:bg-brand-navy-deep">
-          <IconSearch className="w-[18px] h-[18px]" />
-          <span>{t('common.search')}</span>
-        </button>
+        {!hideSubmitButton && (
+          <button type="submit" className="btn btn-lg w-full bg-brand-navy text-white hover:bg-brand-navy-deep">
+            <IconSearch className="w-[18px] h-[18px]" />
+            <span>{t('common.search')}</span>
+          </button>
+        )}
       </div>
 
       {/* Escritorio: una sola barra — oficio · filete · provincia · botón */}
       <div
         className="hidden sm:grid bg-surface border border-c-border rounded-xl shadow-card p-2 items-stretch"
-        style={{ gridTemplateColumns: '1.4fr 1px 1.2fr auto', gap: 4 }}
+        style={{ gridTemplateColumns: hideSubmitButton ? '1fr 1px 1fr' : '1.4fr 1px 1.2fr auto', gap: 4 }}
       >
         <BarField
           id="hero-trade-d"
           label={t('landing.hero.whatLabel')}
           icon={IconBriefcase}
           value={category}
-          onChange={setCategory}
+          onChange={pickCategory}
           placeholder={tradePlaceholder}
           options={categoryOptions}
           disabled={isLoading || categoryOptions.length === 0}
@@ -216,14 +250,16 @@ export default function HeroSearch() {
           label={t('landing.hero.whereLabel')}
           icon={IconMapPin}
           value={provincia}
-          onChange={(v) => { setProvincia(v); setCiudad(''); }}
-          placeholder={t('provinceField')}
+          onChange={pickProvincia}
+          placeholder={provPlaceholder}
           options={provinciaOptions}
         />
-        <button type="submit" className="btn ms-1 whitespace-nowrap bg-brand-navy text-white hover:bg-brand-navy-deep">
-          <IconSearch className="w-[18px] h-[18px]" />
-          <span>{t('common.search')}</span>
-        </button>
+        {!hideSubmitButton && (
+          <button type="submit" className="btn ms-1 whitespace-nowrap bg-brand-navy text-white hover:bg-brand-navy-deep">
+            <IconSearch className="w-[18px] h-[18px]" />
+            <span>{t('common.search')}</span>
+          </button>
+        )}
       </div>
 
       {/* Ciudad — sólo cuando hay provincia elegida. Afina la búsqueda sin
@@ -235,7 +271,7 @@ export default function HeroSearch() {
             id="hero-city"
             className="select"
             value={ciudad}
-            onChange={(e) => setCiudad(e.target.value)}
+            onChange={(e) => pickCiudad(e.target.value)}
           >
             <option value="">{t('landing.hero.wholeProvince')}</option>
             {ciudadOptions.map((opt) => (

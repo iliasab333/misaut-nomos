@@ -103,6 +103,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Titulares con la escala del modelo. Sólo alcanza a los que NO llevan
+     clase de tamaño propia: las utilidades de Tailwind se emiten después de
+     esta capa y ganan siempre. */
+  h1 { @apply text-h1; }
+  h2 { @apply text-h2; }
+  h3 { @apply text-h3; }
   /* Cinturón anti-CLS: cualquier <img> sin altura explícita conserva su ratio
      real en cuanto se conoce el natural-size, y no salta. Los <img> con
      width/height/aspect-ratio explícitos no se ven afectados. */
@@ -159,8 +165,17 @@
   --c-muted:          107 114 128;   /* gray-500 — texto secundario */
   --c-border:         229 231 235;   /* gray-200 — filetes */
   --c-soft:           243 244 246;   /* gray-100 — fondos suaves, chips */
-  --c-accent:          37  99 235;   /* blue-600 — primario */
-  --c-accent-hover:    29  78 216;   /* blue-700 */
+  /* Primario = el AZUL MARINO DE LA MARCA, no el blue-600 de Base44.
+     El token nació copiando el azul que traía la plantilla, y por eso el
+     sitio tenía dos azules: el marino del logo y de la portada (#00255C) y
+     un blue-600 que salía en los chips activos, en los enlaces y en 124
+     `text-c-accent` repartidos por la web. Ninguno de los dos era un error
+     de código —los dos compilaban— y justo por eso nadie lo veía: son dos
+     azules, y hay que ponerlos uno al lado del otro para notarlo.
+     Con el token en marino, esos 124 sitios pasan al color de la marca de
+     una vez, sin tocar un solo fichero. */
+  --c-accent:           0  37  92;   /* #00255C — azul marino de marca */
+  --c-accent-hover:     0  26  69;   /* #001A45 */
   /* Acento SECUNDARIO. No es decoración suelta: la web lo venía usando de
      forma consistente en morado para lo que no es la acción principal —
      búsquedas guardadas, especialidades, la vista previa del perfil y las

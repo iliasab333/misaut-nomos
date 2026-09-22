@@ -12,6 +12,15 @@ module.exports = {
   		maxWidth: {
   			page: '1100px'
   		},
+  		// Escala tipográfica de khdemlidaba. Va en `base` (ver src/index.css:
+  		// `h1 { @apply text-h1 }`), así que un `<h1>` sin clase de tamaño ya
+  		// sale bien; cualquier `text-*` explícito sigue mandando, porque las
+  		// utilidades pintan después de la capa base.
+  		fontSize: {
+  			h1: ['clamp(2rem, 5.5vw, 4rem)', { lineHeight: '1.05', letterSpacing: '-0.02em', fontWeight: '700' }],
+  			h2: ['clamp(1.5rem, 3.5vw, 2.5rem)', { lineHeight: '1.15', letterSpacing: '-0.015em', fontWeight: '700' }],
+  			h3: ['clamp(1.25rem, 2.4vw, 1.75rem)', { lineHeight: '1.25', letterSpacing: '-0.01em', fontWeight: '700' }]
+  		},
   		boxShadow: {
   			card: 'var(--sh-card)'
   		},

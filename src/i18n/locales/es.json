@@ -41,7 +41,10 @@
     "adminUsers": "Usuarios",
     "newsletter": "Newsletter",
     "profile": "Perfil",
-    "saved": "Guardados"
+    "saved": "Guardados",
+    "search": "Buscar autónomos",
+    "forPros": "Para autónomos",
+    "language": "Idioma"
   },
   "landing": {
     "cta_pro_title": "¿Eres autónomo?",
@@ -234,7 +237,8 @@
       "openWhatsAppOf": "Abrir WhatsApp de {{name}}",
       "callNumber": "Llamar al {{phone}}",
       "showPhone": "Ver teléfono",
-      "openWhatsApp": "Abrir WhatsApp"
+      "openWhatsApp": "Abrir WhatsApp",
+      "newPro": "Nuevo"
     },
     "saved": {
       "savedToast": "Búsqueda guardada",
@@ -313,7 +317,12 @@
       "allWeek": "Disponible toda la semana",
       "clearAdvanced": "Limpiar filtros avanzados",
       "clearAll": "✕ Limpiar todos ({{count}})"
-    }
+    },
+    "title": "Buscar autónomos",
+    "filters": "Filtros",
+    "resetFilters": "Quitar filtros",
+    "showResults_one": "Ver {{count}} resultado",
+    "showResults_other": "Ver {{count}} resultados"
   },
   "allCategories": "Todas las categorías",
   "allProvinces": "Todas las provincias",

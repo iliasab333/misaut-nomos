@@ -41,7 +41,10 @@
     "adminUsers": "Users",
     "newsletter": "Newsletter",
     "profile": "Profile",
-    "saved": "Saved"
+    "saved": "Saved",
+    "search": "Find freelancers",
+    "forPros": "For freelancers",
+    "language": "Language"
   },
   "landing": {
     "cta_pro_title": "Are you a professional?",
@@ -234,7 +237,8 @@
       "openWhatsAppOf": "Open WhatsApp with {{name}}",
       "callNumber": "Call {{phone}}",
       "showPhone": "Show phone number",
-      "openWhatsApp": "Open WhatsApp"
+      "openWhatsApp": "Open WhatsApp",
+      "newPro": "New"
     },
     "saved": {
       "savedToast": "Search saved",
@@ -313,7 +317,12 @@
       "allWeek": "Available all week",
       "clearAdvanced": "Clear advanced filters",
       "clearAll": "✕ Clear all ({{count}})"
-    }
+    },
+    "title": "Find freelancers",
+    "filters": "Filters",
+    "resetFilters": "Clear filters",
+    "showResults_one": "Show {{count}} result",
+    "showResults_other": "Show {{count}} results"
   },
   "allCategories": "All categories",
   "allProvinces": "All provinces",
