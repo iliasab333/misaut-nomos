@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import {
-  IconMapPin,
-  IconStar,
-  IconHeart,
-  IconHeartFilled,
-  IconBriefcase,
-  IconArrowLeft
-} from "@/components/Icons";
-import { optimizeSupabaseImage } from "@/lib/supabaseImage";
-import InitialsAvatar from "@/components/InitialsAvatar";
-import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import ProfessionalCard from "@/components/ProfessionalCard";
 import { toast } from "@/lib/toast";
 import SEOHead from "../components/seo/SEOHead";
 import { useTranslation } from "react-i18next";
-import { slugify } from "@/lib/seoUrl";
+import { slugify, getProfileSeoUrl } from "@/lib/seoUrl";
 
 const CIUDADES_PRINCIPALES = [
   "Madrid", "Barcelona", "Valencia", "Sevilla", "Málaga", "Zaragoza", "Bilbao",
@@ -190,10 +179,6 @@ export default function CategoriaPage() {
     }
   };
 
-  const handleViewProfile = (profile) => {
-    const slug = profile.slug_publico || slugify(profile.business_name);
-    navigate(`${createPageUrl("Autonomo")}/${slug}`);
-  };
 
   const handleToggleFavorite = async (profile) => {
     if (!user) { base44.auth.redirectToLogin(); return; }
@@ -273,247 +258,110 @@ export default function CategoriaPage() {
         }} />
       )}
 
-      <div className="min-h-screen bg-soft">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8 md:py-12">
-          <div className="max-w-6xl mx-auto px-4">
-            <button
-              type="button"
-              onClick={() => navigate(createPageUrl("Search"))}
-              className="btn-ghost text-white hover:bg-white/10 mb-4 font-medium"
-            >
-              <IconArrowLeft size={16} />
-              {t('backToSearch')}
-            </button>
+      {/* Página de categoría con la maqueta de khdemlidaba/metier: rótulo,
+          titular grande, recuento, y la lista con la MISMA tarjeta que el
+          buscador. Antes abría con una banda azul en degradado —un azul que
+          no es el de la marca— y las tarjetas eran otras, con un botón «Ver
+          perfil» que hacía lo mismo que pulsar la tarjeta. */}
+      <section className="section-tight">
+        <div className="container-page">
+          <p className="text-sm text-c-muted mb-2">{displayName}</p>
+          <h1>
+            {ciudadName
+              ? t('category.heading.inCity', { category: displayName, city: ciudadName })
+              : t('category.heading.inSpain', { category: displayName })}
+          </h1>
+          <p className="mt-3 text-lg text-c-muted max-w-2xl">
+            {isLoading ? t('category.loading') : t('category.available', { count: profiles.length })}
+          </p>
+          <p className="mt-2 text-lg text-c-muted max-w-2xl">{seoDescription}</p>
 
-            <h1 className="text-2xl md:text-4xl font-bold mb-2">
-              {ciudadName
-                ? t('category.heading.inCity', { category: displayName, city: ciudadName })
-                : t('category.heading.inSpain', { category: displayName })}
-            </h1>
-            <p className="text-blue-100 text-lg">
-              {isLoading ? t('category.loading') : t('category.available', { count: profiles.length })}
-            </p>
+          {/* Filtro de ciudad — cambia la URL, que es la que manda: cada
+              ciudad tiene su propia página indexable. */}
+          <div className="mt-8 max-w-sm">
+            <label htmlFor="categoria-ciudad" className="sr-only">{t('category.filter.selectCity')}</label>
+            <select
+              id="categoria-ciudad"
+              className="select"
+              value={ciudadName || "all"}
+              onChange={(e) => handleCiudadChange(e.target.value)}
+            >
+              <option value="all">{t('category.filter.allSpain')}</option>
+              {CIUDADES_PRINCIPALES.map((ciudad) => (
+                <option key={ciudad} value={ciudad}>{ciudad}</option>
+              ))}
+            </select>
           </div>
         </div>
+      </section>
 
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          {/* Filtro de ciudad */}
-          <div className="card mb-6 shadow-sm border-0 rounded-xl">
-            <div className="p-4">
-              <div className="flex flex-wrap gap-3 items-center">
-                <IconMapPin size={20} className="text-c-muted" />
-                <label htmlFor="categoria-ciudad" className="sr-only">{t('category.filter.selectCity')}</label>
-                <select
-                  id="categoria-ciudad"
-                  className="select w-48"
-                  value={ciudadName || "all"}
-                  onChange={(e) => handleCiudadChange(e.target.value)}
-                >
-                  <option value="all">{t('category.filter.allSpain')}</option>
-                  {CIUDADES_PRINCIPALES.map(ciudad => (
-                    <option key={ciudad} value={ciudad}>{ciudad}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Loading */}
-          {isLoading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <section className="pb-16 sm:pb-24">
+        <div className="container-page">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="card rounded-xl" aria-hidden="true">
-                  <div className="p-4">
-                    <div className="flex gap-3 mb-3">
-                      <div className="skeleton" style={{ width: 48, height: 48, borderRadius: '50%' }} />
-                      <div className="flex-1 space-y-2">
-                        <div className="skeleton" style={{ height: 16, width: '75%' }} />
-                        <div className="skeleton" style={{ height: 12, width: '50%' }} />
-                      </div>
-                    </div>
-                    <div className="skeleton mb-3" style={{ height: 64, width: '100%' }} />
-                    <div className="skeleton" style={{ height: 36, width: '100%' }} />
+                <div key={i} className="card p-4 flex items-center gap-3" style={{ minHeight: 128 }} aria-hidden="true">
+                  <div className="rounded-xl bg-soft" style={{ width: 56, height: 56 }} />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-3/5 rounded bg-soft" />
+                    <div className="h-3 w-2/5 rounded bg-soft" />
+                    <div className="h-3 w-1/2 rounded bg-soft" />
                   </div>
                 </div>
               ))}
             </div>
-          )}
-
-          {/* Sin resultados — banda navy con CTA dorado para que sea un punto de conversión, no un hueco */}
-          {!isLoading && profiles.length === 0 && (
-            <div
-              className="rounded-2xl overflow-hidden border"
-              style={{ borderColor: 'rgba(0,37,92,0.12)' }}
-            >
-              <div className="p-8 md:p-10 text-center" style={{ background: '#00255C', color: 'white' }}>
-                <div className="w-12 h-12 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,193,61,0.16)' }}>
-                  <IconBriefcase size={24} style={{ color: '#F5C13D' }} />
-                </div>
-                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight" style={{ letterSpacing: '-0.02em' }}>
-                  {ciudadName
-                    ? t('category.empty.titleCity', { category: displayName, city: ciudadName })
-                    : t('category.empty.title', { category: displayName })}
-                </h2>
-                <p className="mt-3 text-white/80 max-w-xl mx-auto">
-                  {t('category.empty.body')}
-                </p>
-                <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/registro?tipo=autonomo')}
-                    className="btn px-6 rounded-xl font-semibold"
-                    style={{ backgroundColor: '#F5C13D', color: '#00255C' }}
-                  >
-                    {t('nav.becomeProFree')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/buscar')}
-                    className="btn px-6 rounded-xl font-semibold bg-transparent border border-white/30 text-white hover:bg-white/10"
-                  >
-                    {t('category.empty.allTrades')}
-                  </button>
-                </div>
+          ) : profiles.length === 0 ? (
+            <div className="rounded-xl bg-brand-navy text-white p-8 sm:p-10 text-center">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                {ciudadName
+                  ? t('category.empty.titleCity', { category: displayName, city: ciudadName })
+                  : t('category.empty.title', { category: displayName })}
+              </h2>
+              <p className="text-white/80 mt-3 mb-6 max-w-lg mx-auto leading-relaxed">
+                {t('category.empty.body')}
+              </p>
+              <div className="flex flex-wrap gap-3 justify-center">
+                <Link to="/registro?tipo=autonomo" className="btn bg-brand-gold text-brand-navy font-semibold hover:bg-brand-gold-deep">
+                  {t('nav.becomeProFree')}
+                </Link>
+                <Link to="/buscar" className="btn bg-white/10 text-white hover:bg-white/20">
+                  {t('category.empty.allTrades')}
+                </Link>
               </div>
-              {ciudadName && (
-                <div className="bg-surface p-4 text-center text-sm">
-                  {t('category.empty.otherCity', { category: displayName })}{' '}
-                  <button
-                    onClick={() => navigate(`/categoria/${categorySlug}`)}
-                    className="font-medium underline underline-offset-2"
-                    style={{ color: '#00255C' }}
-                  >
-                    {t('category.empty.viewAllSpain', { category: displayName })}
-                  </button>
-                </div>
-              )}
             </div>
-          )}
-
-          {/* Resultados */}
-          {!isLoading && profiles.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <AnimatePresence>
-                {profiles.map(profile => (
-                  <motion.div
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                {profiles.map((profile, idx) => (
+                  <ProfessionalCard
                     key={profile.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <div className={`card hover:shadow-lg transition-all rounded-xl h-full ${profile.is_ads_plus ? 'ring-1 ring-amber-300' : ''}`}>
-                      <div className="p-4 flex flex-col h-full">
-                        <div className="flex items-start gap-3 mb-3">
-                          {(() => {
-                            const rawPhoto =
-                              profile.imagen_principal ||
-                              (Array.isArray(profile.photos) && profile.photos[0]) ||
-                              null;
-                            const optimized = optimizeSupabaseImage(rawPhoto, { width: 128, quality: 70 });
-                            return (
-                              <div
-                                role="button"
-                                tabIndex={0}
-                                onClick={() => handleViewProfile(profile)}
-                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleViewProfile(profile); }}
-                                className="cursor-pointer"
-                              >
-                                <InitialsAvatar
-                                  name={profile.business_name || ""}
-                                  src={optimized || undefined}
-                                  size={48}
-                                />
-                              </div>
-                            );
-                          })()}
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                              <h3
-                                className="font-semibold text-ink cursor-pointer truncate hover:underline underline-offset-2"
-                                style={{ textDecorationColor: '#00255C' }}
-                                onClick={() => handleViewProfile(profile)}
-                              >
-                                {profile.business_name}
-                              </h3>
-                              {profile.is_ads_plus && (
-                                <span
-                                  className="text-[10px] font-semibold uppercase tracking-[0.06em] border px-1.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0"
-                                  style={{ color: '#7B5400', backgroundColor: '#FBF4DA', borderColor: '#EFD68A' }}
-                                >
-                                  {t('search.card.featured')}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-1 text-sm text-c-muted">
-                              <IconMapPin size={12} />
-                              <span className="truncate">{profile.ciudad || profile.provincia}</span>
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => handleToggleFavorite(profile)}
-                            aria-label={favorites.some(f => f.professional_id === profile.user_id)
-                              ? t('favorites.page.remove') : t('search.card.addFavorite')}
-                            className={`btn-icon ${favorites.some(f => f.professional_id === profile.user_id)
-                              ? 'text-error' : 'text-c-muted'}`}
-                          >
-                            {favorites.some(f => f.professional_id === profile.user_id)
-                              ? <IconHeartFilled size={16} />
-                              : <IconHeart size={16} />}
-                          </button>
-                        </div>
-
-                        {profile.descripcion_corta && (
-                          <p className="text-sm text-c-muted line-clamp-2 mb-3 flex-1">
-                            {profile.descripcion_corta}
-                          </p>
-                        )}
-
-                        {profile.average_rating > 0 && (
-                          <div className="flex items-center gap-1 mb-3">
-                            <IconStar className="text-star" />
-                            <span className="font-semibold">{profile.average_rating.toFixed(1)}</span>
-                            <span className="text-c-muted text-sm">({profile.total_reviews})</span>
-                          </div>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={() => handleViewProfile(profile)}
-                          className="btn w-full text-white font-semibold"
-                          style={{ backgroundColor: '#00255C' }}
-                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#001A45')}
-                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00255C')}
-                        >
-                          {t('profile_card.view_profile')}
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
+                    profile={profile}
+                    href={getProfileSeoUrl(profile)}
+                    onToggleFavorite={user ? () => handleToggleFavorite(profile) : undefined}
+                    isFavorite={favorites.some((f) => f.professional_id === profile.user_id)}
+                    priority={idx < 4}
+                  />
                 ))}
-              </AnimatePresence>
-            </div>
-          )}
+              </div>
 
-          {/* CTA */}
-          {!isLoading && profiles.length > 0 && (
-            <div className="mt-12 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 text-center text-white">
-              <h3 className="text-2xl font-bold mb-2">{t('category.cta.title', { category: displayName })}</h3>
-              <p className="text-blue-100 mb-5">{t('category.cta.body')}</p>
-              <button
-                type="button"
-                onClick={() => navigate(createPageUrl("PricingPlans"))}
-                className="btn bg-surface hover:bg-soft text-c-accent px-8 font-semibold"
-              >
-                <IconBriefcase size={20} />
-                {t('category.cta.button')}
-              </button>
-            </div>
+              {/* Cierre: la invitación a darse de alta EN ESTA categoría.
+                  Llevaba a `PricingPlans`, una página que dejó de existir al
+                  retirar las suscripciones: el botón acababa en el 404. */}
+              <div className="mt-12 rounded-xl bg-brand-navy text-white p-8 sm:p-10 text-center">
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                  {t('category.cta.title', { category: displayName })}
+                </h2>
+                <p className="text-white/80 mt-3 mb-6 max-w-lg mx-auto leading-relaxed">
+                  {t('category.cta.body')}
+                </p>
+                <Link to="/registro?tipo=autonomo" className="btn bg-brand-gold text-brand-navy font-semibold hover:bg-brand-gold-deep">
+                  {t('nav.becomeProFree')}
+                </Link>
+              </div>
+            </>
           )}
         </div>
-      </div>
+      </section>
     </>
   );
 }
