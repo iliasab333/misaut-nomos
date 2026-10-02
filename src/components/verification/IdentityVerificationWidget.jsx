@@ -81,10 +81,19 @@ export default function IdentityVerificationWidget({ user }) {
 
     setStep("submitting");
     try {
+      // Bucket PRIVADO y carpeta propia. Esto subía al bucket público
+      // `uploads`, a su raíz, y la fila guardaba la URL pública: quince
+      // documentos de cinco personas quedaron legibles por cualquiera con la
+      // dirección. Ya están movidos; esto cierra la puerta por la que
+      // entraron. La carpeta es el uid de la SESIÓN porque es contra lo que
+      // compara la regla de storage, no `users.id`.
+      const uid = await base44.auth.uid();
+      if (!uid) throw new Error('sin sesión');
+      const subir = (file) => base44.integrations.Core.UploadFile({ file, bucket: 'credentials', folder: uid });
       const [frontRes, backRes, selfieRes] = await Promise.all([
-        base44.integrations.Core.UploadFile({ file: frontFile }),
-        backFile ? base44.integrations.Core.UploadFile({ file: backFile }) : Promise.resolve({ file_url: null }),
-        base44.integrations.Core.UploadFile({ file: selfieFile }),
+        subir(frontFile),
+        backFile ? subir(backFile) : Promise.resolve({ file_url: null }),
+        subir(selfieFile),
       ]);
 
       const payload = {

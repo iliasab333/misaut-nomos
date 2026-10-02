@@ -216,6 +216,18 @@ async function currentAppUser() {
 }
 
 const auth = {
+  // El identificador de la SESIÓN, que no siempre es `users.id`.
+  //
+  // Las cuentas heredadas de Base44 llevan un `users.id` de 24 hexadecimales y
+  // su uuid de sesión aparte, en `auth_user_id`; las nuevas tienen los dos
+  // iguales. Las reglas de `storage.objects` comparan contra `auth.uid()`, así
+  // que lo que decide la carpeta donde se puede escribir es ESTE valor y no el
+  // otro. Pedirlo a la sesión en vez de deducirlo de una fila evita el fallo
+  // silencioso de escribir en la carpeta de otro.
+  async uid() {
+    const { data } = await supabase.auth.getUser();
+    return data?.user?.id || null;
+  },
   async me() {
     const u = await currentAppUser();
     if (!u) throw new Error('Not authenticated');
@@ -273,16 +285,27 @@ const functions = { invoke: invokeFunction };
 
 // --- INTEGRATIONS.Core ------------------------------------------------------
 const Core = {
-  async UploadFile({ file } = {}) {
+  // `bucket` + `folder` existen por una razón concreta: los documentos de
+  // identidad (DNI por las dos caras y selfie) se subían aquí, al bucket
+  // PÚBLICO `uploads` y a su raíz, y la fila guardaba la URL pública.
+  // Resultado: quince documentos de cinco personas legibles por cualquiera
+  // que tuviera la dirección. Ya están movidos al bucket privado
+  // `credentials`; esto es para que los siguientes no repitan el camino.
+  //
+  // Cuando el bucket es privado se devuelve la RUTA, no una URL: en un bucket
+  // privado no hay URL pública que devolver, y quien tenga que verlo pedirá
+  // una firmada con caducidad.
+  async UploadFile({ file, bucket = 'uploads', folder = null } = {}) {
     if (!file) throw new Error('UploadFile: se requiere "file"');
     const safeName = (file.name || 'file').replace(/[^\w.\-]/g, '_');
-    const path = `${genId()}-${safeName}`;
-    const { error } = await supabase.storage.from('uploads').upload(path, file, {
+    const path = folder ? `${folder}/${genId()}-${safeName}` : `${genId()}-${safeName}`;
+    const { error } = await supabase.storage.from(bucket).upload(path, file, {
       cacheControl: '3600', upsert: false, contentType: file.type || undefined,
     });
     if (error) throw error;
+    if (bucket !== 'uploads') return { file_url: path, path, bucket };
     const { data } = supabase.storage.from('uploads').getPublicUrl(path);
-    return { file_url: data.publicUrl };
+    return { file_url: data.publicUrl, path, bucket };
   },
   async SendEmail(payload = {}) { const { data } = await invokeFunction('sendEmail', payload); return data; },
   async SendSMS(payload = {}) { const { data } = await invokeFunction('sendSMS', payload); return data; },
