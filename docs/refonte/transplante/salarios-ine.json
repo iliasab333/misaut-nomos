@@ -1,0 +1,36 @@
+{
+  "generado_por": "scripts/seed-salarios.mjs",
+  "fuente": "Instituto Nacional de Estadística (INE)",
+  "atribucion": "Elaboración propia con datos extraídos del sitio web del INE: www.ine.es",
+  "licencia": "CC BY 4.0 — el INE no participa ni respalda esta reutilización",
+  "tablas": {
+    "PERCENTILES_2022": "36830",
+    "JORNADA_2022": "36863",
+    "MEDIAS_2024": "28186"
+  },
+  "anyo_base": 2022,
+  "anyo_actualizado": 2024,
+  "magnitud": "salario bruto mensual de persona ASALARIADA a jornada completa — NO es la tarifa de un autónomo",
+  "factor_temporal_global": 1.0962,
+  "referencias": [
+    {
+      "category_slug": "electricista",
+      "cno": "75",
+      "cno_label": "Trabajadores especializados en electricidad y electrotecnología",
+      "fit": "good",
+      "p25_mes": 1890,
+      "p50_mes": 2340,
+      "p75_mes": 3130,
+      "p25_anual_base": 20004.54,
+      "p50_anual_base": 24803.99,
+      "p75_anual_base": 33167.74,
+      "factor_temporal": 1.088,
+      "factor_temporal_origen": "28186 grupo L",
+      "factor_jornada": 1.0411,
+      "baja_fiabilidad": false,
+      "anyo_base": 2022,
+      "anyo_actualizado": 2024
+    }
+  ],
+  "sin_referencia": []
+}
