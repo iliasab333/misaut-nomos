@@ -56,7 +56,7 @@ const ProfessionalCard = React.memo(function ProfessionalCard({ profile, href, o
     (Array.isArray(profile.photos) && profile.photos[0]) ||
     professionalUser?.profile_picture ||
     null;
-  const optimizedPhotoUrl = optimizeSupabaseImage(photoUrl, { width: 128, quality: 70 });
+  const optimizedPhotoUrl = optimizeSupabaseImage(photoUrl, { width: 128, height: 128, quality: 70 });
 
   const isVerified = profile.identity_verified === true;
   const hasWhatsapp = profile.metodos_contacto?.includes('whatsapp') && profile.telefono_contacto;

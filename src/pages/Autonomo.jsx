@@ -498,7 +498,7 @@ export default function AutonomoPage() {
                     (Array.isArray(profile.photos) && profile.photos[0]) ||
                     professionalUser?.profile_picture ||
                     null;
-                  const optimized = optimizeSupabaseImage(rawPhoto, { width: 200, quality: 75 });
+                  const optimized = optimizeSupabaseImage(rawPhoto, { width: 200, height: 200, quality: 75 });
                   return (
                     <button
                       type="button"
@@ -679,7 +679,11 @@ export default function AutonomoPage() {
                         className="relative aspect-square rounded-lg overflow-hidden bg-soft border border-c-border focus:outline-none"
                         aria-label={t('proProfile.gallery.workAlt', { number: idx + 1 })}
                       >
-                        <img src={photo} alt={t('proProfile.gallery.workAlt', { number: idx + 1 })} className="w-full h-full object-cover" loading="lazy" />
+                        {/* Miniatura, no el original: estos cuadrados miden
+                            ~110 px y la foto de obra que hay detrás pesa de
+                            media medio mega. El visor de abajo sí abre el
+                            original — ahí la foto grande es lo que se busca. */}
+                        <img src={optimizeSupabaseImage(photo, { width: 320, height: 320, quality: 70 })} alt={t('proProfile.gallery.workAlt', { number: idx + 1 })} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                       </button>
                     ))}
                     {(displayProfile.portfolio_items || []).map((item) => item.images?.[0] && (
@@ -690,7 +694,7 @@ export default function AutonomoPage() {
                         title={item.title}
                         className="relative aspect-square rounded-lg overflow-hidden bg-soft border border-c-border focus:outline-none"
                       >
-                        <img src={item.images[0]} alt={item.title || ''} className="w-full h-full object-cover" loading="lazy" />
+                        <img src={optimizeSupabaseImage(item.images[0], { width: 320, height: 320, quality: 70 })} alt={item.title || ''} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                         {item.images.length > 1 && (
                           <span className="absolute bottom-1.5 right-1.5 bg-black/70 text-white text-[11px] px-1.5 py-0.5 rounded">
                             +{item.images.length - 1}

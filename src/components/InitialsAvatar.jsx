@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { supabaseImageOriginal } from "@/lib/supabaseImage";
 
 // Paleta de marca discreta para las iniciales. Selección determinística según
 // el nombre, así el mismo profesional siempre tiene el mismo color.
@@ -38,9 +39,19 @@ export default function InitialsAvatar({
   priority = false,
   square = false,
 }) {
-  const [errored, setErrored] = useState(false);
+  // Dos escalones antes de rendirse, no uno.
+  //
+  //   0 — la miniatura que nos han dado (la que pesa 4 KB en vez de 500);
+  //   1 — el ORIGINAL, si el servicio de transformación de Supabase falla;
+  //   2 — las iniciales.
+  //
+  // El escalón intermedio importa: el día que el render vuelva a apagarse,
+  // una web entera de iniciales parece rota, mientras que una foto pesada
+  // sigue siendo la cara de esa persona. Es el mismo orden que usa
+  // khdemlidaba (components/Avatar.jsx).
+  const [step, setStep] = useState(0);
 
-  useEffect(() => { setErrored(false); }, [src]);
+  useEffect(() => { setStep(0); }, [src]);
 
   const initials = deriveInitials(name);
   const [textColor, bgColor] = pickPalette(name || "?");
@@ -52,12 +63,18 @@ export default function InitialsAvatar({
   // así gana siempre al `rounded-*` que pueda traer `className`, sin depender
   // del orden con que Tailwind emita las dos reglas.
   const radiusStyle = square ? { borderRadius: 12 } : { borderRadius: 9999 };
-  const showImage = src && !errored;
+  const original = supabaseImageOriginal(src);
+  // Si la miniatura ES el original (imagen externa, blob, data:) no hay
+  // escalón intermedio que probar: se salta directo a las iniciales.
+  const lastStep = original && original !== src ? 2 : 1;
+  const showImage = src && step < lastStep;
+  const currentSrc = step === 0 ? src : original;
 
   if (showImage) {
     return (
       <img
-        src={src}
+        key={currentSrc}
+        src={currentSrc}
         alt={name || ""}
         width={size}
         height={size}
@@ -66,7 +83,7 @@ export default function InitialsAvatar({
         // y la deja pasar al DOM con un warning en cada tarjeta.
         fetchpriority={priority ? "high" : "low"}
         decoding={priority ? "sync" : "async"}
-        onError={() => setErrored(true)}
+        onError={() => setStep((n) => n + 1)}
         className={`object-cover object-center ${className}`}
         style={{ ...baseStyle, ...radiusStyle }}
       />

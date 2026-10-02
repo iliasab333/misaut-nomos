@@ -161,7 +161,7 @@ export default function FavoritesPage() {
                   profileUser?.profile_picture ||
                   null;
                 const isVerified = profile.identity_verified === true;
-                const optimizedPhoto = optimizeSupabaseImage(photoUrl, { width: 96 });
+                const optimizedPhoto = optimizeSupabaseImage(photoUrl, { width: 96, height: 96 });
                 const categoryLabel = profile.categories?.[0];
                 const location = profile.ciudad
                   ? `${profile.ciudad}${profile.provincia && profile.ciudad !== profile.provincia ? `, ${profile.provincia}` : ''}`
