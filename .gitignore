@@ -34,3 +34,8 @@ dist-ssr
 # Android signing — NEVER commit keystore o credenciales
 android/app/*.keystore
 android/key.properties
+
+# Exportaciones del trasplante: NIF, IBAN, teléfonos y correos de personas
+# reales. Se guardan en disco para cumplir la obligación de conservación
+# (AEAT 4 años, Código de Comercio 6), NUNCA en el repositorio.
+docs/refonte/transplante/exportaciones/
