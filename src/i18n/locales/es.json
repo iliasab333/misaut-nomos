@@ -1501,7 +1501,8 @@
       "messagePlaceholder": "Cuéntanos en qué te podemos ayudar.",
       "sending": "Enviando…",
       "sent": "Mensaje recibido. Te contestamos a {{email}}.",
-      "orEmail": "O escríbenos a <link>{{email}}</link>"
+      "orEmail": "O escríbenos a <link>{{email}}</link>",
+      "failed": "No hemos podido registrar tu mensaje. Inténtalo de nuevo o escríbenos a hola@misautonomos.es."
     },
     "aside": {
       "responseTime": "Respuesta en menos de 24 h laborables.",

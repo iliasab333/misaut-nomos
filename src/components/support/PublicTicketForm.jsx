@@ -69,10 +69,16 @@ export default function PublicTicketForm() {
         status: "abierto",
         priority: "media",
         creator_id: "public_form",
+        // La política del visitante compara los dos campos, y el disparador
+        // `fill_ticket_identity` deja `user_id` igual a `creator_id`: se
+        // declara para que lo que se envía y lo que se comprueba coincidan.
+        user_id: "public_form",
         creator_name: formData.name,
         creator_type: "visitante",
+        creator_email: formData.email,
         tags: ["formulario_publico", formData.email]
-      });
+        // Este formulario tampoco podía escribir: mismo motivo que /contacto.
+      }, { devolverFila: false });
 
       setTicketNumber(newTicketNumber);
       setSubmitted(true);

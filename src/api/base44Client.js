@@ -132,8 +132,19 @@ function makeEntity(name) {
       if (error) throw error;
       return data;
     },
-    async create(values = {}) {
+    // `devolverFila: false` para cuando quien escribe NO puede leer lo que
+    // acaba de escribir. Pasa de verdad: un visitante sin sesión puede abrir
+    // un ticket desde /contacto, pero la política de lectura —con razón— no
+    // le deja ver los tickets. Como `.select()` hace que PostgREST devuelva
+    // la fila, el INSERT entero se rechazaba con un 401 que parecía de
+    // permisos de escritura y era de lectura. Media tarde para encontrarlo.
+    async create(values = {}, { devolverFila = true } = {}) {
       const row = { id: values.id || genId(), ...values };
+      if (!devolverFila) {
+        const { error } = await supabase.from(table).insert(row);
+        if (error) throw error;
+        return row;
+      }
       const { data, error } = await supabase.from(table).insert(row).select().single();
       if (error) throw error;
       return data;

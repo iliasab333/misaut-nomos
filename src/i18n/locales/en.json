@@ -1501,7 +1501,8 @@
       "messagePlaceholder": "Tell us how we can help.",
       "sending": "Sending…",
       "sent": "Message received. We'll reply to {{email}}.",
-      "orEmail": "Or write to us at <link>{{email}}</link>"
+      "orEmail": "Or write to us at <link>{{email}}</link>",
+      "failed": "We could not record your message. Please try again or write to hola@misautonomos.es."
     },
     "aside": {
       "responseTime": "Reply within 24 working hours.",

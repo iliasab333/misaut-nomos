@@ -23,23 +23,56 @@ export default function Contacto() {
 
   const update = (k) => (e) => setForm((s) => ({ ...s, [k]: e.target.value }));
 
+  // Puente entre el valor que guarda el <select> y la clave de su etiqueta.
+  const TEMA_CLAVE = { general: 'general', autonomo: 'pro', cliente: 'client', incidencia: 'issue', prensa: 'press' };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) return setStatus({ state: 'error', msg: t('contact.validation.nameRequired') });
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return setStatus({ state: 'error', msg: t('contact.validation.emailInvalid') });
     if (form.message.trim().length < 10) return setStatus({ state: 'error', msg: t('contact.validation.messageTooShort') });
     setStatus({ state: 'sending', msg: '' });
+    // Este formulario NO ENVIABA NADA.
+    //
+    // Llamaba a una función `contactForm` que nunca se ha desplegado — es una
+    // de las diez que el código invoca y no existen, herencia de Base44. El
+    // `catch` se tragaba el error, el comentario que había aquí decía que
+    // caíamos a un `mailto` de red de seguridad (no existía tal cosa), y acto
+    // seguido se le decía al visitante «mensaje enviado». Quien escribía por
+    // aquí se marchaba convencido de haber contactado, y al otro lado no
+    // llegaba nada.
+    //
+    // Ahora escribe un ticket, que es el camino que SÍ funciona: tiene filas
+    // reales, un disparador que avisa, y una pantalla donde mirarlos
+    // (/admin/soporte). Es además donde ya caen los mensajes de /ayuda, así
+    // que no hay dos bandejas.
     try {
-      await base44.functions.invoke('contactForm', {
-        name: form.name.trim(),
-        email: form.email.trim(),
-        topic: form.topic,
-        message: form.message.trim(),
-        source: 'contacto-page',
-      });
-    } catch (_e) {
-      // La función puede no existir: caemos a mailto como red de seguridad,
-      // pero NO bloqueamos el feedback positivo si la red ya recibió la solicitud.
+      const referencia = `TKT-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      await base44.entities.Ticket.create({
+        ticket_number: referencia,
+        // El valor del desplegable y la clave de su etiqueta NO coinciden
+        // ('autonomo' → 'pro', 'cliente' → 'client'…), así que el puente va
+        // escrito: usar el valor como clave daba un título crudo.
+        title: t(`contact.form.topics.${TEMA_CLAVE[form.topic] || 'general'}`),
+        description: `**Nombre:** ${form.name.trim()}\n**Email:** ${form.email.trim()}\n\n${form.message.trim()}`,
+        type: 'consulta_general',
+        status: 'abierto',
+        priority: 'media',
+        creator_id: 'public_form',
+        user_id: 'public_form',
+        creator_name: form.name.trim(),
+        creator_type: 'visitante',
+        creator_email: form.email.trim(),
+        tags: ['formulario_contacto', form.topic, form.email.trim()],
+        // Sin pedir la fila de vuelta: quien escribe sin sesión no puede
+        // leer los tickets, y pedirla tumbaba el INSERT entero.
+      }, { devolverFila: false });
+    } catch (e) {
+      // Y si falla de verdad, se dice. Antes el fallo era invisible y el
+      // visitante se iba contento: eso es peor que un error.
+      console.error('[contacto] no se pudo registrar el mensaje:', e);
+      setStatus({ state: 'error', msg: t('contact.form.failed') });
+      return;
     }
     setStatus({ state: 'sent', msg: t('contact.form.sent', { email: form.email.trim() }) });
     setForm({ name: '', email: '', topic: 'general', message: '' });
