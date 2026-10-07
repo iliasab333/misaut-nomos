@@ -467,6 +467,7 @@
     "for_clients": "Para clientes",
     "claim": "Profesionales verificados, contacto directo, sin comisiones.",
     "copyright": "© {{year}} <brand>MisAutónomos</brand>. Hecho en España.",
+    "madeBy": "Web creada por",
     "columns": {
       "product": "Producto",
       "company": "Empresa",

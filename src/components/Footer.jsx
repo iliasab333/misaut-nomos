@@ -319,6 +319,21 @@ export default function Footer() {
             ))}
           </div>
         </div>
+
+        {/* La firma del taller que hace los sitios. Fila propia, texto a tamaño
+            normal y nombre subrayado: tiene que leerse y poder buscarse — no
+            perdida entre las menciones legales. */}
+        <div className="mt-4 pt-4 pb-20 lg:pb-1 border-t border-c-border text-sm text-c-muted">
+          {t('footer.madeBy')}{' '}
+          <a
+            href="https://bayendaba.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block py-3 -my-3 font-semibold text-ink underline underline-offset-2 hover:opacity-80"
+          >
+            BayenDaba
+          </a>
+        </div>
       </div>
     </footer>
   );
