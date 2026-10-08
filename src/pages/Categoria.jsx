@@ -220,6 +220,25 @@ export default function CategoriaPage() {
   };
 
   // Nombre visible: categoryName resuelto o placeholder mientras carga
+  // ── LA GUÍA LOCAL ──────────────────────────────────────────────────────
+  // Ocho combinaciones del Vallès tienen una guía escrita a mano (precios de
+  // 2026, qué preguntar, FAQ). El prerenderizador ya la escribía en el HTML
+  // que ve Google; React la borraba al hidratar y dejaba a la persona con
+  // «0 profesionales disponibles» y nada más.
+  //
+  // Se carga con `import()` dinámico y no con un import normal: son 24 kB de
+  // texto que sólo necesitan 8 páginas de las 25 de categoría. Vite lo saca a
+  // su propio trozo y el resto de categorías no lo descarga nunca.
+  const [guia, setGuia] = useState(null);
+  useEffect(() => {
+    let vivo = true;
+    if (!categorySlug || !ciudadSlug) { setGuia(null); return; }
+    import('@/lib/guiasLocales')
+      .then((m) => { if (vivo) setGuia(m.guiaLocal(categorySlug, ciudadSlug)); })
+      .catch(() => { if (vivo) setGuia(null); });
+    return () => { vivo = false; };
+  }, [categorySlug, ciudadSlug]);
+
   const displayName = categoryName || (serviceCategories.length === 0 ? '…' : categorySlug);
 
   // SEO
@@ -298,6 +317,21 @@ export default function CategoriaPage() {
           </p>
           <p className="mt-2 text-lg text-c-muted max-w-2xl">{seoDescription}</p>
 
+          {/* LA GUÍA LOCAL, arriba y antes del listado — el mismo orden en que
+              la escribe el prerenderizador, para que la persona y Google vean
+              la misma página. En las ciudades donde todavía no hay ningún
+              autónomo de este oficio (hoy, todas: ninguna combinación llega a
+              tres), esta guía es LO ÚNICO que la página tiene que ofrecer, y
+              es bastante: precios reales, qué preguntar y en qué fijarse.
+              `dangerouslySetInnerHTML` sobre texto escrito en el repositorio,
+              no sobre nada que venga de fuera. */}
+          {guia && (
+            <div
+              className="guia-local mt-8 max-w-3xl text-ink leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: guia.intro }}
+            />
+          )}
+
           {/* Filtro de ciudad — cambia la URL, que es la que manda: cada
               ciudad tiene su propia página indexable. */}
           <div className="mt-8 max-w-sm">
@@ -332,7 +366,7 @@ export default function CategoriaPage() {
                 </div>
               ))}
             </div>
-          ) : profiles.length === 0 ? (
+          ) : profiles.length === 0 && !guia ? (
             <div className="rounded-xl bg-brand-navy text-white p-8 sm:p-10 text-center">
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 {ciudadName
@@ -381,6 +415,39 @@ export default function CategoriaPage() {
                 </Link>
               </div>
             </>
+          )}
+
+          {/* LAS PREGUNTAS FRECUENTES de la guía, al final y con su JSON-LD.
+              Van después del listado porque quien ya ha visto a los autónomos
+              es quien tiene las dudas de «¿cuánto debería costarme esto?».
+              El `FAQPage` es lo que puede sacar el desplegable de respuestas
+              en los resultados de Google, que ocupa el triple de alto que un
+              resultado normal. */}
+          {guia?.faqs?.length > 0 && (
+            <section className="mt-12 max-w-3xl">
+              <h2 className="text-2xl font-bold tracking-tight">
+                {t('category.faq.title')}
+              </h2>
+              <div className="mt-5 space-y-4">
+                {guia.faqs.map((f, i) => (
+                  <details key={i} className="rounded-xl border border-c-border bg-surface p-4">
+                    <summary className="font-semibold text-ink cursor-pointer">{f.q}</summary>
+                    <p className="mt-2 text-c-muted leading-relaxed">{f.a}</p>
+                  </details>
+                ))}
+              </div>
+              <script type="application/ld+json" dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'FAQPage',
+                  mainEntity: guia.faqs.map((f) => ({
+                    '@type': 'Question',
+                    name: f.q,
+                    acceptedAnswer: { '@type': 'Answer', text: f.a },
+                  })),
+                }),
+              }} />
+            </section>
           )}
         </div>
       </section>

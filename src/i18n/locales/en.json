@@ -1543,6 +1543,9 @@
       "title": "Are you a {{category}}?",
       "body": "Sign up and get more clients",
       "button": "Register as a professional"
+    },
+    "faq": {
+      "title": "Frequently asked questions"
     }
   },
   "newsletter": {
