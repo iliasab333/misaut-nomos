@@ -271,6 +271,58 @@ async function main() {
     console.log('[check-sitemap] ✔ Completitud OK: ninguna clase de página falta');
   }
 
+  // 1 ter) ¿LAS RENDERIZA ALGUIEN?
+  //
+  // Los pasos anteriores comprueban que la URL responda 200 y que no falte
+  // ninguna clase de página. Ninguno de los dos ve el fallo que se encontró el
+  // 2026-10-08 en las 8 guías locales, que es de otra especie:
+  //
+  //     servidor → 200 con la página entera, prerenderizada
+  //     React hidrata → no encuentra ruta → pinta «404 Page Not Found»
+  //
+  // Google veía una página buena y la persona un 404. Un `curl` no lo nota
+  // —el HTML es correcto— y el navegador sí. Ocho páginas con prioridad 0.8,
+  // las de más intención de compra del sitio, perdidas sin un solo error.
+  //
+  // No hace falta un navegador para cazarlo: basta cruzar lo que el sitemap
+  // PUBLICA con lo que el router de React sabe PINTAR. Se leen los
+  // `<Route path="…">` de App.jsx y se comprueba que cada URL del sitemap
+  // encaje en alguno. El comodín `path="*"` se excluye a propósito: es
+  // justamente el que pinta el 404.
+  {
+    const appJsx = readFileSync(path.resolve('src/App.jsx'), 'utf8');
+    const rutas = [...appJsx.matchAll(/<Route\s+path="([^"]+)"/g)]
+      .map((m) => m[1])
+      .filter((r) => r !== '*' && r !== '/*');
+    if (rutas.length === 0) {
+      console.warn('[check-sitemap] ⚠ no se ha podido leer ninguna ruta de App.jsx; salto esta comprobación');
+    } else {
+      const matchers = rutas.map((r) => {
+        const re = r
+          .replace(/[.+?^${}()|[\]\\]/g, '\\$&')  // literales
+          .replace(/:[A-Za-z0-9_]+/g, '[^/]+')      // :slug
+          .replace(/\*/g, '.*');
+        return { ruta: r, re: new RegExp(`^${re}/?$`) };
+      });
+      const huerfanas = [];
+      for (const u of urls) {
+        let ruta;
+        try { ruta = decodeURIComponent(new URL(u).pathname); } catch { continue; }
+        if (!matchers.some((m) => m.re.test(ruta))) huerfanas.push(ruta);
+      }
+      if (huerfanas.length > 0) {
+        console.error(`\n❌ ${huerfanas.length} URLs del sitemap que NINGUNA ruta de React pinta:`);
+        for (const h of huerfanas.slice(0, 30)) console.error(`   ${h}`);
+        if (huerfanas.length > 30) console.error(`   … y ${huerfanas.length - 30} más`);
+        console.error('\n   Responden 200 porque están prerenderizadas, pero en cuanto carga el');
+        console.error('   JavaScript la persona ve el 404. Falta un <Route> en src/App.jsx,');
+        console.error('   o el sitemap está publicando una forma de URL que la app no usa.');
+        process.exit(1);
+      }
+      console.log(`[check-sitemap] ✔ las ${urls.length} URLs encajan en alguna de las ${rutas.length} rutas de React`);
+    }
+  }
+
   // 2) Verificación de existencia por URL.
   //    --generate/--local: comprobar contra archivos prerender en dist/,
   //    porque prod aún no tiene el fix aplicado (falso positivo).
