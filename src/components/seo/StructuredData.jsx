@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { slugify } from '@/lib/slugify';
+import { getProfileSeoUrl } from '@/lib/seoUrl';
 
 export function OrganizationSchema() {
   useEffect(() => {
@@ -127,7 +128,14 @@ export function MerchantListingSchema({ profile, reviews, professionalUser }) {
 
 
     const profileSlug = profile.slug_publico || slugify(profile.business_name);
-    const profileUrl = `https://misautonomos.es/autonomo/${profileSlug}`;
+    // `/autonomo/{oficio}-en-{ciudad}/{nombre}` — la forma de un solo segmento
+    // que había aquí devuelve **404** en 53 de las 55 fichas: no está
+    // prerenderizada y no la cubre ninguna regla. Es decir, los datos
+    // estructurados de cada ficha le decían a Google que la página de ese
+    // negocio está en una dirección que no existe. `getProfileSeoUrl` es el
+    // mismo constructor que usan el sitemap y los enlaces del buscador, y cae
+    // solo a la forma corta cuando la ficha no tiene ciudad (hoy, dos).
+    const profileUrl = `https://misautonomos.es${getProfileSeoUrl(profile)}`;
 
     // image: NUNCA puede ser null — fallback al logo de MisAutónomos
     const imageUrl = profile.imagen_principal
@@ -216,8 +224,9 @@ export function LocalBusinessSchema({ profile, reviews, professionalUser }) {
     }
 
     const profileSlug = profile.slug_publico || slugify(profile.business_name);
-    // ✅ URL canónica con formato correcto /autonomo/:slug
-    const profileUrl = `https://misautonomos.es/autonomo/${profileSlug}`;
+    // La canónica de verdad: la misma que publica el sitemap. El comentario que
+    // había aquí decía «formato correcto» de una URL que responde 404.
+    const profileUrl = `https://misautonomos.es${getProfileSeoUrl(profile)}`;
 
     // ✅ Imagen: preferir la más específica del negocio
     const imageUrl = profile.imagen_principal || profile.photos?.[0] || professionalUser?.profile_picture;
@@ -400,7 +409,7 @@ export function ProfessionalPersonSchema({ profile, professionalUser }) {
       "jobTitle": profile.categories?.[0] || "Profesional autónomo",
       "description": profile.descripcion_corta,
       "image": professionalUser?.profile_picture || profile.imagen_principal,
-      "url": `https://misautonomos.es/autonomo/${profileSlug}`,
+      "url": `https://misautonomos.es${getProfileSeoUrl(profile)}`,
       "address": {
         "@type": "PostalAddress",
         "addressLocality": profile.ciudad,

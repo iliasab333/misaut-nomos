@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { getProfileSeoUrl } from '@/lib/seoUrl';
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -83,7 +84,10 @@ export default function FavoritesPage() {
 
   const handleOpenProfile = (profile) => {
     const slug = profile.slug_publico;
-    if (slug) navigate(`/autonomo/${slug}`);
+    // `getProfileSeoUrl` y no `/autonomo/${slug}`: la forma de un segmento
+    // responde 404 en 53 de las 55 fichas, así que abrir un favorito
+    // guardado llevaba a una página de error.
+    if (slug) navigate(getProfileSeoUrl(profile));
     else navigate(createPageUrl("ProfessionalProfile") + `?id=${profile.user_id}`);
   };
 

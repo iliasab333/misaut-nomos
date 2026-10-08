@@ -279,7 +279,11 @@ export default function CategoriaPage() {
               "item": {
                 "@type": "LocalBusiness",
                 "name": profile.business_name,
-                "url": `https://misautonomos.es/autonomo/${profile.slug_publico || slugify(profile.business_name)}`,
+                // El `ItemList` de esta página listaba a cada autónomo con una
+                // URL de un segmento, que responde 404. El enlace que pinta la
+                // tarjeta justo debajo (`getProfileSeoUrl`) sí era el bueno:
+                // los datos estructurados y los enlaces decían cosas distintas.
+                "url": `https://misautonomos.es${getProfileSeoUrl(profile)}`,
                 "address": {
                   "@type": "PostalAddress",
                   "addressLocality": profile.ciudad,
