@@ -55,6 +55,32 @@ export default function AutonomoPage() {
   const [user, setUser] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+
+  // La barra de acciones de móvil mide su propio alto y lo publica en
+  // `--barra-accion-alto`, que lee `CookieBanner` para colocarse ENCIMA de
+  // ella en vez de taparla. Se mide en lugar de escribir «73px» porque el alto
+  // depende del `safe-area-inset` del aparato: un iPhone con isla no da los
+  // mismos píxeles que un Android.
+  const barraAccionRef = useRef(null);
+  useEffect(() => {
+    const raiz = document.documentElement;
+    const medir = () => {
+      const el = barraAccionRef.current;
+      // En escritorio la barra lleva `lg:hidden`: no ocupa, así que 0.
+      const alto = !el || el.offsetParent === null ? 0 : el.getBoundingClientRect().height;
+      raiz.style.setProperty('--barra-accion-alto', `${Math.round(alto)}px`);
+    };
+    medir();
+    const el = barraAccionRef.current;
+    const ro = el && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(medir) : null;
+    if (ro && el) ro.observe(el);
+    window.addEventListener('resize', medir);
+    return () => {
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', medir);
+      raiz.style.removeProperty('--barra-accion-alto');
+    };
+  });
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -822,6 +848,7 @@ export default function AutonomoPage() {
           a la vista. z-30 la deja por debajo del cajón de la cabecera (z-50),
           que debe poder taparla. */}
       <div
+        ref={barraAccionRef}
         className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-surface border-t border-c-border px-4 py-3 flex gap-2"
         style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
       >
