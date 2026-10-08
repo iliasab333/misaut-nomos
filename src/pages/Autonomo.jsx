@@ -66,8 +66,13 @@ export default function AutonomoPage() {
     const raiz = document.documentElement;
     const medir = () => {
       const el = barraAccionRef.current;
-      // En escritorio la barra lleva `lg:hidden`: no ocupa, así que 0.
-      const alto = !el || el.offsetParent === null ? 0 : el.getBoundingClientRect().height;
+      // El alto del rectángulo, a secas. NO `offsetParent === null` para saber
+      // si está oculta: `offsetParent` es **siempre null** en un elemento
+      // `position: fixed`, por especificación, así que esa comprobación daba 0
+      // también en móvil — donde la barra sí está — y el aviso de cookies
+      // seguía colocándose encima. Con `lg:hidden` en escritorio el display es
+      // `none` y el rectángulo mide 0 solo, que es justo lo que hace falta.
+      const alto = el ? el.getBoundingClientRect().height : 0;
       raiz.style.setProperty('--barra-accion-alto', `${Math.round(alto)}px`);
     };
     medir();
