@@ -87,7 +87,7 @@ function isSafeUrl(loc) {
 }
 
 async function fetchAll(supabase) {
-  const out = { profiles: [], categories: [], blog: [] };
+  const out = { profiles: [], categories: [], blog: [], errores: [] };
   if (!supabase) return out;
 
   const [profilesRes, categoriesRes, blogRes] = await Promise.all([
@@ -103,16 +103,51 @@ async function fetchAll(supabase) {
       .limit(500),
     supabase
       .from('blog_posts')
-      .select('slug, updated_date, published')
-      .eq('published', true)
+      // `status = 'published'`, NO `published = true`: esa columna no existe.
+      // La consulta de antes respondía
+      //   42703 — column blog_posts.published does not exist
+      // y como el `if (!blogRes.error)` de abajo se la tragaba sin decir nada,
+      // el sitemap salía con 90 URLs en vez de 115 y los 25 artículos
+      // publicados eran invisibles para Google. Sin un error en ningún sitio.
+      // `BlogList.jsx:95` filtra por `{ status: 'published' }`: ésta es la
+      // misma condición, y por eso el sitemap y la web dicen ahora lo mismo.
+      .select('slug, updated_date, publish_date, status')
+      .eq('status', 'published')
       .limit(2000),
   ]);
 
+  // ESTOS TRES `if` SON LA TRAMPA, y por eso ahora gritan.
+  //
+  // Un `if (!res.error)` que no tiene `else` convierte cualquier fallo de
+  // consulta en una lista vacía, y una lista vacía produce un sitemap
+  // perfectamente válido al que le falta un tipo entero de URL. Eso es lo que
+  // pasó con el blog: la columna no existía, la consulta devolvía 42703, y el
+  // sitemap se desplegó sin los 25 artículos durante semanas sin un solo
+  // error visible — ni en los logs, ni en el guard de `check:sitemap`, que
+  // sólo comprueba que las URLs que SÍ están respondan 200 y no puede ver las
+  // que faltan.
+  //
+  // `console.error` va a los logs de la función en Vercel, y
+  // `out.errores` sale en una cabecera de respuesta para que el guard pueda
+  // fallar en lugar de aprobar un sitemap mutilado.
   if (!profilesRes.error && Array.isArray(profilesRes.data)) {
     out.profiles = profilesRes.data.filter(isIndexableProfile);
+  } else if (profilesRes.error) {
+    out.errores.push(`professional_profiles: ${profilesRes.error.message}`);
+    console.error('[sitemap] FALLO leyendo professional_profiles:', profilesRes.error.message);
   }
-  if (!categoriesRes.error && Array.isArray(categoriesRes.data)) out.categories = categoriesRes.data;
-  if (!blogRes.error && Array.isArray(blogRes.data)) out.blog = blogRes.data;
+  if (!categoriesRes.error && Array.isArray(categoriesRes.data)) {
+    out.categories = categoriesRes.data;
+  } else if (categoriesRes.error) {
+    out.errores.push(`service_categories: ${categoriesRes.error.message}`);
+    console.error('[sitemap] FALLO leyendo service_categories:', categoriesRes.error.message);
+  }
+  if (!blogRes.error && Array.isArray(blogRes.data)) {
+    out.blog = blogRes.data;
+  } else if (blogRes.error) {
+    out.errores.push(`blog_posts: ${blogRes.error.message}`);
+    console.error('[sitemap] FALLO leyendo blog_posts:', blogRes.error.message);
+  }
   return out;
 }
 
@@ -126,7 +161,10 @@ export default async function handler(req, res) {
     } catch (_e) { /* sigue con solo estáticas */ }
   }
 
-  const data = await fetchAll(supabase).catch(() => ({ profiles: [], categories: [], blog: [] }));
+  const data = await fetchAll(supabase).catch((e) => {
+    console.error('[sitemap] fetchAll ha fallado por completo:', e?.message || e);
+    return { profiles: [], categories: [], blog: [], errores: [`fetchAll: ${e?.message || e}`] };
+  });
 
   const urls = [];
 
@@ -239,7 +277,13 @@ export default async function handler(req, res) {
     if (!isSafeUrl(loc)) continue;
     urls.push(urlEntry({
       loc,
-      lastmod: post.updated_date ? new Date(post.updated_date).toISOString().slice(0, 10) : undefined,
+      // `publish_date` antes que `updated_date`: es la fecha que pinta
+      // `BlogList.jsx:80` y la que va en el `datePublished` del JSON-LD.
+      // `updated_date` se mueve al tocar una etiqueta en el panel, y eso le
+      // diría a Google que el artículo es de hoy cuando no lo es.
+      lastmod: (post.publish_date || post.updated_date)
+        ? new Date(post.publish_date || post.updated_date).toISOString().slice(0, 10)
+        : undefined,
       changefreq: 'monthly',
       priority: 0.6,
     }));
@@ -255,6 +299,12 @@ export default async function handler(req, res) {
     urls.join('\n') +
     `\n</urlset>\n`;
 
+  console.log(`[sitemap] ${urls.length} URLs: ${data.profiles.length} fichas, ${data.categories.length} categorías, ${data.blog.length} del blog`);
+  if (data.errores.length) {
+    // Una cabecera y no un 500: un sitemap incompleto es mejor que ninguno
+    // para Google, pero tiene que ser DETECTABLE. `check-sitemap.mjs` la lee.
+    res.setHeader('X-Sitemap-Errores', data.errores.join(' | ').slice(0, 500));
+  }
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   // CDN: 6 h con stale-while-revalidate generoso para sobrevivir despliegues.
   res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=21600, stale-while-revalidate=86400');

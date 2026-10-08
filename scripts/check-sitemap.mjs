@@ -67,6 +67,15 @@ async function generateLocalSitemap() {
   if (statusCode !== 200) {
     throw new Error(`local sitemap handler returned ${statusCode}`);
   }
+  // AÑADIDO: el handler pone `X-Sitemap-Errores` cuando una de sus tres
+  // consultas ha fallado. Antes no existía esa cabecera y una consulta rota
+  // producía un sitemap válido al que le faltaba un tipo entero de URL — que
+  // es exactamente lo que pasó con los 25 artículos del blog. Un sitemap al
+  // que le falta una clase de página no es un sitemap «casi bien»: es una
+  // promesa falsa a Google, y se tiene que caer aquí.
+  if (headers['X-Sitemap-Errores']) {
+    throw new Error(`el generador de sitemap ha fallado al leer la base: ${headers['X-Sitemap-Errores']}`);
+  }
   const outPath = path.resolve('dist/sitemap.local.xml');
   writeFileSync(outPath, body, 'utf8');
   console.log(`[check-sitemap] Sitemap local generado en ${outPath} (${body.length} bytes)`);
@@ -195,6 +204,72 @@ async function main() {
     process.exit(1);
   }
   console.log('[check-sitemap] ✔ Validación estructural OK');
+
+  // 1 bis) COMPLETITUD — la comprobación que faltaba, y la que habría cazado
+  // lo del blog.
+  //
+  // Los pasos 1 y 2 sólo saben mirar las URLs que ESTÁN en el sitemap: validan
+  // su forma y comprueban que respondan 200. Un sitemap al que le falta un
+  // tipo entero de página pasa los dos con sobresaliente — las 90 URLs que
+  // había respondían 200 y tenían forma correcta. Lo que nadie comprobaba era
+  // si faltaba alguna.
+  //
+  // Esto cuenta en la base lo que debería estar y lo compara con lo que hay.
+  // No exige igualdad exacta: un perfil puede quedar fuera por slug no
+  // canónico y eso es correcto. Exige que ninguna clase esté VACÍA teniendo
+  // filas en la base, y avisa cuando falta más de la cuarta parte.
+  const conteo = {
+    '/autonomo/': urls.filter((u) => u.includes('/autonomo/')).length,
+    '/categoria/': urls.filter((u) => u.includes('/categoria/')).length,
+    '/blog/': urls.filter((u) => /\/blog\/[^/]+$/.test(u)).length,
+  };
+  console.log(`[check-sitemap] por clase: ${Object.entries(conteo).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
+
+  const SB_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const SB_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+  if (!SB_URL || !SB_KEY) {
+    console.warn('[check-sitemap] ⚠ sin claves de Supabase: NO se ha comprobado la completitud.');
+    console.warn('[check-sitemap]   Un tipo de página que falte entero pasaría sin que nadie lo vea.');
+  } else {
+    const cuenta = async (tabla, filtro) => {
+      const res = await fetch(`${SB_URL}/rest/v1/${tabla}?select=id&limit=1${filtro ? `&${filtro}` : ''}`, {
+        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: 'count=exact' },
+      });
+      if (!res.ok) return null;
+      const rango = res.headers.get('content-range') || '';
+      const n = Number(rango.split('/')[1]);
+      return Number.isFinite(n) ? n : null;
+    };
+    const esperado = {
+      '/autonomo/': await cuenta('professional_profiles', 'visible_en_busqueda=eq.true&onboarding_completed=eq.true'),
+      '/categoria/': await cuenta('service_categories'),
+      '/blog/': await cuenta('blog_posts', 'status=eq.published'),
+    };
+    const huecos = [];
+    for (const clase of Object.keys(conteo)) {
+      const hay = conteo[clase];
+      const debe = esperado[clase];
+      if (debe === null || debe === undefined) {
+        console.warn(`[check-sitemap] ⚠ ${clase}: no se ha podido contar en la base`);
+        continue;
+      }
+      if (debe > 0 && hay === 0) {
+        huecos.push(`${clase}: la base tiene ${debe} y el sitemap NINGUNA`);
+      } else if (debe > 0 && hay < debe * 0.75) {
+        huecos.push(`${clase}: la base tiene ${debe} y el sitemap sólo ${hay}`);
+      } else {
+        console.log(`[check-sitemap] ✔ ${clase} ${hay}/${debe}`);
+      }
+    }
+    if (huecos.length > 0) {
+      console.error('\n❌ El sitemap está INCOMPLETO. Falta un tipo de página entero o casi:');
+      for (const h of huecos) console.error(`   ${h}`);
+      console.error('\n   Esto no se ve en los otros dos pasos: las URLs que sí están responden 200.');
+      console.error('   Mira los logs del generador — una consulta que falla deja su clase vacía.');
+      process.exit(1);
+    }
+    console.log('[check-sitemap] ✔ Completitud OK: ninguna clase de página falta');
+  }
 
   // 2) Verificación de existencia por URL.
   //    --generate/--local: comprobar contra archivos prerender en dist/,
