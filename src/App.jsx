@@ -11,7 +11,7 @@ import { AppProvider } from '@/lib/AppContext';
 import { routerBasename } from '@/i18n';
 import ScrollToTop from '@/lib/ScrollToTop';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import { SpeedInsights } from '@vercel/speed-insights/react';
+import AnalyticsGate from '@/components/AnalyticsGate';
 import { Suspense, React, Component, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -377,7 +377,7 @@ function App() {
             {/* Vercel RUM: Core Web Vitals reales (LCP/CLS/INP) por ruta.
                 El componente carga el script de forma diferida, no afecta al
                 LCP, y solo envía métricas en producción (en dev es no-op). */}
-            <SpeedInsights />
+            <AnalyticsGate />
           </QueryClientProvider>
         </AppProvider>
       </AuthProvider>

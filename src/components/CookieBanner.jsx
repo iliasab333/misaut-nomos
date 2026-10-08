@@ -86,6 +86,9 @@ export default function CookieBanner() {
       version: 'cookies-v1'
     }));
     localStorage.setItem('consent_id', consentId);
+    // Aviso en caliente: el gate de analítica monta o desmonta los scripts de
+    // Vercel sin recargar la página.
+    window.dispatchEvent(new Event('consent:changed'));
 
     // Activar/desactivar scripts según preferencia
     if (acceptedAnalytics) enableAnalytics();
