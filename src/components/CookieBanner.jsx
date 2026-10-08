@@ -110,9 +110,23 @@ export default function CookieBanner() {
 
   if (!visible) return null;
 
+  // `bottom` sale de una variable y no es `bottom-0` fijo: si la página tiene
+  // una barra de acciones pegada abajo —la ficha de autónomo la tiene en
+  // móvil, con «WhatsApp» y «Llamar»— este aviso se colocaba ENCIMA y la
+  // tapaba entera, porque va con z-100 y la barra con z-30.
+  //
+  // Medido en producción el 2026-10-08, pantalla de 812 px: el banner ocupaba
+  // de 449 a 812 (el 45% del alto) y la barra de 739 a 812. Resultado: en la
+  // primera visita —la que llega de Google— no había forma de contactar con el
+  // autónomo sin quitar antes el aviso. En toda la historia del sitio hay 776
+  // visitas de ficha, 30 contactos y UN consentimiento guardado.
+  //
+  // La variable la publica la propia barra al medirse. Donde no hay barra vale
+  // 0 y el aviso se queda exactamente donde estaba.
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-[100] p-3 md:p-4 pointer-events-none"
+      className="fixed inset-x-0 z-[100] p-3 md:p-4 pointer-events-none"
+      style={{ bottom: 'var(--barra-accion-alto, 0px)' }}
       role="region"
       aria-label={t('cookies.regionLabel')}
       aria-live="polite"
