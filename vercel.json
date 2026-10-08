@@ -112,7 +112,6 @@
       "statusCode": 301
     },
     {
-      "_comentario": "La forma vieja de una pieza, a la canonica de dos segmentos. Nadie deberia generarla ya (ni la portada, ni las migas de pan, ni la propia pagina), pero puede estar en un marcador o en un enlace de fuera, y hoy el servidor la responde con un 404 de verdad. El :cat es perezoso, asi que albanil-reformas-en-sabadell se parte bien.",
       "source": "/categoria/:cat-en-:ciudad",
       "destination": "/categoria/:cat/:ciudad",
       "statusCode": 301
