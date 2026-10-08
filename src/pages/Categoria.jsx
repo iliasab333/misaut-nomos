@@ -47,17 +47,33 @@ export default function CategoriaPage() {
 
   const urlParams = new URLSearchParams(window.location.search);
 
-  // Detectar si el segmento dinámico es "categoria-en-ciudad" o solo "categoria"
+  // TRES FORMAS DE URL LLEGAN AQUÍ, y hasta hoy sólo se entendían dos:
+  //
+  //   /categoria/fontanero                  → sólo oficio
+  //   /categoria/fontanero/sabadell         → oficio + ciudad  ← LA CANÓNICA
+  //   /categoria/fontanero-en-sabadell      → la forma vieja, de una pieza
+  //
+  // La de dos segmentos es la que emiten el sitemap, el prerenderizador y las
+  // 301 de `vercel.json`, y era la única que esta página NO sabía leer. Ni
+  // falta le hacía saberlo, porque tampoco había ruta para ella: todas esas
+  // URLs acababan en el 404 del router.
   const cityCategorySlug = params.slug || params.cityCategory;
 
   let categorySlug = null;
   let ciudadSlug = null;
   let legacyRedirectPath = null;
 
-  if (cityCategorySlug && cityCategorySlug.includes('-en-')) {
+  if (params.cat && params.ciudad) {
+    // La canónica. Dos segmentos, cada uno ya limpio.
+    categorySlug = params.cat;
+    ciudadSlug = params.ciudad;
+  } else if (cityCategorySlug && cityCategorySlug.includes('-en-')) {
+    // La vieja. Se entiende y se manda a la canónica con un replace, para que
+    // no queden dos direcciones vivas para la misma página.
     const enIdx = cityCategorySlug.indexOf('-en-');
     categorySlug = cityCategorySlug.slice(0, enIdx);
     ciudadSlug = cityCategorySlug.slice(enIdx + 4);
+    legacyRedirectPath = `/categoria/${categorySlug}/${ciudadSlug}`;
   } else if (cityCategorySlug) {
     categorySlug = cityCategorySlug;
   } else {
@@ -68,7 +84,7 @@ export default function CategoriaPage() {
       categorySlug = slugify(legacyName);
       ciudadSlug = legacyCiudad ? slugify(legacyCiudad) : null;
       legacyRedirectPath = ciudadSlug
-        ? `/categoria/${categorySlug}-en-${ciudadSlug}`
+        ? `/categoria/${categorySlug}/${ciudadSlug}`
         : `/categoria/${categorySlug}`;
     }
   }
@@ -76,7 +92,7 @@ export default function CategoriaPage() {
   // Redirect legacy ?name=X&ciudad=Y — siempre al nivel superior (no condicional)
   useEffect(() => {
     if (legacyRedirectPath) navigate(legacyRedirectPath, { replace: true });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Ciudad legible: capitalizar cada palabra del slug
   const ciudadName = ciudadSlug
@@ -109,14 +125,14 @@ export default function CategoriaPage() {
       const correctSlug = resolvedCategory.slug || slugify(resolvedCategory.name);
       if (correctSlug && correctSlug !== categorySlug) {
         const canonical = ciudadSlug
-          ? `/categoria/${correctSlug}-en-${ciudadSlug}`
+          ? `/categoria/${correctSlug}/${ciudadSlug}`
           : `/categoria/${correctSlug}`;
         // Log fire-and-forget
         base44.functions.invoke('resolveLegacySlug', { path: window.location.pathname }).catch(() => {});
         navigate(canonical, { replace: true });
       }
     }
-  }, [serviceCategories, categorySlug, resolvedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [serviceCategories, categorySlug, resolvedCategory]);
 
   // Cargar perfiles solo cuando tenemos el nombre de categoría
   const { data: profiles = [], isLoading } = useQuery({
@@ -175,7 +191,10 @@ export default function CategoriaPage() {
     if (ciudad === "all") {
       navigate(`/categoria/${categorySlug}`);
     } else {
-      navigate(`/categoria/${categorySlug}-en-${slugify(ciudad)}`);
+      // Dos segmentos: es la forma que el sitemap publica y la que el
+      // prerenderizador tiene escrita en disco. Navegar a la vieja desde aquí
+      // llevaba a una URL que el servidor responde con un 404 de verdad.
+      navigate(`/categoria/${categorySlug}/${slugify(ciudad)}`);
     }
   };
 
@@ -204,8 +223,11 @@ export default function CategoriaPage() {
   const displayName = categoryName || (serviceCategories.length === 0 ? '…' : categorySlug);
 
   // SEO
+  // El canonical TIENE que ser el que está en el sitemap. Antes apuntaba a la
+  // forma de una pieza, que devuelve 404: una canónica que no existe le dice a
+  // Google que la página buena no es ésta y que la buena no está.
   const canonicalUrl = ciudadSlug
-    ? `https://misautonomos.es/categoria/${categorySlug}-en-${ciudadSlug}`
+    ? `https://misautonomos.es/categoria/${categorySlug}/${ciudadSlug}`
     : `https://misautonomos.es/categoria/${categorySlug}`;
 
   const seoTitle = ciudadName

@@ -178,7 +178,13 @@ export default function HeroSearch({
 
   const buildSearchUrl = () => {
     if (category) {
-      if (ciudad) return `/categoria/${category}-en-${slugify(ciudad)}`;
+      // `/categoria/oficio/ciudad`, con dos segmentos. La forma de una pieza
+      // (`fontanero-en-barcelona`) se pinta bien en el navegador pero el
+      // servidor la responde con un **404 de verdad**: no está prerenderizada
+      // ni la cubre ninguna regla. Es decir, el buscador de la portada —la
+      // puerta principal del sitio— mandaba a la gente, y a Google, a una
+      // dirección que responde 404 en cuanto se elige una ciudad.
+      if (ciudad) return `/categoria/${category}/${slugify(ciudad)}`;
       return `/categoria/${category}${provincia ? `?provincia=${encodeURIComponent(provincia)}` : ''}`;
     }
     const params = new URLSearchParams();

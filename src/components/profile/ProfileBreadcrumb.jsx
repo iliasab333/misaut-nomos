@@ -54,8 +54,10 @@ export default function ProfileBreadcrumb({ categoryName, ciudad, provincia }) {
       {place && (
         <>
           <span aria-hidden="true">/</span>
+          {/* Dos segmentos: la forma de una pieza responde 404 en el servidor,
+              así que esta miga de pan era un enlace muerto en las 55 fichas. */}
           {categoryName && ciudad ? (
-            <Link to={`/categoria/${catSlug}-en-${slugify(ciudad)}`} className="hover:text-ink">{ciudad}</Link>
+            <Link to={`/categoria/${catSlug}/${slugify(ciudad)}`} className="hover:text-ink">{ciudad}</Link>
           ) : (
             <span className="text-ink">{place}</span>
           )}

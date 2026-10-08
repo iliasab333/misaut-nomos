@@ -287,7 +287,18 @@ const AuthenticatedApp = () => {
           <Route path="/autonomo/:cityCategory/:slug" element={<Pages.Autonomo />} />  {/* SEO: /autonomo/electricista-en-antequera/ruben-cardenas-torres */}
           <Route path="/categoria" element={<Pages.Categoria />} />
           <Route path="/categoria/:slug" element={<Pages.Categoria />} />            {/* legacy: ?name=X&ciudad=Y */}
-          <Route path="/categoria/:cityCategory" element={<Pages.Categoria />} />     {/* SEO: /categoria/electricistas-en-antequera */}
+          <Route path="/categoria/:cityCategory" element={<Pages.Categoria />} />     {/* SEO antiguo: /categoria/electricista-en-antequera */}
+          {/* SEO ACTUAL: /categoria/electricista/antequera — DOS segmentos.
+              Esta ruta FALTABA, y es la que emiten el sitemap (8 guías con
+              prioridad 0.8), el prerenderizador (`api/prerender.js`, que les
+              escribe 2.400 caracteres de guía local con precios y FAQ) y las
+              301 de `vercel.json`. El servidor devolvía 200 con la guía
+              entera, React hidrataba, no encontraba ruta y pintaba encima
+              «404 Page Not Found» — en inglés, en una web en español.
+              Google veía una página buena; la persona, un 404. Justo en las
+              consultas de más intención que tiene el sitio («fontanero en
+              Sabadell» lo busca alguien con una fuga en casa). */}
+          <Route path="/categoria/:cat/:ciudad" element={<Pages.Categoria />} />
           <Route path="/para-autonomos" element={<ParaAutonomos />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/preguntas-frecuentes" element={<Pages.FAQ />} />
