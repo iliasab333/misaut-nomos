@@ -18,6 +18,13 @@ export async function autoSubscribeToNewsletter({
     if (existing && existing.length > 0) {
       return;
     }
+    // { devolverFila: false }: la policy `ns_create` deja insertar a
+    // cualquiera, pero `ns_read` exige `is_admin()`. `.create()` hacía
+    // `insert().select().single()`, así que la fila ENTRABA y la lectura
+    // de vuelta devolvía 401; el adaptador lanzaba, el catch lo daba por
+    // un fallo de alta y el visitante veía un error. `newsletter_subscribers`
+    // tiene 0 filas después de meses en línea por esto. Es el mismo fallo
+    // que tenía /contacto.
     await base44.entities.NewsletterSubscriber.create({
       email,
       name: name || '',
@@ -29,7 +36,7 @@ export async function autoSubscribeToNewsletter({
       confirmation_token: 'auto_' + Math.random().toString(36).substring(2, 14),
       confirmed_at: new Date().toISOString(),
       unsubscribe_token: 'unsub_' + Math.random().toString(36).substring(2, 16),
-    });
+    }, { devolverFila: false });
     notifyAdminEvent({
       event: 'newsletter_signup',
       title: '📧 Nuevo suscriptor newsletter',

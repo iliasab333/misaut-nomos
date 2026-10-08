@@ -90,6 +90,13 @@ function NewsletterInlineForm() {
       const genToken = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
       const unsubscribeToken = genToken();
 
+      // { devolverFila: false }: la policy `ns_create` deja insertar a
+      // cualquiera, pero `ns_read` exige `is_admin()`. `.create()` hacía
+      // `insert().select().single()`, así que la fila ENTRABA y la lectura
+      // de vuelta devolvía 401; el adaptador lanzaba, el catch lo daba por
+      // un fallo de alta y el visitante veía un error. `newsletter_subscribers`
+      // tiene 0 filas después de meses en línea por esto. Es el mismo fallo
+      // que tenía /contacto.
       await NewsletterSubscriber.create({
         email: normalizedEmail,
         status: 'confirmed',
@@ -100,7 +107,7 @@ function NewsletterInlineForm() {
         confirmed_at: new Date().toISOString(),
         user_type_interest: 'ambos',
         emails_sent: 0,
-      });
+      }, { devolverFila: false });
 
       base44.functions.invoke('sendNewsletterWelcome', {
         email: normalizedEmail,
@@ -326,7 +333,12 @@ export default function Footer() {
         <div className="mt-4 pt-4 pb-20 lg:pb-1 border-t border-c-border text-sm text-c-muted">
           {t('footer.madeBy')}{' '}
           <a
-            href="https://bayendaba.com"
+            // Con `utm_*`: hoy es el ÚNICO punto de contacto con la agencia en
+            // todo el sitio y no lleva un solo parámetro, así que después de
+            // 7.750 apariciones y 776 visitas de ficha no hay forma de saber si
+            // alguien ha pulsado nunca. Medir es la condición para decidir si
+            // este enlace merece algo más que una línea en el pie.
+            href="https://bayendaba.com/es?utm_source=misautonomos&utm_medium=pie&utm_campaign=firma"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block py-3 -my-3 font-semibold text-ink underline underline-offset-2 hover:opacity-80"

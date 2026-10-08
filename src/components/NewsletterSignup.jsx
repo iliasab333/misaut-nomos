@@ -42,6 +42,13 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
       const unsubToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
       const lang = document.documentElement.lang || localStorage.getItem('i18nextLng') || 'es';
 
+      // { devolverFila: false }: la policy `ns_create` deja insertar a
+      // cualquiera, pero `ns_read` exige `is_admin()`. `.create()` hacía
+      // `insert().select().single()`, así que la fila ENTRABA y la lectura
+      // de vuelta devolvía 401; el adaptador lanzaba, el catch lo daba por
+      // un fallo de alta y el visitante veía un error. `newsletter_subscribers`
+      // tiene 0 filas después de meses en línea por esto. Es el mismo fallo
+      // que tenía /contacto.
       await base44.entities.NewsletterSubscriber.create({
         email: email.toLowerCase().trim(),
         status: 'confirmed',
@@ -52,7 +59,7 @@ export default function NewsletterSignup({ variant = 'footer', source = 'footer'
         unsubscribe_token: unsubToken,
         confirmed_at: new Date().toISOString(),
         tags: []
-      });
+      }, { devolverFila: false });
 
       // Fire-and-forget welcome email
       try {

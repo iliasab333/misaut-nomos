@@ -73,7 +73,12 @@ export default function CookieBanner() {
     };
 
     try {
-      await base44.entities.CookieConsent.create(consent);
+      // `devolverFila: false`: sin esto el insert entra pero la lectura de
+      // vuelta devuelve 401 —un visitante anónimo no puede, ni debe, leer
+      // los consentimientos de nadie— y el catch de abajo se lo tragaba.
+      // Resultado: 1 consentimiento guardado en toda la historia del sitio,
+      // que es justo el registro que hay que poder enseñar si lo piden.
+      await base44.entities.CookieConsent.create(consent, { devolverFila: false });
     } catch(e) {
       // Non-blocking — continuar incluso si falla la BD
     }

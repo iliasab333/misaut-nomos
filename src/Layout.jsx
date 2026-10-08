@@ -77,8 +77,22 @@ const LayoutContent = React.memo(function LayoutContent({ children, currentPageN
       if (analyticsLoaded) return;
       analyticsLoaded = true;
 
-      // Cargar solo cuando el usuario lo consiente
-      const consentGiven = sessionStorage.getItem('analytics_consent') === 'true';
+      // Cargar sólo cuando el visitante lo consiente — y leyendo donde el
+      // consentimiento SE GUARDA de verdad.
+      //
+      // Aquí se miraba `sessionStorage.analytics_consent`, una clave que no
+      // escribe ni una sola línea del proyecto (`grep -rn analytics_consent
+      // src` devuelve únicamente esta lectura). Así que `consentGiven` era
+      // siempre false y **Google Analytics y Google Ads no han cargado nunca
+      // para nadie**. No es que midieran poco: no existían. Eso explica por
+      // qué no hay un solo dato de procedencia del tráfico.
+      //
+      // El banner guarda en `localStorage.cookie_consent` un objeto con
+      // `analytics`, y `AnalyticsGate.jsx` ya lo lee bien: es la misma fuente.
+      let consentGiven = false;
+      try {
+        consentGiven = Boolean(JSON.parse(localStorage.getItem('cookie_consent') || '{}').analytics);
+      } catch { consentGiven = false; }
       if (!consentGiven) return;
 
       const scriptGA = document.createElement('script');
