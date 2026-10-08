@@ -321,7 +321,7 @@
       "repesca": {
         "title": "Client Re-engagement V1",
         "subtitle": "Audience: clients without onboarding · Tag: {{tag}}",
-        "targetAudience": "users with user_type = client / cliente / empty, excluding {{blocked}} blocked emails and anyone who already has the tag.",
+        "targetAudience": "users with user_type = client / cliente / empty, excluding anyone who already has the tag and anyone on the server's exclusion list.",
         "audienceError": "Error calculating audience: {{message}}",
         "calculating": "Calculating...",
         "sendMeTest": "Send me a test",

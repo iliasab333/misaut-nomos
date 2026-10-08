@@ -52,7 +52,13 @@ const FROM_FORMATTED = `${FROM_NAME} <${FROM_EMAIL}>`;
 
 const SUBJECT = 'Que la cuota de autónomos esté congelada en 2026 no es toda la verdad';
 
-const CSV_PATH = path.join(ROOT, 'data', 'audiencia-resend-misautonomos.csv');
+// El CSV de audiencia (38 personas con nombre, apellido y correo) YA NO ESTÁ
+// EN EL REPOSITORIO: este repositorio es público en GitHub. Sigue en
+// `data/` en el ordenador del dueño y está ignorado por git, con una copia en
+// `~/Desktop/misautonomos-datos-privados/`. `AUDIENCIA_CSV` permite apuntar a
+// otro sitio sin tocar el código.
+const CSV_PATH = process.env.AUDIENCIA_CSV
+  || path.join(ROOT, 'data', 'audiencia-resend-misautonomos.csv');
 const HTML_PATH = path.join(ROOT, 'preview-correo-newsletter-cuota-autonomos-2026.html');
 
 const TEST_EMAIL = process.env.TEST_EMAIL || 'bigseo.online.com@gmail.com';

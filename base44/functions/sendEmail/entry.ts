@@ -8,7 +8,12 @@ const CANONICAL_REPLY_TO = "hola@misautonomos.es";
 // === FIN FROM CENTRALIZADO ===
 
 // === EMAIL BLOCKLIST TEMPORAL — vence 2026-05-01 23:59 UTC ===
-const EMAIL_BLOCKLIST = ["rubencardenastorres@gmail.com"];
+// La dirección que había aquí escrita a mano era de un autónomo REAL y este
+// repositorio es público: se saca a `EMAIL_BLOCKLIST` (variable de entorno,
+// direcciones separadas por comas). Vacía no bloquea a nadie, que es lo que
+// hacía esta función antes de que existiera la lista.
+const EMAIL_BLOCKLIST = (Deno.env.get("EMAIL_BLOCKLIST") || "")
+  .split(",").map((c) => c.trim().toLowerCase()).filter(Boolean);
 const BLOCKLIST_EXPIRES_AT = new Date("2026-05-01T23:59:00Z");
 function isBlockedRecipient(toEmail) {
   if (new Date() > BLOCKLIST_EXPIRES_AT) return false;

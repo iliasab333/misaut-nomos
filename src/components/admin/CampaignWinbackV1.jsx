@@ -12,13 +12,19 @@ const CAMPAIGN_ID = 'winback_v1';
 const CAMPAIGN_SUBJECT = 'Estuviste con nosotros hace un tiempo — ¿qué falló?';
 
 // Lista FIJA de destinatarios (hardcoded, no query dinámica)
+// Los correos y los nombres de estas personas NO se escriben aquí: este
+// repositorio es PÚBLICO en GitHub y son datos de autónomos reales. Los ids de
+// 24 hexadecimales identifican la fila sin publicar a nadie; para ver de quién
+// es cada uno, se consulta la base. (El minificador borra los comentarios, así
+// que esto nunca llegó al navegador — pero sí estaba, y sigue estando, en el
+// histórico de un repositorio que cualquiera puede clonar.)
 const TARGET_USER_IDS = [
-  '692980f8a1233a63cc216433', // moujtabakh123@gmail.com - Al Moujtaba Kharrat
-  '692b04468af1f276d86a6529', // emaar.estates@gmail.com - Ilyas
-  '6937c7d7503351ab9cd5c9d4', // estradaservice0953@gmail.com - Andrés Felipe Rodríguez Estrada
-  '693acd9f370063e1959b824f', // kassim.kone27@gmail.com - Kassim Kone
-  '69412ee0bdf0b3d43693759f', // seletto9@gmail.com - Seletto
-  '695a671d41f34d1044653729', // bencharkizaid@gmail.com - Zaid Bencharki
+  '692980f8a1233a63cc216433',
+  '692b04468af1f276d86a6529',
+  '6937c7d7503351ab9cd5c9d4',
+  '693acd9f370063e1959b824f',
+  '69412ee0bdf0b3d43693759f',
+  '695a671d41f34d1044653729',
 ];
 
 const buildHtml = (name, email) => {

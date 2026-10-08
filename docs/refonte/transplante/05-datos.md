@@ -120,7 +120,7 @@ Valores reales observados en khdemlidaba (para no inventar): `users.user_type` �
 ### 2.3 Los 57 sin cuenta
 
 No pueden insertarse (`users.id` es FK a `auth.users`). De ellos:
-- 20 tienen perfil profesional → el perfil migra con `user_id = NULL` (§15). Sus emails quedan en `legacy.users` para invitarlos más adelante: `pinturasdiamonds@…`, `misautonomos.sl@…`, `estictreball@…`, `electriclima2025@…`, `testingmisautonomos@…`, `fastserviceasesoria@…`, `seletto9@…`, `sstus8579@…`, `bigseovulito@…`, `benchellal122@…`, `milautonomos25@…`, `kassim.kone27@…`, `estradaservice0953@…`, `bencharkizaid@…`, `brokeemasteriloas@…`, `ilias.ahmed@euncet.es`, `moujtabakh123@…`, `rubencardenastorres@…`, `emaar.estates@…`, `nahuelvilches.tbv@…`. Varios son claramente cuentas de prueba del dueño (`testingmisautonomos`, `bigseovulito`, `benchellal122`, `misautonomos.sl`).
+- 20 tienen perfil profesional → el perfil migra con `user_id = NULL` (§15). Sus correos quedan en `legacy.users` para invitarlos más adelante. **No se listan aquí: este repositorio es PÚBLICO en GitHub y son direcciones de personas reales.** La lista está en `exportaciones/users.csv`, que está ignorado por git. De los 20, cuatro son cuentas de prueba del propio dueño.
 - 37 no tienen nada enganchado (9 `client`, 2 `professionnel`, 26 sin tipo) → se pierden como usuarios; sólo quedan en el CSV de exportación.
 
 ---
@@ -133,14 +133,14 @@ No pueden insertarse (`users.id` es FK a `auth.users`). De ellos:
 - `categories[]`: 46 con exactamente 1 categoría. Pintor=8, Albañil / Reformas=6, Asesoría o gestoría=5, Cerrajero=5, Electricista=5, Empresa multiservicios=4, Marketing digital / diseño web=3, Informático a domicilio / soporte IT=2, Carpintero=2, y 1 cada: Autónomo de limpieza, Peluquería y estética a domicilio, Climatización / Calefacción, Persianas y toldos, Transportista, Jardinero.
 - `provincia`: Barcelona=24, Alicante=6, Madrid=3, Girona=2, Valencia=2, Islas Baleares=2, Málaga=2, Zamora=1, Badajoz=1, Ciudad Real=1, Granada=1, Tarragona=1. `ciudad`: 28 distintas + 2 vacías (`ANDRES F RODRIGUEZ ESTRADA` y `Esdrújulo`, ambos provincia Barcelona). `municipio`: vacío en 46. `service_area`: "Ciudad, Provincia" redundante. `radio_servicio_km`: 25 en 45, 10 en 1.
 - `metodos_contacto`: chat_interno+telefono+whatsapp=34, chat_interno+whatsapp=9, **sólo chat_interno=3** (`Joselito`, `Marwan El Haddadi`, `Florentín Gabriel Tudor`).
-- `telefono_contacto`: 46 no vacíos (34 de 9 dígitos, 12 con `+34`). El número `644853733` aparece en **6 perfiles** (perfiles de prueba). `whatsapp_phone_number` y `whatsapp_notifications_enabled`: 0.
+- `telefono_contacto`: 46 no vacíos (34 de 9 dígitos, 12 con `+34`). El teléfono de pruebas del dueño aparece en **6 perfiles** (perfiles de prueba). `whatsapp_phone_number` y `whatsapp_notifications_enabled`: 0.
 - `disponibilidad_tipo`: ambos=44, laborables=2. Horario: `09:00-18:00` sin días en 43; 3 personalizados.
 - `business_name`: 46 no vacíos; 23 iguales a `users.full_name`. Palabras: 1=11, 2=16, 3=9, 4=4, 5=3, 6=1, 8=1, 9=1.
 - `description`: 46 no vacías (7 < 40 chars, 28 < 200, 11 < 1000), 0 con HTML. `descripcion_corta`: igual a `description` en 41, prefijo en 1, distinta en 4.
 - `photos`: 81 URLs en total; 18 perfiles con 0, 17 con 1, 3 con 2, 1 con 3, 1 con 4, 1 con 5, 1 con 7, 1 con 9, 3 con 10. `imagen_principal`: 30 (13 de ellas también están en `photos`). Las 111 URLs apuntan a `https://dquxsethatxtptfviiwd.supabase.co/storage/v1/object/public/uploads/…`; 0 rotas; 0 con `/render/image/`.
 - `years_experience`: 0..35 (todos enteros). `website`: 6 (`fastservices.es`, `https://fixtic.lovable.app/`, `www.ecosmartsl.com`, `nvmontseny.com`, `Tik tok`, `https://www.zaask.es/avaliar-sp/658175`). `social_links`: instagram=10, facebook=3, tiktok=2; **6 valores son handles sin URL** (`fastserviceasesores`, `fastservices_asesores`, `guccitooi`, `_.moha._x77`, `serralleria_nv_montseny`, `amigdecor`).
 - `identity_verified`: 1 (`Guccito`, `identity_verified_at` 2026-04-19, `dni`). `is_ads_plus`: 6 (`Oleksandr`, `Fast Services Asesores`, `ANDRES F RODRIGUEZ ESTRADA`, `Zaid Bencharki`, `Ruben cárdenas torres`, `Guccito`). `tarifa_base`: 0 en 29; 30=6, 35=4, 40=2, y 1 cada 20/25/28/48/90. `cif_nif`: 27 no vacíos. `iban`: 1. `skills`: 4 perfiles (13 ítems). `certifications`: 1 (`Carnet instalador gas`). `services_offered`: 4 perfiles (10 ítems con nombre/descripción/unidad/precio vacío). `portfolio_items`: 2 perfiles (4 ítems, 1 con imagen). `faq_items`: 0. `referral_code`: 25. `average_rating/total_reviews`: `5.00/2`=1, `5.00/1`=1, `0/0`=44.
-- `email_contacto`: 46, 45 iguales al email del usuario (`Cerrajeria Cabello`: `rraulcabhi@hotmail.com` vs `raulcabhi@gmail.com`).
+- `email_contacto`: 46, 45 iguales al correo del usuario. La excepción es `Cerrajeria Cabello`, que puso en la ficha un correo distinto del de su cuenta (uno de `@hotmail.com` y otro de `@gmail.com`). Las direcciones no se escriben aquí: el repositorio es público.
 - `id`: 46 ObjectId de 24 hex → hay que generar UUID nuevos y guardar el puente (`profile_metrics`, `reviews`, `favorites`, `identity_verifications`, redirecciones de slug).
 
 ### 3.2 Mapeo columna a columna
@@ -639,4 +639,4 @@ Métricas: 515 visitas de perfil y 6.828 apariciones en búsqueda (sólo sobrevi
 14. **Tickets**: migrar sólo el real de ECOSMART (propuesto) o los 3.
 15. **CGU**: dar por aceptadas las condiciones (`cgu_accepted_at = created_date`, versión `misautonomos-legacy`) para los 26 con cuenta, o dejarlas en NULL y que khdemlidaba se las pida en el próximo login.
 16. **Exportaciones legales**: confirmar dónde se guardan los CSV de `payment_records` (87 cobros, 1.549,21 €) e `invoicing_settings` (NIF + IBAN) antes de borrar `legacy`.
-17. **Cuentas de prueba del propio dueño** (`Juan Pérez`, `Guccito`, `Oscar Barambio`, `Ilias`, `Rayan`, `Esdrújulo`, `Leonor`, `Oscar Gómez`, `Electricistas SL`, `Inmobiliaria Traspasos` y los 6 perfiles con el teléfono `644853733`): ¿migran como fichas públicas o se limpian antes?
+17. **Cuentas de prueba del propio dueño** (`Juan Pérez`, `Guccito`, `Oscar Barambio`, `Ilias`, `Rayan`, `Esdrújulo`, `Leonor`, `Oscar Gómez`, `Electricistas SL`, `Inmobiliaria Traspasos` y los 6 perfiles con el teléfono de pruebas del dueño): ¿migran como fichas públicas o se limpian antes?

@@ -10,15 +10,19 @@ import { toast } from '@/lib/toast';
 const CAMPAIGN_TAG = 'repesca_v1_sent';
 const CAMPAIGN_SUBJECT = 'Te dejaste algo a medias en MisAutónomos 👋';
 
-// Blocklist específica de esta campaña
-const CAMPAIGN_BLOCKLIST = [
-  'gucciahmedben@gmail.com',
-  'yahyarayan25@gmail.com',
-  'anisbenchellal@gmail.com',
-  'edxikol@gmail.com',
-  'guccito67@gmail.com',
-  'missautonomos@gmail.com',
-];
+// NO HAY BLOCKLIST EN EL CLIENTE, y antes tampoco la había de verdad.
+//
+// Aquí vivían seis direcciones de correo escritas a mano —las cuentas de
+// prueba del dueño— y resulta que NO bloqueaban nada: lo único que hacía ese
+// array era dar su `.length` a una etiqueta. El bloqueo de verdad lo hace
+// `sendAndLog` en el servidor, que devuelve `status: 'skipped'`, y eso es lo
+// que cuenta `skippedBlocklist` más abajo.
+//
+// Así que eran seis direcciones reales publicadas para nada: en un repositorio
+// PÚBLICO de GitHub y, como las cadenas sí sobreviven al minificador, servidas
+// dentro de `/assets/AdminEmails-*.js`, que responde 200 a cualquier visitante
+// sin sesión (comprobado en producción el 2026-10-08). Se quitan, y la
+// etiqueta deja de prometer un número que no era suyo.
 
 const buildHtml = (name) => `<!DOCTYPE html>
 <html lang="es">
@@ -188,7 +192,7 @@ export default function CampaignRepescaV1() {
 
       <div className="bg-soft rounded-lg p-3 mb-4 text-sm text-ink">
         <p><strong>{t('admin.campaigns.shared.subjectLabel')}</strong> {CAMPAIGN_SUBJECT}</p>
-        <p className="mt-1"><strong>{t('admin.campaigns.shared.targetAudienceLabel')}</strong> {t('admin.campaigns.repesca.targetAudience', { blocked: CAMPAIGN_BLOCKLIST.length })}</p>
+        <p className="mt-1"><strong>{t('admin.campaigns.shared.targetAudienceLabel')}</strong> {t('admin.campaigns.repesca.targetAudience')}</p>
       </div>
 
       {/* Acciones */}

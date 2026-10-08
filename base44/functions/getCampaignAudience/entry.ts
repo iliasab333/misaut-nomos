@@ -1,14 +1,12 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const CAMPAIGN_TAG = 'repesca_v1_sent';
-const CAMPAIGN_BLOCKLIST = [
-  'gucciahmedben@gmail.com',
-  'yahyarayan25@gmail.com',
-  'anisbenchellal@gmail.com',
-  'edxikol@gmail.com',
-  'guccito67@gmail.com',
-  'missautonomos@gmail.com',
-];
+// Las seis direcciones que había aquí escritas a mano —las cuentas de prueba
+// del dueño— salen a una variable de entorno: este repositorio es público.
+// Vacía, la campaña no excluye a nadie, que es lo que hacía antes de que la
+// lista existiera.
+const CAMPAIGN_BLOCKLIST = (Deno.env.get('CAMPAIGN_BLOCKLIST') || '')
+  .split(',').map((c) => c.trim().toLowerCase()).filter(Boolean);
 
 Deno.serve(async (req) => {
   try {

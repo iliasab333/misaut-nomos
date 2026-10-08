@@ -3,7 +3,12 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 const ONESIGNAL_APP_ID = 'e178adb2-38e8-4397-9239-833be611ed27';
 
 // === EMAIL BLOCKLIST TEMPORAL — vence 2026-05-01 23:59 UTC ===
-const EMAIL_BLOCKLIST_OM = ["rubencardenastorres@gmail.com"];
+// La dirección que había aquí escrita a mano era de un autónomo REAL y este
+// repositorio es público: se saca a `EMAIL_BLOCKLIST` (variable de entorno,
+// direcciones separadas por comas). Vacía no bloquea a nadie, que es lo que
+// hacía esta función antes de que existiera la lista.
+const EMAIL_BLOCKLIST_OM = (Deno.env.get("EMAIL_BLOCKLIST") || "")
+  .split(",").map((c) => c.trim().toLowerCase()).filter(Boolean);
 const BLOCKLIST_EXPIRES_AT_OM = new Date("2026-05-01T23:59:00Z");
 function isBlockedRecipientOM(toEmail) {
   if (new Date() > BLOCKLIST_EXPIRES_AT_OM) return false;

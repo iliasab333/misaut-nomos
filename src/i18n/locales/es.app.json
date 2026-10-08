@@ -321,7 +321,7 @@
       "repesca": {
         "title": "Repesca Clientes V1",
         "subtitle": "Audiencia: clientes sin onboarding · Tag: {{tag}}",
-        "targetAudience": "users con user_type = client / cliente / vacío, excluyendo {{blocked}} emails bloqueados y quienes ya tengan el tag.",
+        "targetAudience": "users con user_type = client / cliente / vacío, excluyendo a quienes ya tengan el tag y a los que el servidor tenga en su lista de exclusión.",
         "audienceError": "Error al calcular audiencia: {{message}}",
         "calculating": "Calculando...",
         "sendMeTest": "Enviarme prueba",

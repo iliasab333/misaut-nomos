@@ -12,18 +12,24 @@ const CAMPAIGN_ID = 'blog_plataformas_v1';
 const CAMPAIGN_SUBJECT = 'Hemos comparado 7 plataformas para autónomos en España';
 
 // Lista FIJA de 11 destinatarios (hardcoded, no query dinámica)
+// Los correos y los nombres de estas personas NO se escriben aquí: este
+// repositorio es PÚBLICO en GitHub y son datos de autónomos reales. Los ids de
+// 24 hexadecimales identifican la fila sin publicar a nadie; para ver de quién
+// es cada uno, se consulta la base. (El minificador borra los comentarios, así
+// que esto nunca llegó al navegador — pero sí estaba, y sigue estando, en el
+// histórico de un repositorio que cualquiera puede clonar.)
 const TARGET_USER_IDS = [
-  '69df7f55607df85d840e4fda', // fixtic.consultant@gmail.com - FixTIC
-  '695a671d41f34d1044653729', // bencharkizaid@gmail.com - Zaid Bencharki
-  '69412ee0bdf0b3d43693759f', // seletto9@gmail.com - Seletto
-  '6940fe823069e39c15eb2f43', // varon5927@gmail.com - Jorge Varon
-  '693acd9f370063e1959b824f', // kassim.kone27@gmail.com - Kassim Kone
-  '6937c7d7503351ab9cd5c9d4', // estradaservice0953@gmail.com - Andrés F. Rodríguez
-  '6936fcf4a5dd1965a8c9d011', // nahuelvilches.tbv@gmail.com - Nahuel Vilches
-  '6932b27acee41be4b8ef3978', // fastserviceasesoria@gmail.com - FAST SERVICE
-  '692b04468af1f276d86a6529', // emaar.estates@gmail.com - Ilyas
-  '692980f8a1233a63cc216433', // moujtabakh123@gmail.com - Al Moujtaba Kharrat
-  '6929599cd8f5ce796ed1f11f', // sstus8579@gmail.com - саша стус
+  '69df7f55607df85d840e4fda',
+  '695a671d41f34d1044653729',
+  '69412ee0bdf0b3d43693759f',
+  '6940fe823069e39c15eb2f43',
+  '693acd9f370063e1959b824f',
+  '6937c7d7503351ab9cd5c9d4',
+  '6936fcf4a5dd1965a8c9d011',
+  '6932b27acee41be4b8ef3978',
+  '692b04468af1f276d86a6529',
+  '692980f8a1233a63cc216433',
+  '6929599cd8f5ce796ed1f11f',
 ];
 
 const buildHtml = (name, email) => {
