@@ -294,7 +294,10 @@
       "internalNotePlaceholder": "Nota interna…",
       "replyPlaceholder": "Responder al usuario…",
       "internalNote": "Nota interna",
-      "selectTicket": "Selecciona un ticket para ver el detalle."
+      "selectTicket": "Selecciona un ticket para ver el detalle.",
+      "noticeSent": "Aviso enviado por correo a la persona.",
+      "noticeSkipped": "Respuesta guardada, pero no se envió aviso: {{reason}}",
+      "noticeFailed": "Respuesta guardada, pero el aviso por correo falló."
     },
     "emails": {
       "title": "📧 Centro de Emails",

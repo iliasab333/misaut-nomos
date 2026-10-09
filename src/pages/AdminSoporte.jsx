@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { supabase } from '@/api/supabaseClient';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { IconSearch, IconSend, IconLock, IconArrowLeft } from '@/components/Icons';
@@ -145,10 +146,48 @@ function TicketDetail({ ticket, onClose, refresh }) {
       await base44.entities.TicketMessage.create({
         ticket_id: ticket.id,
         sender_type: 'admin',
-        body,
+        // `content`, NO `body`. La columna de `ticket_messages` se llama
+        // `content`; escribir `body` devolvía 400 de PostgREST, el `catch` lo
+        // convertía en un aviso y la fila no se guardaba nunca. Por eso la
+        // tabla tenía CERO filas: ni el admin ni el autónomo habían podido
+        // responder jamás a un ticket.
+        content: body,
         is_internal: internal,
       });
       await base44.entities.Ticket.update(ticket.id, { updated_date: new Date().toISOString() });
+
+      // Y AHORA SE LE AVISA. Hasta hoy, responder escribía la fila y nada más:
+      // la persona sólo se enteraba si volvía a la web por su cuenta y abría
+      // el ticket. `ticket_messages` tenía CERO filas — nadie había respondido
+      // nunca a nadie —, así que el camino completo no se había recorrido.
+      //
+      // Las notas internas no se avisan: son para uno mismo.
+      // Va DESPUÉS de guardar y sin `await` que bloquee la pantalla: si el
+      // correo falla, la respuesta ya está escrita y el admin no debe quedarse
+      // esperando. El fallo se avisa, pero sin deshacer nada.
+      if (!internal) {
+        (async () => {
+          try {
+            const { data } = await supabase.auth.getSession();
+            const token = data?.session?.access_token || '';
+            const r = await fetch('/api/admin/aviso-respuesta', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ ticketId: ticket.id }),
+            });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok) toast.error(t('admin.soporte.noticeFailed'));
+            else if (d.enviado === false) toast(t('admin.soporte.noticeSkipped', { reason: d.motivo || '' }));
+            else toast.success(t('admin.soporte.noticeSent'));
+          } catch {
+            toast.error(t('admin.soporte.noticeFailed'));
+          }
+        })();
+      }
+
       setReply(''); setInternal(false);
       qc.invalidateQueries({ queryKey: ['admin:ticket:messages', ticket.id] });
       refresh();
@@ -210,7 +249,7 @@ function TicketDetail({ ticket, onClose, refresh }) {
           return (
             <div key={m.id} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${isAdmin ? 'text-white' : 'bg-soft text-ink'}`} style={isAdmin ? { background: NAVY } : null}>
-                <p className="whitespace-pre-wrap leading-relaxed">{m.body}</p>
+                <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                 <p className={`text-[10px] mt-1 ${isAdmin ? 'text-white/70' : 'text-c-muted'}`}>{formatDate(m.created_date)}</p>
               </div>
             </div>
@@ -222,7 +261,7 @@ function TicketDetail({ ticket, onClose, refresh }) {
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-warning my-3">{t('admin.soporte.internalNotesTitle')}</p>
             {internalNotes.map((m) => (
               <div key={m.id} className="my-2 rounded-xl border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
-                <p className="whitespace-pre-wrap">{m.body}</p>
+                <p className="whitespace-pre-wrap">{m.content}</p>
                 <p className="text-[10px] mt-1 text-warning/70">{formatDate(m.created_date)}</p>
               </div>
             ))}

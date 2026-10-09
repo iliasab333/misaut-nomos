@@ -294,7 +294,10 @@
       "internalNotePlaceholder": "Internal note…",
       "replyPlaceholder": "Reply to the user…",
       "internalNote": "Internal note",
-      "selectTicket": "Select a ticket to see its details."
+      "selectTicket": "Select a ticket to see its details.",
+      "noticeSent": "Email notification sent.",
+      "noticeSkipped": "Reply saved, but no notification was sent: {{reason}}",
+      "noticeFailed": "Reply saved, but the email notification failed."
     },
     "emails": {
       "title": "📧 Email Center",

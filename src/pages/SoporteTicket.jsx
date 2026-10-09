@@ -72,7 +72,12 @@ export default function SoporteTicket() {
       await base44.entities.TicketMessage.create({
         ticket_id: id,
         sender_type: 'user',
-        body,
+        // `content`, NO `body`. La columna de `ticket_messages` se llama
+        // `content`; escribir `body` devolvía 400 de PostgREST, el `catch` lo
+        // convertía en un aviso y la fila no se guardaba nunca. Por eso la
+        // tabla tenía CERO filas: ni el admin ni el autónomo habían podido
+        // responder jamás a un ticket.
+        content: body,
         is_internal: false,
       });
       // Si el ticket estaba esperando al usuario, ya respondió → vuelve a "abierto"
@@ -153,7 +158,7 @@ export default function SoporteTicket() {
                       : { background: 'white', color: '#0f172a', border: '1px solid #E2E8F0' }}
                   >
                     {!isMe && <p className="text-[10px] font-semibold uppercase tracking-[0.06em] mb-1" style={{ color: NAVY }}>{t('supportChat.supportTeam')}</p>}
-                    <p className="whitespace-pre-wrap leading-relaxed">{m.body}</p>
+                    <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     <p className={`text-[10px] mt-1 ${isMe ? 'text-white/70' : 'text-c-muted'}`}>{formatDate(m.created_date)}</p>
                   </div>
                 </div>
