@@ -22,11 +22,16 @@ import { enviarCorreo, plantilla, seccion, escapar } from './_lib/correo.js';
 
 // Los tres canales que de verdad hay en una ficha, y cómo se llaman en el
 // correo. Es lista blanca, no traducción: lo que no esté aquí no se envía.
-const CANALES = {
-  telefono: { titulo: 'Contacto por teléfono', verbo: 'ha pulsado Llamar' },
-  whatsapp: { titulo: 'Contacto por WhatsApp', verbo: 'ha pulsado WhatsApp' },
-  formulario: { titulo: 'Contacto por el formulario', verbo: 'ha abierto el formulario de contacto' },
-};
+//
+// Y es un Map, no un objeto: `{}['__proto__']` o `{}['toString']` devuelven
+// algo, así que con un objeto literal la comprobación `if (!etiqueta)` dejaba
+// pasar `canal:'__proto__'` y salía un correo con el asunto «undefined ·
+// Luis adolfo pintor». Un Map sólo conoce las claves que se le han puesto.
+const CANALES = new Map([
+  ['telefono', { titulo: 'Contacto por teléfono', verbo: 'ha pulsado Llamar' }],
+  ['whatsapp', { titulo: 'Contacto por WhatsApp', verbo: 'ha pulsado WhatsApp' }],
+  ['formulario', { titulo: 'Contacto por el formulario', verbo: 'ha abierto el formulario de contacto' }],
+]);
 
 // Un móvil que no acaba de abrir el marcador manda el mismo clic dos o tres
 // veces. Esto no protege de nadie que quiera llenar el buzón a propósito —
@@ -34,6 +39,24 @@ const CANALES = {
 // duplicado del doble toque, que es el caso real.
 const RECIENTES = new Map();
 const VENTANA_MS = 90 * 1000;
+
+// El endpoint es público y está en el bundle: cualquiera puede llamarlo en
+// bucle con los 56 ids de las fichas y las tres etiquetas, y el dedupe de
+// arriba sólo frena la repetición exacta. Con 30 contactos en cinco meses,
+// 40 avisos en una hora ya es doscientas veces el tráfico real; pasado eso se
+// deja de enviar y se anota en los logs. Nada se pierde: la métrica la escribe
+// el navegador por su cuenta y el informe diario cuenta el contacto igual.
+const TECHO_POR_HORA = 40;
+let enviadosEnLaHora = 0;
+let horaEnCurso = 0;
+
+function pasaElTecho() {
+  const hora = Math.floor(Date.now() / 3600000);
+  if (hora !== horaEnCurso) { horaEnCurso = hora; enviadosEnLaHora = 0; }
+  if (enviadosEnLaHora >= TECHO_POR_HORA) return false;
+  enviadosEnLaHora += 1;
+  return true;
+}
 
 function repetido(clave) {
   const ahora = Date.now();
@@ -66,10 +89,12 @@ async function avisar(req, res) {
   // En Vercel `req.body` ya viene parseado; en local o con otro content-type
   // llega como texto.
   const cuerpo = typeof req.body === 'string' ? leerJSON(req.body) : (req.body || {});
-  const profileId = String(cuerpo.profileId || '');
-  const canal = String(cuerpo.canal || '');
+  // Texto o nada. Sin el `typeof`, `String(['6a00…'])` aplana el array y un
+  // id dentro de una lista colaba como si fuera una cadena.
+  const profileId = typeof cuerpo?.profileId === 'string' ? cuerpo.profileId : '';
+  const canal = typeof cuerpo?.canal === 'string' ? cuerpo.canal : '';
 
-  const etiqueta = CANALES[canal];
+  const etiqueta = CANALES.get(canal);
   // Un id con caracteres raros no es un id: se corta antes de preguntar a la
   // base, aunque `nombresDeFichas` ya lo codifique.
   if (!etiqueta || !/^[A-Za-z0-9_-]{6,64}$/.test(profileId)) {
@@ -92,9 +117,22 @@ async function avisar(req, res) {
       return res.status(200).json({ saltado: true, motivo: 'repetido' });
     }
 
-    const nombre = escapar(p.business_name || 'ficha sin nombre');
-    const oficio = p.categories?.[0] ? escapar(p.categories[0]) : 'sin oficio';
-    const ciudad = p.ciudad ? escapar(p.ciudad) : 'sin ciudad';
+    if (!pasaElTecho()) {
+      console.warn(`[aviso-contacto] techo de ${TECHO_POR_HORA} avisos/hora alcanzado`);
+      return res.status(200).json({ saltado: true, motivo: 'techo_horario' });
+    }
+
+    // 15 de los 56 nombres de la base llevan un espacio de sobra («Luís
+    // Reformas »), y en la línea de asunto eso se ve.
+    const rotulo = String(p.business_name || '').trim() || 'ficha sin nombre';
+    const nombre = escapar(rotulo);
+    // El oficio y la ciudad se pegan sólo si existen. Antes salía «Esdrújulo
+    // — Persianas y toldos en sin ciudad»: dos fichas de la base no tienen
+    // ciudad, y «en sin ciudad» no es castellano.
+    const descriptor = [
+      p.categories?.[0] ? escapar(p.categories[0]) : '',
+      p.ciudad ? `en ${escapar(p.ciudad)}` : '',
+    ].filter(Boolean).join(' ');
     // Hora de Madrid, no UTC: el que lee el correo vive en esa hora y en
     // verano la diferencia son dos horas, suficiente para que «a las 9:40»
     // parezca de madrugada.
@@ -107,18 +145,23 @@ async function avisar(req, res) {
       entradilla: `Alguien ${etiqueta.verbo} a las ${escapar(hora)}.`,
       bloques: [
         seccion('La ficha', [
-          `<a href="${urlFicha(p)}" style="color:#00255C;font-weight:600;">${nombre}</a> — ${oficio} en ${ciudad}`,
+          `<a href="${escapar(enlace(p))}" style="color:#00255C;font-weight:600;">${nombre}</a>`
+          + (descriptor ? ` — ${descriptor}` : ''),
         ]),
       ],
       pie: 'Aviso automático de MisAutónomos · <a href="https://misautonomos.es/admin" style="color:#8b93a7;">abrir el panel</a>',
     });
 
-    const envio = await enviarCorreo({ asunto: `${etiqueta.titulo} · ${p.business_name || 'ficha sin nombre'}`, html });
+    const envio = await enviarCorreo({ asunto: `${etiqueta.titulo} · ${rotulo}`, html });
     // Aquí NO se devuelve 502 aunque Resend falle, al contrario que en los
     // crons: el `fetch` del navegador es fire-and-forget y un error sólo
     // ensuciaría la consola del visitante. El fallo se ve en los logs.
-    if (envio.ok === false) {
-      console.error('[aviso-contacto] resend', envio);
+    if (envio.ok !== true) {
+      // `enviarCorreo` devuelve {saltado:true} si falta la clave o el
+      // destinatario, y {ok:false} si Resend ha dicho no. Ninguno de los dos
+      // es un envío, y esta respuesta sólo la leen los logs de Vercel: que
+      // diga ok:true cuando no ha salido nada es lo que luego cuesta una tarde.
+      console.error('[aviso-contacto] no enviado', envio);
       return res.status(200).json({ ok: false, envio });
     }
     return res.status(200).json({ ok: true, envio, canal });
@@ -129,3 +172,22 @@ async function avisar(req, res) {
 }
 
 function leerJSON(s) { try { return JSON.parse(s); } catch { return {}; } }
+
+/**
+ * El enlace de la ficha, sorteando los slugs sucios de la base.
+ *
+ * `urlFicha` usa `slug_publico` tal cual viene, y 11 de las 56 fichas lo
+ * tienen con tildes, comas o puntos («luís-reformas-», «um.instalaciones»)
+ * mientras la página publicada vive en la forma sin tildes. Medido contra
+ * producción: 14 de los 56 enlaces daban 404. Si el slug no es ya un slug
+ * limpio se descarta y `urlFicha` lo deriva del nombre, que es justo la forma
+ * que responde 200 — con eso bajan a 2, y esas dos son fichas que todavía no
+ * están en el prerender, no un enlace mal montado.
+ *
+ * Esto debería estar en `urlFicha` (api/_lib/datos.js), porque los tres
+ * resúmenes enlazan igual y arrastran el mismo 404.
+ */
+function enlace(p) {
+  const limpio = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(p?.slug_publico || '');
+  return urlFicha(limpio ? p : { ...p, slug_publico: null });
+}

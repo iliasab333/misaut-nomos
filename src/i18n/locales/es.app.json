@@ -65,31 +65,94 @@
   },
   "admin": {
     "dashboard": {
-      "seoTitle": "Métricas · Admin",
-      "title": "Métricas",
-      "subtitle": "Datos en directo de la plataforma.",
-      "rangeDays": "{{days}}d",
-      "noData": "Sin datos.",
-      "unassigned": "Sin asignar",
-      "stats": {
-        "users": "Usuarios",
-        "activeProfessionals": "Profesionales activos",
-        "subscribers": "Suscriptores",
-        "newUsers_one": "{{count}} nuevo {{days}}d",
-        "newUsers_other": "{{count}} nuevos {{days}}d",
-        "totalCount_one": "{{count}} total",
-        "totalCount_other": "{{count}} totales",
-        "lastDays": "últimos {{days}}d",
-        "profileViews": "Vistas de perfil",
-        "searchAppearances": "Apariciones en búsqueda",
-        "contactClicks": "Clics de contacto",
-        "messagesReceived": "Mensajes recibidos"
+      "seoTitle": "Panel · Admin",
+      "title": "Panel",
+      "subtitle": "Lo que hay que atender, cómo va el sitio y desde dónde se gestiona.",
+      "errorTitle": "No se han podido leer los datos",
+      "unavailable": "No se han podido leer estos datos: mejor nada que ceros con pinta de reales.",
+      "notAdmin": "Este panel es sólo para administradores.",
+      "goHome": "Volver al inicio",
+      "pending": {
+        "title": "Pendiente de atender",
+        "allClear": "Nada pendiente: ninguna verificación sin revisar, ningún ticket abierto y todas las fichas publicadas con foto y con alguna valoración.",
+        "verifications_one": "{{count}} verificación de identidad sin revisar",
+        "verifications_other": "{{count}} verificaciones de identidad sin revisar",
+        "verificationsAge_one": "La más antigua lleva {{count}} día esperando, y el producto promete 24-48 h.",
+        "verificationsAge_other": "La más antigua lleva {{count}} días esperando, y el producto promete 24-48 h.",
+        "tickets_one": "{{count}} ticket de soporte sin cerrar",
+        "tickets_other": "{{count}} tickets de soporte sin cerrar",
+        "ticketsHint": "Todo lo que no está resuelto ni cerrado.",
+        "noPhoto_one": "{{count}} ficha publicada sin foto",
+        "noPhoto_other": "{{count}} fichas publicadas sin foto",
+        "noPhotoHint": "Una ficha sin foto se abre mucho menos que una con foto.",
+        "noReviews_one": "{{count}} ficha publicada sin ninguna valoración",
+        "noReviews_other": "{{count}} fichas publicadas sin ninguna valoración",
+        "noReviewsHint": "Nadie elige a quien no tiene ni una valoración.",
+        "goUsers": "Ver en Usuarios y fichas",
+        "goSupport": "Ir a Soporte"
       },
-      "activity": "Actividad ({{days}}d)",
-      "breakdownTitle": "Reparto de profesionales activos",
-      "topCategories": "Top categorías",
-      "topProvinces": "Top provincias",
-      "topCities": "Top ciudades"
+      "pulse": {
+        "title": "Pulso del negocio",
+        "today": "Hoy",
+        "lastDays": "Últimos {{days}} días",
+        "views": "Visitas a fichas",
+        "contacts": "Contactos",
+        "newProfiles": "Fichas nuevas",
+        "vsYesterday": "frente a {{value}} ayer",
+        "vsPrevious": "frente a {{value}} los {{days}} días anteriores",
+        "caveat": "«Contactos» cuenta clics de contacto —formulario, WhatsApp y teléfono—, uno por ficha y visitante cada cinco minutos. No todos los canales han medido lo mismo desde el principio, así que compara con cuidado hacia atrás. El día se cierra en UTC, igual que lo escribe la base, y «Hoy» es un día a medias: a primera hora casi siempre va por debajo de ayer entero."
+      },
+      "week": {
+        "topTitle": "Las 5 fichas más vistas de la semana",
+        "topEmpty": "Esta semana no se ha abierto ninguna ficha.",
+        "viewsCount_one": "{{count}} visita",
+        "viewsCount_other": "{{count}} visitas",
+        "coldTitle": "Publicadas y sin una sola visita en 7 días",
+        "coldNote_one": "{{count}} ficha.",
+        "coldNote_other": "{{count}} fichas.",
+        "coldTruncated": "Se muestran las {{shown}} primeras.",
+        "coldEmpty": "Todas las fichas publicadas han recibido alguna visita."
+      },
+      "sections": {
+        "title": "Secciones del panel",
+        "users": {
+          "name": "Usuarios y fichas",
+          "desc": "Buscar, publicar o retirar una ficha y ver quién está verificado.",
+          "count": "{{users}} usuarios · {{profiles}} fichas"
+        },
+        "support": {
+          "name": "Soporte",
+          "desc": "Conversación con quien escribe, con su estado y su prioridad.",
+          "count_one": "{{count}} sin cerrar",
+          "count_other": "{{count}} sin cerrar"
+        },
+        "tickets": {
+          "name": "Tickets",
+          "desc": "La misma cola en forma de lista, para asignar y anotar.",
+          "count_one": "{{count}} sin cerrar",
+          "count_other": "{{count}} sin cerrar"
+        },
+        "blog": {
+          "name": "Blog",
+          "desc": "Escribir, publicar y retirar artículos.",
+          "count_one": "{{count}} publicado",
+          "count_other": "{{count}} publicados"
+        },
+        "newsletter": {
+          "name": "Boletín",
+          "desc": "Suscriptores y envío del boletín.",
+          "count_one": "{{count}} suscriptor confirmado",
+          "count_other": "{{count}} suscriptores confirmados"
+        },
+        "emails": {
+          "name": "Correos",
+          "desc": "Las plantillas de los correos que manda el sitio."
+        },
+        "outreach": {
+          "name": "Captación por WhatsApp",
+          "desc": "Mensajes a autónomos que todavía no están en el directorio."
+        }
+      }
     },
     "soporte": {
       "seoTitle": "Soporte · Admin",

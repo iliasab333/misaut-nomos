@@ -41,6 +41,47 @@ import { slugify } from '@/lib/slugify';
 import ProfileBreadcrumb from "../components/profile/ProfileBreadcrumb";
 import GuestContactModal from "@/components/GuestContactModal";
 
+// Un contacto se registra en dos sitios, y por dos motivos distintos: la
+// métrica alimenta los contadores del panel y los resúmenes por correo; el
+// aviso llega al buzón del admin en el momento, que es cuando todavía se
+// puede hacer algo.
+//
+// Hasta hoy sólo se registraba el formulario, así que los 30 contactos que
+// hay medidos en cinco meses son 30 formularios abiertos y nada más: el botón
+// de WhatsApp (en 53 de las 56 fichas, contadas hoy) y el de Llamar (43) no
+// escribían en ningún contador. La única cifra que gobierna este negocio
+// venía midiendo un canal e ignorando los dos más usados.
+//
+// Nada de esto se espera con `await` ni bloquea nada: se llama DESPUÉS de
+// abrir el marcador o el WhatsApp. Un aviso que retrasa una llamada es peor
+// que no tener aviso.
+function registrarContacto(profileId, canal) {
+  if (!profileId) return;
+
+  // trackMetric deduplica por (ficha + tipo) durante 5 minutos, así que un
+  // visitante que pruebe WhatsApp y luego el teléfono cuenta como un contacto.
+  // Es lo que queremos en el contador: contactos, no clics.
+  import('@/lib/trackMetric')
+    .then(({ trackMetric }) => trackMetric(profileId, 'contact_click'))
+    .catch(() => null);
+
+  try {
+    fetch('/api/aviso-contacto', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // Sólo el id y el canal. El nombre, el oficio y la ciudad los lee el
+      // servidor de la base: lo que mande el navegador no acaba en el correo.
+      body: JSON.stringify({ profileId, canal }),
+      // keepalive: el clic de teléfono navega a `tel:` y el de WhatsApp abre
+      // otra pestaña. Sin esto el navegador cancela la petición a medias.
+      keepalive: true,
+    }).catch(() => null);
+  } catch (err) {
+    // El visitante no puede enterarse de que el aviso ha fallado.
+    console.warn('aviso-contacto no enviado:', err);
+  }
+}
+
 // Limpiar slug antiguo que puede tener IDs hex al final (ej: -5e8405).
 function cleanOldSlug(slug) {
   if (!slug) return '';
@@ -297,12 +338,8 @@ export default function AutonomoPage() {
   // ProfessionalProfile.jsx: el chat interno se retiró y este botón pasa a
   // abrir el formulario que ya usaban los visitantes sin cuenta.
   const handleStartChat = () => {
-    if (profile?.id) {
-      import('@/lib/trackMetric').then(({ trackMetric }) => {
-        trackMetric(profile.id, 'contact_click');
-      });
-    }
     setGuestModal(true);
+    registrarContacto(profile?.id, 'formulario');
   };
 
   const formatPhoneForWhatsApp = (phone) => {
@@ -323,6 +360,8 @@ export default function AutonomoPage() {
     } else {
       setShowPhoneModal(true);
     }
+    // Primero el marcador, luego el registro.
+    registrarContacto(profile?.id, 'telefono');
   };
 
   const handleWhatsAppClick = () => {
@@ -332,6 +371,8 @@ export default function AutonomoPage() {
     } else {
       setShowWhatsAppModal(true);
     }
+    // Primero el WhatsApp, luego el registro.
+    registrarContacto(profile?.id, 'whatsapp');
   };
 
   const copyToClipboard = (text) => {

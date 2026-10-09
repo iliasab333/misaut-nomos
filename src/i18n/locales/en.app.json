@@ -65,31 +65,94 @@
   },
   "admin": {
     "dashboard": {
-      "seoTitle": "Metrics · Admin",
-      "title": "Metrics",
-      "subtitle": "Live platform data.",
-      "rangeDays": "{{days}}d",
-      "noData": "No data.",
-      "unassigned": "Unassigned",
-      "stats": {
-        "users": "Users",
-        "activeProfessionals": "Active professionals",
-        "subscribers": "Subscribers",
-        "newUsers_one": "{{count}} new {{days}}d",
-        "newUsers_other": "{{count}} new {{days}}d",
-        "totalCount_one": "{{count}} total",
-        "totalCount_other": "{{count}} total",
-        "lastDays": "last {{days}}d",
-        "profileViews": "Profile views",
-        "searchAppearances": "Search appearances",
-        "contactClicks": "Contact clicks",
-        "messagesReceived": "Messages received"
+      "seoTitle": "Dashboard · Admin",
+      "title": "Dashboard",
+      "subtitle": "What needs attention, how the site is doing, and where each thing is managed.",
+      "errorTitle": "Could not load the data",
+      "unavailable": "These data could not be read: better nothing than zeros that look real.",
+      "notAdmin": "This dashboard is for administrators only.",
+      "goHome": "Back to home",
+      "pending": {
+        "title": "Needs attention",
+        "allClear": "Nothing pending: no identity checks waiting, no open tickets, and every published listing has a photo and at least one review.",
+        "verifications_one": "{{count}} identity check not reviewed",
+        "verifications_other": "{{count}} identity checks not reviewed",
+        "verificationsAge_one": "The oldest has been waiting {{count}} day, and the product promises 24-48 h.",
+        "verificationsAge_other": "The oldest has been waiting {{count}} days, and the product promises 24-48 h.",
+        "tickets_one": "{{count}} support ticket still open",
+        "tickets_other": "{{count}} support tickets still open",
+        "ticketsHint": "Everything not resolved or closed.",
+        "noPhoto_one": "{{count}} published listing with no photo",
+        "noPhoto_other": "{{count}} published listings with no photo",
+        "noPhotoHint": "A listing without a photo gets opened far less often.",
+        "noReviews_one": "{{count}} published listing with no reviews",
+        "noReviews_other": "{{count}} published listings with no reviews",
+        "noReviewsHint": "Nobody picks a professional with not a single review.",
+        "goUsers": "See in Users and listings",
+        "goSupport": "Go to Support"
       },
-      "activity": "Activity ({{days}}d)",
-      "breakdownTitle": "Breakdown of active professionals",
-      "topCategories": "Top categories",
-      "topProvinces": "Top provinces",
-      "topCities": "Top cities"
+      "pulse": {
+        "title": "Business pulse",
+        "today": "Today",
+        "lastDays": "Last {{days}} days",
+        "views": "Listing views",
+        "contacts": "Contacts",
+        "newProfiles": "New listings",
+        "vsYesterday": "vs {{value}} yesterday",
+        "vsPrevious": "vs {{value}} the previous {{days}} days",
+        "caveat": "\"Contacts\" counts contact clicks — form, WhatsApp and phone — once per listing and visitor every five minutes. Not every channel has been measured since the start, so compare backwards with care. The day closes in UTC, the same way the database writes it, and \"Today\" is a day still in progress: early on it is almost always below a full yesterday."
+      },
+      "week": {
+        "topTitle": "Top 5 listings of the week",
+        "topEmpty": "No listing was opened this week.",
+        "viewsCount_one": "{{count}} view",
+        "viewsCount_other": "{{count}} views",
+        "coldTitle": "Published with not a single view in 7 days",
+        "coldNote_one": "{{count}} listing.",
+        "coldNote_other": "{{count}} listings.",
+        "coldTruncated": "Showing the first {{shown}}.",
+        "coldEmpty": "Every published listing got at least one view."
+      },
+      "sections": {
+        "title": "Admin sections",
+        "users": {
+          "name": "Users and listings",
+          "desc": "Search, publish or unpublish a listing and see who is verified.",
+          "count": "{{users}} users · {{profiles}} listings"
+        },
+        "support": {
+          "name": "Support",
+          "desc": "The conversation with whoever wrote in, with status and priority.",
+          "count_one": "{{count}} still open",
+          "count_other": "{{count}} still open"
+        },
+        "tickets": {
+          "name": "Tickets",
+          "desc": "The same queue as a list, to assign and annotate.",
+          "count_one": "{{count}} still open",
+          "count_other": "{{count}} still open"
+        },
+        "blog": {
+          "name": "Blog",
+          "desc": "Write, publish and unpublish articles.",
+          "count_one": "{{count}} published",
+          "count_other": "{{count}} published"
+        },
+        "newsletter": {
+          "name": "Newsletter",
+          "desc": "Subscribers and newsletter sending.",
+          "count_one": "{{count}} confirmed subscriber",
+          "count_other": "{{count}} confirmed subscribers"
+        },
+        "emails": {
+          "name": "Emails",
+          "desc": "The templates for the emails the site sends."
+        },
+        "outreach": {
+          "name": "WhatsApp outreach",
+          "desc": "Messages to freelancers who are not in the directory yet."
+        }
+      }
     },
     "soporte": {
       "seoTitle": "Support · Admin",

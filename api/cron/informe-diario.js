@@ -34,7 +34,14 @@ export default async function handler(req, res) {
       filas(`tickets?select=id,title,creator_name,status,created_date&created_date=gte.${ayer}&order=created_date.desc`),
       cuenta('newsletter_subscribers', `created_date=gte.${ayer}&created_date=lt.${dia(0)}`),
       filas('identity_verifications?select=id,created_date,document_type&status=eq.pending&order=created_date.asc'),
-      cuenta('tickets', 'status=eq.open'),
+      // Por lo que NO está cerrado, no por `status=eq.open`. Esta base guarda
+      // los estados en castellano («abierto») — lo escribe `AdminTickets` —
+      // mientras que `AdminSoporte` escribe «open». Dos vocabularios conviven
+      // en la misma columna, así que preguntar por uno de los dos da siempre
+      // cero: con `eq.open` este aviso no se habría disparado nunca, teniendo
+      // 4 tickets abiertos. Preguntando por lo cerrado aguanta además un
+      // estado nuevo que a nadie se le ocurra añadir mañana.
+      cuenta('tickets', 'status=not.in.(cerrado,closed,resuelto,resolved)'),
       metricas(ayer),
       metricas(anteayer),
     ]);

@@ -222,6 +222,18 @@
     {
       "source": "/NewsletterUnsubscribe",
       "destination": "/index.html"
+    },
+    {
+      "source": "/autonomo/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/categoria/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/blog/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -295,6 +307,24 @@
           "value": "public, max-age=0, must-revalidate"
         }
       ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/informe-diario",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/digest-contactos",
+      "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/resumen-semanal",
+      "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/api/cron/resumen-mensual",
+      "schedule": "0 7 1 * *"
     }
   ]
 }

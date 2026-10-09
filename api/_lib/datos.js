@@ -79,11 +79,20 @@ export async function nombresDeFichas(ids) {
   return new Map(f.map((p) => [p.id, p]));
 }
 
-/** El enlace público de una ficha, en la forma que de verdad responde 200. */
+/** El enlace público de una ficha, en su forma CANÓNICA.
+ *
+ *  `slug_publico` no se usa tal cual: 19 de las 56 fichas lo tienen acabado en
+ *  guion («oleksandr-») y alguna lleva guiones dobles
+ *  («alberto---carpintero-evanista»). Esas direcciones responden 301 hacia la
+ *  limpia —las recogen las redirecciones de `vercel.json`— y acaban en 200,
+ *  así que no se rompe nada; pero mandar en un correo un enlace que rebota es
+ *  gastar un salto y publicar una dirección que no es la buena. Se pasa el
+ *  slug guardado por la misma limpieza que el nombre.
+ */
 export function urlFicha(p) {
-  const limpia = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+  const limpia = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  const nombre = p?.slug_publico || limpia(p?.business_name);
+  const nombre = limpia(p?.slug_publico) || limpia(p?.business_name);
   if (!nombre) return 'https://misautonomos.es/buscar';
   const cat = p?.categories?.[0], ciudad = p?.ciudad;
   return cat && ciudad

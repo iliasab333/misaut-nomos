@@ -26,6 +26,18 @@ import { hayBase, filas, nombresDeFichas, urlFicha } from '../_lib/datos.js';
 import { enviarCorreo, plantilla, cifras, seccion, escapar, plural } from '../_lib/correo.js';
 
 /**
+ * ¿Es `AAAA-MM-DD` de un día que de verdad existe? El regex solo no basta:
+ * `2026-02-30` lo pasa y luego PostgREST devuelve un 400 que acaba en un 500
+ * con la consulta cruda dentro. Vale más decirle al que teclea el parámetro
+ * que ese día no existe.
+ */
+function diaValido(s) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const d = new Date(`${s}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+}
+
+/**
  * Suma de `profile_metrics` sobre un rango de días, quedándose sólo con las
  * filas que traen algún contacto. Se consulta a mano en vez de con
  * `metricas()` porque ese ayudante filtra por `date >= x` y aquí hace falta un
@@ -57,12 +69,20 @@ export default async function handler(req, res) {
 
   try {
     // `?dia=AAAA-MM-DD` sirve para rehacer a mano el correo de un día cuyo cron
-    // falló. Se valida con regex: va directo a la consulta.
+    // falló. Se valida antes de tocar la base: va directo a la consulta.
     const pedido = String(req.query?.dia || '');
-    const hoy = /^\d{4}-\d{2}-\d{2}$/.test(pedido)
-      ? pedido
-      : new Date().toISOString().slice(0, 10);
+    if (pedido && !diaValido(pedido)) {
+      return res.status(400).json({ error: 'dia no válido: se espera AAAA-MM-DD de un día que exista' });
+    }
+    const diaDeHoy = new Date().toISOString().slice(0, 10);
+    const hoy = pedido || diaDeHoy;
     const primeroDeMes = `${hoy.slice(0, 7)}-01`;
+
+    // Con `?dia=` de un día pasado, decir «hoy» por todo el correo es mentir
+    // justo en el caso para el que existe el parámetro. La fecha ya va en el
+    // encabezado, así que basta con una palabra que valga en los dos modos.
+    const esHoy = hoy === diaDeHoy;
+    const cuando = esHoy ? 'hoy' : 'ese día';
 
     const [dia, mes] = await Promise.all([
       contactosEntre(hoy, hoy),
@@ -81,15 +101,27 @@ export default async function handler(req, res) {
 
     const lineas = ordenadas.map(([id, v]) => {
       const p = nombres.get(id);
+      const nombre = (p?.business_name || '').trim();
       const quien = p
-        ? `<a href="${urlFicha(p)}" style="color:#00255C;font-weight:600;">${escapar(p.business_name || 'sin nombre')}</a>`
+        ? `<a href="${urlFicha(p)}" style="color:#00255C;font-weight:600;">${escapar(nombre || 'sin nombre')}</a>`
         : '<span style="color:#9aa1ae;">ficha retirada</span>';
-      const oficio = p?.categories?.[0] ? escapar(p.categories[0]) : 'sin oficio';
-      const ciudad = p?.ciudad ? escapar(p.ciudad) : 'sin ciudad';
-      return `${quien} — ${oficio} en ${ciudad}<br>`
+
+      // Las señas se montan con lo que haya, no con relleno: dos fichas de la
+      // base tienen la ciudad vacía y el «— sin oficio en sin ciudad» que
+      // salía de ahí se lee como una plantilla a medio hacer.
+      const oficio = (p?.categories?.[0] || '').trim();
+      const ciudad = (p?.ciudad || '').trim();
+      const senas = oficio && ciudad
+        ? `${escapar(oficio)} en ${escapar(ciudad)}`
+        : escapar(oficio || ciudad);
+
+      // Un «0 visitas» al lado de un contacto se lee como un error del
+      // contador. Si no hay visitas que contar, no se menciona.
+      const visitas = v.visitas ? ` · ${plural(v.visitas, 'visita')} a la ficha` : '';
+      return `${quien}${senas ? ` — ${senas}` : ''}<br>`
         + `<span style="color:#6b7280;font-size:13px;">`
         + `<strong style="color:#1FAD4F;">${plural(v.contactos, 'contacto')}</strong>`
-        + ` · ${plural(v.visitas, 'visita')} a la ficha hoy</span>`;
+        + `${visitas}</span>`;
     });
 
     const visitasDeEsas = ordenadas.reduce((s, [, v]) => s + v.visitas, 0);
@@ -97,25 +129,35 @@ export default async function handler(req, res) {
       .toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 
     const fichasDelMes = [...mes.porFicha.keys()].length;
+
+    // El día 1 el acumulado del mes ES el día, y repetir la misma cifra dos
+    // líneas más abajo resta credibilidad al resto del correo.
+    const mesAporta = mes.total !== dia.total || fichasDelMes !== ordenadas.length;
+    const lineaMes = mesAporta
+      ? `En lo que va de mes: ${plural(mes.total, 'contacto')} en `
+        + `${plural(fichasDelMes, 'ficha distinta', 'fichas distintas')}.<br>`
+      : '';
+
     const html = plantilla({
       titulo: `MisAutónomos · contactos del ${fecha}`,
       entradilla: `${plural(dia.total, 'contacto')} en ${plural(ordenadas.length, 'ficha')}.`,
       bloques: [
         cifras([
-          { etiqueta: 'contactos hoy', valor: dia.total },
+          { etiqueta: `contactos ${cuando}`, valor: dia.total },
           { etiqueta: 'fichas con contacto', valor: ordenadas.length },
           { etiqueta: 'visitas a esas fichas', valor: visitasDeEsas },
         ]),
-        seccion('Quién ha recibido contactos hoy', lineas),
+        seccion(`Quién ha recibido contactos ${cuando}`, lineas),
       ],
-      pie: `En lo que va de mes: ${plural(mes.total, 'contacto')} en `
-        + `${plural(fichasDelMes, 'ficha distinta', 'fichas distintas')}.`
-        + '<br>El contador sólo registra quien abre el formulario: las llamadas y los WhatsApp no se cuentan.'
+      pie: lineaMes
+        + 'El contador sólo registra quien abre el formulario: las llamadas y los WhatsApp no se cuentan.'
         + '<br>Panel de MisAutónomos · <a href="https://misautonomos.es/admin" style="color:#8b93a7;">abrir el panel</a>',
     });
 
     const envio = await enviarCorreo({
-      asunto: `MisAutónomos · ${plural(dia.total, 'contacto')} hoy, ${fecha}`,
+      asunto: esHoy
+        ? `MisAutónomos · ${plural(dia.total, 'contacto')} hoy, ${fecha}`
+        : `MisAutónomos · ${plural(dia.total, 'contacto')} el ${fecha}`,
       html,
     });
     if (envio.ok === false) return res.status(502).json({ error: 'resend', detalle: envio });
