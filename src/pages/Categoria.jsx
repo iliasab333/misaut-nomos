@@ -7,6 +7,7 @@ import { toast } from "@/lib/toast";
 import SEOHead from "../components/seo/SEOHead";
 import { useTranslation } from "react-i18next";
 import { slugify, getProfileSeoUrl } from "@/lib/seoUrl";
+import { ordenarFichas } from "@/lib/ordenFichas";
 
 const CIUDADES_PRINCIPALES = [
   "Madrid", "Barcelona", "Valencia", "Sevilla", "Málaga", "Zaragoza", "Bilbao",
@@ -140,7 +141,7 @@ export default function CategoriaPage() {
     queryFn: async () => {
       const allProfiles = await base44.entities.ProfessionalProfile.list();
 
-      return allProfiles.filter(p => {
+      const lista = allProfiles.filter(p => {
         // Solo perfiles activos y visibles
         if (!p.visible_en_busqueda || !p.onboarding_completed) return false;
         if (p.estado_perfil && p.estado_perfil !== 'activo') return false;
@@ -168,12 +169,11 @@ export default function CategoriaPage() {
         }
 
         return true;
-      }).sort((a, b) => {
-        // Ads+ primero, luego por rating
-        if (a.is_ads_plus && !b.is_ads_plus) return -1;
-        if (!a.is_ads_plus && b.is_ads_plus) return 1;
-        return (b.average_rating || 0) - (a.average_rating || 0);
       });
+      // Mismo orden que el buscador: aleatorio para todas. Esta página ponía
+      // delante a las destacadas y después ordenaba por nota, así que el mismo
+      // autónomo salía en un sitio distinto según por dónde se llegara.
+      return ordenarFichas(lista);
     },
     // Ejecutar siempre que tengamos categorySlug, incluso antes de resolver categoryName
     // (la query se refinará cuando categoryName esté disponible por el re-render)

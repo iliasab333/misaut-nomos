@@ -21,6 +21,7 @@
 // existe en khdemlidaba y los tres vivían sólo aquí.
 
 import React, { useState, useEffect, useMemo } from "react";
+import { ordenarFichas } from '@/lib/ordenFichas';
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, Link } from "react-router-dom";
@@ -131,18 +132,11 @@ export default function SearchPage() {
     staleTime: 1000 * 60 * 10, gcTime: 1000 * 60 * 30, refetchOnWindowFocus: false,
   });
 
-  // Orden: Ads+ primero (por nota), el resto en orden aleatorio estable.
-  const shuffledProfiles = useMemo(() => {
-    if (!profiles.length) return profiles;
-    const ads = profiles.filter(p => p.is_ads_plus);
-    const rest = profiles.filter(p => !p.is_ads_plus);
-    ads.sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0) || new Date(b.created_date) - new Date(a.created_date));
-    for (let i = rest.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [rest[i], rest[j]] = [rest[j], rest[i]];
-    }
-    return [...ads, ...rest];
-  }, [profiles]);
+  // Orden aleatorio para TODAS: ni destacados delante, ni prioridad por nota.
+  // La lógica está en `@/lib/ordenFichas` porque `Categoria.jsx` enseña el
+  // mismo catálogo y tenía otro orden distinto; con una pieza compartida no
+  // pueden volver a separarse.
+  const shuffledProfiles = useMemo(() => ordenarFichas(profiles), [profiles]);
 
   const filteredProfiles = useMemo(() => shuffledProfiles.filter((profile) => {
     const matchesCategory = filters.category === "all" || profile.categories?.includes(filters.category);

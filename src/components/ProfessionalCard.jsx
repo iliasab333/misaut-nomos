@@ -160,16 +160,13 @@ const ProfessionalCard = React.memo(function ProfessionalCard({ profile, href, o
                 </>
               )}
             </div>
-            {profile.is_ads_plus && (
-              <span
-                className="inline-flex items-center gap-1 rounded-full font-bold text-white flex-shrink-0 ms-auto"
-                style={{ background: '#7B5400', padding: '1px 7px', fontSize: 11, letterSpacing: '0.03em', lineHeight: 1.4 }}
-                title={t('search.card.featuredTitle')}
-              >
-                <IconStar size={10} />
-                {t('search.card.featured')}
-              </span>
-            )}
+            {/* Fuera el sello de «destacado». Anunciaba una posición
+                privilegiada en el listado que ya no existe —ahora todas salen
+                en orden aleatorio— y por la que además nadie paga desde el
+                17/04. Un distintivo que no corresponde a nada es una señal
+                falsa para quien compara, y las 5 fichas que lo llevaban no
+                habían hecho nada para merecerlo. El interruptor sigue en
+                /admin/usuarios por si vuelve a haber un plan de pago. */}
           </div>
         </Link>
 

@@ -617,15 +617,8 @@ export default function AutonomoPage() {
                         {t('proProfile.badges.identityVerified')}
                       </span>
                     )}
-                    {profile.is_ads_plus && (
-                      <span
-                        className="inline-flex items-center gap-1 rounded-full font-bold text-white"
-                        style={{ background: '#7B5400', padding: '2px 9px', fontSize: 11.5, letterSpacing: '0.03em' }}
-                      >
-                        <IconStarOutline className="w-3 h-3 fill-current" />
-                        {t('search.card.featured')}
-                      </span>
-                    )}
+                    {/* El sello de «destacado» sale también de la ficha:
+                        ya no hay posición privilegiada que anunciar. */}
                   </div>
                 </div>
               </div>
