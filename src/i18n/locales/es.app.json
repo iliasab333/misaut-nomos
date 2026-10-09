@@ -89,7 +89,8 @@
         "noReviews_other": "{{count}} fichas publicadas sin ninguna valoración",
         "noReviewsHint": "Nadie elige a quien no tiene ni una valoración.",
         "goUsers": "Ver en Usuarios y fichas",
-        "goSupport": "Ir a Soporte"
+        "goSupport": "Ir a Soporte",
+        "goVerify": "Revisar los documentos"
       },
       "pulse": {
         "title": "Pulso del negocio",
@@ -151,7 +152,109 @@
         "outreach": {
           "name": "Captación por WhatsApp",
           "desc": "Mensajes a autónomos que todavía no están en el directorio."
+        },
+        "verify": {
+          "name": "Verificar identidad",
+          "desc": "Los documentos que la gente ha subido, uno por uno, para aprobar o rechazar.",
+          "count_one": "{{count}} sin revisar",
+          "count_other": "{{count}} sin revisar"
         }
+      }
+    },
+    "verify": {
+      "seoTitle": "Verificar identidad · Admin",
+      "title": "Verificar identidad",
+      "subtitle": "Una por una, empezando por la que más lleva esperando.",
+      "privacy": "Son documentos de identidad de personas reales. No los descargues ni los compartas: se abren con un enlace firmado que caduca a los dos minutos.",
+      "notAdmin": "Esta pantalla es sólo para administradores.",
+      "goHome": "Volver al inicio",
+      "backToPanel": "Volver al panel",
+      "saving": "Guardando…",
+      "actionsHint": "Aprobar da el distintivo público de identidad comprobada. Rechazar pide un motivo, y ese motivo lo lee la persona.",
+      "waiting_one": "Lleva {{count}} día esperando",
+      "waiting_other": "Lleva {{count}} días esperando",
+      "promise": "Se le prometieron 24-48 h.",
+      "queue": {
+        "position": "Verificación {{n}} de {{total}}",
+        "order": "Primero la que más lleva esperando.",
+        "prev": "Anterior",
+        "next": "Siguiente"
+      },
+      "empty": {
+        "title": "No hay nada que revisar",
+        "body": "Ninguna verificación pendiente. Cuando alguien suba su documento, aparecerá aquí."
+      },
+      "fields": {
+        "email": "Correo",
+        "profile": "Ficha",
+        "noProfile": "No tiene ficha de autónomo",
+        "submitted": "Enviado el",
+        "noName": "Sin nombre declarado",
+        "waitingUnknown": "Sin fecha de envío",
+        "alreadyBadged": "Ojo: la ficha ya tiene el distintivo de verificada aunque la verificación siga pendiente. Viene de una aprobación anterior que se quedó a medias."
+      },
+      "docTypes": {
+        "dni": "DNI",
+        "nie": "NIE",
+        "passport": "Pasaporte",
+        "unknown": "Documento sin especificar"
+      },
+      "docs": {
+        "front": "Anverso",
+        "back": "Reverso",
+        "selfie": "Selfie con el documento",
+        "zoom": "Ampliar",
+        "unreadable": "No se ha podido abrir este documento. Recarga las imágenes; si sigue sin salir es cosa del almacén y no de la persona, porque sin él no habría podido enviar la solicitud.",
+        "backNotNeeded": "El pasaporte no tiene reverso: no falta nada.",
+        "failed": "La imagen no ha cargado. Prueba a recargarlas."
+      },
+      "viewer": {
+        "fit": "Ajustar a la pantalla",
+        "full": "Ampliar más",
+        "panHint": "Desplázate por la imagen para leer el documento."
+      },
+      "expiry": {
+        "left": "Las imágenes caducan en {{s}} s",
+        "expiredTitle": "Los enlaces de las imágenes han caducado",
+        "expiredShort": "Enlace caducado",
+        "expiredBody": "Duran dos minutos por seguridad. Recárgalas y sigues en la misma verificación.",
+        "reload": "Recargar imágenes",
+        "reloading": "Recargando…"
+      },
+      "approve": {
+        "cta": "Aprobar",
+        "confirmTitle": "¿Aprobar la verificación?",
+        "confirmBody": "Esto marca la ficha de {{name}} como identidad comprobada y le pone el distintivo que ven los clientes. Deshacerlo es a mano.",
+        "confirmCta": "Sí, aprobar",
+        "noProfileWarning": "Esta persona no tiene ficha de autónomo, así que el distintivo no se verá en ninguna parte hasta que la cree.",
+        "done": "Verificación aprobada."
+      },
+      "reject": {
+        "cta": "Rechazar",
+        "title": "Rechazar la verificación",
+        "notice": "El motivo se le enseña a la persona en su panel, así que escríbelo para que sepa qué tiene que volver a subir.",
+        "shortcutsLabel": "Motivos frecuentes",
+        "shortcuts": {
+          "blurry": "La foto está borrosa y no se puede leer.",
+          "expired": "El documento está caducado.",
+          "selfie": "El selfie no coincide con el documento.",
+          "back": "Falta el reverso del documento."
+        },
+        "motiveLabel": "Motivo",
+        "motivePlaceholder": "Qué falla y qué tiene que volver a subir.",
+        "motiveRequired": "Escribe el motivo: sin él la persona no sabe qué corregir.",
+        "confirmCta": "Rechazar",
+        "done": "Verificación rechazada."
+      },
+      "errors": {
+        "noSession": "Tu sesión ha caducado. Vuelve a entrar.",
+        "list": "No se ha podido leer la cola de verificaciones.",
+        "decision": "No se ha podido guardar la decisión.",
+        "server": "El servidor ha respondido {{status}}.",
+        "notAllowed": "Tu cuenta no tiene permiso para ver esto.",
+        "notConfigured": "El servidor no tiene la configuración necesaria para leer los documentos. Avisa a quien lleve el despliegue.",
+        "unavailable": "No se ha podido comprobar la sesión ahora mismo. Inténtalo en un momento.",
+        "notFound": "Esa verificación ya no está en la cola: puede que se haya revisado desde otro sitio."
       }
     },
     "soporte": {

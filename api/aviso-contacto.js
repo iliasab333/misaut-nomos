@@ -162,12 +162,16 @@ async function avisar(req, res) {
       // es un envío, y esta respuesta sólo la leen los logs de Vercel: que
       // diga ok:true cuando no ha salido nada es lo que luego cuesta una tarde.
       console.error('[aviso-contacto] no enviado', envio);
-      return res.status(200).json({ ok: false, envio });
+      // El motivo va al log y NO al cuerpo de la respuesta. El endpoint lo
+      // llama el navegador de cualquier visitante, y el error de Resend repite
+      // a menudo el campo `to`, que es la dirección del dueño; el identificador
+      // del envío tampoco es cosa de quien pulsó un botón.
+      return res.status(200).json({ ok: false });
     }
-    return res.status(200).json({ ok: true, envio, canal });
+    return res.status(200).json({ ok: true, canal });
   } catch (e) {
     console.error('[aviso-contacto]', e);
-    return res.status(200).json({ ok: false, error: e?.message || String(e) });
+    return res.status(200).json({ ok: false });
   }
 }
 

@@ -378,10 +378,12 @@ export default function AdminDashboardPage() {
         detalle: Number.isFinite(dias) && dias >= 1
           ? t('admin.dashboard.pending.verificationsAge', { count: dias })
           : null,
-        // No hay pantalla propia de revisión de identidad: lo más cerca que se
-        // puede llegar es el listado de fichas con su columna «Verificado».
-        enlace: '/admin/usuarios',
-        etiquetaEnlace: t('admin.dashboard.pending.goUsers'),
+        // Ya hay pantalla propia de revisión de identidad. Antes esto
+        // enlazaba a /admin/usuarios —el listado de fichas con su columna
+        // «Verificado»—, que era lo más cerca que se podía llegar: enseñaba
+        // que faltaba revisar sin dejar ver ni un documento.
+        enlace: '/admin/verificar',
+        etiquetaEnlace: t('admin.dashboard.pending.goVerify'),
       });
     }
     if (pendientes.ticketsAbiertos) {
@@ -426,6 +428,14 @@ export default function AdminDashboardPage() {
   }, [pendientes, fichas, t]);
 
   const secciones = [
+    {
+      clave: 'verificar', icon: IconShield, enlace: '/admin/verificar',
+      nombre: t('admin.dashboard.sections.verify.name'),
+      descripcion: t('admin.dashboard.sections.verify.desc'),
+      contador: pendientes
+        ? t('admin.dashboard.sections.verify.count', { count: pendientes.verificaciones.length })
+        : null,
+    },
     {
       clave: 'usuarios', icon: IconUsers, enlace: '/admin/usuarios',
       nombre: t('admin.dashboard.sections.users.name'),

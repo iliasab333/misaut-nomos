@@ -1,5 +1,5 @@
 // ╔══════════════════════════════════════════════════════════════════════════╗
-// ║  RESUMEN MENSUAL — el día 1 a las 07:00                                 ║
+// ║  RESUMEN MENSUAL — el día 1 a las 07:00 UTC (09:00 en España ahora)     ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 //
 // El mes natural ANTERIOR completo, comparado con el mes anterior a ése. No
@@ -21,7 +21,7 @@
 
 import { esCronLegitimo } from '../_lib/guardia.js';
 import { hayBase, cuenta, filas, nombresDeFichas, urlFicha } from '../_lib/datos.js';
-import { enviarCorreo, plantilla, cifras, seccion, alerta, escapar, plural } from '../_lib/correo.js';
+import { enviarCorreo, plantilla, cifras, seccion, alerta, escapar, plural, sinRastro } from '../_lib/correo.js';
 
 /**
  * Los tres cortes del mes, a medianoche UTC. `Date.UTC` normaliza los meses
@@ -119,7 +119,9 @@ function pctCorto(ahora, antes) {
 // correo que pide una decisión es peor que no poner la cifra.
 const dosDecimales = (n) => n.toFixed(2).replace('.', ',');
 
-// «1.764», no «1764». El mensual maneja cuatro cifras de rutina.
+// Separador de miles del castellano. Ojo con lo que se espera: en es-ES los
+// números de cuatro cifras van SIN punto («1394»), y a partir de cinco con él
+// («10.394»). Es lo correcto según CLDR, no un fallo del formateador.
 const miles = (n) => n.toLocaleString('es-ES');
 
 const conMayuscula = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -341,11 +343,18 @@ export default async function handler(req, res) {
 
     const html = plantilla({ titulo: `MisAutónomos · ${nombreMes}`, entradilla, bloques });
 
-    const envio = await enviarCorreo({ asunto: `MisAutónomos · resumen de ${nombreMes}`, html });
-    if (envio.ok === false) return res.status(502).json({ error: 'resend', detalle: envio });
+    // «resumen de septiembre de 2026»: el año evita confundirse con el mismo
+    // mes del año que viene, y «resumen de» evita confundirse con los otros
+    // tres correos del mismo periodo. La marca identifica informe Y periodo.
+    const envio = await enviarCorreo({ asunto: `MisAutónomos · resumen de ${nombreMes}`, html, marca: `resumen de ${nombreMes}` });
+    if (!envio.ok) {
+      const estado = envio.estado ? 502 : 500;
+      return res.status(estado).json(sinRastro(envio, 'resumen-mensual'));
+    }
 
     return res.status(200).json({
       ok: true,
+      enviado: !envio.duplicado,
       envio,
       mes: nombreMes,
       ventana: [dIni, dFin],

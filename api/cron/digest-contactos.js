@@ -1,5 +1,5 @@
 // ╔══════════════════════════════════════════════════════════════════════════╗
-// ║  DIGEST DE CONTACTOS — 20:00, todos los días                            ║
+// ║  DIGEST DE CONTACTOS — 18:00 UTC, a diario (20:00 en España ahora)      ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 //
 // Quién ha recibido trabajo hoy, ficha por ficha. En la web hermana es el
@@ -23,7 +23,7 @@
 
 import { esCronLegitimo } from '../_lib/guardia.js';
 import { hayBase, filas, nombresDeFichas, urlFicha } from '../_lib/datos.js';
-import { enviarCorreo, plantilla, cifras, seccion, escapar, plural } from '../_lib/correo.js';
+import { enviarCorreo, plantilla, cifras, seccion, escapar, plural, sinRastro } from '../_lib/correo.js';
 
 /**
  * ¿Es `AAAA-MM-DD` de un día que de verdad existe? El regex solo no basta:
@@ -149,8 +149,17 @@ export default async function handler(req, res) {
         ]),
         seccion(`Quién ha recibido contactos ${cuando}`, lineas),
       ],
+      // Esta nota decía «el contador sólo registra quien abre el formulario:
+      // las llamadas y los WhatsApp no se cuentan», y desde que `Autonomo.jsx`
+      // llama a `trackMetric` también en Llamar y en WhatsApp eso es falso: le
+      // estaba diciendo al dueño que desconfiara de su mejor cifra. Lo que sí
+      // hay que advertir es el tope de `trackMetric`, que deduplica cinco
+      // minutos por ficha y tipo: quien prueba el teléfono y luego el WhatsApp
+      // en la misma ficha cuenta como UN contacto aquí, aunque haya llegado un
+      // aviso instantáneo por cada uno.
       pie: lineaMes
-        + 'El contador sólo registra quien abre el formulario: las llamadas y los WhatsApp no se cuentan.'
+        + 'Cuenta los tres botones: Llamar, WhatsApp y el formulario. Un mismo visitante en la misma '
+        + 'ficha cuenta una vez cada cinco minutos, así que dos intentos seguidos suman uno.'
         + '<br>Panel de MisAutónomos · <a href="https://misautonomos.es/admin" style="color:#8b93a7;">abrir el panel</a>',
     });
 
@@ -158,11 +167,25 @@ export default async function handler(req, res) {
       asunto: esHoy
         ? `MisAutónomos · ${plural(dia.total, 'contacto')} hoy, ${fecha}`
         : `MisAutónomos · ${plural(dia.total, 'contacto')} el ${fecha}`,
+      // El candado no puede ser el asunto entero —lleva el número de contactos
+      // dentro, y ese número cambia entre las 20:00 y un reintento diez minutos
+      // después— pero tampoco puede ser sólo la fecha: el informe diario de la
+      // mañana siguiente titula «resumen del jueves, 8 de octubre» con esa
+      // misma fecha, y los dos correos se darían por enviados el uno al otro.
+      // «hoy, <fecha>» sale de este asunto y de ningún otro.
+      //
+      // Con `?dia=` no hay candado: eso lo pide una persona a mano para rehacer
+      // un correo que falló, y negárselo porque «ya salió» es justo lo
+      // contrario de lo que ha pedido.
+      marca: esHoy ? `hoy, ${fecha}` : null,
       html,
     });
-    if (envio.ok === false) return res.status(502).json({ error: 'resend', detalle: envio });
+    if (!envio.ok) {
+      const estado = envio.estado ? 502 : 500;
+      return res.status(estado).json(sinRastro(envio, 'digest-contactos'));
+    }
     return res.status(200).json({
-      ok: true, enviado: true, envio, dia: hoy, contactos: dia.total, fichas: ordenadas.length, contactosMes: mes.total,
+      ok: true, enviado: !envio.duplicado, envio, dia: hoy, contactos: dia.total, fichas: ordenadas.length, contactosMes: mes.total,
     });
   } catch (e) {
     console.error('[digest-contactos]', e);

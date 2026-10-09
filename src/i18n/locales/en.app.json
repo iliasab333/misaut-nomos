@@ -89,7 +89,8 @@
         "noReviews_other": "{{count}} published listings with no reviews",
         "noReviewsHint": "Nobody picks a professional with not a single review.",
         "goUsers": "See in Users and listings",
-        "goSupport": "Go to Support"
+        "goSupport": "Go to Support",
+        "goVerify": "Review the documents"
       },
       "pulse": {
         "title": "Business pulse",
@@ -151,7 +152,109 @@
         "outreach": {
           "name": "WhatsApp outreach",
           "desc": "Messages to freelancers who are not in the directory yet."
+        },
+        "verify": {
+          "name": "Identity review",
+          "desc": "The documents people uploaded, one by one, to approve or reject.",
+          "count_one": "{{count}} not reviewed",
+          "count_other": "{{count}} not reviewed"
         }
+      }
+    },
+    "verify": {
+      "seoTitle": "Identity review · Admin",
+      "title": "Identity review",
+      "subtitle": "One at a time, starting with whoever has waited longest.",
+      "privacy": "These are real people's identity documents. Do not download or share them: they open through a signed link that expires after two minutes.",
+      "notAdmin": "This screen is for administrators only.",
+      "goHome": "Back to home",
+      "backToPanel": "Back to the panel",
+      "saving": "Saving…",
+      "actionsHint": "Approving grants the public verified-identity badge. Rejecting requires a reason, and the person reads that reason.",
+      "waiting_one": "Waiting for {{count}} day",
+      "waiting_other": "Waiting for {{count}} days",
+      "promise": "They were promised 24-48 h.",
+      "queue": {
+        "position": "Verification {{n}} of {{total}}",
+        "order": "Longest wait first.",
+        "prev": "Previous",
+        "next": "Next"
+      },
+      "empty": {
+        "title": "Nothing to review",
+        "body": "No verification is pending. When someone uploads their document, it will show up here."
+      },
+      "fields": {
+        "email": "Email",
+        "profile": "Profile",
+        "noProfile": "No professional profile",
+        "submitted": "Submitted on",
+        "noName": "No name declared",
+        "waitingUnknown": "No submission date",
+        "alreadyBadged": "Careful: the profile already carries the verified badge even though the verification is still pending. That comes from an earlier approval that was left half done."
+      },
+      "docTypes": {
+        "dni": "DNI",
+        "nie": "NIE",
+        "passport": "Passport",
+        "unknown": "Unspecified document"
+      },
+      "docs": {
+        "front": "Front",
+        "back": "Back",
+        "selfie": "Selfie with the document",
+        "zoom": "Enlarge",
+        "unreadable": "This document could not be opened. Reload the images; if it still does not show, it is the storage and not the person, because they could not have submitted without it.",
+        "backNotNeeded": "A passport has no back side: nothing is missing.",
+        "failed": "The image did not load. Try reloading them."
+      },
+      "viewer": {
+        "fit": "Fit to screen",
+        "full": "Zoom in",
+        "panHint": "Scroll around the image to read the document."
+      },
+      "expiry": {
+        "left": "Images expire in {{s}} s",
+        "expiredTitle": "The image links have expired",
+        "expiredShort": "Link expired",
+        "expiredBody": "They last two minutes for safety. Reload them and you stay on the same verification.",
+        "reload": "Reload images",
+        "reloading": "Reloading…"
+      },
+      "approve": {
+        "cta": "Approve",
+        "confirmTitle": "Approve this verification?",
+        "confirmBody": "This marks {{name}}'s profile as identity-verified and shows the badge clients see. Undoing it is a manual job.",
+        "confirmCta": "Yes, approve",
+        "noProfileWarning": "This person has no professional profile, so the badge will not show anywhere until they create one.",
+        "done": "Verification approved."
+      },
+      "reject": {
+        "cta": "Reject",
+        "title": "Reject this verification",
+        "notice": "The reason is shown to the person in their dashboard, so write it so they know what to upload again.",
+        "shortcutsLabel": "Common reasons",
+        "shortcuts": {
+          "blurry": "The photo is blurry and cannot be read.",
+          "expired": "The document has expired.",
+          "selfie": "The selfie does not match the document.",
+          "back": "The back of the document is missing."
+        },
+        "motiveLabel": "Reason",
+        "motivePlaceholder": "What is wrong and what they need to upload again.",
+        "motiveRequired": "Write the reason: without it the person cannot know what to fix.",
+        "confirmCta": "Reject",
+        "done": "Verification rejected."
+      },
+      "errors": {
+        "noSession": "Your session has expired. Sign in again.",
+        "list": "The verification queue could not be read.",
+        "decision": "The decision could not be saved.",
+        "server": "The server answered {{status}}.",
+        "notAllowed": "Your account is not allowed to see this.",
+        "notConfigured": "The server is missing the configuration needed to read the documents. Tell whoever runs the deployment.",
+        "unavailable": "The session could not be checked right now. Try again in a moment.",
+        "notFound": "That verification is no longer in the queue: it may have been reviewed somewhere else."
       }
     },
     "soporte": {

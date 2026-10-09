@@ -134,6 +134,7 @@ const AdminEmails = lazyApp(() => import('./pages/AdminEmails'));
 const AdminUsuarios = lazyApp(() => import('./pages/AdminUsuarios'));
 const AdminOutreachWhatsApp = lazyApp(() => import('./pages/AdminOutreachWhatsApp'));
 const AdminSoporte = lazyApp(() => import('./pages/AdminSoporte'));
+const AdminVerificar = lazyApp(() => import('./pages/AdminVerificar'));
 const BajaNewsletter = lazyWithRetry(() => import('./pages/BajaNewsletter'));
 const EmailUnsubscribe = lazyWithRetry(() => import('./pages/EmailUnsubscribe'));
 const BlogList = lazyWithRetry(() => import('./pages/BlogList'));
@@ -335,6 +336,7 @@ const AuthenticatedApp = () => {
           {/* Subrutas admin ANTES que /admin para matchear primero */}
           <Route path="/admin/tickets" element={<Suspense fallback={<PageLoader />}><AdminTickets /></Suspense>} />
           <Route path="/admin/soporte" element={<Suspense fallback={<PageLoader />}><AdminSoporte /></Suspense>} />
+          <Route path="/admin/verificar" element={<Suspense fallback={<PageLoader />}><AdminVerificar /></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
           <Route path="/admin/usuarios" element={<Suspense fallback={<PageLoader />}><AdminUsuarios /></Suspense>} />
           <Route path="/admin/blog" element={<Suspense fallback={<PageLoader />}><AdminBlog /></Suspense>} />

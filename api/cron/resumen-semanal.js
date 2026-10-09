@@ -1,5 +1,5 @@
 // ╔══════════════════════════════════════════════════════════════════════════╗
-// ║  RESUMEN SEMANAL — lunes a las 07:00                                    ║
+// ║  RESUMEN SEMANAL — lunes a las 07:00 UTC (09:00 en España ahora)        ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 //
 // El informe diario dice qué pasó ayer. Este dice si la cosa va hacia arriba o
@@ -18,7 +18,7 @@
 
 import { esCronLegitimo } from '../_lib/guardia.js';
 import { hayBase, cuenta, filas, urlFicha, desde } from '../_lib/datos.js';
-import { enviarCorreo, plantilla, cifras, seccion, alerta, escapar, plural } from '../_lib/correo.js';
+import { enviarCorreo, plantilla, cifras, seccion, alerta, escapar, plural, sinRastro } from '../_lib/correo.js';
 
 const dia = (n) => desde(n).slice(0, 10);
 
@@ -295,10 +295,18 @@ export default async function handler(req, res) {
       bloques,
     });
 
-    const envio = await enviarCorreo({ asunto: `MisAutónomos · semana ${rango}`, html });
-    if (envio.ok === false) return res.status(502).json({ error: 'resend', detalle: envio });
+    // «semana del 2 al 8 de octubre»: el rango identifica la semana y la
+    // palabra «semana» identifica el informe. Lo segundo no es adorno — con la
+    // marca a secas, dos informes distintos del mismo periodo se dan por
+    // enviados el uno al otro (le pasaba al diario con el digest).
+    const envio = await enviarCorreo({ asunto: `MisAutónomos · semana ${rango}`, html, marca: `semana ${rango}` });
+    if (!envio.ok) {
+      const estado = envio.estado ? 502 : 500;
+      return res.status(estado).json(sinRastro(envio, 'resumen-semanal'));
+    }
     return res.status(200).json({
       ok: true,
+      enviado: !envio.duplicado,
       envio,
       ventana: { inicio, fin: hoy },
       visitas: semana.visitas,

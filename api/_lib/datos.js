@@ -47,16 +47,42 @@ export function hoyISO() {
 }
 
 /**
- * Las métricas agregadas de un periodo. `profile_metrics` guarda una fila por
- * ficha y día, así que esto es la suma — y de paso devuelve las fichas más
- * vistas, que es lo que convierte un número en algo accionable.
+ * Las métricas agregadas de una ventana [desde, hasta). `profile_metrics`
+ * guarda una fila por ficha y día, así que esto es la suma — y de paso
+ * devuelve las fichas más vistas, que es lo que convierte un número en algo
+ * accionable.
+ *
+ * `hastaFecha` es OBLIGATORIO en la práctica y antes no existía. Sin tope por
+ * arriba, `metricas(ayer)` sumaba ayer Y HOY, y el informe diario titulaba
+ * «61 visitas» un día que había tenido 59 porque le colaba las 2 de hoy. Peor
+ * que la cifra: el apartado «las más vistas de ayer» se reordenaba según iba
+ * entrando el tráfico de la mañana, así que dos ejecuciones del mismo informe
+ * daban listas distintas. Medido contra producción el 9 de octubre: el correo
+ * de las 10:28 decía 67 visitas del día 8 y la misma consulta a las 13:00
+ * decía 61, con el día 8 cerrado e inmóvil en 59.
+ *
+ * Y se pagina. `limit=5000` no sube el techo de PostgREST: Supabase devuelve
+ * 1.000 filas y se calla el resto. Hoy una ventana de dos días son 93 filas,
+ * pero es el mismo fallo silencioso contra el que ya se protegen los resúmenes
+ * semanal y mensual, y aquí faltaba.
  */
-export async function metricas(desdeFecha) {
-  const f = await filas(
-    `profile_metrics?select=professional_id,date,profile_views,search_appearances,contact_clicks`
-    + `&date=gte.${desdeFecha.slice(0, 10)}&limit=5000`,
-  );
-  const tot = { visitas: 0, apariciones: 0, contactos: 0 };
+export async function metricas(desdeFecha, hastaFecha) {
+  const d = desdeFecha.slice(0, 10);
+  const h = hastaFecha ? `&date=lt.${hastaFecha.slice(0, 10)}` : '';
+  const f = [];
+  const TAMANO = 1000;
+  for (let salto = 0; salto < 200000; salto += TAMANO) {
+    // `order=id.asc` y no por fecha: con fechas repetidas el orden entre
+    // páginas no está garantizado y se duplicarían unas filas y se perderían
+    // otras, que es peor que una suma corta porque no se nota.
+    const trozo = await filas(
+      'profile_metrics?select=professional_id,date,profile_views,search_appearances,contact_clicks'
+      + `&date=gte.${d}${h}&order=id.asc&limit=${TAMANO}&offset=${salto}`,
+    );
+    f.push(...trozo);
+    if (trozo.length < TAMANO) break;
+  }
+  const tot = { visitas: 0, apariciones: 0, contactos: 0, filas: f.length };
   const porFicha = new Map();
   for (const r of f) {
     const v = Number(r.profile_views || 0), a = Number(r.search_appearances || 0), c = Number(r.contact_clicks || 0);
