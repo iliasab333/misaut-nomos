@@ -32,6 +32,8 @@
 //   SUPABASE_ANON_KEY (o VITE_SUPABASE_ANON_KEY)  para validar el token; es
 //                                             pública, ya va en el bundle.
 
+import { avisarVerificada } from '../_lib/avisoVerificacion.js';
+
 const BASE = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
 const SERVICIO = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const ANONIMA = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
@@ -350,6 +352,22 @@ async function listar(req, res, admin) {
   });
 }
 
+/** El enlace público de la ficha de quien se acaba de verificar, para que el
+ *  correo le lleve a ver su propio distintivo. Devuelve null si no se puede
+ *  construir: un botón «Ver mi ficha» que lleva a un 404 es peor que no tener
+ *  botón. */
+function enlaceDeFicha(ficha) {
+  if (!ficha) return null;
+  const limpia = (x) => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const nombre = limpia(ficha.slug_publico) || limpia(ficha.business_name);
+  if (!nombre) return null;
+  const cat = ficha.categories?.[0], ciudad = ficha.ciudad;
+  return cat && ciudad
+    ? `https://misautonomos.es/autonomo/${limpia(cat)}-en-${limpia(ciudad)}/${nombre}`
+    : `https://misautonomos.es/autonomo/${nombre}`;
+}
+
 function diasDesde(iso) {
   const t = Date.parse(iso || '');
   if (!Number.isFinite(t)) return null;
@@ -462,7 +480,34 @@ async function resolver(req, res, admin) {
     }
 
     console.log(`[admin/verificaciones] ${id} aprobada (distintivo: ${distintivo})`);
-    return res.status(200).json({ ok: true, id, decision, anterior, estado: 'approved', distintivo });
+
+    // Y SE LE DICE. Aprobar en silencio es hacer que alguien enseñe su DNI,
+    // espere semanas y no se entere de que ha servido.
+    //
+    // Va DESPUÉS de las dos escrituras y con su propio try: la aprobación ya
+    // está hecha y es lo que importa. Si el correo falla se anota y se sigue;
+    // nunca al revés — un fallo de Resend no puede deshacer una aprobación.
+    let aviso = { enviado: false, motivo: 'no intentado' };
+    try {
+      let ficha = null;
+      try {
+        const fs = await postgrest(
+          `professional_profiles?user_id=eq.${encodeURIComponent(fila.user_id)}`
+          + `&select=business_name,slug_publico,ciudad,categories&limit=1`,
+        );
+        ficha = fs?.[0] || null;
+      } catch { /* sin ficha, el correo lo dice de otra manera */ }
+      aviso = await avisarVerificada({
+        nombre: fila.user_name,
+        correo: fila.user_email,
+        tieneFicha: distintivo === 'puesto',
+        urlFicha: enlaceDeFicha(ficha),
+      });
+    } catch (e) {
+      console.error(`[admin/verificaciones] ${id}: aprobada pero sin avisar:`, e.message);
+    }
+
+    return res.status(200).json({ ok: true, id, decision, anterior, estado: 'approved', distintivo, aviso });
   }
 
   // ── Rechazar ───────────────────────────────────────────────────────────
