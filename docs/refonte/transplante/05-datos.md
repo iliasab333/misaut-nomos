@@ -91,7 +91,7 @@ Valores reales observados en khdemlidaba (para no inventar): `users.user_type` �
 
 - `id` text: 29 son UUID (y en esos 29 `id = auth_user_id`), 62 son ObjectId de 24 hex heredados de Base44.
 - `auth_user_id`: 34 no nulos, los 34 existen en `auth.users`.
-- `role`: admin=1 (`bigseo.online.com@gmail.com`, con cuenta), user=90. `app_role`: vacío en los 91.
+- `role`: admin=1 (`ADMIN_NOTIFY_EMAIL`, con cuenta), user=90. `app_role`: vacío en los 91.
 - `user_type`: professionnel=51, client=11, NULL=29.
 - Cruce cuenta × tipo × perfil profesional:
   - con cuenta (34): 25 `professionnel` con perfil, 1 sin tipo con perfil (`Fernando`), 4 `professionnel` sin perfil, 2 `client`, 2 sin tipo sin perfil.

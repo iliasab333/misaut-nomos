@@ -6,9 +6,8 @@
 //   - RESEND_API_KEY       — sin esto, el endpoint responde 200 {skipped:true}.
 //   - RESEND_FROM_EMAIL    — opcional. Defaults a onboarding@resend.dev (test).
 //   - RESEND_FROM_NAME     — opcional. Defaults a "MisAutónomos".
-//   - ADMIN_NOTIFY_EMAIL   — opcional. Defaults a bigseo.online.com@gmail.com.
-
-const DEFAULT_ADMIN_EMAIL = 'bigseo.online.com@gmail.com';
+//   - ADMIN_NOTIFY_EMAIL   — OBLIGATORIA. Sin ella no se envía: no hay valor
+//                            por defecto a propósito (ver abajo).
 
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({
@@ -44,7 +43,15 @@ export default async function handler(req, res) {
     return res.status(200).json({ skipped: true, reason: 'no_api_key' });
   }
 
-  const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || DEFAULT_ADMIN_EMAIL;
+  // Sin valor por defecto. Aquí había escrita la dirección personal del dueño,
+  // y este repositorio es PÚBLICO en GitHub. La variable ya está puesta en
+  // Vercel (producción); si falta, es mejor no enviar y decirlo en los logs que
+  // volver a publicar una dirección en el código.
+  const adminEmail = process.env.ADMIN_NOTIFY_EMAIL;
+  if (!adminEmail) {
+    console.warn('[notify-admin] ADMIN_NOTIFY_EMAIL sin configurar — no se envía');
+    return res.status(200).json({ skipped: true, reason: 'no_admin_email' });
+  }
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
   const fromName = process.env.RESEND_FROM_NAME || 'MisAutónomos';
 
@@ -53,7 +60,14 @@ export default async function handler(req, res) {
     ? safeJSON(req.body)
     : (req.body || {});
 
-  const { event, title, body = '', data = null, severity = 'low' } = payload;
+  const { event, title, body = '', data = null, severity = 'low', userEmail = null } = payload;
+
+  // No avisarse a uno mismo: el admin prueba cosas y no necesita un correo por
+  // cada una. La comparación vive AQUÍ y no en el navegador, que es de donde
+  // vino: allí obligaba a escribir la dirección en un bundle público.
+  if (userEmail && adminEmail && String(userEmail).trim().toLowerCase() === adminEmail.trim().toLowerCase()) {
+    return res.status(200).json({ skipped: true, reason: 'es_el_propio_admin' });
+  }
   if (!event || !title) {
     return res.status(400).json({ error: 'missing_event_or_title' });
   }

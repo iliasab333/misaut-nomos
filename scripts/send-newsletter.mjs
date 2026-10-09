@@ -61,7 +61,8 @@ const CSV_PATH = process.env.AUDIENCIA_CSV
   || path.join(ROOT, 'data', 'audiencia-resend-misautonomos.csv');
 const HTML_PATH = path.join(ROOT, 'preview-correo-newsletter-cuota-autonomos-2026.html');
 
-const TEST_EMAIL = process.env.TEST_EMAIL || 'bigseo.online.com@gmail.com';
+// Sin dirección por defecto: repositorio público. Se pasa por el entorno.
+const TEST_EMAIL = process.env.TEST_EMAIL || '';
 const DRY_RUN = String(process.env.DRY_RUN ?? 'true').toLowerCase() !== 'false';
 const RATE_LIMIT_MS = parseInt(process.env.RATE_LIMIT_MS || '550', 10); // ~1.8/s seguro
 

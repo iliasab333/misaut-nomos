@@ -1,6 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const ADMIN_EMAIL = 'bigseo.online.com@gmail.com';
+// Repositorio público: la dirección sale a una variable de entorno.
+const ADMIN_EMAIL = Deno.env.get('ADMIN_NOTIFY_EMAIL') || '';
 
 Deno.serve(async (req) => {
   try {

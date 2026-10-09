@@ -1,0 +1,92 @@
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  Lo que los resúmenes preguntan a la base, en un solo sitio             ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+//
+// Se lee con la clave de servicio, desde el servidor. NUNCA desde el
+// navegador: estas consultas tocan correos y teléfonos de personas.
+//
+// No se usa el cliente de Supabase sino `fetch` contra PostgREST: una
+// dependencia menos en una función serverless, y las consultas se leen tal
+// cual se envían.
+
+const BASE = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
+const CLAVE = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+export function hayBase() { return Boolean(BASE && CLAVE); }
+
+async function pedir(ruta, { contar = false } = {}) {
+  const cab = { apikey: CLAVE, Authorization: `Bearer ${CLAVE}` };
+  if (contar) cab.Prefer = 'count=exact';
+  const r = await fetch(`${BASE}/rest/v1/${ruta}`, { headers: cab });
+  if (!r.ok) throw new Error(`PostgREST ${r.status} en ${ruta.slice(0, 90)}: ${(await r.text()).slice(0, 180)}`);
+  if (contar) {
+    const rango = r.headers.get('content-range') || '';
+    const n = Number(rango.split('/')[1]);
+    return Number.isFinite(n) ? n : 0;
+  }
+  return r.json();
+}
+
+export const cuenta = (tabla, filtro = '') => pedir(`${tabla}?select=id&limit=1${filtro ? `&${filtro}` : ''}`, { contar: true });
+export const filas = (ruta) => pedir(ruta);
+
+/** Fecha ISO de hace n días, a medianoche UTC. Las comparaciones de los
+ *  resúmenes son por día natural, no por ventana rodante: un informe diario
+ *  que dice «las últimas 24 h» a las 7:00 cuenta media tarde de ayer. */
+export function desde(dias) {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - dias);
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
+export function hoyISO() {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
+/**
+ * Las métricas agregadas de un periodo. `profile_metrics` guarda una fila por
+ * ficha y día, así que esto es la suma — y de paso devuelve las fichas más
+ * vistas, que es lo que convierte un número en algo accionable.
+ */
+export async function metricas(desdeFecha) {
+  const f = await filas(
+    `profile_metrics?select=professional_id,date,profile_views,search_appearances,contact_clicks`
+    + `&date=gte.${desdeFecha.slice(0, 10)}&limit=5000`,
+  );
+  const tot = { visitas: 0, apariciones: 0, contactos: 0 };
+  const porFicha = new Map();
+  for (const r of f) {
+    const v = Number(r.profile_views || 0), a = Number(r.search_appearances || 0), c = Number(r.contact_clicks || 0);
+    tot.visitas += v; tot.apariciones += a; tot.contactos += c;
+    const p = porFicha.get(r.professional_id) || { visitas: 0, contactos: 0 };
+    p.visitas += v; p.contactos += c;
+    porFicha.set(r.professional_id, p);
+  }
+  return { ...tot, porFicha, dias: new Set(f.map((r) => r.date)).size };
+}
+
+/** Nombre y ciudad de un puñado de fichas, para que el correo diga «Luis,
+ *  pintor en Esplugues» y no un identificador de 24 caracteres. */
+export async function nombresDeFichas(ids) {
+  const lista = [...new Set(ids)].filter(Boolean).slice(0, 60);
+  if (!lista.length) return new Map();
+  const f = await filas(
+    `professional_profiles?select=id,business_name,ciudad,categories,slug_publico&id=in.(${lista.map(encodeURIComponent).join(',')})`,
+  );
+  return new Map(f.map((p) => [p.id, p]));
+}
+
+/** El enlace público de una ficha, en la forma que de verdad responde 200. */
+export function urlFicha(p) {
+  const limpia = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const nombre = p?.slug_publico || limpia(p?.business_name);
+  if (!nombre) return 'https://misautonomos.es/buscar';
+  const cat = p?.categories?.[0], ciudad = p?.ciudad;
+  return cat && ciudad
+    ? `https://misautonomos.es/autonomo/${limpia(cat)}-en-${limpia(ciudad)}/${nombre}`
+    : `https://misautonomos.es/autonomo/${nombre}`;
+}

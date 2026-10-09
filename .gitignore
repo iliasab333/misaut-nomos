@@ -42,3 +42,4 @@ docs/refonte/transplante/exportaciones/
 
 # Datos personales: 38 personas con nombre, apellido y correo. Repositorio PÚBLICO.
 data/audiencia-resend-*.csv
+.tmp-vista/
