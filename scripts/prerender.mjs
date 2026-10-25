@@ -1,4 +1,40 @@
 // scripts/prerender.mjs
+//
+// ⚠️  NO DESPLEGAR ESTE PRERENDERIZADOR SIN LEER ESTO  (comprobado 2026-10-25)
+//
+// Lo que misautonomos.es sirve hoy NO lo genera este archivo. Producción está
+// renderizada con React en servidor: cada página trae cabecera, navegación,
+// listados y pie dentro del HTML, con marcadores de Suspense (<!--$-->) y
+// atributos data-prerender="content" / "article" / "article-body". Ese
+// renderizador no está en el repositorio: no hay react-dom/server en ninguna
+// parte, y el script «build:nossr» de package.json es el rastro de que existió.
+//
+// Este archivo es un prerenderizador de plantillas de texto: emite H1, intro y
+// cuerpo, y nada más. Palabras visibles medidas el 2026-10-25, producción
+// frente a lo que genera este script:
+//
+//     /                           482 → 67
+//     /blog                      1376 → 29
+//     /para-autonomos             532 → 59
+//     /buscar                     530 → 55
+//     /preguntas-frecuentes       222 → 36
+//     /categoria/fontanero        171 → 91
+//     /blog/<artículo>            786 → 575
+//
+// Además producción sirve /tu-web (1011 palabras, la página comercial de
+// BayenDaba, en el sitemap) y este script no la conoce.
+//
+// Es decir: `npm run build` seguido de un despliegue vacía el sitio. Es la
+// misma causa que tumbó el blog el 2026-10-25 — código desplegado que nunca se
+// comprometió. Antes de volver a desplegar hay que recuperar el renderizado de
+// React, no retocar este archivo.
+//
+// Mientras tanto, el contenido nuevo del blog SÍ se publica sin desplegar: la
+// SPA lee blog_posts en caliente y /api/sitemap.xml también, así que un
+// artículo insertado en la base aparece en el sitio y en el sitemap solo.
+//
+// ---------------------------------------------------------------------------
+//
 // Prerender estático post-build: genera dist/<ruta>/index.html para todas las
 // rutas SEO con <title>, meta description, canonical, OG, JSON-LD y contenido
 // real (H1 + intro + listing snippet) renderizado en HTML, manteniendo el
@@ -183,6 +219,7 @@ function renderTemplate(tpl, cfg) {
   const initial = [
     cfg.h1 ? `<h1>${escapeHtml(cfg.h1)}</h1>` : '',
     cfg.intro ? `<div data-prerender="intro">${cfg.intro}</div>` : '',
+    cfg.articleHtml ? `<article data-prerender="article">${cfg.articleHtml}</article>` : '',
     cfg.listingHtml ? `<div data-prerender="listing">${cfg.listingHtml}</div>` : '',
   ].filter(Boolean).join('\n      ');
 
@@ -535,6 +572,30 @@ function buildProfile(tpl, p, catByName = new Map(), ciudadesConPagina = new Set
   writeRoute(path, html);
 }
 
+/**
+ * Limpia el HTML de un artículo antes de meterlo en el documento servido.
+ *
+ * `content_es` lo escribe el panel y acaba aquí sin pasar por React, que es
+ * quien normalmente escapa. Quitamos lo ejecutable y los atributos que pueden
+ * disparar código; el resto del marcado editorial (títulos, listas, tablas,
+ * citas, enlaces, imágenes) se conserva porque es justo lo que Google lee.
+ */
+function sanitizeArticleHtml(raw) {
+  let h = String(raw || '');
+  h = h.replace(/<\s*(script|iframe|object|embed|style|form|link|meta)\b[\s\S]*?<\s*\/\s*\1\s*>/gi, '');
+  h = h.replace(/<\s*(script|iframe|object|embed|link|meta)\b[^>]*\/?>/gi, '');
+  h = h.replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, '');
+  h = h.replace(/\son[a-z]+\s*=\s*'[^']*'/gi, '');
+  h = h.replace(/\son[a-z]+\s*=\s*[^\s>]+/gi, '');
+  h = h.replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1="#"');
+  return h;
+}
+
+/** Palabras visibles de un fragmento HTML, para el guardia de contenido. */
+function visibleWordCount(html) {
+  return stripHtml(html).split(/\s+/).filter(Boolean).length;
+}
+
 function buildBlogPost(tpl, post) {
   const title = `${post.title_es || 'Artículo'} | ${SITE_NAME} Blog`;
   const description = truncate(post.excerpt_es || post.meta_description_es || '', 160);
@@ -566,8 +627,12 @@ function buildBlogPost(tpl, post) {
     ],
     h1: post.title_es,
     intro,
+    // El cuerpo del artículo va en el HTML servido. Sin esto Google sólo ve
+    // el titular y el extracto: unas 50 palabras en lugar de varios cientos.
+    articleHtml: sanitizeArticleHtml(post.content_es),
   });
   writeRoute(`/blog/${post.slug}`, html);
+  return visibleWordCount(post.content_es);
 }
 
 function build404(tpl) {
@@ -600,7 +665,7 @@ async function main() {
       .eq('onboarding_completed', true),
     supabase
       .from('blog_posts')
-      .select('slug, title_es, excerpt_es, meta_description_es, publish_date, updated_date, featured_image')
+      .select('slug, title_es, excerpt_es, meta_description_es, publish_date, updated_date, featured_image, content_es')
       .eq('status', 'published'),
   ]);
 
@@ -692,11 +757,48 @@ async function main() {
   }
 
   // ── 4) Blog posts
+  //
+  // Guardia de contenido: el 25 de octubre de 2026 un despliegue dejó los 30
+  // artículos en 52 palabras de HTML servido (sólo titular y extracto) sin que
+  // nada fallara, porque la inyección del cuerpo vivía en una copia local que
+  // nunca se commiteó. Ahora el build se rompe en lugar de publicar artículos
+  // vacíos: un fallo ruidoso es preferible a una caída silenciosa de tráfico.
+  // El fallo que buscamos atrapar es sistémico —la inyección se rompe y TODOS
+  // los artículos salen con el titular y poco más—, no que un artículo viejo
+  // sea corto. Por eso rompemos el build sólo si la mediana se desploma, y los
+  // artículos flacos sueltos se avisan sin bloquear.
+  const SUELO_MEDIANA = 150;
+  const FLACO = 150;
   let blogCount = 0;
+  const medidas = [];
   for (const post of posts) {
     if (!post.slug) continue;
-    buildBlogPost(tpl, post);
+    medidas.push({ slug: post.slug, palabras: buildBlogPost(tpl, post) });
     blogCount++;
+  }
+
+  if (medidas.length) {
+    const ordenadas = medidas.map((m) => m.palabras).sort((a, b) => a - b);
+    const mediana = ordenadas[Math.floor(ordenadas.length / 2)];
+    const flacos = medidas.filter((m) => m.palabras < FLACO);
+
+    if (flacos.length) {
+      console.warn(`\n[prerender] ${flacos.length} artículo(s) con menos de ${FLACO} palabras (contenido pobre, no bloquea):`);
+      for (const a of flacos.sort((x, y) => x.palabras - y.palabras)) {
+        console.warn(`   ${String(a.palabras).padStart(5)}  /blog/${a.slug}`);
+      }
+    }
+
+    if (mediana < SUELO_MEDIANA) {
+      console.error(
+        `\n[prerender] ABORTADO: la mediana del blog es ${mediana} palabras (mínimo ${SUELO_MEDIANA}).\n` +
+        '   Eso no es un artículo corto: es la inyección del cuerpo rota, y publicarlo\n' +
+        '   dejaría los artículos vacíos para Google. Comprueba que la consulta a\n' +
+        "   blog_posts sigue trayendo 'content_es'.\n",
+      );
+      process.exit(1);
+    }
+    console.log(`  · blog: mediana ${mediana} palabras por artículo`);
   }
 
   // ── 5) City × Category con candado de densidad
