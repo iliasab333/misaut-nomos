@@ -166,10 +166,15 @@ function renderTemplate(tpl, cfg) {
     }
   }
 
-  // JSON-LD
+  // JSON-LD. Acepta un objeto o una lista: cada entrada sale en su propio
+  // <script>, que es como Google espera varios tipos en una misma página
+  // (p. ej. LocalBusiness + BreadcrumbList).
   if (cfg.jsonLd) {
-    const ld = `<script type="application/ld+json">${JSON.stringify(cfg.jsonLd)}</script>`;
-    html = html.replace(/<\/head>/, `${ld}\n  </head>`);
+    const bloques = (Array.isArray(cfg.jsonLd) ? cfg.jsonLd : [cfg.jsonLd]).filter(Boolean);
+    const ld = bloques
+      .map((b) => `<script type="application/ld+json">${JSON.stringify(b)}</script>`)
+      .join('\n  ');
+    if (ld) html = html.replace(/<\/head>/, `${ld}\n  </head>`);
   }
 
   // Contenido server-rendered dentro de #root: H1 + intro + listing.
@@ -268,6 +273,31 @@ const STATIC_ROUTES = [
   { path: '/aviso-legal', title: 'Aviso legal | MisAutónomos', description: 'Titularidad y datos del responsable del sitio MisAutónomos.', h1: 'Aviso legal', intro: '<p>Datos identificativos del responsable del sitio y información legal preceptiva.</p>' },
 ];
 
+/**
+ * Migas de pan en JSON-LD.
+ *
+ * React ya las inyecta al hidratar (BreadcrumbSchema), pero sólo las ve quien
+ * ejecuta el JavaScript. Emitirlas también en el HTML servido es lo que hace
+ * que Google muestre la ruta «misautonomos.es › Electricista › Barcelona» en
+ * lugar de la URL cruda, y eso se nota en el porcentaje de clics.
+ *
+ * `items` son pares {name, url}; la última entrada es la página actual.
+ */
+function breadcrumbJsonLd(items) {
+  const limpios = (items || []).filter((i) => i && i.name && i.url);
+  if (limpios.length < 2) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: limpios.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
 function buildStatic(tpl, route) {
   const html = renderTemplate(tpl, {
     title: route.title,
@@ -329,6 +359,10 @@ function buildCategory(tpl, cat, profs) {
     description,
     canonical,
     image: OG_IMAGE,
+    jsonLd: breadcrumbJsonLd([
+      { name: 'Inicio', url: SITE },
+      { name: cat.name, url: canonical },
+    ]),
     h1: `${cat.name} cerca de ti`,
     intro,
     listingHtml,
@@ -355,6 +389,11 @@ function buildCityCategory(tpl, cat, ciudad, ciudadSlug, profs) {
     description,
     canonical,
     image: OG_IMAGE,
+    jsonLd: breadcrumbJsonLd([
+      { name: 'Inicio', url: SITE },
+      { name: cat.name, url: `${SITE}/categoria/${cat.slug}` },
+      { name: ciudad, url: canonical },
+    ]),
     h1: `${cat.name} en ${ciudad}`,
     intro,
     listingHtml,
@@ -430,7 +469,7 @@ function buildEditorialGuide(tpl, guide, cat, profs) {
   writeRoute(`/categoria/${cat.slug}/${guide.ciudadSlug}`, html);
 }
 
-function buildProfile(tpl, p) {
+function buildProfile(tpl, p, catByName = new Map(), ciudadesConPagina = new Set()) {
   const url = profileUrl(p);
   const path = url.replace(SITE, '');
   const title = `${p.business_name}${p.ciudad ? ` en ${p.ciudad}` : ''} | ${SITE_NAME}`;
@@ -467,13 +506,29 @@ function buildProfile(tpl, p) {
     ${p.total_reviews > 0 ? `<p><strong>Valoración:</strong> ${Number(p.average_rating).toFixed(1)} / 5 (${p.total_reviews} reseñas)</p>` : ''}
   `;
 
+  // Migas: Inicio › Categoría › Ciudad › Negocio. La categoría sólo entra si
+  // resolvemos su slug real; con un slugify del nombre («Asesoría o gestoría»)
+  // el enlace caería en una página inexistente.
+  const catName = Array.isArray(p.categories) ? p.categories[0] : null;
+  const catRow = catName ? catByName.get(catName) : null;
+  const catSlug = catRow ? (catRow.slug || slugify(catRow.name)) : null;
+  const migas = [{ name: 'Inicio', url: SITE }];
+  if (catName && catSlug) migas.push({ name: catName, url: `${SITE}/categoria/${catSlug}` });
+  if (catName && catSlug && p.ciudad) {
+    const ciudadSlug = slugify(p.ciudad);
+    if (ciudadesConPagina.has(`${catSlug}::${ciudadSlug}`)) {
+      migas.push({ name: p.ciudad, url: `${SITE}/categoria/${catSlug}/${ciudadSlug}` });
+    }
+  }
+  migas.push({ name: p.business_name, url });
+
   const html = renderTemplate(tpl, {
     title,
     description,
     canonical: url,
     image: p.imagen_principal || OG_IMAGE,
     ogType: 'profile',
-    jsonLd,
+    jsonLd: [jsonLd, breadcrumbJsonLd(migas)],
     h1: p.business_name,
     intro,
   });
@@ -501,7 +556,14 @@ function buildBlogPost(tpl, post) {
     canonical,
     image: post.featured_image || OG_IMAGE,
     ogType: 'article',
-    jsonLd,
+    jsonLd: [
+      jsonLd,
+      breadcrumbJsonLd([
+        { name: 'Inicio', url: SITE },
+        { name: 'Blog', url: `${SITE}/blog` },
+        { name: post.title_es, url: canonical },
+      ]),
+    ],
     h1: post.title_es,
     intro,
   });
@@ -585,6 +647,32 @@ async function main() {
     categoryCount++;
   }
 
+  // Páginas ciudad×categoría que SÍ van a existir: las guías editoriales más
+  // las combinaciones que pasan el candado de densidad. Se calcula aquí, antes
+  // de las fichas, porque las migas de pan de cada ficha sólo pueden enlazar a
+  // una ciudad si esa página se genera. Enlazar a las demás empujaría a Google
+  // hacia las 52 combinaciones que el candado deja fuera a propósito.
+  const ciudadesConPagina = new Set(
+    EDITORIAL_GUIDES.map((g) => `${g.catSlug}::${g.ciudadSlug}`),
+  );
+  {
+    const cuenta = new Map();
+    for (const p of profs) {
+      const ciudad = (p.ciudad || '').trim();
+      if (!ciudad) continue;
+      const ciudadSlug = slugify(ciudad);
+      for (const catName of Array.isArray(p.categories) ? p.categories : []) {
+        const cat = catByName.get(catName);
+        if (!cat) continue;
+        const key = `${cat.slug}::${ciudadSlug}`;
+        cuenta.set(key, (cuenta.get(key) || 0) + 1);
+      }
+    }
+    for (const [key, n] of cuenta) {
+      if (n >= MIN_PROS_POR_CIUDAD_CATEGORIA) ciudadesConPagina.add(key);
+    }
+  }
+
   // ── 3) Profiles
   // Slug dirty detection: si el slug original tiene chars no-ASCII o guion final,
   // generamos el archivo con el slug LIMPIO y registramos el alias para 301.
@@ -599,7 +687,7 @@ async function main() {
       const cleanUrl = profileUrl({ ...p, slug_publico: cleanSlug }).replace(SITE, '');
       if (dirtyUrl !== cleanUrl) slugRedirects.push({ from: dirtyUrl, to: cleanUrl });
     }
-    buildProfile(tpl, { ...p, slug_publico: cleanSlug });
+    buildProfile(tpl, { ...p, slug_publico: cleanSlug }, catByName, ciudadesConPagina);
     profileCount++;
   }
 
