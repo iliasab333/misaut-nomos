@@ -28,6 +28,16 @@
       "permanent": true
     },
     {
+      "source": "/blog/mejores-herramientas-gratuitas-autonomos-2025",
+      "destination": "/blog/mejores-apps-herramientas-autonomos-espana",
+      "statusCode": 301
+    },
+    {
+      "source": "/blog/novedades-laborales-autonomos-2025",
+      "destination": "/blog",
+      "statusCode": 301
+    },
+    {
       "source": "/mensajes",
       "destination": "/",
       "statusCode": 301
